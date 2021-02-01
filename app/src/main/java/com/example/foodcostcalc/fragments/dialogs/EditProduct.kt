@@ -1,5 +1,7 @@
 package com.example.foodcostcalc.fragments.dialogs
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -46,9 +48,10 @@ class EditProduct :DialogFragment(){
             val saveButton = view.findViewById<Button>(R.id.save_changes_button)
             val deleteButton = view.findViewById<Button>(R.id.delete_product_button)
 
-            /** OBSERVE DATA FROM VIEWMODEL */
-
-
+            /** OBSERVE DATA FROM VIEWMODEL
+             * Flag works as a safety, if flag is set to false that means that delete operation is going
+             * so this doesn't try to set EditText fields from product data that is about to get
+             * deleted*/
 
                     viewModel.getProducts().observe(this, Observer { product ->
                         if(viewModel.getFlag().value == false){this.dismiss()
@@ -59,8 +62,6 @@ class EditProduct :DialogFragment(){
                              tax.setText(product[adapterPosition].tax.toString())
                              waste.setText(product[adapterPosition].waste.toString())
                         }})
-
-
 
 
             /** BUTTON LOGIC*/
@@ -84,15 +85,10 @@ class EditProduct :DialogFragment(){
                 AreYouSure().show(childFragmentManager,TAG)
 
             }
-
-
-
                 }
 
 
-
-
-
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         initializeUi()
         return view
 

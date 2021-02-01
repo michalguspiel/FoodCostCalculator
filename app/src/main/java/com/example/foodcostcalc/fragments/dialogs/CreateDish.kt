@@ -1,6 +1,8 @@
 package com.example.foodcostcalc.fragments.dialogs
 
 import android.annotation.SuppressLint
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -22,17 +24,18 @@ class CreateDish : DialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        inflater.inflate(R.layout.fragment_create_dish, container, false)
-        val view: View = inflater!!.inflate(R.layout.fragment_create_dish,container,false)
+        val view: View = inflater.inflate(R.layout.fragment_create_dish,container,false)
         @SuppressLint("WrongConstant")
         fun initializeUi() {
             val factory = InjectorUtils.provideAddViewModelFactory()
             val viewModel = ViewModelProviders.of(this, factory)
                 .get(AddViewModel::class.java)
 
-            /** BUTTON LOGIC*/
+            /** binders*/
             val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
             val dishName = view.findViewById<TextView>(R.id.new_dish_edittext)
+
+            /** BUTTON LOGIC*/
             addDishBtn.setOnClickListener{
                 if(dishName.text.isNotEmpty()) {
                     val dish = Dish(dishName.text.toString())
@@ -43,7 +46,8 @@ class CreateDish : DialogFragment() {
             }
 
         }
-    initializeUi()
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        initializeUi()
     return view
 
 

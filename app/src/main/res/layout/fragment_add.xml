@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/add_layout"
+    android:background="@drawable/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -79,13 +79,17 @@
 
         <Spinner
             android:id="@+id/dishSpinner"
-            android:layout_width="120dp"
+            android:background="@drawable/button_gradient"
+            android:layout_width="115dp"
+            android:layout_margin="4dp"
             android:layout_height="match_parent"
             android:spinnerMode="dialog"/>
 
         <Spinner
             android:id="@+id/mySpinner"
-            android:layout_width="130dp"
+            android:layout_margin="4dp"
+            android:layout_width="125dp"
+            android:background="@drawable/button_gradient"
             android:layout_height="match_parent"
             android:spinnerMode="dialog" />
 
@@ -106,12 +110,6 @@
 
     </LinearLayout>
 
-    <TextView
-        android:id="@+id/textViewTest"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="this is test!"
-        android:textSize="30dp"
-        android:gravity="center_horizontal"/>
+
 
 </LinearLayout>

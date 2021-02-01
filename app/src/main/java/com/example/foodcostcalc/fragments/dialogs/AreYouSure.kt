@@ -1,27 +1,23 @@
 package com.example.foodcostcalc.fragments.dialogs
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.renderscript.Allocation
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
 import com.example.foodcostcalc.InjectorUtils
-import com.example.foodcostcalc.MainActivity
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.fragments.AddViewModel
 import com.example.foodcostcalc.fragments.AddViewModelFactory
 
+@Suppress("NAME_SHADOWING")
 class AreYouSure : DialogFragment(){
 
-
-    override fun onStop() {
-        super.onStop()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,15 +29,18 @@ class AreYouSure : DialogFragment(){
             val factory: AddViewModelFactory = InjectorUtils.provideAddViewModelFactory()
             val viewModel: AddViewModel = ViewModelProviders.of(this,factory).get(AddViewModel::class.java)
 
-       /** Binders*/
+             /** Binders*/
             val confirmBtn = view.findViewById<Button>(R.id.button_yes)
             val cancelBtn = view.findViewById<Button>(R.id.button_cancel)
 
+            /**positions to delete
+             * one position was enough untill implementation
+             * of deleteProductFromDish where function needs position of dish
+             * and position of product to delete from it*/
+            var pos:Int? = null // first position
+            var secondPos: Int? = null //  second position
 
-         /**position of product to delete */
-            var pos:Int? = null
-            var secondPos: Int? = null
-        /**Observe data */
+            /**Observe data to set positions to provide parameters for delete methods */
           viewModel.getPosition().observe(this, Observer { position ->
               pos = position
           })
@@ -49,9 +48,7 @@ class AreYouSure : DialogFragment(){
                 secondPos = position
             })
 
-        /**Button function */
-
-
+        /**Button  logic tag informs this dialog from where it was open so it knows what action to proceed */
             confirmBtn.setOnClickListener{
                 viewModel.setFlag(false)
                  when(this.tag) {
@@ -75,6 +72,7 @@ class AreYouSure : DialogFragment(){
 
 
         }
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         initilizeUi()
         return view
     }

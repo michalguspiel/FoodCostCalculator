@@ -30,4 +30,7 @@
     <string name="product_price">price:</string>
     <string name="product_tax">tax:</string>
     <string name="waste_percent_product">waste percent:</string>
+    <string name="name_of_new_dish">Name of new Dish</string>
+    <string name="add">Add</string>
+    <string name="editbutton">EditButton</string>
 </resources>

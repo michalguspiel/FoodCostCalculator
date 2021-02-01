@@ -6,7 +6,7 @@
     android:layout_gravity="center"
     android:id="@+id/fragment_edit_product"
     style="@style/Theme.AppCompat.DayNight.Dialog"
-
+    android:background="@drawable/background_for_dialogs"
     android:orientation="vertical">
 
     <LinearLayout

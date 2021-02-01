@@ -5,17 +5,20 @@
     android:id="@+id/fragment_create_dish"
     style="@style/Theme.AppCompat.DayNight.Dialog"
     android:layout_gravity="center"
+    android:background="@drawable/background_for_dialogs"
     >
     <EditText
         android:id="@+id/new_dish_edittext"
         android:inputType="textEmailAddress"
         android:layout_width="match_parent"
+        android:textColor="@color/white"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
-        android:hint="Name of new Dish" />
+        android:hint="@string/name_of_new_dish"
+        android:autofillHints="" />
 
     <Button
         android:id="@+id/add_button_dialog"
@@ -25,6 +28,6 @@
         android:padding="8dp"
         android:layout_margin="4dp"
         android:textColor="@color/white"
-        android:text="Add" />
+        android:text="@string/add" />
 
 </LinearLayout>

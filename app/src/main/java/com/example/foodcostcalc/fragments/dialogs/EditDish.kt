@@ -1,5 +1,7 @@
 package com.example.foodcostcalc.fragments.dialogs
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -16,20 +18,17 @@ import com.example.foodcostcalc.adapter.EditDishAdapter
 import com.example.foodcostcalc.fragments.AddViewModel
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product
-import kotlin.properties.Delegates
 
 class EditDish : DialogFragment(){
 
     lateinit var dish:Dish
-    //var position by Delegates.notNull<Int>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        inflater.inflate(R.layout.fragment_edit_dish, container, false)
-        val view: View = inflater!!.inflate(R.layout.fragment_edit_dish,container,false)
+        val view: View = inflater.inflate(R.layout.fragment_edit_dish,container,false)
 
         fun initializeUi() {
             val factory = InjectorUtils.provideAddViewModelFactory()
@@ -49,25 +48,23 @@ class EditDish : DialogFragment(){
             val actualRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
             val recyclerAdapter = EditDishAdapter(viewModel,childFragmentManager)
             actualRecyclerView.adapter = recyclerAdapter
+            val saveBtn = view.findViewById<Button>(R.id.save_dish_changes_button)
+            val deleteBtn = view.findViewById<Button>(R.id.delete_dish_button)
+
+            /** Observe data from viewmodel */
             viewModel.getDishes().observe(this, Observer { thisDish ->
                 if(viewModel.getFlag().value == false){this.dismiss()
                     viewModel.setFlag(true)}
                 else if(viewModel.getFlag().value == true) {
                     dish = thisDish[position!!]
-                    var testData = mutableListOf<Pair<Product, Double>>()
+                    val testData = mutableListOf<Pair<Product, Double>>()
                     name.text = thisDish[position!!].name
                     testData.addAll(thisDish[position!!].getPairs())
                     recyclerAdapter.switchLists(testData)
                 }
                 })
 
-
-
-
             /** BUTTON LOGIC*/
-
-            val saveBtn = view.findViewById<Button>(R.id.save_dish_changes_button)
-            val deleteBtn = view.findViewById<Button>(R.id.delete_dish_button)
 
             saveBtn.setOnClickListener{
                 recyclerAdapter.save(dish)
@@ -77,11 +74,11 @@ class EditDish : DialogFragment(){
             deleteBtn.setOnClickListener{
                 AreYouSure().show(childFragmentManager,TAG)
                 viewModel.setPosition(position!!)
-               // viewModel.setFlag(false)
-               // viewModel.deleteDish(dish)
+
             }
 
         }
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         initializeUi()
         return view
 
