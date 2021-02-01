@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/add_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/product_name"
+            android:layout_width="200dp"
+            android:layout_height="match_parent"
+            android:autofillHints="@string/name"
+            android:hint="@string/name"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/product_price"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:autofillHints="@string/price"
+            android:hint="@string/price"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/product_tax"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:autofillHints="tax%"
+            android:hint="@string/tax"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/product_waste"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:autofillHints="waste percent"
+            android:hint="@string/waste"
+            android:inputType="number" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/addProduct"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_gradient"
+        android:padding="8dp"
+        android:textColor="@color/white"
+        android:layout_margin="8dp"
+        android:text="@string/add_stuff" />
+
+    <Button
+        android:id="@+id/new_dish_button"
+        android:layout_width="match_parent"
+        android:layout_margin="8dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_gradient"
+        android:padding="8dp"
+        android:textColor="@color/white"
+        android:text="@string/new_dish" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/compose" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/dishSpinner"
+            android:layout_width="120dp"
+            android:layout_height="match_parent"
+            android:spinnerMode="dialog"/>
+
+        <Spinner
+            android:id="@+id/mySpinner"
+            android:layout_width="130dp"
+            android:layout_height="match_parent"
+            android:spinnerMode="dialog" />
+
+        <EditText
+            android:id="@+id/product_weight"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:hint="@string/weight"
+            android:inputType="number"
+            android:autofillHints="" />
+
+        <ImageButton
+            android:id="@+id/add_product_to_dish"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/ic_input_add" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/textViewTest"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="this is test!"
+        android:textSize="30dp"
+        android:gravity="center_horizontal"/>
+
+</LinearLayout>
