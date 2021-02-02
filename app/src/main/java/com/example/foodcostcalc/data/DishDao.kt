@@ -17,7 +17,9 @@ interface DishDao {
     @Delete
     suspend fun deleteDish(dish: Dish)
 
-
+    @Transaction
+    @Query("SELECT * FROM dishes")
+    fun getDishesWithProductsIncluded(): LiveData<List<DishWithProductsIncluded>>
 
     /**
     fun addProductToDish(dish: Dish, product: Product, weight: Double){

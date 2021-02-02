@@ -18,6 +18,8 @@ class DishRepository(private val dishDao: DishDao) {
         dishDao.deleteDish(dish)
     }
 
+    fun getDishesWithProductsIncluded() = dishDao.getDishesWithProductsIncluded()
+
     companion object {
         // Singleton instantiation you already know and love
         @Volatile

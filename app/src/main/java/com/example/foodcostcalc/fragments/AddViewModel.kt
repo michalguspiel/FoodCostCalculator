@@ -1,43 +1,91 @@
 package com.example.foodcostcalc.fragments
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.viewModelScope
+import com.example.foodcostcalc.data.*
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product
-import com.example.foodcostcalc.data.Repository
-import kotlin.properties.Delegates
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
-class AddViewModel(private val repository: Repository)
-    : ViewModel() {
+class AddViewModel(application: Application)
+    : AndroidViewModel(application) {
 
-    fun getProducts()                 = repository.getProduct()
+     val readAllProductData: LiveData<List<Product>>
+     val readAllDishData : LiveData<List<Dish>>
+    private val productRepository: ProductRepository
+    private val dishRepository : DishRepository
+    private val basicRepository : BasicRepository
+    init {
+        val productDao = AppRoomDataBase.getDatabase(application).productDao()
+        val dishDao = AppRoomDataBase.getDatabase(application).dishDao()
+        val basicDao = BasicDataBase.getInstance().basicDao
+        productRepository = ProductRepository(productDao)
+        dishRepository = DishRepository(dishDao)
+        basicRepository = BasicRepository(basicDao)
+        readAllProductData = productRepository.readAllData
+        readAllDishData = dishRepository.readAllData
+    }
 
-    fun addProducts(product: Product) = repository.addProduct(product)
+    fun getProducts()                 = productRepository.getProduct()
 
-    fun getDishes()                   = repository.getDishes()
+    fun getDishes()                   = dishRepository.getDishes()
 
-    fun addDishes(dish: Dish)         = repository.addDish(dish)
 
-    fun addProductToDish(dish: Dish,product: Product, weight: Double) = repository.addProductToDish(dish,product,weight)
+    fun addProducts(product: Product) {
+   viewModelScope.launch(Dispatchers.IO){
+       productRepository.addProduct(product)
+   }
+    }
+    fun addDishes(dish: Dish) {
+        viewModelScope.launch(Dispatchers.IO){
+            dishRepository.addDish(dish)
+        }
+    }
 
-    fun editProduct(newProduct: Product, oldProduct: Product) = repository.editProduct(newProduct,oldProduct)
+    fun deleteDish(dish: Dish){
+        viewModelScope.launch(Dispatchers.IO){
+            dishRepository.deleteDish(dish)
+        }
+    }
 
-    fun deleteProduct(product: Product) = repository.deleteProduct(product)
+    fun editProduct(newProduct: Product) {
+        viewModelScope.launch(Dispatchers.IO){
+            productRepository.editProduct(newProduct)
+        }
+    }
+    fun deleteProduct(product: Product) {
+        viewModelScope.launch(Dispatchers.IO) {
+            productRepository.deleteProduct(product)
+        }
+    }
 
-    fun setPosition(pos: Int) = repository.setPosition(pos)
+    fun addProductToDish(product: ProductIncluded){
+        viewModelScope.launch(Dispatchers.IO){
+            productRepository.addProductToDish(product)
+        }
+    }
 
-    fun getPosition() = repository.getPosition()
+    fun getDishesWithProductsIncluded() = dishRepository.getDishesWithProductsIncluded()
 
-    fun setSecondPosition(pos: Int) = repository.setSecondPosition(pos)
 
-    fun getSecondPosition() = repository.getSecondPosition()
+    fun setPosition(pos: Int){
+        basicRepository.setPosition(pos)
+    }
 
-    fun setFlag(boolean: Boolean) = repository.setFlag(boolean)
+    fun getPosition() = basicRepository.getPosition()
 
-    fun getFlag() = repository.getFlag()
+    fun setSecondPosition(pos: Int){
+       basicRepository.setSecondPosition(pos)
+    }
 
-    fun editDish(dish:Dish ,listOfProducts: MutableList<Pair<Product, Double>>) = repository.editDish(dish,listOfProducts)
+    fun getSecondPosition() = basicRepository.getSecondPosition()
 
-    fun deleteDish(dish: Dish) = repository.deleteDish(dish)
+    fun setFlag(boolean: Boolean) {
+        basicRepository.setFlag(boolean)
+    }
 
-    fun deleteProductFromDish(dish:Dish ,product: Product) = repository.deleteProductFromDish(dish, product)
+    fun getFlag() = basicRepository.getFlag()
 }

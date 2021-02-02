@@ -1,6 +1,7 @@
 package com.example.foodcostcalc.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -8,10 +9,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.*
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
-import com.example.foodcostcalc.InjectorUtils
 import com.example.foodcostcalc.R
+import com.example.foodcostcalc.data.ProductIncluded
 import com.example.foodcostcalc.fragments.dialogs.CreateDish
+import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product
 
 
@@ -33,10 +36,12 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             1 -> {productPosition = position
-                showToast(message ="product list")
+                showToast(message ="product list"
+                )
             }
             else -> {dishPosition = position
                 showToast(message = "dish list")
+
             }
         }
     }
@@ -48,20 +53,12 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_add, container, false)
-
-
-
-
         /** initialize ui with viewmodel*/
+        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
-        fun initializeUi() {
 
-            // Get the AddViewModelFactory with all of it's dependencies constructed
-            val factory = InjectorUtils.provideAddViewModelFactory()
-            // Use ViewModelProviders class to create / get already created AddViewModel
-            // for this view (activity)
-            val viewModel = ViewModelProviders.of(requireActivity(), factory)
-                .get(AddViewModel::class.java)
+
+
 
             /** BINDERS FOR BUTTONS AND FIELDS */
             val name                 = view.findViewById<EditText>(R.id.product_name)
@@ -76,8 +73,11 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
 
 
             /** ADAPTERs FOR SPINNERs */
-            val productAdapter = ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_item,viewModel.getProducts().value!!.map { it.name })
-            productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            val productAdapter = viewModel.readAllProductData.value?.map { it.name }?.let {
+                ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_item,
+                    it
+                ) }
+            productAdapter?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
              val mySpinner = view.findViewById<Spinner>(R.id.mySpinner)
             with(mySpinner)
             {
@@ -88,10 +88,13 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                 gravity = Gravity.CENTER
             }
             mySpinner.id = NEW_SPINNER_ID
+            productAdapter?.notifyDataSetChanged()
 
-
-            val dishesAdapter = ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_item,viewModel.getDishes().value!!.map{it.name})
-            dishesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            val dishesAdapter = viewModel.readAllDishData.value?.map { it.name }?.let {
+                ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_item,
+                    it
+                ) }
+            dishesAdapter?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
             with(dishSpinner){
                 adapter = dishesAdapter
@@ -101,23 +104,25 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                 gravity = Gravity.CENTER
             }
             dishSpinner.id =  ANOTHER_SPINNER_ID
+            dishesAdapter?.notifyDataSetChanged()
 
 
             /**OBSERVING LIVEDATA FROM ADDVIEWMODEL
              *  WHICH OBSERVES LIVEDATA IN REPOSITORY
              *  WHICH OBSERVES LIVEDATA FROM DAO */
 
-            viewModel.getProducts().observe(this, Observer { products ->
-                productAdapter.clear()
+            viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
+                productAdapter?.clear()
                 products.forEach { product ->
-                    productAdapter.add(product.name)
+                    productAdapter?.add(product.name)
+                    productAdapter?.notifyDataSetChanged()
                 }
             })
-
-            viewModel.getDishes().observe(this, Observer { dishes ->
-                dishesAdapter.clear()
+            viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { dishes ->
+                dishesAdapter?.clear()
                 dishes.forEach{dish ->
-                    dishesAdapter.add(dish.name)
+                    dishesAdapter?.add(dish.name)
+                    dishesAdapter?.notifyDataSetChanged()
                 }
 
             })
@@ -135,7 +140,7 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                     tax.text.isNullOrEmpty()||
                     waste.text.isNullOrEmpty()){showToast(message = "Fill all data!")}
                 else {
-                    val product = Product(
+                    val product = Product(0,
                         name.text.toString(),
                         price.text.toString().toDouble(),
                         tax.text.toString().toDouble(),
@@ -152,20 +157,20 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
             addProductToDishBtn.setOnClickListener {
                 if (weightOfAddedProduct.text.isNullOrEmpty()) { showToast(message = "You can't add product without weight.")
                 } else {
-                    val pickedDish = viewModel.getDishes().value!![this.dishPosition!!]
-                    val pickedProduct = viewModel.getProducts().value!![this.productPosition!!]
-                    viewModel.addProductToDish(
-                        pickedDish,
-                        pickedProduct,
-                            (weightOfAddedProduct.text.toString().toDouble() / 1000) // implementation as input in grams
-                    )
+                    Log.i("test",dishPosition.toString())
+                    Log.i("test",productPosition.toString())
+                    val chosenDish      = viewModel.readAllDishData.value?.get(dishPosition!!)
+                    val chosenProduct   = viewModel.readAllProductData.value?.get(productPosition!!)
+                    val weight          = weightOfAddedProduct.text.toString().toDouble()
+                    viewModel.addProductToDish(ProductIncluded(0, chosenDish!!.dishId, chosenProduct!!.productId,weight))
+                    }
                     weightOfAddedProduct.text.clear()
                 }
-            }
 
-        }
 
-        initializeUi()
+
+
+
         return view
     }
     companion object {

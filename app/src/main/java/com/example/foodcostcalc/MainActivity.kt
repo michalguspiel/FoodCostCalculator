@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import com.example.foodcostcalc.fragments.*
 import com.example.foodcostcalc.model.Product
@@ -23,15 +24,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        initializeUi()
-    }
 
-    fun initializeUi() {
-        val factory = InjectorUtils.provideAddViewModelFactory()
-        val viewModel = ViewModelProviders.of(this, factory)
-            .get(AddViewModel::class.java)
 
-        /** Open Fragment */
+
+
+    /** initialize ui with viewmodel*/
+    val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+
+
+    /** Open Fragment */
         fun openFragment(fragment: Fragment) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.container, fragment)

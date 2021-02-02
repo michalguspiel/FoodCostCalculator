@@ -53,18 +53,17 @@ class EditDishAdapter(val viewModel: AddViewModel, val fragmentManager: Fragment
         return listOfPairs.size
     }
 
-
-
-
+    /** TODO
     fun save(dish: Dish){
     viewModel.editDish(dish,cloneOfList)
         notifyDataSetChanged()
 
     }
+    */
 
     override fun onBindViewHolder(holder: EditDishViewHolder, position: Int) {
         holder.nameTextView.text = listOfPairs[position].first.name // name of product not changeable
-        holder.unitTextView.text = listOfPairs[position].first.unit // unit, changeable in future
+        holder.unitTextView.text = "grams" // unit, changeable in future
         holder.editTextView.setText(listOfPairs[position].second.toString()) // To set edittext with current data
 
         /**Holder for each delete product button */
