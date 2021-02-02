@@ -10,9 +10,9 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
-import com.example.foodcostcalc.InjectorUtils
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.adapter.EditDishAdapter
 import com.example.foodcostcalc.fragments.AddViewModel
@@ -30,10 +30,8 @@ class EditDish : DialogFragment(){
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_edit_dish,container,false)
 
-        fun initializeUi() {
-            val factory = InjectorUtils.provideAddViewModelFactory()
-            val viewModel = ViewModelProviders.of(this, factory)
-                .get(AddViewModel::class.java)
+        /** initialize ui with viewmodel*/
+        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
 
             val name = view.findViewById<TextView>(R.id.edit_dish_name)
@@ -59,7 +57,7 @@ class EditDish : DialogFragment(){
                     dish = thisDish[position!!]
                     val testData = mutableListOf<Pair<Product, Double>>()
                     name.text = thisDish[position!!].name
-                    testData.addAll(thisDish[position!!].getPairs())
+                  //TODO  testData.addAll(thisDish[position!!].getPairs())
                     recyclerAdapter.switchLists(testData)
                 }
                 })
@@ -67,7 +65,7 @@ class EditDish : DialogFragment(){
             /** BUTTON LOGIC*/
 
             saveBtn.setOnClickListener{
-                recyclerAdapter.save(dish)
+             //TODO   recyclerAdapter.save(dish)
                 this.dismiss()
             }
 
@@ -77,9 +75,9 @@ class EditDish : DialogFragment(){
 
             }
 
-        }
+
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        initializeUi()
+
         return view
 
 
