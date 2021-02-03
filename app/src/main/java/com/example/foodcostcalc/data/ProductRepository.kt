@@ -16,7 +16,9 @@ class ProductRepository(private val productDao: ProductDao) {
     suspend fun addProduct(product: Product) {
         productDao.addProduct(product)
     }
-    fun getProduct() = productDao.getProducts()
+    fun getProducts() = productDao.getProducts()
+
+    fun getProduct(id: Long) = productDao.getProduct(id)
 
     suspend fun editProduct(newProduct: Product) = productDao.editProduct(newProduct)
 

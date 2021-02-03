@@ -29,9 +29,12 @@ class AddViewModel(application: Application)
         readAllDishData = dishRepository.readAllData
     }
 
-    fun getProducts()                 = productRepository.getProduct()
+    fun getProducts()                 = productRepository.getProducts()
+
+    fun getProduct(id: Long)          = productRepository.getProduct(id)
 
     fun getDishes()                   = dishRepository.getDishes()
+
 
 
     fun addProducts(product: Product) {
@@ -68,7 +71,22 @@ class AddViewModel(application: Application)
         }
     }
 
+    fun editDish(dish: Dish){
+        viewModelScope.launch(Dispatchers.IO){
+            dishRepository.editDish(dish)
+        }
+    }
+
+    fun editProductsIncluded(productIncluded: ProductIncluded){
+        viewModelScope.launch(Dispatchers.IO) {
+            dishRepository.editProductsIncluded(productIncluded)
+        }
+
+    }
+
     fun getDishesWithProductsIncluded() = dishRepository.getDishesWithProductsIncluded()
+
+    fun getIngredientsFromDish(dishId: Long) = dishRepository.getIngredientsFromDish(dishId)
 
 
     fun setPosition(pos: Int){
