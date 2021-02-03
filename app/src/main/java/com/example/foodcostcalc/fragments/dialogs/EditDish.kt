@@ -15,6 +15,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.adapter.EditDishAdapter
+import com.example.foodcostcalc.data.DishWithProductsIncluded
+import com.example.foodcostcalc.data.ProductIncluded
 import com.example.foodcostcalc.fragments.AddViewModel
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product
@@ -50,22 +52,25 @@ class EditDish : DialogFragment(){
             val deleteBtn = view.findViewById<Button>(R.id.delete_dish_button)
 
             /** Observe data from viewmodel */
-            viewModel.getDishes().observe(this, Observer { thisDish ->
+            viewModel.getDishesWithProductsIncluded().observe(this, Observer { thisDish ->
                 if(viewModel.getFlag().value == false){this.dismiss()
                     viewModel.setFlag(true)}
                 else if(viewModel.getFlag().value == true) {
-                    dish = thisDish[position!!]
-                    val testData = mutableListOf<Pair<Product, Double>>()
-                    name.text = thisDish[position!!].name
-                  //TODO  testData.addAll(thisDish[position!!].getPairs())
-                    recyclerAdapter.switchLists(testData)
+                    dish = thisDish[position!!].dish
+                    name.text = thisDish[position!!].dish.name
+                    viewModel.getIngredientsFromDish(dish.dishId).observe(this, Observer { eachProduct ->
+                        val testData = mutableListOf<ProductIncluded>()
+                        testData.addAll(eachProduct)
+                        recyclerAdapter.switchLists(testData)
+                    })
+
                 }
                 })
 
             /** BUTTON LOGIC*/
 
             saveBtn.setOnClickListener{
-             //TODO   recyclerAdapter.save(dish)
+                recyclerAdapter.save(Dish(dish.dishId,name.text.toString()))
                 this.dismiss()
             }
 

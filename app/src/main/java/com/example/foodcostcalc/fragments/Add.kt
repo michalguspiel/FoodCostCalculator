@@ -157,12 +157,10 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
             addProductToDishBtn.setOnClickListener {
                 if (weightOfAddedProduct.text.isNullOrEmpty()) { showToast(message = "You can't add product without weight.")
                 } else {
-                    Log.i("test",dishPosition.toString())
-                    Log.i("test",productPosition.toString())
                     val chosenDish      = viewModel.readAllDishData.value?.get(dishPosition!!)
                     val chosenProduct   = viewModel.readAllProductData.value?.get(productPosition!!)
-                    val weight          = weightOfAddedProduct.text.toString().toDouble()
-                    viewModel.addProductToDish(ProductIncluded(0, chosenDish!!.dishId, chosenProduct!!.productId,weight))
+                    val weight          = weightOfAddedProduct.text.toString().toDouble() / 1000
+                    viewModel.addProductToDish(ProductIncluded(0,chosenProduct!!, chosenDish!!.dishId, chosenProduct!!.productId,weight))
                     }
                     weightOfAddedProduct.text.clear()
                 }

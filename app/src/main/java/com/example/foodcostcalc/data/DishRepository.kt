@@ -18,7 +18,19 @@ class DishRepository(private val dishDao: DishDao) {
         dishDao.deleteDish(dish)
     }
 
+    suspend fun editDish(dish: Dish){
+        dishDao.editDish(dish)
+    }
+
+    suspend fun editProductsIncluded(productIncluded: ProductIncluded){
+        dishDao.editProductsIncluded(productIncluded)
+    }
+
     fun getDishesWithProductsIncluded() = dishDao.getDishesWithProductsIncluded()
+
+
+    fun getIngredientsFromDish(dishId: Long) = dishDao.getIngredientsFromDish(dishId)
+
 
     companion object {
         // Singleton instantiation you already know and love

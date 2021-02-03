@@ -24,14 +24,12 @@ class Dishes : Fragment(){
         inflater.inflate(R.layout.fragment_dishes,container,false)
     val view: View = inflater.inflate(R.layout.fragment_dishes, container, false)
 
-        /** initialize ui with viewmodel*/
-        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+             /** initialize ui with viewmodel*/
+             val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
             /**Implementing adapter for recycler view. */
             val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_dishes)
             recyclerView.setHasFixedSize(true)
-
-
             viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer { dish ->
                 var data = mutableListOf<DishWithProductsIncluded>()
                 dish.forEach{data.add(it)}

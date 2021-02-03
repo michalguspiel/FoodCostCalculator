@@ -13,7 +13,7 @@ interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addProduct(product: Product)
 
-    @Query("SELECT * from products ORDER BY name ASC")
+    @Query("SELECT * from products ORDER BY product_name ASC")
     fun getProducts(): LiveData<List<Product>>
 
     @Update
@@ -24,6 +24,9 @@ interface ProductDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addProductToDish(productIncluded: ProductIncluded)
+
+    @Query("SELECT * FROM products WHERE productId = :id")
+    fun getProduct(id: Long): LiveData<Product>
 
 
 
