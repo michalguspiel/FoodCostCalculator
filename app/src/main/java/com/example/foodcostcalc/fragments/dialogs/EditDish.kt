@@ -1,4 +1,4 @@
-package com.example.foodcostcalc.fragments.dialogs
+ package com.example.foodcostcalc.fragments.dialogs
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -11,17 +11,14 @@ import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.adapter.EditDishAdapter
-import com.example.foodcostcalc.data.DishWithProductsIncluded
-import com.example.foodcostcalc.data.ProductIncluded
-import com.example.foodcostcalc.fragments.AddViewModel
+import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.Product
 
-class EditDish : DialogFragment(){
+ class EditDish : DialogFragment(){
 
     lateinit var dish:Dish
 

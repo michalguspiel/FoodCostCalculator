@@ -3,7 +3,8 @@ package com.example.foodcostcalc.data
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.Product
+import com.example.foodcostcalc.model.DishWithProductsIncluded
+import com.example.foodcostcalc.model.ProductIncluded
 
 @Dao
 interface DishDao {
@@ -31,26 +32,8 @@ interface DishDao {
     @Update
     suspend fun editProductsIncluded(productIncluded: ProductIncluded)
 
-    /**
-    fun addProductToDish(dish: Dish, product: Product, weight: Double){
-        dish.productsIncluded.add(product)
-        dish.weightList.add(weight)
-        dishes.value = dishList
-    }
-
-    fun editDish(dish: Dish,listOfProducts: MutableList<Pair<Product, Double>>) {
-        dish.productsIncluded.clear()
-        dish.weightList.clear()
-        dish.productsIncluded.addAll(listOfProducts.map { it.first })
-        dish.weightList.addAll(listOfProducts.map{it.second})
-        dishes.value = dishList
-
-    }
+    @Delete
+    suspend fun deleteProductIncluded(productIncluded: ProductIncluded)
 
 
-    fun deleteProductFromDish(dish:Dish ,product: Product){
-        dish.productsIncluded.remove(product)
-        dishes.value = dishList
-    }
-*/
 }

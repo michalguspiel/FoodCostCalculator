@@ -1,9 +1,14 @@
 package com.example.foodcostcalc.data
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import com.example.foodcostcalc.model.ProductIncluded
 
 class BasicRepository(private val basicDao: BasicDao) {
+
+
+    fun getProductIncluded() = basicDao.getProductIncluded()
+    fun setProductIncluded(product: ProductIncluded){
+        basicDao.setProductIncluded(product)
+    }
 
     fun setPosition(pos: Int){
         basicDao.setPosition(pos)

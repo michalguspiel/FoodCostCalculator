@@ -1,7 +1,6 @@
 package com.example.foodcostcalc.adapter
 
 
-import android.media.Image
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -13,22 +12,20 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
-import com.example.foodcostcalc.data.DishWithProductsIncluded
-import com.example.foodcostcalc.data.ProductIncluded
-import com.example.foodcostcalc.fragments.AddViewModel
+import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.fragments.dialogs.AreYouSure
 import com.example.foodcostcalc.fragments.dialogs.EditDish
 import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.Product
 
-class EditDishAdapter(val viewModel: AddViewModel, val fragmentManager: FragmentManager)
+class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentManager: FragmentManager)
     : RecyclerView.Adapter<EditDishAdapter.EditDishViewHolder>() {
 
-    var listOfPairs: MutableList<ProductIncluded> = mutableListOf<ProductIncluded>()
+    var list: MutableList<ProductIncluded> = mutableListOf()
     /**List of same pairs as a data which populates an adapter
      * created in order to change this list with edittext
      * and afterwards override original list with this one(with save btn)*/
-    var cloneOfList: MutableList<ProductIncluded> = mutableListOf<ProductIncluded>()
+    var cloneOfList: MutableList<ProductIncluded> = mutableListOf()
 
 
     class EditDishViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -45,14 +42,14 @@ class EditDishAdapter(val viewModel: AddViewModel, val fragmentManager: Fragment
     }
 
 
-    fun switchLists(list: MutableList<ProductIncluded>){
-        this.listOfPairs = list
-        cloneOfList = listOfPairs
+    fun switchLists(passedList: MutableList<ProductIncluded>){
+        this.list = passedList
+        cloneOfList = passedList
     notifyDataSetChanged()
     }
 
     override fun getItemCount():Int  {
-        return listOfPairs.size
+        return list.size
     }
 
 
@@ -64,14 +61,15 @@ class EditDishAdapter(val viewModel: AddViewModel, val fragmentManager: Fragment
 
 
     override fun onBindViewHolder(holder: EditDishViewHolder, position: Int) {
-        holder.nameTextView.text = listOfPairs[position].productIncluded.name // name of product not changeable
+        holder.nameTextView.text = list[position].productIncluded.name // name of product not changeable
         holder.unitTextView.text = "grams" // unit, changeable in future
-        holder.editTextView.setText(listOfPairs[position].weight.toString()) // To set edittext with current data
+        holder.editTextView.setText(list[position].weight.toString()) // To set edittext with current data
 
         /**Holder for each delete product button */
         holder.deleteProductBtn.setOnClickListener{
             EditDish.position?.let { it1 -> viewModel.setPosition(it1) } // First Position as dish position in list
-            viewModel.setSecondPosition(position)                        // Second position as product position in productsincluded list
+            viewModel.setSecondPosition(position)  // Second position as product position in productsincluded list
+            viewModel.setProductIncluded(list[position])
             AreYouSure().show(this.fragmentManager,"EditDishAdapter")
         notifyDataSetChanged()
         }
@@ -84,21 +82,15 @@ class EditDishAdapter(val viewModel: AddViewModel, val fragmentManager: Fragment
             override fun beforeTextChanged(s: CharSequence, start: Int,
                                            count: Int, after: Int) {
             }
-
             override fun onTextChanged(s: CharSequence, start: Int,
                                        before: Int, count: Int) {
-                if(s.isNotEmpty()) {
-                     cloneOfList[position].weight = s.toString().toDouble()
-                   // val cloned = cloneOfList[position].copy(second = s.toString().toDouble())
-                   // cloneOfList[position] = cloned
-                }
-                }
+                if(s.isNotEmpty()) { cloneOfList[position].weight = s.toString().toDouble() }
+            }
         }
                 ))
 
 
     }
-
     }
 
 

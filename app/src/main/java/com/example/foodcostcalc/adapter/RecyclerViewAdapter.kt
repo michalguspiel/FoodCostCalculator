@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.annotation.LayoutRes
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
@@ -17,10 +16,10 @@ import com.example.foodcostcalc.fragments.dialogs.EditProduct
 import java.util.ArrayList
 
 
-class RecyclerViewAdapter<T>(val tag: String?, private val list: ArrayList<T>, val fragmentManager: FragmentManager)
+class RecyclerViewAdapter<T>(val tag: String?, private val list: ArrayList<T>, private val fragmentManager: FragmentManager)
     : RecyclerView.Adapter<RecyclerViewAdapter.RecyclerViewHolder>() {
 
-    class RecyclerViewHolder(private val view: View) :RecyclerView.ViewHolder(view){
+    class RecyclerViewHolder(view: View) :RecyclerView.ViewHolder(view){
         val textView: TextView = view.findViewById(R.id.product_title)
         val editButton: ImageButton = view.findViewById(R.id.edit_button)
     }
