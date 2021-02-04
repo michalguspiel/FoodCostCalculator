@@ -3,7 +3,6 @@ package com.example.foodcostcalc.fragments.dialogs
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,11 +10,8 @@ import android.widget.Button
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.example.foodcostcalc.R
-import com.example.foodcostcalc.fragments.AddViewModel
-import com.example.foodcostcalc.model.Product
-import kotlin.properties.Delegates
+import com.example.foodcostcalc.viewmodel.AddViewModel
 
 @Suppress("NAME_SHADOWING")
 class AreYouSure : DialogFragment(){
@@ -56,12 +52,9 @@ private lateinit var viewModel: AddViewModel
                     when(this.tag) {
                         EditProduct.TAG -> viewModel.getProducts().observe(viewLifecycleOwner, Observer { viewModel.deleteProduct(it[pos!!]) })
                             EditDish.TAG -> viewModel.getDishes().observe(viewLifecycleOwner, Observer { viewModel.deleteDish(it[pos!!]) })
-                        //"EditDishAdapter" -> {
-                        //  viewModel.getDishes().value?.get(pos!!)?.let { it1 ->
-                        //        viewModel.deleteProductFromDish(it1,
-                        //              it1.productsIncluded[secondPos!!])
-                        //}
-                        //}
+                        "EditDishAdapter" -> viewModel.getDishesWithProductsIncluded()
+                                .observe(viewLifecycleOwner, Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!)})
+                              //  .observe(viewLifecycleOwner, Observer { viewModel.deleteProductIncluded(it[pos!!].productIncluded[secondPos!!]) })
                         else -> this.dismiss()
                     }
 

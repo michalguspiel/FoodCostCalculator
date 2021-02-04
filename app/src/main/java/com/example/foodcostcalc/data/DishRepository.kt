@@ -2,7 +2,7 @@ package com.example.foodcostcalc.data
 
 import androidx.lifecycle.LiveData
 import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.Product
+import com.example.foodcostcalc.model.ProductIncluded
 
 class DishRepository(private val dishDao: DishDao) {
 
@@ -24,6 +24,10 @@ class DishRepository(private val dishDao: DishDao) {
 
     suspend fun editProductsIncluded(productIncluded: ProductIncluded){
         dishDao.editProductsIncluded(productIncluded)
+    }
+
+    suspend fun deleteProductIncluded(productIncluded: ProductIncluded){
+        dishDao.deleteProductIncluded(productIncluded)
     }
 
     fun getDishesWithProductsIncluded() = dishDao.getDishesWithProductsIncluded()

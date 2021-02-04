@@ -1,7 +1,6 @@
 package com.example.foodcostcalc.fragments
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,12 +9,11 @@ import android.widget.*
 import androidx.fragment.app.*
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.example.foodcostcalc.R
-import com.example.foodcostcalc.data.ProductIncluded
+import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.fragments.dialogs.CreateDish
-import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product
+import com.example.foodcostcalc.viewmodel.AddViewModel
 
 
 class Add : Fragment(), AdapterView.OnItemSelectedListener {
@@ -36,16 +34,11 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             1 -> {productPosition = position
-                showToast(message ="product list"
-                )
             }
             else -> {dishPosition = position
-                showToast(message = "dish list")
-
             }
         }
     }
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -53,11 +46,7 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_add, container, false)
-        /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-
-
-
 
 
             /** BINDERS FOR BUTTONS AND FIELDS */
@@ -73,11 +62,10 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
 
 
             /** ADAPTERs FOR SPINNERs */
-            val productAdapter = viewModel.readAllProductData.value?.map { it.name }?.let {
-                ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_item,
-                    it
-                ) }
-            productAdapter?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            val productList = mutableListOf<String>()
+            viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { it.forEach{product -> productList.add(product.name) } })
+            val productAdapter = ArrayAdapter(requireActivity(),R.layout.spinner_layout,productList)
+        productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
              val mySpinner = view.findViewById<Spinner>(R.id.mySpinner)
             with(mySpinner)
             {
@@ -88,13 +76,12 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                 gravity = Gravity.CENTER
             }
             mySpinner.id = NEW_SPINNER_ID
-            productAdapter?.notifyDataSetChanged()
+            productAdapter.notifyDataSetChanged()
 
-            val dishesAdapter = viewModel.readAllDishData.value?.map { it.name }?.let {
-                ArrayAdapter(requireActivity(),android.R.layout.simple_spinner_item,
-                    it
-                ) }
-            dishesAdapter?.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+            val dishList = mutableListOf<String>()
+            viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { it.forEach{dish -> dishList.add(dish.name)} })
+            val dishesAdapter = ArrayAdapter(requireActivity(),R.layout.spinner_layout,dishList)
+        dishesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
             with(dishSpinner){
                 adapter = dishesAdapter
@@ -104,25 +91,25 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                 gravity = Gravity.CENTER
             }
             dishSpinner.id =  ANOTHER_SPINNER_ID
-            dishesAdapter?.notifyDataSetChanged()
+        dishesAdapter.notifyDataSetChanged()
 
 
             /**OBSERVING LIVEDATA FROM ADDVIEWMODEL
              *  WHICH OBSERVES LIVEDATA IN REPOSITORY
-             *  WHICH OBSERVES LIVEDATA FROM DAO */
+             *  WHICH OBSERVES LIVEDATA FROM DAO*/
 
             viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
-                productAdapter?.clear()
+                productAdapter.clear()
                 products.forEach { product ->
-                    productAdapter?.add(product.name)
-                    productAdapter?.notifyDataSetChanged()
+                    productAdapter.add(product.name)
+                    productAdapter.notifyDataSetChanged()
                 }
             })
             viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { dishes ->
-                dishesAdapter?.clear()
+                dishesAdapter.clear()
                 dishes.forEach{dish ->
-                    dishesAdapter?.add(dish.name)
-                    dishesAdapter?.notifyDataSetChanged()
+                    dishesAdapter.add(dish.name)
+                    dishesAdapter.notifyDataSetChanged()
                 }
 
             })
@@ -160,7 +147,7 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                     val chosenDish      = viewModel.readAllDishData.value?.get(dishPosition!!)
                     val chosenProduct   = viewModel.readAllProductData.value?.get(productPosition!!)
                     val weight          = weightOfAddedProduct.text.toString().toDouble() / 1000
-                    viewModel.addProductToDish(ProductIncluded(0,chosenProduct!!, chosenDish!!.dishId, chosenProduct!!.productId,weight))
+                    viewModel.addProductToDish(ProductIncluded(0, chosenProduct!!, chosenDish!!.dishId, chosenProduct.productId, weight))
                     }
                     weightOfAddedProduct.text.clear()
                 }

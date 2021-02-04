@@ -1,6 +1,5 @@
 package com.example.foodcostcalc.fragments.dialogs
 
-import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -12,9 +11,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.example.foodcostcalc.R
-import com.example.foodcostcalc.fragments.AddViewModel
+import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.model.Dish
 
 class CreateDish : DialogFragment() {

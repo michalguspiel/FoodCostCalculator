@@ -2,6 +2,7 @@ package com.example.foodcostcalc.data
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.foodcostcalc.model.ProductIncluded
 
 class BasicDao{
     /** Data access object to basic database  */
@@ -14,11 +15,24 @@ class BasicDao{
     private var mutableFlag: Boolean = true
     private val flag = MutableLiveData<Boolean>()
 
+    private var productIncluded: ProductIncluded? = null
+    private val productIncludedLive = MutableLiveData<ProductIncluded>()
+
+
     init {
         position.value = mutablePosition
         secondPosition.value = secondMutablePosition
         flag.value = mutableFlag
+        productIncludedLive.value = productIncluded
     }
+
+    fun setProductIncluded(product: ProductIncluded){
+        productIncluded = product
+        productIncludedLive.value = productIncluded
+    }
+
+    fun getProductIncluded() = productIncludedLive as LiveData<ProductIncluded>
+
 
     fun setPosition(pos: Int){
         mutablePosition = pos

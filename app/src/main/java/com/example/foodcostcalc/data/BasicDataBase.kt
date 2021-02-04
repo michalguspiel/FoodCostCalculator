@@ -1,7 +1,7 @@
 package com.example.foodcostcalc.data
 
 
-/** Basic database is temporary, everytime app closes everything from here disappears
+/** Basic database is temporary, every time app closes everything from here disappears
  * which is okay because in here we only store information like which product position to delete
  * or safe flag state*/
 class BasicDataBase private constructor() {

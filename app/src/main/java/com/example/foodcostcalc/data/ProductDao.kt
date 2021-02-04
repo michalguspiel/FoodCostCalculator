@@ -1,10 +1,9 @@
 package com.example.foodcostcalc.data
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.room.*
-import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product
+import com.example.foodcostcalc.model.ProductIncluded
 
 /** DATA ACCESS OBJECT */
 @Dao

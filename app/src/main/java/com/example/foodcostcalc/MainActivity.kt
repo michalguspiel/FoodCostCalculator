@@ -4,28 +4,23 @@ import android.os.Bundle
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import com.example.foodcostcalc.fragments.*
-import com.example.foodcostcalc.model.Product
+import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
 
-    lateinit var toolbar: ActionBar
-    val productsFragment = Products.newInstance()
-    val dishesFragment = Dishes.newInstance()
-    val addFragment = Add.newInstance()
+   // lateinit var toolbar: ActionBar
+    private val productsFragment = Products.newInstance()
+    private val dishesFragment = Dishes.newInstance()
+    private val addFragment = Add.newInstance()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-
 
 
     /** initialize ui with viewmodel*/
@@ -44,30 +39,27 @@ class MainActivity : AppCompatActivity() {
             BottomNavigationView.OnNavigationItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.navigation_products -> {
-                        toolbar.title = "Products"
+                    //    toolbar.title = "Products"
                         openFragment(productsFragment)
                         return@OnNavigationItemSelectedListener true
                     }
                     R.id.navigation_dishes -> {
-                        toolbar.title = "Dishes"
+                      //  toolbar.title = "Dishes"
                         openFragment(dishesFragment)
                         return@OnNavigationItemSelectedListener true
                     }
                     R.id.navigation_add -> {
-                        toolbar.title = "Add"
+                        //toolbar.title = "Add"
                         openFragment(addFragment)
                         return@OnNavigationItemSelectedListener true
                     }
                 }
                 false
             }
-
-
-        toolbar = supportActionBar!!
+        openFragment(addFragment)
+        //toolbar = supportActionBar!!
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigationView)
         bottomNavigation.setOnNavigationItemSelectedListener(menuNavigationClickListener)
-
-
 
 
     }

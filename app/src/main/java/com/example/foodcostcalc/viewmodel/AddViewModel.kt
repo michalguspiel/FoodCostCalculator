@@ -1,4 +1,4 @@
-package com.example.foodcostcalc.fragments
+package com.example.foodcostcalc.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.foodcostcalc.data.*
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product
+import com.example.foodcostcalc.model.ProductIncluded
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -81,8 +82,14 @@ class AddViewModel(application: Application)
         viewModelScope.launch(Dispatchers.IO) {
             dishRepository.editProductsIncluded(productIncluded)
         }
-
     }
+
+    fun deleteProductIncluded(productIncluded: ProductIncluded){
+        viewModelScope.launch(Dispatchers.IO) {
+            dishRepository.deleteProductIncluded(productIncluded)
+        }
+    }
+
 
     fun getDishesWithProductsIncluded() = dishRepository.getDishesWithProductsIncluded()
 
@@ -106,4 +113,10 @@ class AddViewModel(application: Application)
     }
 
     fun getFlag() = basicRepository.getFlag()
+
+    fun getProductIncluded() = basicRepository.getProductIncluded()
+    fun setProductIncluded(product: ProductIncluded){
+        basicRepository.setProductIncluded(product)
+    }
+
 }
