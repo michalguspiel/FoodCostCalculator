@@ -57,65 +57,7 @@
         android:layout_margin="8dp"
         android:text="@string/add_stuff" />
 
-    <Button
-        android:id="@+id/new_dish_button"
-        android:layout_width="match_parent"
-        android:layout_margin="8dp"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_gradient"
-        android:padding="8dp"
-        android:textColor="@color/white"
-        android:text="@string/new_dish" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:text="@string/compose" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-        <Spinner
-            android:id="@+id/dishSpinner"
-            android:layout_width="115dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:layout_gravity="center"
-            android:background="@drawable/button_gradient"
-            android:dropDownWidth="wrap_content"
-            android:spinnerMode="dialog" />
-
-        <Spinner
-            android:id="@+id/mySpinner"
-            android:layout_width="125dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
-            android:background="@drawable/button_gradient"
-            android:dropDownWidth="wrap_content"
-            android:spinnerMode="dialog" />
-
-        <EditText
-            android:id="@+id/product_weight"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:hint="@string/weight"
-            android:inputType="number"
-            android:autofillHints="" />
-
-        <ImageButton
-            android:id="@+id/add_product_to_dish"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            app:srcCompat="@android:drawable/ic_input_add" />
-
-    </LinearLayout>
 
     <TextView
         android:id="@+id/textView2"
