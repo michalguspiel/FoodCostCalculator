@@ -10,9 +10,5 @@
         android:icon="@drawable/ic_food_bank"
         android:title="Dishes"/>
 
-    <item
-        android:id="@+id/navigation_add"
-        android:icon="@drawable/ic_add_circle"
-        android:title="Add"/>
 
 </menu>
