@@ -27,11 +27,11 @@ data class DishWithProductsIncluded(
 ){
         override fun toString(): String {
                 val totalPrice: Double = productIncluded.map {(it.productIncluded.priceAfterWasteAndTax * it.weight)}.sum()
-                val formated = "%.2f".format(totalPrice).toDouble()
+               // val formated = "%.2f".format(totalPrice).toDouble()
                 return if(productIncluded.isEmpty()) "${dish.name} without any ingredients."
                 else " ${dish.name} includes: " +
                         productIncluded.map { it.productIncluded.name }.sortedBy { it }.joinToString { it } +
-                        " with total price of: $formated. "
+                        " with total price of: $totalPrice. "
         }
 }
 

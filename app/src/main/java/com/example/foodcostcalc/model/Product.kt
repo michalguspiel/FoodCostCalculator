@@ -17,8 +17,8 @@ data class Product(@PrimaryKey(autoGenerate = true) val productId: Long,
     @Ignore        val priceAfterWasteAndTax = pricePerUnit + pricePerUnit * (waste/100) + pricePerUnit * (tax/100)
 
     override fun toString():String{
-        val formatedBruttoPrice = "%.2f".format(priceAfterWasteAndTax).toDouble()
-        return "$name, price per unit netto:$pricePerUnit. Price per unit with foodcost: $formatedBruttoPrice"
+       // val formatedBruttoPrice = "%.2f".format(priceAfterWasteAndTax).toDouble()
+        return "$name, price per unit netto:$pricePerUnit. Price per unit with foodcost: $priceAfterWasteAndTax"
     }
 }
 
