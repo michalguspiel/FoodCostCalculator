@@ -18,7 +18,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_dish">create dish</string>
-    <string name ="cancel">cancel</string>
+    <string name ="cancel">Cancel</string>
     <string name ="done">done</string>
     <string name ="fire">fire</string>
     <string name="save">Save</string>
@@ -33,4 +33,8 @@
     <string name="name_of_new_dish">Name of new Dish</string>
     <string name="add">Add</string>
     <string name="editbutton">EditButton</string>
+    <string name="product_weight">Product weight</string>
+    <string name="product_waste">product waste</string>
+    <string name="food_cost_calculator">Food cost calculator</string>
+    <string name="calculate_your_foodcost">Calculate your foodcost</string>
 </resources>

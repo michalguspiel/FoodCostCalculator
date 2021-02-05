@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group>
+        <item
+            android:id="@+id/nav_add_product"
+            android:icon="@drawable/ic_add_circle"
+            android:title="Add product"/>
+        <item
+            android:id="@+id/nav_create_new_dish"
+            android:icon="@drawable/ic_add_circle"
+            android:title="Create a new dish"/>
+        <item
+            android:id="@+id/nav_add_product_to_dish"
+            android:icon="@drawable/ic_add_circle"
+            android:title="Add products to your dish"/>
+        <item
+            android:id="@+id/nav_update"
+            android:icon="@drawable/ic_add_circle"
+            android:title="Donate money to developer"/>
+        <item
+            android:id="@+id/nav_units"
+            android:icon="@drawable/ic_add_circle"
+            android:title="Personalize units"/>
+    </group>
+
+
+</menu>

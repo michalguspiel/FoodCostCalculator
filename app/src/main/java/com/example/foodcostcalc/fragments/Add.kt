@@ -58,7 +58,9 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
             val addButton            = view.findViewById<Button>(R.id.addProduct)
             val createDishButton     = view.findViewById<Button>(R.id.new_dish_button)
             val addProductToDishBtn  = view.findViewById<ImageButton>(R.id.add_product_to_dish)
-
+            val calculateWasteBtn    = view.findViewById<Button>(R.id.count_waste_percent_btn)
+            val calcWasteWeight      = view.findViewById<EditText>(R.id.waste_calc_product_waste)
+            val calcProductWeight    = view.findViewById<EditText>(R.id.waste_calc_product_weight)
 
 
             /** ADAPTERs FOR SPINNERs */
@@ -152,7 +154,20 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                     weightOfAddedProduct.text.clear()
                 }
 
+            calculateWasteBtn.setOnClickListener{
+                if(calcProductWeight.text.isNotEmpty() && calcWasteWeight.text.isNotEmpty()){
+                    val calcWeight = calcProductWeight.text.toString().toDouble()
+                    val calcWaste = calcWasteWeight.text.toString().toDouble()
+                    val result = (100 * calcWaste) / calcWeight
+                    waste.setText(result.toString())
 
+                    calcProductWeight.text.clear()
+                    calcWasteWeight.text.clear()
+
+
+                }
+
+            }
 
 
 
