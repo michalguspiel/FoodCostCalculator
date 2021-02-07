@@ -73,6 +73,9 @@ class Add : Fragment() {
             }
 
 
+            /** Calculates waste % from given product weight and waste weight,
+             * formattedResultCheck works as safety if device formats number to
+             * for example 21,21 */
             calculateWasteBtn.setOnClickListener{
                 if(calcProductWeight.text.isNotEmpty() && calcWasteWeight.text.isNotEmpty()){
                     val calcWeight = calcProductWeight.text.toString().toDouble()
@@ -80,15 +83,16 @@ class Add : Fragment() {
                     val result = (100 * calcWaste) / calcWeight
                     val df = DecimalFormat("#.##")
                     df.roundingMode = RoundingMode.CEILING
-                    val formatedResult = df.format(result)
-                    waste.setText(formatedResult)
-
+                    val formattedResult = df.format(result)
+                    var formattedResultCheck = ""
+                    for(eachChar in formattedResult){
+                        if(eachChar.equals(",")) formattedResultCheck += "."
+                        else formattedResultCheck += eachChar
+                    }
+                    waste.setText(formattedResultCheck)
                     calcProductWeight.text.clear()
                     calcWasteWeight.text.clear()
-
-
                 }
-
             }
 
 

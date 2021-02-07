@@ -9,7 +9,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.fragments.*
 import com.example.foodcostcalc.fragments.dialogs.AddProductToDish
@@ -32,10 +31,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        supportActionBar?.setCustomView(R.layout.custom_toolbar)
+        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
 
-    /** initialize ui with viewmodel*/
+
+        /** initialize ui with viewmodel*/
     val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-
 
     /** Open Fragment */
         fun openFragment(fragment: Fragment) {
