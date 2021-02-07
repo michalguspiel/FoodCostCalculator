@@ -1,8 +1,11 @@
 package com.example.foodcostcalc
 
+import android.app.Notification
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.ImageButton
 import android.widget.Toast
+import android.widget.Toolbar
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -25,18 +28,13 @@ class MainActivity : AppCompatActivity() {
     private val addFragment = Add.newInstance()
     private val createDishFragment = CreateDish.newInstance()
     lateinit var drawerLayout: DrawerLayout
+    lateinit var toolbar: ActionBar
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        supportActionBar?.setCustomView(R.layout.custom_toolbar)
-        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
-
-
-        /** initialize ui with viewmodel*/
-    val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
     /** Open Fragment */
         fun openFragment(fragment: Fragment) {
@@ -45,6 +43,14 @@ class MainActivity : AppCompatActivity() {
             transaction.addToBackStack(fragment.tag)
             transaction.commit()
         }
+
+        /** Toolbar  */
+        val menuBtn = findViewById<ImageButton>(R.id.side_menu_button)
+
+        menuBtn.setOnClickListener{
+            drawerLayout.open()
+        }
+
 
         /**Side drawer menu */
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -59,15 +65,16 @@ class MainActivity : AppCompatActivity() {
                 when (item.itemId){
                     R.id.nav_add_product -> {
                         openFragment(addFragment)
-                        Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()}
+                        }
                     R.id.nav_create_new_dish -> {
                         CreateDish().show(supportFragmentManager,CreateDish.TAG)
-                        Toast.makeText(this, "Opened", Toast.LENGTH_SHORT).show()
                         }
                     R.id.nav_add_product_to_dish -> {
                         AddProductToDish().show(supportFragmentManager,AddProductToDish.TAG)
-                        Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()}
-                    R.id.nav_units -> {Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()}
+                       }
+                    R.id.nav_units -> {
+                        Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()
+                    }
                 }
                 drawerLayout.closeDrawer(GravityCompat.START)
                 return@OnNavigationItemSelectedListener true
@@ -88,10 +95,11 @@ class MainActivity : AppCompatActivity() {
                 }
                 false
             }
+
+
         openFragment(productsFragment)
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigationView)
         bottomNavigation.setOnNavigationItemSelectedListener(menuNavigationClickListener)
-
         val sideNavigation: NavigationView = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
     }

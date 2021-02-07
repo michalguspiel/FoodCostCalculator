@@ -34,8 +34,8 @@ data class DishWithProductsIncluded(
                 val formated = df.format(totalPrice)
                 return if(productIncluded.isEmpty()) "${dish.name} without any ingredients."
                 else " ${dish.name} includes: " +
-                        productIncluded.map { it.productIncluded.name }.sortedBy { it }.joinToString { it } +
-                        " with total price of: $formated. "
+                        productIncluded.map { it.productIncluded.name }.sortedBy { it }.joinToString { "\n-$it" } +
+                        "\n with total price of: $formated. "
         }
 }
 

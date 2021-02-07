@@ -116,7 +116,7 @@ class AddProductToDish: DialogFragment(), AdapterView.OnItemSelectedListener {
             } else {
                 val chosenDish      = viewModel.readAllDishData.value?.get(dishPosition!!)
                 val chosenProduct   = viewModel.readAllProductData.value?.get(productPosition!!)
-                val weight          = weightOfAddedProduct.text.toString().toDouble() / 1000
+                val weight          = weightOfAddedProduct.text.toString().toDouble()
                 viewModel.addProductToDish(ProductIncluded(0, chosenProduct!!, chosenDish!!.dishId, chosenProduct.productId, weight))
             }
             weightOfAddedProduct.text.clear()

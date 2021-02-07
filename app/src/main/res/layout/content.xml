@@ -16,8 +16,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_editor_absoluteX="16dp"
         android:paddingBottom="55dp"
+        android:paddingTop="56dp"
         />
 
+    <include
+        layout="@layout/custom_toolbar"
+        />
 
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
