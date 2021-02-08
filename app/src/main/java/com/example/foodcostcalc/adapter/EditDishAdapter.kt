@@ -60,10 +60,35 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
     }
 
 
+
+
+
     override fun onBindViewHolder(holder: EditDishViewHolder, position: Int) {
         holder.nameTextView.text = list[position].productIncluded.name // name of product not changeable
-        holder.unitTextView.text = "grams" // unit, changeable in future
         holder.editTextView.setText(list[position].weight.toString()) // To set edittext with current data
+            fun setUnit(){ if(list[position].weight <= 1) {
+                holder.unitTextView.text =  when(list[position].productIncluded.unit){
+                    "per piece" -> "piece"
+                    "per kilogram" -> "kilogram"
+                    "per gram" -> "gram"
+                    "per milliliter" -> "milliliter"
+                    "per liter" -> "liter"
+                    else -> "unidentified"
+                }
+            }
+                else{  holder.unitTextView.text =  when(list[position].productIncluded.unit){
+                "per piece" -> "pieces"
+                "per kilogram" -> "kilograms"
+                "per gram" -> "grams"
+                "per milliliter" -> "milliliters"
+                "per liter" -> "liters"
+                else -> "unidentified"
+            }}
+            }
+
+
+            setUnit()
+
 
         /**Holder for each delete product button */
         holder.deleteProductBtn.setOnClickListener{

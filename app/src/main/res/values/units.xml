@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="units">
+        <item>"per kilogram"</item>
+        <item>per liter</item>
+        <item>"per piece"</item>
+        <item>"per gram"</item>
+        <item>per milliliter</item>
+
+    </array>
+
+    <array name="addProductUnits">
+        <item>"per piece"</item>
+        <item>"per kg"</item>
+        <item>"ml/l"</item>
+
+
+    </array>
+
+</resources>

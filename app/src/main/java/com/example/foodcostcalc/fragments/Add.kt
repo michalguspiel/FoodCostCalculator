@@ -1,36 +1,36 @@
 package com.example.foodcostcalc.fragments
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.*
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
-import com.example.foodcostcalc.model.ProductIncluded
-import com.example.foodcostcalc.fragments.dialogs.CreateDish
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
 
-class Add : Fragment() {
+class Add : Fragment(),AdapterView.OnItemSelectedListener {
 
-
+    var unitPosition: Int? = null
 
     private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
         Toast.makeText(context, message, duration) .show()
     }
 
+    @SuppressLint("ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view: View = inflater.inflate(R.layout.fragment_add, container, false)
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
@@ -46,10 +46,20 @@ class Add : Fragment() {
             val calcProductWeight    = view.findViewById<EditText>(R.id.waste_calc_product_weight)
 
 
+            /**Spinner adapter*/
+            val unitSpinner = view.findViewById<Spinner>(R.id.units_spinner)
+            val unitList = resources.getStringArray(R.array.units)
+            val unitsAdapter = ArrayAdapter(requireActivity(),R.layout.support_simple_spinner_dropdown_item,unitList)
+            with(unitSpinner){
+                setSelection(0,false)
+                adapter = unitsAdapter
+                onItemSelectedListener = this@Add
+                gravity = Gravity.CENTER
+                this.prompt = "Choose unit"
+                id = 1
+            }
 
             /** BUTTONS FUNCTIONALITY */
-
-
 
             addButton.setOnClickListener{
                 if(name.text.isNullOrEmpty()||
@@ -61,7 +71,8 @@ class Add : Fragment() {
                         name.text.toString(),
                         price.text.toString().toDouble(),
                         tax.text.toString().toDouble(),
-                        waste.text.toString().toDouble()
+                        waste.text.toString().toDouble(),
+                            unitList[unitPosition!!]
                     )
                     viewModel.addProducts(product)
 
@@ -102,6 +113,21 @@ class Add : Fragment() {
     companion object {
         fun newInstance():Add = Add()
         const val TAG = "Add"
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        when(parent?.id){
+            1->  {  unitPosition = position
+                    showToast(message = "$position")
+                Log.i("test","$unitPosition")
+            }
+                else -> {showToast(message = "wtf")}
+        }
+
+    }
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+    Toast.makeText(requireContext(),"nothing selected", Toast.LENGTH_SHORT).show()
     }
 
 }

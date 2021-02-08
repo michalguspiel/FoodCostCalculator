@@ -32,12 +32,27 @@
             tools:ignore="LabelFor" />
     </LinearLayout>
 
-    <Switch
-        android:id="@+id/switch_edit_product"
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_margin="4dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:text="per Unit/Piece"
-        tools:ignore="UseSwitchCompatOrMaterialXml" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="@string/unit" />
+
+       <Spinner
+           android:id="@+id/spinner_edit_product"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:spinnerMode="dropdown"
+           />
+
+
+    </LinearLayout>
 
 
     <LinearLayout

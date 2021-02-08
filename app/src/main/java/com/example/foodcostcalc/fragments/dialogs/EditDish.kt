@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -17,6 +18,7 @@ import com.example.foodcostcalc.adapter.EditDishAdapter
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.model.Dish
+import org.w3c.dom.Text
 
  class EditDish : DialogFragment(){
 
@@ -26,7 +28,7 @@ import com.example.foodcostcalc.model.Dish
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view: View = inflater.inflate(R.layout.fragment_edit_dish,container,false)
 
         /** initialize ui with viewmodel*/
@@ -34,9 +36,10 @@ import com.example.foodcostcalc.model.Dish
 
 
             val name = view.findViewById<TextView>(R.id.edit_dish_name)
+            val marginEditText = view.findViewById<TextView>(R.id.edit_margin)
 
 
-            /**Recycler view adapter made of list of pairs product+weight included in this dish */
+        /**Recycler view adapter made of list of pairs product+weight included in this dish */
             /** 28-01-21  at this point I came to realize that its better if data about weight of product
              * in the dish stays in dish as a collection of weights
              * every index of product included has its own index in weight collection
@@ -49,13 +52,14 @@ import com.example.foodcostcalc.model.Dish
             val deleteBtn = view.findViewById<Button>(R.id.delete_dish_button)
 
             /** Observe data from viewmodel */
-            viewModel.getDishesWithProductsIncluded().observe(this, Observer { thisDish ->
+            viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer { thisDish ->
                 if(viewModel.getFlag().value == false){this.dismiss()
                     viewModel.setFlag(true)}
                 else if(viewModel.getFlag().value == true) {
                     dish = thisDish[position!!].dish
                     name.text = thisDish[position!!].dish.name
-                    viewModel.getIngredientsFromDish(dish.dishId).observe(this, Observer { eachProduct ->
+                    marginEditText.text = thisDish[position!!].dish.marginPercent.toString()
+                    viewModel.getIngredientsFromDish(dish.dishId).observe(viewLifecycleOwner, Observer { eachProduct ->
                         val testData = mutableListOf<ProductIncluded>()
                         testData.addAll(eachProduct)
                         recyclerAdapter.switchLists(testData)
@@ -67,7 +71,7 @@ import com.example.foodcostcalc.model.Dish
             /** BUTTON LOGIC*/
 
             saveBtn.setOnClickListener{
-                recyclerAdapter.save(Dish(dish.dishId,name.text.toString()))
+                recyclerAdapter.save(Dish(dish.dishId,name.text.toString(),marginEditText.text.toString().toDouble()))
                 this.dismiss()
             }
 
