@@ -9,14 +9,10 @@ import java.text.DecimalFormat
 data class ProductIncluded(@PrimaryKey(autoGenerate = true) val productIncludedId : Long,
                            @Embedded val productIncluded: Product,
                            val dishOwnerId: Long,
+                           @Embedded val dish: Dish,
                            val productOwnerId: Long,
                            var weight: Double
-
-){
-        override fun toString(): String {
-                return super.toString()
-        }
-}
+)
 
 data class DishWithProductsIncluded(
         @Embedded val dish: Dish,
@@ -28,14 +24,26 @@ data class DishWithProductsIncluded(
         val productIncluded: List<ProductIncluded>
 ){
         override fun toString(): String {
-                val totalPrice: Double = productIncluded.map {(it.productIncluded.priceAfterWasteAndTax * it.weight)}.sum()
-                val df = DecimalFormat("#.##")
+                val totalPrice: Double = productIncluded.map {(it.productIncluded.priceAfterWasteAndTax *
+                    when(it.productIncluded.unit){
+                            "per piece" -> it.weight
+                            "per kilogram" -> it.weight
+                            "per gram" -> it.weight/1000
+                            "per milliliter" -> it.weight/1000
+                            "per liter" -> it.weight
+                            else -> it.weight
+                    })
+                }.sum()
+            val priceWithMargin = totalPrice * this.dish.marginPercent / 100
+            val df = DecimalFormat("#.##")
                 df.roundingMode = RoundingMode.CEILING
-                val formated = df.format(totalPrice)
+                val formatted = df.format(totalPrice)
+                val formattedFinalPrice = df.format(priceWithMargin)
                 return if(productIncluded.isEmpty()) "${dish.name} without any ingredients."
                 else " ${dish.name} includes: " +
                         productIncluded.map { it.productIncluded.name }.sortedBy { it }.joinToString { "\n-$it" } +
-                        "\n with total price of: $formated. "
+                        "\n with total food cost of: $formatted. " +
+                        "\n price with calculated margin : $formattedFinalPrice"
         }
 }
 

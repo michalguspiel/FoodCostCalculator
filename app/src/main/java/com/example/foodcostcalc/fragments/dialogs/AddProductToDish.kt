@@ -47,7 +47,7 @@ class AddProductToDish: DialogFragment(), AdapterView.OnItemSelectedListener {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view: View = inflater.inflate(R.layout.add_products_to_dish,container,false)
         /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
@@ -117,7 +117,12 @@ class AddProductToDish: DialogFragment(), AdapterView.OnItemSelectedListener {
                 val chosenDish      = viewModel.readAllDishData.value?.get(dishPosition!!)
                 val chosenProduct   = viewModel.readAllProductData.value?.get(productPosition!!)
                 val weight          = weightOfAddedProduct.text.toString().toDouble()
-                viewModel.addProductToDish(ProductIncluded(0, chosenProduct!!, chosenDish!!.dishId, chosenProduct.productId, weight))
+                viewModel.addProductToDish(ProductIncluded(0,
+                        chosenProduct!!,
+                        chosenDish!!.dishId,
+                        chosenDish,
+                        chosenProduct.productId,
+                        weight))
             }
             weightOfAddedProduct.text.clear()
             Toast.makeText(requireContext(), "${viewModel.readAllProductData.value?.get(productPosition!!)?.name} added.", Toast.LENGTH_SHORT).show()
