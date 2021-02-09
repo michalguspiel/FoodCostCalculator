@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
 
-    /** Open Fragment */
+        /** Open Fragment */
         fun openFragment(fragment: Fragment) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.container, fragment)
@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity() {
         /** Toolbar  */
         val menuBtn = findViewById<ImageButton>(R.id.side_menu_button)
 
-        menuBtn.setOnClickListener{
+        menuBtn.setOnClickListener {
             drawerLayout.open()
         }
 
@@ -55,46 +55,46 @@ class MainActivity : AppCompatActivity() {
         /**Side drawer menu */
         drawerLayout = findViewById(R.id.drawer_layout)
 
-        val toggle = ActionBarDrawerToggle(this,drawerLayout,0,0)
+        val toggle = ActionBarDrawerToggle(this, drawerLayout, 0, 0)
 
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
         val sideNavigationClickListener =
-            NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
-                when (item.itemId){
-                    R.id.nav_add_product -> {
-                        openFragment(addFragment)
+                NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
+                    when (item.itemId) {
+                        R.id.nav_add_product -> {
+                            openFragment(addFragment)
                         }
-                    R.id.nav_create_new_dish -> {
-                        CreateDish().show(supportFragmentManager,CreateDish.TAG)
+                        R.id.nav_create_new_dish -> {
+                            CreateDish().show(supportFragmentManager, CreateDish.TAG)
                         }
-                    R.id.nav_add_product_to_dish -> {
-                        AddProductToDish().show(supportFragmentManager,AddProductToDish.TAG)
-                       }
-                    R.id.nav_units -> {
-                        Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()
+                        R.id.nav_add_product_to_dish -> {
+                            AddProductToDish().show(supportFragmentManager, AddProductToDish.TAG)
+                        }
+                        R.id.nav_units -> {
+                            Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()
+                        }
                     }
+                    drawerLayout.closeDrawer(GravityCompat.START)
+                    return@OnNavigationItemSelectedListener true
                 }
-                drawerLayout.closeDrawer(GravityCompat.START)
-                return@OnNavigationItemSelectedListener true
-            }
 
         /**Bottom Navigation menu */
         val menuNavigationClickListener =
-            BottomNavigationView.OnNavigationItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.navigation_products -> {
-                        openFragment(productsFragment)
-                        return@OnNavigationItemSelectedListener true
+                BottomNavigationView.OnNavigationItemSelectedListener { item ->
+                    when (item.itemId) {
+                        R.id.navigation_products -> {
+                            openFragment(productsFragment)
+                            return@OnNavigationItemSelectedListener true
+                        }
+                        R.id.navigation_dishes -> {
+                            openFragment(dishesFragment)
+                            return@OnNavigationItemSelectedListener true
+                        }
                     }
-                    R.id.navigation_dishes -> {
-                        openFragment(dishesFragment)
-                        return@OnNavigationItemSelectedListener true
-                    }
+                    false
                 }
-                false
-            }
 
 
         openFragment(productsFragment)
@@ -103,9 +103,6 @@ class MainActivity : AppCompatActivity() {
         val sideNavigation: NavigationView = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
     }
-
-
-
 
 
 }

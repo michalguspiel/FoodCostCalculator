@@ -14,36 +14,36 @@ import com.example.foodcostcalc.model.DishWithProductsIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import java.util.ArrayList
 
-class Dishes : Fragment(){
+class Dishes : Fragment() {
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View?{
-        inflater.inflate(R.layout.fragment_dishes,container,false)
-    val view: View = inflater.inflate(R.layout.fragment_dishes, container, false)
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
+        inflater.inflate(R.layout.fragment_dishes, container, false)
+        val view: View = inflater.inflate(R.layout.fragment_dishes, container, false)
 
 
-             val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
-            /**Implementing adapter for recycler view. */
-            val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_dishes)
-            recyclerView.setHasFixedSize(true)
-            viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer { dish ->
-                val data = mutableListOf<DishWithProductsIncluded>()
-                dish.forEach{data.add(it)}
-                recyclerView.adapter =   RecyclerViewAdapter(TAG,
-                        data as ArrayList<*>,
-                        childFragmentManager)
-            })
+        /**Implementing adapter for recycler view. */
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_dishes)
+        recyclerView.setHasFixedSize(true)
+        viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer { dish ->
+            val data = mutableListOf<DishWithProductsIncluded>()
+            dish.forEach { data.add(it) }
+            recyclerView.adapter = RecyclerViewAdapter(TAG,
+                    data as ArrayList<*>,
+                    childFragmentManager)
+        })
 
 
 
-    return view
-}
+        return view
+    }
 
     companion object {
-        fun newInstance():Dishes = Dishes()
+        fun newInstance(): Dishes = Dishes()
         const val TAG = "Dishes"
     }
 }

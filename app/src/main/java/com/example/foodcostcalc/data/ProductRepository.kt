@@ -25,11 +25,9 @@ class ProductRepository(private val productDao: ProductDao) {
     suspend fun deleteProduct(product: Product) = productDao.deleteProduct(product)
 
     suspend fun addProductToDish(product: ProductIncluded) = productDao.addProductToDish(product)
-    /**
 
-    fun addProductToDish(dish: Dish, product: Product, weight: Double) {productDao.addProductToDish(dish,product,weight)}
 
-*/
+
     companion object {
         // Singleton instantiation you already know and love
         @Volatile private var instance: ProductRepository? = null

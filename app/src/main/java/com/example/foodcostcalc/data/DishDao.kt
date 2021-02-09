@@ -12,7 +12,7 @@ interface DishDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addDish(dish: Dish)
 
-    @Query("SELECT * FROM dishes ORDER BY dish_name ASC" )
+    @Query("SELECT * FROM dishes ORDER BY dish_name ASC")
     fun getDishes(): LiveData<List<Dish>>
 
     @Update
@@ -28,6 +28,10 @@ interface DishDao {
     @Transaction
     @Query("SELECT * FROM productincluded WHERE dishOwnerId = :dishId ORDER BY product_name ASC")
     fun getIngredientsFromDish(dishId: Long): LiveData<List<ProductIncluded>>
+
+    @Transaction
+    @Query("SELECT * FROM productincluded WHERE productId =:id ")
+    fun getCertainProductsIncluded(id: Long) : LiveData<List<ProductIncluded>>
 
     @Update
     suspend fun editProductsIncluded(productIncluded: ProductIncluded)

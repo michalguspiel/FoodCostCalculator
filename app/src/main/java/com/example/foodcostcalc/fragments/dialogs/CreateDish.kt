@@ -18,42 +18,42 @@ import com.example.foodcostcalc.model.Dish
 class CreateDish : DialogFragment() {
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater.inflate(R.layout.fragment_create_dish,container,false)
+        val view: View = inflater.inflate(R.layout.fragment_create_dish, container, false)
+
         /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
-            /** binders*/
-            val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
-            val dishName = view.findViewById<TextView>(R.id.new_dish_edittext)
+        /** binders*/
+        val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
+        val dishName = view.findViewById<TextView>(R.id.new_dish_edittext)
 
-            /** BUTTON LOGIC*/
-            addDishBtn.setOnClickListener{
-                if(dishName.text.isNotEmpty()) {
-                    val dish = Dish(0,dishName.text.toString())
-                    viewModel.addDishes(dish)
-                    this.dismiss()
-                }
-                else Toast.makeText(activity,"Can't make nameless dish!",Toast.LENGTH_SHORT).show()
-            }
+        /** BUTTON LOGIC*/
+        addDishBtn.setOnClickListener {
+            if (dishName.text.isNotEmpty()) {
+                val dish = Dish(0, dishName.text.toString())
+                viewModel.addDishes(dish)
+                this.dismiss()
+            } else Toast.makeText(activity, "Can't make nameless dish!", Toast.LENGTH_SHORT).show()
+        }
 
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
-    return view
-
+        return view
 
 
     }
+
     companion object {
         fun newInstance(): CreateDish =
-            CreateDish()
+                CreateDish()
+
         const val TAG = "CreateDish"
     }
-
 
 
 }

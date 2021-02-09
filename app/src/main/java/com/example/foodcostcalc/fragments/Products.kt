@@ -23,20 +23,20 @@ class Products : Fragment() {
             savedInstanceState: Bundle?
     ): View? {
         val view: View = inflater.inflate(R.layout.fragment_products, container, false)
+
         /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
 
+        /**Implementing adapter for recycler view. */
+        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_products)
+        recyclerView.setHasFixedSize(true)
+        viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
+            val data = mutableListOf<Product>()
+            products.forEach { data.add(it) }
+            recyclerView.adapter = RecyclerViewAdapter(TAG, data as ArrayList<*>, childFragmentManager)
 
-            /**Implementing adapter for recycler view. */
-            val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_products)
-            recyclerView.setHasFixedSize(true)
-            viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
-                val data = mutableListOf<Product>()
-                products.forEach{data.add(it) }
-                recyclerView.adapter = RecyclerViewAdapter(TAG, data as ArrayList<*>, childFragmentManager)
-
-            })
+        })
 
 
 
@@ -46,8 +46,9 @@ class Products : Fragment() {
 
         return view
     }
+
     companion object {
-        fun newInstance():Products = Products()
+        fun newInstance(): Products = Products()
         const val TAG = "Products"
 
     }
