@@ -24,6 +24,7 @@ interface ProductDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addProductToDish(productIncluded: ProductIncluded)
 
+
     @Query("SELECT * FROM products WHERE productId = :id")
     fun getProduct(id: Long): LiveData<Product>
 

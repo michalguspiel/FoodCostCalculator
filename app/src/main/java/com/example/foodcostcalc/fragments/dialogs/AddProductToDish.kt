@@ -18,52 +18,56 @@ import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
 
-class AddProductToDish: DialogFragment(), AdapterView.OnItemSelectedListener {
+class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val NEW_SPINNER_ID = 1
     private val ANOTHER_SPINNER_ID = 2
     private var productPosition: Int? = null
     private var dishPosition: Int? = null
 
     private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
-        Toast.makeText(context, message, duration) .show()
+        Toast.makeText(context, message, duration).show()
     }
+
     /**Spinner implementation TODO */
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        showToast(activity,"nothing selected ",3)
+        showToast(activity, "nothing selected ", 3)
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
-            1 -> {productPosition = position
+            1 -> {
+                productPosition = position
             }
-            else -> {dishPosition = position
+            else -> {
+                dishPosition = position
             }
         }
     }
 
 
     override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(R.layout.add_products_to_dish,container,false)
+        val view: View = inflater.inflate(R.layout.add_products_to_dish, container, false)
+
         /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
         /** binders*/
         val weightOfAddedProduct = view.findViewById<EditText>(R.id.product_weight)
-        val addProductToDishBtn  = view.findViewById<ImageButton>(R.id.add_product_to_dish)
+        val addProductToDishBtn = view.findViewById<ImageButton>(R.id.add_product_to_dish)
         val productSpinner = view.findViewById<Spinner>(R.id.mySpinner)
         val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
 
         /** ADAPTERs FOR SPINNERs */
         val productList = mutableListOf<String>()
-        viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { it.forEach{product -> productList.add(product.name) } })
-        val productAdapter = ArrayAdapter(requireActivity(),R.layout.spinner_layout,productList)
+        viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { it.forEach { product -> productList.add(product.name) } })
+        val productAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, productList)
         productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-       with(productSpinner)
+        with(productSpinner)
         {
             adapter = productAdapter
             setSelection(0, false)
@@ -75,17 +79,17 @@ class AddProductToDish: DialogFragment(), AdapterView.OnItemSelectedListener {
         productAdapter.notifyDataSetChanged()
 
         val dishList = mutableListOf<String>()
-        viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { it.forEach{dish -> dishList.add(dish.name)} })
-        val dishesAdapter = ArrayAdapter(requireActivity(),R.layout.spinner_layout,dishList)
+        viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { it.forEach { dish -> dishList.add(dish.name) } })
+        val dishesAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, dishList)
         dishesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        with(dishSpinner){
+        with(dishSpinner) {
             adapter = dishesAdapter
-            setSelection(0,false)
+            setSelection(0, false)
             onItemSelectedListener = this@AddProductToDish
             prompt = "Select dish"
             gravity = Gravity.CENTER
         }
-        dishSpinner.id =  ANOTHER_SPINNER_ID
+        dishSpinner.id = ANOTHER_SPINNER_ID
         dishesAdapter.notifyDataSetChanged()
 
 
@@ -102,7 +106,7 @@ class AddProductToDish: DialogFragment(), AdapterView.OnItemSelectedListener {
         })
         viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { dishes ->
             dishesAdapter.clear()
-            dishes.forEach{dish ->
+            dishes.forEach { dish ->
                 dishesAdapter.add(dish.name)
                 dishesAdapter.notifyDataSetChanged()
             }
@@ -112,11 +116,12 @@ class AddProductToDish: DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** BUTTON LOGIC*/
         addProductToDishBtn.setOnClickListener {
-            if (weightOfAddedProduct.text.isNullOrEmpty()) { showToast(message = "You can't add product without weight.")
+            if (weightOfAddedProduct.text.isNullOrEmpty()) {
+                showToast(message = "You can't add product without weight.")
             } else {
-                val chosenDish      = viewModel.readAllDishData.value?.get(dishPosition!!)
-                val chosenProduct   = viewModel.readAllProductData.value?.get(productPosition!!)
-                val weight          = weightOfAddedProduct.text.toString().toDouble()
+                val chosenDish = viewModel.readAllDishData.value?.get(dishPosition!!)
+                val chosenProduct = viewModel.readAllProductData.value?.get(productPosition!!)
+                val weight = weightOfAddedProduct.text.toString().toDouble()
                 viewModel.addProductToDish(ProductIncluded(0,
                         chosenProduct!!,
                         chosenDish!!.dishId,
@@ -134,14 +139,14 @@ class AddProductToDish: DialogFragment(), AdapterView.OnItemSelectedListener {
         return view
 
 
-
     }
+
     companion object {
         fun newInstance(): AddProductToDish =
-            AddProductToDish()
+                AddProductToDish()
+
         const val TAG = "AddProductToDish"
     }
-
 
 
 }

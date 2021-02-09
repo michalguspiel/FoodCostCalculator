@@ -35,6 +35,7 @@ class DishRepository(private val dishDao: DishDao) {
 
     fun getIngredientsFromDish(dishId: Long) = dishDao.getIngredientsFromDish(dishId)
 
+    fun getCertainProductIncluded(id: Long) = dishDao.getCertainProductsIncluded(id)
 
     companion object {
         // Singleton instantiation you already know and love
