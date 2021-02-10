@@ -21,6 +21,7 @@ import com.example.foodcostcalc.model.Dish
 class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentManager: FragmentManager)
     : RecyclerView.Adapter<EditDishAdapter.EditDishViewHolder>() {
 
+
     var list: MutableList<ProductIncluded> = mutableListOf()
 
     /**List of same pairs as a data which populates an adapter
@@ -64,9 +65,10 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
     override fun onBindViewHolder(holder: EditDishViewHolder, position: Int) {
         holder.nameTextView.text = list[position].productIncluded.name // name of product not changeable
         holder.editTextView.setText(list[position].weight.toString()) // To set edittext with current data
+
         fun setUnit() {
-            if (list[position].weight <= 1) {
-                holder.unitTextView.text = when (list[position].productIncluded.unit) {
+            var result = ""
+                result = when (list[position].productIncluded.unit) {
                     "per piece" -> "piece"
                     "per kilogram" -> "kilogram"
                     "per gram" -> "gram"
@@ -74,16 +76,8 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
                     "per liter" -> "liter"
                     else -> "unidentified"
                 }
-            } else {
-                holder.unitTextView.text = when (list[position].productIncluded.unit) {
-                    "per piece" -> "pieces"
-                    "per kilogram" -> "kilograms"
-                    "per gram" -> "grams"
-                    "per milliliter" -> "milliliters"
-                    "per liter" -> "liters"
-                    else -> "unidentified"
-                }
-            }
+            if (list[position].weight > 1) result += 's'
+            holder.unitTextView.text = result
         }
 
 
@@ -92,8 +86,6 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
 
         /**Holder for each delete product button */
         holder.deleteProductBtn.setOnClickListener {
-            //EditDish.position?.let { it1 -> viewModel.setPosition(it1) } // First Position as dish position in list
-            viewModel.setSecondPosition(position)  // Second position as product position in productsincluded list
             viewModel.setProductIncluded(list[position])
             AreYouSure().show(this.fragmentManager, "EditDishAdapter")
             notifyDataSetChanged()

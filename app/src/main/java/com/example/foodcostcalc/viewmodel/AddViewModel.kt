@@ -33,11 +33,7 @@ class AddViewModel(application: Application)
 
     fun getProducts() = productRepository.getProducts()
 
-    fun getProduct(id: Long) = productRepository.getProduct(id)
-
     fun getDishes() = dishRepository.getDishes()
-
-    fun getDishesByName(name: String) = dishRepository.getDishesByName(name)
 
     fun addProducts(product: Product) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -111,8 +107,6 @@ class AddViewModel(application: Application)
     fun setSecondPosition(pos: Int) {
         basicRepository.setSecondPosition(pos)
     }
-
-    fun getSecondPosition() = basicRepository.getSecondPosition()
 
     fun setFlag(boolean: Boolean) {
         basicRepository.setFlag(boolean)
