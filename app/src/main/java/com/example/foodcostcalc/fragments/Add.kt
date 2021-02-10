@@ -121,11 +121,8 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         when (parent?.id) {
             1 -> {
                 unitPosition = position
-                showToast(message = "$position")
-                Log.i("test", "$unitPosition")
             }
             else -> {
-                showToast(message = "wtf")
             }
         }
 

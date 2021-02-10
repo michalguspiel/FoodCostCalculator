@@ -1,5 +1,6 @@
 package com.example.foodcostcalc.fragments.dialogs
 
+import android.app.Application
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
+import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.model.Dish
 
@@ -31,11 +33,19 @@ class CreateDish : DialogFragment() {
         val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
         val dishName = view.findViewById<TextView>(R.id.new_dish_edittext)
 
+        val sharedPreferences = SharedPreferences(requireContext())
 
         /** BUTTON LOGIC*/
         addDishBtn.setOnClickListener {
+            val marginAsString = sharedPreferences.getValueString("margin")
+            val taxAsString = sharedPreferences.getValueString("tax")
+            var tax = 23.0
+            var margin = 100.0
+            if(taxAsString != null) tax = taxAsString.toDouble()
+            if(marginAsString != null) margin = marginAsString.toDouble()
+
             if (dishName.text.isNotEmpty()) {
-                val dish = Dish(0, dishName.text.toString())
+                val dish = Dish(0, dishName.text.toString(),margin,tax)
                 viewModel.addDishes(dish)
                 this.dismiss()
             } else Toast.makeText(activity, "Can't make nameless dish!", Toast.LENGTH_SHORT).show()

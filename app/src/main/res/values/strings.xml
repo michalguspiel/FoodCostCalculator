@@ -46,4 +46,6 @@
     <string name="calculate">calculate</string>
     <string name="delete_product">Delete product</string>
     <string name="unit">unit:</string>
+    <string name="set_your_default_margin">Set your default margin as %</string>
+    <string name="set_your_default_dish_tax">Set your default dish tax as %</string>
 </resources>

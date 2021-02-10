@@ -4,23 +4,23 @@
     <group>
         <item
             android:id="@+id/nav_add_product"
-            android:icon="@drawable/ic_add_circle"
+            android:icon="@drawable/plus"
             android:title="Add product"/>
         <item
             android:id="@+id/nav_create_new_dish"
-            android:icon="@drawable/ic_add_circle"
+            android:icon="@drawable/serving_dish"
             android:title="Create a new dish"/>
         <item
             android:id="@+id/nav_add_product_to_dish"
-            android:icon="@drawable/ic_add_circle"
+            android:icon="@drawable/grocery"
             android:title="Add products to your dish"/>
         <item
             android:id="@+id/nav_update"
-            android:icon="@drawable/ic_add_circle"
+            android:icon="@drawable/money"
             android:title="Donate money to developer"/>
         <item
-            android:id="@+id/nav_units"
-            android:icon="@drawable/ic_add_circle"
+            android:id="@+id/nav_personalize"
+            android:icon="@drawable/settings"
             android:title="Personalize"/>
     </group>
 
