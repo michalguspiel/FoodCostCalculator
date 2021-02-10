@@ -98,8 +98,8 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                 val formattedResult = df.format(result)
                 var formattedResultCheck = ""
                 for (eachChar in formattedResult) {
-                    if (eachChar.equals(",")) formattedResultCheck += "."
-                    else formattedResultCheck += eachChar
+                    formattedResultCheck += if (eachChar == ',') '.'
+                    else eachChar
                 }
                 waste.setText(formattedResultCheck)
                 calcProductWeight.text.clear()

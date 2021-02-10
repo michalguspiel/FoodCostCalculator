@@ -15,6 +15,7 @@ interface DishDao {
     @Query("SELECT * FROM dishes ORDER BY dish_name ASC")
     fun getDishes(): LiveData<List<Dish>>
 
+
     @Update
     suspend fun editDish(dish: Dish)
 
@@ -24,6 +25,10 @@ interface DishDao {
     @Transaction
     @Query("SELECT * FROM dishes ORDER BY dish_name ASC")
     fun getDishesWithProductsIncluded(): LiveData<List<DishWithProductsIncluded>>
+
+    @Transaction
+    @Query("SELECT * FROM dishes WHERE dish_name = :name  ORDER BY dish_name ASC")
+    fun getDishesByName(name: String): LiveData<List<DishWithProductsIncluded>>
 
     @Transaction
     @Query("SELECT * FROM productincluded WHERE dishOwnerId = :dishId ORDER BY product_name ASC")

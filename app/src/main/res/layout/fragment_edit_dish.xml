@@ -39,7 +39,7 @@
         android:layout_gravity="center_horizontal">
 
         <TextView
-            android:layout_width="100dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:text="@string/dish_margin" />
@@ -50,14 +50,41 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             tools:text="dish margin"
-            android:inputType="text"
+            android:inputType="numberDecimal"
             android:autofillHints=""
             tools:ignore="LabelFor" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/percent"/>
+            android:layout_gravity="center"
+            android:text="@string/percent"
+            android:layout_marginEnd="16dp"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="dish tax" />
+
+        <EditText
+            android:id="@+id/edit_dish_tax"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            tools:text="tax"
+            android:inputType="numberDecimal"
+            android:autofillHints=""
+            tools:ignore="LabelFor" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/percent"
+            android:layout_gravity="center"/>
+
+
     </LinearLayout>
 
     <FrameLayout android:layout_height="300dp"

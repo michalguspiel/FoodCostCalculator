@@ -13,32 +13,29 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.viewmodel.AddViewModel
-import com.example.foodcostcalc.model.Dish
 
-class CreateDish : DialogFragment() {
+class SearchDialog : DialogFragment() {
 
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        val view: View = inflater.inflate(R.layout.fragment_create_dish, container, false)
+        val view: View = inflater.inflate(R.layout.search_dialog, container, false)
 
         /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
         /** binders*/
-        val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
-        val dishName = view.findViewById<TextView>(R.id.new_dish_edittext)
-
+        val searchBtn = view.findViewById<Button>(R.id.search_dialog_button)
+        val searchTextField = view.findViewById<TextView>(R.id.search_field)
 
         /** BUTTON LOGIC*/
-        addDishBtn.setOnClickListener {
-            if (dishName.text.isNotEmpty()) {
-                val dish = Dish(0, dishName.text.toString())
-                viewModel.addDishes(dish)
+        searchBtn.setOnClickListener {
+            if (searchTextField.text.isNotEmpty()) {
+
                 this.dismiss()
-            } else Toast.makeText(activity, "Can't make nameless dish!", Toast.LENGTH_SHORT).show()
+            } else Toast.makeText(activity, "Can't search for nothing!", Toast.LENGTH_SHORT).show()
         }
 
 
@@ -50,10 +47,10 @@ class CreateDish : DialogFragment() {
     }
 
     companion object {
-        fun newInstance(): CreateDish =
-                CreateDish()
+        fun newInstance(): SearchDialog =
+                SearchDialog()
 
-        const val TAG = "CreateDish"
+        const val TAG = "SearchDialog"
     }
 
 

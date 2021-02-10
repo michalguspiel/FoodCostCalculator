@@ -2,10 +2,12 @@ package com.example.foodcostcalc
 
 import android.app.Notification
 import android.os.Bundle
+import android.text.Editable
+import android.text.Layout
+import android.text.TextWatcher
 import android.view.MenuItem
-import android.widget.ImageButton
-import android.widget.Toast
-import android.widget.Toolbar
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +18,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.fragments.*
 import com.example.foodcostcalc.fragments.dialogs.AddProductToDish
 import com.example.foodcostcalc.fragments.dialogs.CreateDish
+import com.example.foodcostcalc.fragments.dialogs.SearchDialog
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -35,6 +38,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+
 
         /** Open Fragment */
         fun openFragment(fragment: Fragment) {
@@ -44,12 +49,29 @@ class MainActivity : AppCompatActivity() {
             transaction.commit()
         }
 
-        /** Toolbar  */
-        val menuBtn = findViewById<ImageButton>(R.id.side_menu_button)
 
+
+        /** Toolbar  */
+        val menuBtn          = findViewById<ImageButton>(R.id.side_menu_button)
+        val searchBtn        = findViewById<ImageButton>(R.id.search_button)
+        val searchTextField  = findViewById<EditText>(R.id.toolbar_text_field)
+        val backBtn          = findViewById<ImageButton>(R.id.search_back)
+        backBtn.visibility = View.GONE
         menuBtn.setOnClickListener {
             drawerLayout.open()
         }
+        searchBtn.setOnClickListener{
+        viewModel.searchFor(searchTextField.text.toString())
+           menuBtn.visibility = View.GONE
+           backBtn.visibility = View.VISIBLE
+        }
+        backBtn.setOnClickListener{
+            viewModel.searchFor("")
+            searchTextField.text.clear()
+            backBtn.visibility = View.GONE
+            menuBtn.visibility = View.VISIBLE
+        }
+
 
 
         /**Side drawer menu */
@@ -65,6 +87,10 @@ class MainActivity : AppCompatActivity() {
                     when (item.itemId) {
                         R.id.nav_add_product -> {
                             openFragment(addFragment)
+                            searchBtn.visibility = View.GONE
+                            searchTextField.visibility = View.GONE
+                            backBtn.visibility = View.GONE
+                            menuBtn.visibility = View.VISIBLE
                         }
                         R.id.nav_create_new_dish -> {
                             CreateDish().show(supportFragmentManager, CreateDish.TAG)
@@ -86,10 +112,17 @@ class MainActivity : AppCompatActivity() {
                     when (item.itemId) {
                         R.id.navigation_products -> {
                             openFragment(productsFragment)
+                            searchBtn.visibility = View.VISIBLE
+                            searchTextField.visibility = View.VISIBLE
+                            searchTextField.hint = "Search by name"
                             return@OnNavigationItemSelectedListener true
                         }
                         R.id.navigation_dishes -> {
                             openFragment(dishesFragment)
+                            searchBtn.visibility = View.VISIBLE
+                            searchTextField.visibility = View.VISIBLE
+                            searchTextField.hint = "Search by name"
+
                             return@OnNavigationItemSelectedListener true
                         }
                     }

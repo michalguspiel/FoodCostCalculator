@@ -18,13 +18,24 @@ class BasicDao{
     private var productIncluded: ProductIncluded? = null
     private val productIncludedLive = MutableLiveData<ProductIncluded>()
 
+    private var searchWord: String = ""
+    private val searchWordLive = MutableLiveData<String>()
+
 
     init {
         position.value = mutablePosition
         secondPosition.value = secondMutablePosition
         flag.value = mutableFlag
         productIncludedLive.value = productIncluded
+        searchWordLive.value = searchWord
     }
+
+    fun searchFor(word: String){
+        searchWord = word
+        searchWordLive.value = searchWord
+    }
+
+    fun getWhatToSearchFor() = searchWordLive as LiveData<String>
 
     fun setProductIncluded(product: ProductIncluded){
         productIncluded = product

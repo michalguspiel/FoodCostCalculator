@@ -37,6 +37,7 @@ class AddViewModel(application: Application)
 
     fun getDishes() = dishRepository.getDishes()
 
+    fun getDishesByName(name: String) = dishRepository.getDishesByName(name)
 
     fun addProducts(product: Product) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -124,5 +125,11 @@ class AddViewModel(application: Application)
     fun setProductIncluded(product: ProductIncluded) {
         basicRepository.setProductIncluded(product)
     }
+
+    fun searchFor(word: String) {
+        basicRepository.searchFor(word)
+    }
+
+    fun getWhatToSearchFor() = basicRepository.getWhatToSearchFor()
 
 }

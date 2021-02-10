@@ -12,11 +12,7 @@ data class ProductIncluded(@PrimaryKey(autoGenerate = true) val productIncludedI
                            @Embedded val dish: Dish,
                            val productOwnerId: Long,
                            var weight: Double
-){
-    override fun toString(): String {
-        return "name  ${productIncluded.name} individualid: $productIncludedId ${productIncluded.productId} and the same $productOwnerId"
-    }
-}
+)
 
 data class DishWithProductsIncluded(
         @Embedded val dish: Dish,
@@ -27,28 +23,33 @@ data class DishWithProductsIncluded(
         )
         val productIncluded: List<ProductIncluded>
 ) {
+    @Ignore val totalPrice: Double = productIncluded.map {
+        (it.productIncluded.priceAfterWasteAndTax *
+                when (it.productIncluded.unit) {
+                    "per piece" -> it.weight
+                    "per kilogram" -> it.weight
+                    "per gram" -> it.weight / 1000
+                    "per milliliter" -> it.weight / 1000
+                    "per liter" -> it.weight
+                    else -> it.weight
+                })
+    }.sum()
+
+    @Ignore val priceWithMargin = totalPrice * this.dish.marginPercent / 100
+    @Ignore val priceWithMarginAndTax = priceWithMargin + (priceWithMargin * this.dish.dishTax / 100)
+
     override fun toString(): String {
-        val totalPrice: Double = productIncluded.map {
-            (it.productIncluded.priceAfterWasteAndTax *
-                    when (it.productIncluded.unit) {
-                        "per piece" -> it.weight
-                        "per kilogram" -> it.weight
-                        "per gram" -> it.weight / 1000
-                        "per milliliter" -> it.weight / 1000
-                        "per liter" -> it.weight
-                        else -> it.weight
-                    })
-        }.sum()
-        val priceWithMargin = totalPrice * this.dish.marginPercent / 100
         val df = DecimalFormat("#.##")
         df.roundingMode = RoundingMode.CEILING
         val formatted = df.format(totalPrice)
         val formattedFinalPrice = df.format(priceWithMargin)
+        val formattedFinalBruttoPrice = df.format(priceWithMarginAndTax)
         return if (productIncluded.isEmpty()) "${dish.name} without any ingredients."
         else " ${dish.name} includes: " +
                 productIncluded.map { it.productIncluded.name }.sortedBy { it }.joinToString { "\n-$it" } +
                 "\n with total food cost of: $formatted. " +
-                "\n price with calculated margin : $formattedFinalPrice"
+                "\n Price with calculated margin : $formattedFinalPrice." +
+                "\n Price with calculated margin and tax : $formattedFinalBruttoPrice."
     }
 }
 

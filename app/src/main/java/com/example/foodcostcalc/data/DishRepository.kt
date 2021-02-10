@@ -14,6 +14,8 @@ class DishRepository(private val dishDao: DishDao) {
 
     fun getDishes() = dishDao.getDishes()
 
+    fun getDishesByName(name: String) = dishDao.getDishesByName(name)
+
     suspend fun deleteDish(dish: Dish){
         dishDao.deleteDish(dish)
     }

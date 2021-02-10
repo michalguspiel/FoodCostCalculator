@@ -4,8 +4,12 @@ import com.example.foodcostcalc.model.ProductIncluded
 
 class BasicRepository(private val basicDao: BasicDao) {
 
+    fun getWhatToSearchFor()    = basicDao.getWhatToSearchFor()
+
+    fun searchFor(word: String) = basicDao.searchFor(word)
 
     fun getProductIncluded() = basicDao.getProductIncluded()
+
     fun setProductIncluded(product: ProductIncluded){
         basicDao.setProductIncluded(product)
     }
