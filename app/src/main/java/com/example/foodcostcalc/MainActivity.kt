@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
     private val productsFragment = Products.newInstance()
     private val dishesFragment = Dishes.newInstance()
     private val addFragment = Add.newInstance()
+    private val settingsFragment = Settings.newInstance()
     private val createDishFragment = CreateDish.newInstance()
     lateinit var drawerLayout: DrawerLayout
     lateinit var toolbar: ActionBar
@@ -74,6 +75,14 @@ class MainActivity : AppCompatActivity() {
 
 
 
+        /**hide every button and show only side menu button */
+        fun setToolbar(){
+            searchBtn.visibility = View.GONE
+            searchTextField.visibility = View.GONE
+            backBtn.visibility = View.GONE
+            menuBtn.visibility = View.VISIBLE
+        }
+
         /**Side drawer menu */
         drawerLayout = findViewById(R.id.drawer_layout)
 
@@ -87,10 +96,7 @@ class MainActivity : AppCompatActivity() {
                     when (item.itemId) {
                         R.id.nav_add_product -> {
                             openFragment(addFragment)
-                            searchBtn.visibility = View.GONE
-                            searchTextField.visibility = View.GONE
-                            backBtn.visibility = View.GONE
-                            menuBtn.visibility = View.VISIBLE
+                            setToolbar()
                         }
                         R.id.nav_create_new_dish -> {
                             CreateDish().show(supportFragmentManager, CreateDish.TAG)
@@ -98,10 +104,13 @@ class MainActivity : AppCompatActivity() {
                         R.id.nav_add_product_to_dish -> {
                             AddProductToDish().show(supportFragmentManager, AddProductToDish.TAG)
                         }
-                        R.id.nav_units -> {
-                            Toast.makeText(this, "Profile clicked", Toast.LENGTH_SHORT).show()
+                        R.id.nav_personalize -> {
+                            openFragment(settingsFragment)
+                            setToolbar()
                         }
                     }
+
+
                     drawerLayout.closeDrawer(GravityCompat.START)
                     return@OnNavigationItemSelectedListener true
                 }
