@@ -38,8 +38,6 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         /** initialize ui with viewmodel*/
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
-        /** position to keep track which product is being edited*/
-        val adapterPosition = position!!
 
         /** empty list which gets populated by every 'ProductIncluded' that has the same
          * ID as edited product. */
@@ -66,6 +64,12 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         val saveButton = view.findViewById<Button>(R.id.save_changes_button)
         val deleteButton = view.findViewById<Button>(R.id.delete_product_button)
 
+        /**Send data about which dish is being edited
+         * so .setPosition(index of this dish in main list)*/
+        viewModel.getProducts().observe(viewLifecycleOwner, Observer { products ->
+            viewModel.setPosition(products.indexOf(productPassedFromAdapter))
+        })
+
         /** OBSERVE DATA FROM VIEWMODEL
          * Sets every text field value appropriate to edited product
          *
@@ -83,12 +87,12 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                 this.dismiss()
                 viewModel.setFlag(true)
             } else if (viewModel.getFlag().value == true) {
-                productId = product[adapterPosition].productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
-                name.setText(product[adapterPosition].name)
-                price.setText(product[adapterPosition].pricePerUnit.toString())
-                tax.setText(product[adapterPosition].tax.toString())
-                waste.setText(product[adapterPosition].waste.toString())
-                unitSpinner.setSelection(unitList.indexOf(product[adapterPosition].unit))
+                productId = productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
+                name.setText(productPassedFromAdapter.name)
+                price.setText(productPassedFromAdapter.pricePerUnit.toString())
+                tax.setText(productPassedFromAdapter.tax.toString())
+                waste.setText(productPassedFromAdapter.waste.toString())
+                unitSpinner.setSelection(unitList.indexOf(productPassedFromAdapter.unit))
 
                 viewModel.getCertainProductsIncluded(productId!!).                           // GETS LIST OF PRODUCT INCLUDED
                 observe(viewLifecycleOwner, Observer { listOfProducts ->                     // WITH THE SAME ID AS productID
@@ -126,7 +130,6 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
 
         deleteButton.setOnClickListener {
-            viewModel.setPosition(adapterPosition)
             AreYouSure().show(childFragmentManager, TAG)
 
         }
@@ -147,7 +150,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         const val TAG = "EditProduct"
 
         /**Position of Edited product */
-        var position: Int? = null
+        lateinit var productPassedFromAdapter: Product
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

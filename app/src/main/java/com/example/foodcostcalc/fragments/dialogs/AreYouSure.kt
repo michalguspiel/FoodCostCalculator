@@ -11,12 +11,16 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
+import com.example.foodcostcalc.model.Dish
+import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.viewmodel.AddViewModel
 
 @Suppress("NAME_SHADOWING")
 class AreYouSure : DialogFragment() {
 
     private lateinit var viewModel: AddViewModel
+    private lateinit var dishToDelete: Dish
+    private lateinit var productToDelete: Product
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -36,22 +40,30 @@ class AreYouSure : DialogFragment() {
          * of deleteProductFromDish where function needs position of dish
          * and position of product to delete from it*/
         var pos: Int? = null // first position
-        var secondPos: Int? = null //  second position
+
+
         /**Observe data to set positions to provide parameters for delete methods */
         viewModel.getPosition().observe(viewLifecycleOwner, Observer { position ->
             pos = position
         })
-        viewModel.getSecondPosition().observe(viewLifecycleOwner, Observer { position ->
-            secondPos = position
+
+        /** Get dish to delete */
+        viewModel.getDishes().observe(viewLifecycleOwner, Observer { dish ->
+          if(this.tag == EditDish.TAG)  dishToDelete = dish[pos!!]
+        })
+        /**Get product to delete*/
+        viewModel.getProducts().observe(viewLifecycleOwner, Observer { product ->
+          if(this.tag == EditProduct.TAG)  productToDelete = product[pos!!]
         })
 
-        /**Button  logic tag informs this dialog from where it was open so it knows what action to proceed*/
+        /**Button  logic tag informs this dialog from where it was open so it knows what action to proceed
+         * firstly item gets assigned to lateinit variable then its deleted.*/
 
         confirmBtn.setOnClickListener {
             viewModel.setFlag(false)
             when (this.tag) {
-                EditProduct.TAG -> viewModel.getProducts().observe(viewLifecycleOwner, Observer { viewModel.deleteProduct(it[pos!!]) })
-                EditDish.TAG -> viewModel.getDishes().observe(viewLifecycleOwner, Observer { viewModel.deleteDish(it[pos!!]) })
+                EditProduct.TAG -> viewModel.deleteProduct(productToDelete)
+                EditDish.TAG -> viewModel.deleteDish(dishToDelete)
                 "EditDishAdapter" -> viewModel.getDishesWithProductsIncluded()
                         .observe(viewLifecycleOwner, Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })
                 else -> this.dismiss()

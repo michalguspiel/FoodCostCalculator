@@ -27,22 +27,22 @@ class Products : Fragment() {
         /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
-
         /**Implementing adapter for recycler view. */
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_products)
         recyclerView.setHasFixedSize(true)
-        viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
+        viewModel.getWhatToSearchFor().observe(viewLifecycleOwner,Observer{word ->
+
+            viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
             val data = mutableListOf<Product>()
             products.forEach { data.add(it) }
-            recyclerView.adapter = RecyclerViewAdapter(TAG, data as ArrayList<*>, childFragmentManager)
+            recyclerView.adapter = RecyclerViewAdapter(TAG,
+                    data.filter { it.name.contains(word) } as ArrayList<*>
+                    , childFragmentManager,
+            viewModel)
 
         })
 
-
-
-
-
-
+        })
 
         return view
     }

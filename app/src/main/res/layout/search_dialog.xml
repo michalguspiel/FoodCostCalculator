@@ -1,33 +1,33 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="200dp"
+    android:layout_height="120dp"
     android:id="@+id/fragment_create_dish"
     style="@style/Theme.AppCompat.DayNight.Dialog"
     android:layout_gravity="center"
     android:background="@drawable/background_for_dialogs"
     >
     <EditText
-        android:id="@+id/new_dish_edittext"
+        android:id="@+id/search_field"
         android:inputType="textEmailAddress"
         android:layout_width="match_parent"
-        android:textColor="@color/blue_500"
+        android:textColor="@color/white"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
-        android:hint="@string/name_of_new_dish"
+        android:hint="Name"
         android:autofillHints="" />
 
     <Button
-        android:id="@+id/add_button_dialog"
+        android:id="@+id/search_dialog_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/button_gradient"
         android:padding="8dp"
         android:layout_margin="4dp"
         android:textColor="@color/white"
-        android:text="@string/add" />
+        android:text="Search" />
 
 </LinearLayout>

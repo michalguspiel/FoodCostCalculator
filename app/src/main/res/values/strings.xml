@@ -39,9 +39,9 @@
     <string name="calculate_your_foodcost">Calculate your foodcost</string>
     <string name="amount">amount</string>
     <string name="add_product_to_dish">add product to dish</string>
-    <string name="dish_margin">Dish margin</string>
-    <string name="percent">%.</string>
-    <string name="choose_unit">choose unit</string>
+    <string name="dish_margin">margin</string>
+    <string name="percent">%</string>
+    <string name="choose_unit">Choose unit</string>
     <string name="calculate_waste">Calculate waste %</string>
     <string name="calculate">calculate</string>
     <string name="delete_product">Delete product</string>

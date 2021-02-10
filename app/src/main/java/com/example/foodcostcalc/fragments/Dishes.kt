@@ -1,10 +1,14 @@
 package com.example.foodcostcalc.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +19,8 @@ import com.example.foodcostcalc.viewmodel.AddViewModel
 import java.util.ArrayList
 
 class Dishes : Fragment() {
+
+
     override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
@@ -26,17 +32,21 @@ class Dishes : Fragment() {
 
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
+
         /**Implementing adapter for recycler view. */
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_dishes)
         recyclerView.setHasFixedSize(true)
-        viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer { dish ->
-            val data = mutableListOf<DishWithProductsIncluded>()
-            dish.forEach { data.add(it) }
-            recyclerView.adapter = RecyclerViewAdapter(TAG,
-                    data as ArrayList<*>,
-                    childFragmentManager)
-        })
 
+        /** Observe what is in the search box in LIVEDATA */
+        viewModel.getWhatToSearchFor().observe(viewLifecycleOwner, Observer { word ->
+            viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer { dish ->
+                val data = mutableListOf<DishWithProductsIncluded>()
+                dish.forEach { data.add(it)}
+                recyclerView.adapter = RecyclerViewAdapter(TAG,
+                        data.filter{it.dish.name.contains(word)} as ArrayList<*>,
+                        childFragmentManager,viewModel)
+            })
+        })
 
 
         return view

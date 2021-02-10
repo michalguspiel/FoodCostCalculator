@@ -92,7 +92,7 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
 
         /**Holder for each delete product button */
         holder.deleteProductBtn.setOnClickListener {
-            EditDish.position?.let { it1 -> viewModel.setPosition(it1) } // First Position as dish position in list
+            //EditDish.position?.let { it1 -> viewModel.setPosition(it1) } // First Position as dish position in list
             viewModel.setSecondPosition(position)  // Second position as product position in productsincluded list
             viewModel.setProductIncluded(list[position])
             AreYouSure().show(this.fragmentManager, "EditDishAdapter")
