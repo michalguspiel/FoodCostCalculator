@@ -21,20 +21,23 @@ import com.example.foodcostcalc.model.Dish
 class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentManager: FragmentManager)
     : RecyclerView.Adapter<EditDishAdapter.EditDishViewHolder>() {
 
-
+    /**List of ProductIncluded which this adapter works on,
+     * initially empty,gets populated with method 'switchLists'
+     * it works like this so after save button is hit
+     * this list have the same ProductsIncluded as 'cloneOfList'*/
     var list: MutableList<ProductIncluded> = mutableListOf()
 
-    /**List of same pairs as a data which populates an adapter
-     * created in order to change this list with edittext
+    /**List of same ProductsIncluded as a data which populates an adapter
+     * created in order to change this list with each holder edit text field
      * and afterwards override original list with this one(with save btn)*/
     var cloneOfList: MutableList<ProductIncluded> = mutableListOf()
 
 
     class EditDishViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val nameTextView: TextView = view.findViewById(R.id.edit_dish_product_name)
-        val unitTextView: TextView = view.findViewById(R.id.unit)
-        val editTextView: EditText = view.findViewById(R.id.product_weight_edittext)
-        val deleteProductBtn: ImageButton = view.findViewById(R.id.delete_product_in_dish_button)
+        val nameTextView: TextView          = view.findViewById(R.id.edit_dish_product_name)
+        val unitTextView: TextView          = view.findViewById(R.id.unit)
+        val editTextView: EditText          = view.findViewById(R.id.product_weight_edittext)
+        val deleteProductBtn: ImageButton   = view.findViewById(R.id.delete_product_in_dish_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditDishViewHolder {
@@ -64,7 +67,7 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
 
     override fun onBindViewHolder(holder: EditDishViewHolder, position: Int) {
         holder.nameTextView.text = list[position].productIncluded.name // name of product not changeable
-        holder.editTextView.setText(list[position].weight.toString()) // To set edittext with current data
+        holder.editTextView.setText(list[position].weight.toString()) // To set EditText with current data
 
         fun setUnit() {
             var result = ""
@@ -91,7 +94,9 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
             notifyDataSetChanged()
         }
 
-        /** Edit text product weight CHANGEABLE observe data */
+        /** Edit text product weight.
+         *  When weight is changed the same position in cloneOfList gets changed.
+         *  */
         holder.editTextView.addTextChangedListener((object : TextWatcher {
 
             override fun afterTextChanged(s: Editable) {}

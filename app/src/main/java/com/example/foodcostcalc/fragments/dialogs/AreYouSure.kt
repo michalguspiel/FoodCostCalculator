@@ -26,7 +26,7 @@ class AreYouSure : DialogFragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view: View = inflater.inflate(R.layout.fragment_dialog_are_you_sure, container, false)
         /** initialize ui with viewmodel*/
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
@@ -35,30 +35,24 @@ class AreYouSure : DialogFragment() {
         val confirmBtn = view.findViewById<Button>(R.id.button_yes)
         val cancelBtn = view.findViewById<Button>(R.id.button_cancel)
 
-        /**positions to delete
-         * one position was enough untill implementation
-         * of deleteProductFromDish where function needs position of dish
-         * and position of product to delete from it*/
-        var pos: Int? = null // first position
-
+        /**Position to delete, after pushing delete button, information about product/dish index in main list
+         * is passed to this variable.*/
+        var pos: Int? = null
 
         /**Observe data to set positions to provide parameters for delete methods */
         viewModel.getPosition().observe(viewLifecycleOwner, Observer { position ->
             pos = position
         })
-
-        /** Get dish to delete */
+        /** Get dish to delete only if this was called from EditDish. */
         viewModel.getDishes().observe(viewLifecycleOwner, Observer { dish ->
-          if(this.tag == EditDish.TAG)  dishToDelete = dish[pos!!]
+            if (this.tag == EditDish.TAG) dishToDelete = dish[pos!!]
         })
-        /**Get product to delete*/
+        /**Get product to delete only if this was called from EditProduct.*/
         viewModel.getProducts().observe(viewLifecycleOwner, Observer { product ->
-          if(this.tag == EditProduct.TAG)  productToDelete = product[pos!!]
+            if (this.tag == EditProduct.TAG) productToDelete = product[pos!!]
         })
 
-        /**Button  logic tag informs this dialog from where it was open so it knows what action to proceed
-         * firstly item gets assigned to lateinit variable then its deleted.*/
-
+        /**Button logic: tag informs this dialog from where it was open so it knows what action to proceed.*/
         confirmBtn.setOnClickListener {
             viewModel.setFlag(false)
             when (this.tag) {
@@ -68,8 +62,6 @@ class AreYouSure : DialogFragment() {
                         .observe(viewLifecycleOwner, Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })
                 else -> this.dismiss()
             }
-
-
             this.dismiss()
         }
 
@@ -87,7 +79,6 @@ class AreYouSure : DialogFragment() {
     companion object {
         fun newInstance(): AreYouSure =
                 AreYouSure()
-
         const val TAG = "AreYouSure"
 
     }
