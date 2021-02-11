@@ -32,8 +32,6 @@ class MainActivity : AppCompatActivity() {
     private val settingsFragment = Settings.newInstance()
     private val createDishFragment = CreateDish.newInstance()
     lateinit var drawerLayout: DrawerLayout
-    lateinit var toolbar: ActionBar
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,37 +48,40 @@ class MainActivity : AppCompatActivity() {
             transaction.commit()
         }
 
-
-
         /** Toolbar  */
-        val menuBtn          = findViewById<ImageButton>(R.id.side_menu_button)
-        val searchBtn        = findViewById<ImageButton>(R.id.search_button)
-        val searchTextField  = findViewById<EditText>(R.id.toolbar_text_field)
-        val backBtn          = findViewById<ImageButton>(R.id.search_back)
+        val menuBtn = findViewById<ImageButton>(R.id.side_menu_button)
+        val searchBtn = findViewById<ImageButton>(R.id.search_button)
+        val searchTextField = findViewById<EditText>(R.id.toolbar_text_field)
+        val backBtn = findViewById<ImageButton>(R.id.search_back)
         backBtn.visibility = View.GONE
         menuBtn.setOnClickListener {
             drawerLayout.open()
         }
-        searchBtn.setOnClickListener{
-        viewModel.searchFor(searchTextField.text.toString())
-           menuBtn.visibility = View.GONE
-           backBtn.visibility = View.VISIBLE
+        searchBtn.setOnClickListener {
+            viewModel.searchFor(searchTextField.text.toString())
+            menuBtn.visibility = View.GONE
+            backBtn.visibility = View.VISIBLE
         }
-        backBtn.setOnClickListener{
+        backBtn.setOnClickListener {
             viewModel.searchFor("")
             searchTextField.text.clear()
             backBtn.visibility = View.GONE
             menuBtn.visibility = View.VISIBLE
         }
 
-
-
-        /**hide every button and show only side menu button */
-        fun setToolbar(){
+        /**Hide everything on toolbar but side menu button. */
+        fun hideSearchToolbar() {
             searchBtn.visibility = View.GONE
             searchTextField.visibility = View.GONE
             backBtn.visibility = View.GONE
             menuBtn.visibility = View.VISIBLE
+        }
+
+        /**Show search field and search button on toolbar. */
+        fun setSearchToolbar() {
+            searchBtn.visibility = View.VISIBLE
+            searchTextField.visibility = View.VISIBLE
+            searchTextField.hint = "Search by name"
         }
 
         /**Side drawer menu */
@@ -96,7 +97,7 @@ class MainActivity : AppCompatActivity() {
                     when (item.itemId) {
                         R.id.nav_add_product -> {
                             openFragment(addFragment)
-                            setToolbar()
+                            hideSearchToolbar()
                         }
                         R.id.nav_create_new_dish -> {
                             CreateDish().show(supportFragmentManager, CreateDish.TAG)
@@ -106,10 +107,9 @@ class MainActivity : AppCompatActivity() {
                         }
                         R.id.nav_personalize -> {
                             openFragment(settingsFragment)
-                            setToolbar()
+                            hideSearchToolbar()
                         }
                     }
-
 
                     drawerLayout.closeDrawer(GravityCompat.START)
                     return@OnNavigationItemSelectedListener true
@@ -121,23 +121,18 @@ class MainActivity : AppCompatActivity() {
                     when (item.itemId) {
                         R.id.navigation_products -> {
                             openFragment(productsFragment)
-                            searchBtn.visibility = View.VISIBLE
-                            searchTextField.visibility = View.VISIBLE
-                            searchTextField.hint = "Search by name"
+                            setSearchToolbar()
                             return@OnNavigationItemSelectedListener true
                         }
                         R.id.navigation_dishes -> {
                             openFragment(dishesFragment)
-                            searchBtn.visibility = View.VISIBLE
-                            searchTextField.visibility = View.VISIBLE
-                            searchTextField.hint = "Search by name"
+                            setSearchToolbar()
 
                             return@OnNavigationItemSelectedListener true
                         }
                     }
                     false
                 }
-
 
         openFragment(productsFragment)
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigationView)
