@@ -14,7 +14,7 @@
     <string name="name_dish">dish name</string>
 
     <string name="waste">waste percent</string>
-    <string name="compose">Compose a dish</string>
+    <string name="compose">Add product to your dish.</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="create_dish">create dish</string>

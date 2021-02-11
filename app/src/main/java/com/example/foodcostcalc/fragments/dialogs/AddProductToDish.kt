@@ -21,6 +21,7 @@ import com.example.foodcostcalc.viewmodel.AddViewModel
 class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val NEW_SPINNER_ID = 1
     private val ANOTHER_SPINNER_ID = 2
+    private val UNIT_SPINNER_ID = 3
     private var productPosition: Int? = null
     private var dishPosition: Int? = null
 
@@ -38,10 +39,19 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         when (parent?.id) {
             1 -> {
                 productPosition = position
+
+                //when this is chosen
+                //it sends all of the available units to
+                //unit spinner
+                // for example, if metric units are the only chosen option
+                // and product price is per kg, unitlist is gram, kilogram
+                // if us units are also chosen unitlist is gram, kilogram, oz, pound
+                // i need a function which determines availble units based on sharedpreferences + product unit 
             }
-            else -> {
+            2 -> {
                 dishPosition = position
             }
+            else -> {}
         }
     }
 
@@ -61,12 +71,13 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         val addProductToDishBtn = view.findViewById<ImageButton>(R.id.add_product_to_dish)
         val productSpinner = view.findViewById<Spinner>(R.id.mySpinner)
         val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
+        val unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
 
         /** ADAPTERs FOR SPINNERs */
         val productList = mutableListOf<String>()
         viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { it.forEach { product -> productList.add(product.name) } })
         val productAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, productList)
-        productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        //productAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         with(productSpinner)
         {
             adapter = productAdapter
@@ -74,24 +85,35 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             onItemSelectedListener = this@AddProductToDish
             prompt = "Select product"
             gravity = Gravity.CENTER
+            id = NEW_SPINNER_ID
         }
-        productSpinner.id = NEW_SPINNER_ID
         productAdapter.notifyDataSetChanged()
 
         val dishList = mutableListOf<String>()
         viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { it.forEach { dish -> dishList.add(dish.name) } })
         val dishesAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, dishList)
-        dishesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        //dishesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         with(dishSpinner) {
             adapter = dishesAdapter
             setSelection(0, false)
             onItemSelectedListener = this@AddProductToDish
             prompt = "Select dish"
             gravity = Gravity.CENTER
+            id = ANOTHER_SPINNER_ID
         }
-        dishSpinner.id = ANOTHER_SPINNER_ID
         dishesAdapter.notifyDataSetChanged()
 
+        val unitList = arrayListOf<String>()
+        val unitAdapter = ArrayAdapter(requireActivity(),R.layout.support_simple_spinner_dropdown_item,unitList)
+        unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        with(unitSpinner){
+            adapter = unitAdapter
+            setSelection(0,false)
+            onItemSelectedListener = this@AddProductToDish
+            prompt = "Select unit"
+            gravity = Gravity.CENTER
+            id = UNIT_SPINNER_ID
+        }
 
         /**OBSERVING LIVEDATA FROM ADDVIEWMODEL
          *  WHICH OBSERVES LIVEDATA IN REPOSITORY
