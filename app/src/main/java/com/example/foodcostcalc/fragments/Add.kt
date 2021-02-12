@@ -11,6 +11,7 @@ import android.widget.*
 import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
+import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import java.math.RoundingMode
@@ -19,7 +20,9 @@ import java.text.DecimalFormat
 
 class Add : Fragment(), AdapterView.OnItemSelectedListener {
 
-    var unitPosition: Int? = null
+    private var chosenUnit: String = ""
+    private var unitList: Array<String> = arrayOf<String>()
+
 
     private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
         Toast.makeText(context, message, duration).show()
@@ -34,7 +37,6 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         val view: View = inflater.inflate(R.layout.fragment_add, container, false)
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
-
         /** BINDERS FOR BUTTONS AND FIELDS */
         val name = view.findViewById<EditText>(R.id.product_name)
         val price = view.findViewById<EditText>(R.id.product_price)
@@ -45,11 +47,24 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         val calcWasteWeight = view.findViewById<EditText>(R.id.waste_calc_product_waste)
         val calcProductWeight = view.findViewById<EditText>(R.id.waste_calc_product_weight)
 
+         val sharedPreferences = SharedPreferences(requireContext())
+
+        /**Get units preferred by the user.*/
+         fun getUnits(): Array<out String> {
+            var chosenUnits = resources.getStringArray(R.array.piece)
+            if (sharedPreferences.getValueBoolien("metric", false)) {
+                chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
+            }
+            if (sharedPreferences.getValueBoolien("usa", false)) {
+                chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
+            }
+            unitList = chosenUnits
+            return chosenUnits
+        }
 
         /**Spinner adapter*/
         val unitSpinner = view.findViewById<Spinner>(R.id.units_spinner)
-        val unitList = resources.getStringArray(R.array.units)
-        val unitsAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, unitList)
+        val unitsAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, getUnits())
         with(unitSpinner) {
             setSelection(0, false)
             adapter = unitsAdapter
@@ -73,7 +88,7 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
                         price.text.toString().toDouble(),
                         tax.text.toString().toDouble(),
                         waste.text.toString().toDouble(),
-                        unitList[unitPosition!!]
+                        chosenUnit
                 )
                 viewModel.addProducts(product)
 
@@ -120,7 +135,8 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             1 -> {
-                unitPosition = position
+                chosenUnit = unitList[position]
+
             }
             else -> {
             }

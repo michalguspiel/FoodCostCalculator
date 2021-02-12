@@ -9,12 +9,18 @@
 
     </array>
 
-    <array name="addProductUnits">
+    <array name="piece">
         <item>"per piece"</item>
-        <item>"per kg"</item>
-        <item>"ml/l"</item>
+    </array>
 
+    <array name="addProductUnitsMetric">
+        <item>"per kilogram"</item>
+        <item>"per liter"</item>
+    </array>
 
+    <array name="addProductUnitsUS">
+        <item>per pound</item>
+        <item>per gallon</item>
     </array>
 
 </resources>

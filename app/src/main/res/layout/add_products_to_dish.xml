@@ -1,69 +1,138 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:layout_width="wrap_content"
-    android:layout_height="100dp"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/fragment_add_product_to_dish"
     style="@style/Theme.AppCompat.DayNight.Dialog"
+    android:layout_width="400dp"
+    android:layout_height="300dp"
     android:layout_gravity="center"
-    android:background="@drawable/background_for_dialogs">
+    android:background="@drawable/background_for_dialogs"
+    android:orientation="vertical">
 
-
-    <TextView
-        android:layout_marginTop="12dp"
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/compose"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="@color/blue_700"/>
 
     <LinearLayout
+        android:id="@+id/linearLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView">
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Choose dish: "
+            android:textColor="@color/blue_700"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <Spinner
             android:id="@+id/dishSpinner"
             android:layout_width="115dp"
-            android:layout_height="match_parent"
-            android:layout_margin="4dp"
+            android:layout_height="35dp"
             android:layout_gravity="center"
+            android:layout_margin="4dp"
             android:background="@drawable/button_gradient"
             android:dropDownWidth="wrap_content"
             android:spinnerMode="dialog" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/unitSpinner"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
+
+        <TextView
+            android:id="@+id/textView7"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:text="Choose product:"
+            android:textColor="@color/blue_700"
+            android:textSize="14sp"
+            android:textStyle="bold" />
 
         <Spinner
             android:id="@+id/mySpinner"
             android:layout_width="125dp"
-            android:layout_height="match_parent"
+            android:layout_height="35dp"
             android:layout_margin="4dp"
             android:background="@drawable/button_gradient"
             android:dropDownWidth="wrap_content"
             android:spinnerMode="dialog" />
 
+    </LinearLayout>
+
+    <Spinner
+        android:id="@+id/unitSpinner"
+        android:layout_width="125dp"
+        android:layout_height="35dp"
+        android:layout_margin="4dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="32dp"
+        android:background="@drawable/button_gradient"
+        android:dropDownWidth="wrap_content"
+        android:spinnerMode="dropdown"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout5"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="8dp"
+        android:text="@string/compose"
+        android:textColor="@color/blue_700"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
         <EditText
             android:id="@+id/product_weight"
             android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:autofillHints=""
             android:hint="@string/amount"
-            android:inputType="numberDecimal"
-            android:autofillHints="" />
+            android:inputType="numberDecimal" />
 
         <ImageButton
             android:id="@+id/add_product_to_dish"
-            android:layout_width="0dp"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            app:srcCompat="@android:drawable/ic_input_add"
-            android:contentDescription="@string/add_product_to_dish" />
+            android:contentDescription="@string/add_product_to_dish"
+            app:srcCompat="@android:drawable/ic_input_add" />
 
     </LinearLayout>
 
+</androidx.constraintlayout.widget.ConstraintLayout>
 
-</LinearLayout>
+
+
 
 
