@@ -27,6 +27,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     var unitPosition: Int? = null
     var productId: Long? = null
+
     var unitList: Array<String> = arrayOf<String>()
     private lateinit var viewModel: AddViewModel
 
@@ -65,7 +66,6 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** Spinner */
         val unitSpinner = view.findViewById<Spinner>(R.id.spinner_edit_product)
-        val unitList = resources.getStringArray(R.array.units)
         val unitsAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item,getUnits())
         with(unitSpinner) {
             adapter = unitsAdapter
