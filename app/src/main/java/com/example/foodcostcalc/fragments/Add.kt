@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
+import com.example.foodcostcalc.MainActivity
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.model.Product
@@ -21,7 +22,7 @@ import java.text.DecimalFormat
 class Add : Fragment(), AdapterView.OnItemSelectedListener {
 
     private var chosenUnit: String = ""
-    private var unitList: Array<String> = arrayOf<String>()
+    var unitList: Array<String> = arrayOf<String>()
 
 
     private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
@@ -61,6 +62,7 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
             unitList = chosenUnits
             return chosenUnits
         }
+
 
         /**Spinner adapter*/
         val unitSpinner = view.findViewById<Spinner>(R.id.units_spinner)

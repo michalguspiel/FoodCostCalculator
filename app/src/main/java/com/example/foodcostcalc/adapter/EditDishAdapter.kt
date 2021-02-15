@@ -71,14 +71,7 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
 
         fun setUnit() {
             var result = ""
-                result = when (list[position].productIncluded.unit) {
-                    "per piece" -> "piece"
-                    "per kilogram" -> "kilogram"
-                    "per gram" -> "gram"
-                    "per milliliter" -> "milliliter"
-                    "per liter" -> "liter"
-                    else -> "unidentified"
-                }
+                result = list[position].weightUnit
             if (list[position].weight > 1) result += 's'
             holder.unitTextView.text = result
         }
@@ -91,7 +84,6 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
         holder.deleteProductBtn.setOnClickListener {
             viewModel.setProductIncluded(list[position])
             AreYouSure().show(this.fragmentManager, "EditDishAdapter")
-            notifyDataSetChanged()
         }
 
         /** Edit text product weight.

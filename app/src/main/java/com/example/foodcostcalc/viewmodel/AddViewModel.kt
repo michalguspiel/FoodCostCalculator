@@ -83,13 +83,13 @@ class AddViewModel(application: Application)
          }
      }
 
-
     fun deleteProductIncluded(productIncluded: ProductIncluded) {
         viewModelScope.launch(Dispatchers.IO) {
             dishRepository.deleteProductIncluded(productIncluded)
         }
     }
 
+    fun getProductIncludedByDishId(dishId: Long) = dishRepository.getProductIncludedByDishID(dishId)
 
     fun getDishesWithProductsIncluded() = dishRepository.getDishesWithProductsIncluded()
 
