@@ -13,7 +13,10 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.example.foodcostcalc.MainActivity
 import com.example.foodcostcalc.R
+import com.example.foodcostcalc.SharedPreferences
+import com.example.foodcostcalc.fragments.Add
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.model.ProductIncluded
@@ -25,6 +28,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
     var unitPosition: Int? = null
     var productId: Long? = null
 
+    var unitList: Array<String> = arrayOf<String>()
     private lateinit var viewModel: AddViewModel
 
     @SuppressLint("ResourceType")
@@ -43,11 +47,27 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
          * ID as edited product. */
         var productIncludedList = listOf<ProductIncluded>()
 
+        val sharedPreferences = SharedPreferences(requireContext())
+
+        /**Get units preferred by the user.*/
+        fun getUnits(): Array<out String> {
+            var chosenUnits = resources.getStringArray(R.array.piece)
+            if (sharedPreferences.getValueBoolien("metric", false)) {
+                chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
+            }
+            if (sharedPreferences.getValueBoolien("usa", false)) {
+                chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
+            }
+            unitList = chosenUnits
+            return chosenUnits
+        }
+
+
 
         /** Spinner */
         val unitSpinner = view.findViewById<Spinner>(R.id.spinner_edit_product)
         val unitList = resources.getStringArray(R.array.units)
-        val unitsAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, unitList)
+        val unitsAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item,getUnits())
         with(unitSpinner) {
             adapter = unitsAdapter
             onItemSelectedListener = this@EditProduct
@@ -121,7 +141,8 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                         it.dishOwnerId,
                         it.dish,
                         it.productOwnerId,
-                        it.weight)
+                        it.weight,
+                        it.weightUnit)
                 )
             }
 

@@ -33,11 +33,13 @@ class MainActivity : AppCompatActivity() {
     private val createDishFragment = CreateDish.newInstance()
     lateinit var drawerLayout: DrawerLayout
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+
 
 
         /** Open Fragment */

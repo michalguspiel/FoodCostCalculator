@@ -81,7 +81,6 @@
         android:layout_margin="4dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="32dp"
-        android:background="@drawable/button_gradient"
         android:dropDownWidth="wrap_content"
         android:spinnerMode="dropdown"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout5"

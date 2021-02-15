@@ -41,8 +41,8 @@ class CreateDish : DialogFragment() {
             val taxAsString = sharedPreferences.getValueString("tax")
             var tax = 23.0
             var margin = 100.0
-            if(taxAsString != null) tax = taxAsString.toDouble()
-            if(marginAsString != null) margin = marginAsString.toDouble()
+            if(!taxAsString.isNullOrEmpty()) tax = taxAsString.toDouble()
+            if(!marginAsString.isNullOrEmpty()) margin = marginAsString.toDouble()
 
             if (dishName.text.isNotEmpty()) {
                 val dish = Dish(0, dishName.text.toString(),margin,tax)

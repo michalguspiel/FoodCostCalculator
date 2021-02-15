@@ -23,6 +23,7 @@ import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import kotlin.properties.Delegates
 /** TODO improving this class plus refractoring.  */
+
 class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val PRODUCT_SPINNER_ID = 1
     private val DISH_SPINNER_ID = 2
@@ -30,7 +31,11 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private var productPosition: Int? = null
     private var dishPosition: Int? = null
     private val unitList = arrayListOf<String>() // list for units, to populate spinner
+    private var chosenUnit: String = ""
+
+   /** Initialized here so it can be called outside of 'onCreateView' */
     lateinit var viewModel :ViewModel
+    private lateinit var unitAdapter: ArrayAdapter<*>
 
     /**Holder for booleans*/
     private var metricAsBoolean = true
@@ -65,10 +70,12 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                 }
             }
         }
-
+    unitAdapter.notifyDataSetChanged()
     }
-    /**Get chosen product and set correct type of array list of units */
-    private fun setAdapterList() { if(productPosition != null) { Log.i("test","notnull,executed")
+
+
+    /**Get chosen product and set correct type of units */
+    private fun setAdapterList() {
         val thisViewModel = viewModel as AddViewModel
         unitType = when (thisViewModel.readAllProductData.value?.get(productPosition!!)?.unit) {
             "per kilogram", "per pound" -> {
@@ -83,8 +90,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         }
         changeUnitList()
     }
-    else Log.i("test","null")
-    }
+
 
 
     /**Spinner implementation */
@@ -98,11 +104,14 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             1 -> {
                 productPosition = position
                 setAdapterList()
+                chosenUnit = unitList.first() // to make sure that first unit from new list is chosen when product is changed.
             }
             2 -> {
                 dishPosition = position
             }
-            else -> {}
+            else -> {
+                chosenUnit = unitList[position]
+            }
         }
     }
     override fun onCreateView(
@@ -122,16 +131,12 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         metricAsBoolean = sharedPreferences.getValueBoolien("metric", false)
         usaAsBoolean =  sharedPreferences.getValueBoolien("usa", false)
 
-
-
-
         /** binders*/
         val weightOfAddedProduct = view.findViewById<EditText>(R.id.product_weight)
         val addProductToDishBtn = view.findViewById<ImageButton>(R.id.add_product_to_dish)
         val productSpinner = view.findViewById<Spinner>(R.id.mySpinner)
         val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
         val unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
-
 
             /** ADAPTERs FOR SPINNERs */
         val productList = mutableListOf<String>()
@@ -161,7 +166,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         }
         dishesAdapter.notifyDataSetChanged()
 
-        val unitAdapter = ArrayAdapter(requireActivity(),R.layout.support_simple_spinner_dropdown_item,unitList)
+        unitAdapter = ArrayAdapter(requireActivity(),R.layout.support_simple_spinner_dropdown_item,unitList)
         unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         with(unitSpinner){
             adapter = unitAdapter
@@ -172,27 +177,25 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             id = UNIT_SPINNER_ID
         }
 
-        /**OBSERVING LIVEDATA FROM ADDVIEWMODEL
-         *  WHICH OBSERVES LIVEDATA IN REPOSITORY
-         *  WHICH OBSERVES LIVEDATA FROM DAO*/
+        /**OBSERVING 'LIVEDATA' FROM ADDVIEWMODEL
+         *  WHICH OBSERVES 'LIVEDATA' IN REPOSITORY
+         *  WHICH OBSERVES 'LIVEDATA' FROM DAO*/
 
         thisViewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
             productAdapter.clear()
             products.forEach { product ->
                 productAdapter.add(product.name)
                 productAdapter.notifyDataSetChanged()
-
             }
         })
+
         thisViewModel.readAllDishData.observe(viewLifecycleOwner, Observer { dishes ->
             dishesAdapter.clear()
             dishes.forEach { dish ->
                 dishesAdapter.add(dish.name)
                 dishesAdapter.notifyDataSetChanged()
             }
-
         })
-
 
         /** BUTTON LOGIC*/
         addProductToDishBtn.setOnClickListener {
@@ -207,7 +210,9 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                         chosenDish!!.dishId,
                         chosenDish,
                         chosenProduct.productId,
-                        weight))
+                        weight,
+                        chosenUnit
+                ))
             }
             weightOfAddedProduct.text.clear()
             Toast.makeText(requireContext(), "${thisViewModel.readAllProductData.value?.get(productPosition!!)?.name} added.", Toast.LENGTH_SHORT).show()
