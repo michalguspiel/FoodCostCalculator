@@ -27,7 +27,6 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     var unitPosition: Int? = null
     var productId: Long? = null
-
     var unitList: Array<String> = arrayOf<String>()
     private lateinit var viewModel: AddViewModel
 
