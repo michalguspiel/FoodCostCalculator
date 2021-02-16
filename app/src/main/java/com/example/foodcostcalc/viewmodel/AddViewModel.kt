@@ -67,7 +67,7 @@ class AddViewModel(application: Application)
 
     fun addProductToDish(product: ProductIncluded) {
         viewModelScope.launch(Dispatchers.IO) {
-            productRepository.addProductToDish(product)
+            dishRepository.addProductToDish(product)
         }
     }
 

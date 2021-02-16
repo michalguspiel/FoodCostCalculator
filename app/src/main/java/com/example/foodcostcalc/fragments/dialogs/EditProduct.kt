@@ -52,7 +52,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         /**Get units preferred by the user.*/
         fun getUnits(): Array<out String> {
             var chosenUnits = resources.getStringArray(R.array.piece)
-            if (sharedPreferences.getValueBoolien("metric", false)) {
+            if (sharedPreferences.getValueBoolien("metric", true)) {
                 chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
             }
             if (sharedPreferences.getValueBoolien("usa", false)) {
@@ -61,8 +61,6 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
             unitList = chosenUnits
             return chosenUnits
         }
-
-
 
         /** Spinner */
         val unitSpinner = view.findViewById<Spinner>(R.id.spinner_edit_product)
@@ -100,8 +98,6 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
          * Also gets information about every product included with same productID and
          * saves it as list so the product will be edited in every dish as well */
 
-
-        viewModel.getProducts().observe(viewLifecycleOwner, Observer { product ->
             if (viewModel.getFlag().value == false) {
                 this.dismiss()
                 viewModel.setFlag(true)
@@ -113,14 +109,13 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                 waste.setText(productPassedFromAdapter.waste.toString())
                 unitSpinner.setSelection(unitList.indexOf(productPassedFromAdapter.unit))
 
+
                 viewModel.getCertainProductsIncluded(productId!!).                           // GETS LIST OF PRODUCT INCLUDED
                 observe(viewLifecycleOwner, Observer { listOfProducts ->                     // WITH THE SAME ID AS productID
                     productIncludedList = listOfProducts                                     // AND SAVES IT IN 'productIncludedList'
                 })
-
-
             }
-        })
+
 
 
         /** BUTTON LOGIC*/
@@ -133,8 +128,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                     unitList[unitPosition!!])
             viewModel.editProduct(productToChange)
 
-            productIncludedList.forEach {
-                Log.i("test", it.dishOwnerId.toString() + it.productIncluded.name + " " + it.productIncluded.productId)
+            productIncludedList.forEach {Log.i("test", "edited!")
                 viewModel.editProductsIncluded(ProductIncluded(it.productIncludedId,
                         productToChange,
                         it.dishOwnerId,
@@ -144,7 +138,6 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                         it.weightUnit)
                 )
             }
-
             this.dismiss()
         }
 

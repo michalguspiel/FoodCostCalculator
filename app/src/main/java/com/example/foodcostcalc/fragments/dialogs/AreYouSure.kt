@@ -66,19 +66,31 @@ class AreYouSure : DialogFragment() {
             if (this.tag == EditProduct.TAG) productToDelete = product[pos!!]
         })
 
+
+
         /**Button logic: tag informs this dialog from where it was open so it knows what action to proceed.*
          *  listOfProductsIncludedToErase is method which deletes every trace of dish in ProductIncluded query,
          *  higher order method foreach is called twice just to make sure that everything is deleted. It doesn't work
          *  100% effectively and I can't see reason why just yet but this needs to be refractored somehow. TODO
          */
 
+        /**Function, made because of inconsistency in deleting products included associated with dish*/
+        fun deleteAllProductIncluded(list: List<ProductIncluded>){
+            list.forEach { viewModel.deleteProductIncluded(it) }
+            var listOfSurvivors = listOf<ProductIncluded>()
+            viewModel.getProductIncludedByDishId(dishToDelete.dishId).observe(viewLifecycleOwner, Observer { listOfProducts ->
+                listOfSurvivors = listOfProducts
+            })
+            if(listOfSurvivors.isNotEmpty()) deleteAllProductIncluded(list)
+        }
+
+
         confirmBtn.setOnClickListener {
             viewModel.setFlag(false)
             when (this.tag) {
                 EditProduct.TAG -> viewModel.deleteProduct(productToDelete)
-                EditDish.TAG -> { viewModel.deleteDish(dishToDelete)
-                        listOfProductsIncludedToErase.forEach{ viewModel.deleteProductIncluded(it)}   // TODO refactoring/improving
-                    listOfProductsIncludedToErase.forEach { viewModel.deleteProductIncluded(it)}     //  TODO refactoring/improving
+                EditDish.TAG -> {deleteAllProductIncluded(listOfProductsIncludedToErase)
+                                viewModel.deleteDish(dishToDelete)
                 }
                 "EditDishAdapter" -> viewModel.getDishesWithProductsIncluded()
                         .observe(viewLifecycleOwner, Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })

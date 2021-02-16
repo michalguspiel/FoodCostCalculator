@@ -24,8 +24,6 @@ class ProductRepository(private val productDao: ProductDao) {
 
     suspend fun deleteProduct(product: Product) = productDao.deleteProduct(product)
 
-    suspend fun addProductToDish(product: ProductIncluded) = productDao.addProductToDish(product)
-
 
 
     companion object {

@@ -1,5 +1,8 @@
 package com.example.foodcostcalc
 
+import android.app.Application
+import android.content.Context
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 
@@ -20,5 +23,12 @@ class ExampleInstrumentedTest {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
         assertEquals("com.example.foodcostcalc", appContext.packageName)
+    }
+
+    @Test
+    fun exampleTest(){
+        val context = ApplicationProvider.getApplicationContext<Context>()
+        val result = TODO()
+
     }
 }

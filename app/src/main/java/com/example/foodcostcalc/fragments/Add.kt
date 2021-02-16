@@ -53,7 +53,7 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         /**Get units preferred by the user.*/
          fun getUnits(): Array<out String> {
             var chosenUnits = resources.getStringArray(R.array.piece)
-            if (sharedPreferences.getValueBoolien("metric", false)) {
+            if (sharedPreferences.getValueBoolien("metric", true)) {
                 chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
             }
             if (sharedPreferences.getValueBoolien("usa", false)) {
@@ -75,6 +75,28 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
             this.prompt = "Choose unit"
             id = 1
         }
+
+        /**Functions*/
+
+        /** Calculates waste % from given product weight and waste weight,
+         * formattedResultCheck works as safety for devices that formats number to
+         * for example 21,21 */
+        fun calculateWaste(calcWeight: Double, calcWaste: Double): String {
+                val result = (100 * calcWaste) / calcWeight
+                val df = DecimalFormat("#.##")
+                df.roundingMode = RoundingMode.CEILING
+                val formattedResult = df.format(result)
+                var formattedResultCheck = ""
+                for (eachChar in formattedResult) {
+                    formattedResultCheck += if (eachChar == ',') '.'
+                    else eachChar
+                }
+                waste.setText(formattedResultCheck)
+                calcProductWeight.text.clear()
+                calcWasteWeight.text.clear()
+                return formattedResultCheck // returns this only in order to test it
+            }
+
 
         /** BUTTONS FUNCTIONALITY */
 
@@ -101,29 +123,12 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
             }
         }
 
-
-        /** Calculates waste % from given product weight and waste weight,
-         * formattedResultCheck works as safety if device formats number to
-         * for example 21,21 */
         calculateWasteBtn.setOnClickListener {
-            if (calcProductWeight.text.isNotEmpty() && calcWasteWeight.text.isNotEmpty()) {
-                val calcWeight = calcProductWeight.text.toString().toDouble()
-                val calcWaste = calcWasteWeight.text.toString().toDouble()
-                val result = (100 * calcWaste) / calcWeight
-                val df = DecimalFormat("#.##")
-                df.roundingMode = RoundingMode.CEILING
-                val formattedResult = df.format(result)
-                var formattedResultCheck = ""
-                for (eachChar in formattedResult) {
-                    formattedResultCheck += if (eachChar == ',') '.'
-                    else eachChar
-                }
-                waste.setText(formattedResultCheck)
-                calcProductWeight.text.clear()
-                calcWasteWeight.text.clear()
+            if (calcProductWeight.text.isNotEmpty() && calcWasteWeight.text.isNotEmpty()){
+                calculateWaste(calcProductWeight.text.toString().toDouble(),
+                                calcWasteWeight.text.toString().toDouble())
             }
         }
-
 
 
         return view

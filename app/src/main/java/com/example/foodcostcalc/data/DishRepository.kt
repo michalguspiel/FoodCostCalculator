@@ -22,6 +22,9 @@ class DishRepository(private val dishDao: DishDao) {
         dishDao.editDish(dish)
     }
 
+    suspend fun addProductToDish(product: ProductIncluded) = dishDao.addProductToDish(product)
+
+
     suspend fun editProductsIncluded(productIncluded: ProductIncluded){
         dishDao.editProductsIncluded(productIncluded)
     }

@@ -104,7 +104,6 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             1 -> {
                 productPosition = position
                 setAdapterList()
-                chosenUnit = unitList.first() // to make sure that first unit from new list is chosen when product is changed.
             }
             2 -> {
                 dishPosition = position
@@ -128,7 +127,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         /** Get the data about unit settings from shared preferences.
          * true means that user uses certain units.*/
         val sharedPreferences = SharedPreferences(requireContext())
-        metricAsBoolean = sharedPreferences.getValueBoolien("metric", false)
+        metricAsBoolean = sharedPreferences.getValueBoolien("metric", true)
         usaAsBoolean =  sharedPreferences.getValueBoolien("usa", false)
 
         /** binders*/

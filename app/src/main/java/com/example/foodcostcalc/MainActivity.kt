@@ -1,14 +1,9 @@
 package com.example.foodcostcalc
 
-import android.app.Notification
 import android.os.Bundle
-import android.text.Editable
-import android.text.Layout
-import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -18,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.fragments.*
 import com.example.foodcostcalc.fragments.dialogs.AddProductToDish
 import com.example.foodcostcalc.fragments.dialogs.CreateDish
-import com.example.foodcostcalc.fragments.dialogs.SearchDialog
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
