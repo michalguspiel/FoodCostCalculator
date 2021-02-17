@@ -24,8 +24,7 @@ class MainActivity : AppCompatActivity() {
     private val dishesFragment = Dishes.newInstance()
     private val addFragment = Add.newInstance()
     private val settingsFragment = Settings.newInstance()
-    private val createDishFragment = CreateDish.newInstance()
-    lateinit var drawerLayout: DrawerLayout
+    private lateinit var drawerLayout: DrawerLayout
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         fun openFragment(fragment: Fragment) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.container, fragment)
-            transaction.addToBackStack(fragment.tag)
+            transaction.addToBackStack(null)
             transaction.commit()
         }
 
@@ -96,7 +95,9 @@ class MainActivity : AppCompatActivity() {
                             hideSearchToolbar()
                         }
                         R.id.nav_create_new_dish -> {
-                            CreateDish().show(supportFragmentManager, CreateDish.TAG)
+                            val dialogTransaction = supportFragmentManager.beginTransaction()
+                            dialogTransaction.addToBackStack(null)
+                            CreateDish().show(dialogTransaction, CreateDish.TAG)
                         }
                         R.id.nav_add_product_to_dish -> {
                             AddProductToDish().show(supportFragmentManager, AddProductToDish.TAG)

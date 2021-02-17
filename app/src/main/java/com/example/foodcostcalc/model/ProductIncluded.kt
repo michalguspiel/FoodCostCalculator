@@ -13,9 +13,7 @@ data class ProductIncluded(@PrimaryKey(autoGenerate = true) val productIncludedI
                            val productOwnerId: Long,
                            var weight: Double,
                            val weightUnit: String
-) {
-
-}
+)
 
 data class DishWithProductsIncluded(
         @Embedded val dish: Dish,

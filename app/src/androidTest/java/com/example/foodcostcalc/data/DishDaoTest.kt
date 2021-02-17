@@ -2,7 +2,6 @@ package com.example.foodcostcalc.data
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
-import androidx.room.RoomDatabase
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
@@ -12,7 +11,6 @@ import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.model.ProductIncluded
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.After
 import org.junit.Before
@@ -49,14 +47,13 @@ class DishDaoTest {
         val simpleDish = Dish(1, "1")
         val simpleProduct = Product(1, "1", 1.0, 1.0, 1.0, "1")
         val singleProduct = ProductIncluded(1, simpleProduct, 1, simpleDish, 1, 1.0, "1")
-        val secondProduct = ProductIncluded(2, simpleProduct, 1, simpleDish, 1, 2.0, "2")
         dao.addProductToDish(singleProduct)
         val allProductsIncluded = dao.getAllProductsIncluded().getOrAwaitValue()
         assertThat(allProductsIncluded).contains(singleProduct)
     }
 
     @Test
-    fun testIfProductWasDelted_false() = runBlockingTest {
+    fun testIfProductWasDeleted_false() = runBlockingTest {
         val simpleDish = Dish(2, "1")
         val simpleProduct = Product(2, "1", 1.0, 1.0, 1.0, "1")
         val secondProduct = ProductIncluded(2, simpleProduct, 2, simpleDish, 2, 2.0, "2")
@@ -74,7 +71,6 @@ class DishDaoTest {
         val firstProduct = Product(1, "1", 1.0, 1.0, 1.0, "1")
         val secondProduct = Product(2, "2", 1.0, 1.0, 1.0, "1")
         val thirdProduct = Product(3, "3", 1.0, 1.0, 1.0, "1")
-        val fourthProduct = Product(4, "4", 1.0, 1.0, 1.0, "1")
         val fifthProduct = Product(5, "5", 1.0, 1.0, 1.0, "1")
         val firstPI = ProductIncluded(1, firstProduct, 1, firstDish, 1, 2.0, "2")
         val secondPI = ProductIncluded(2, secondProduct, 1, firstDish, 2, 2.0, "2")
@@ -84,7 +80,7 @@ class DishDaoTest {
         val sixthPI = ProductIncluded(6, fifthProduct, 2, secondDish, 5, 2.0, "2")
         val seventhPI = ProductIncluded(7, firstProduct, 2, secondDish, 1, 2.0, "2")
 
-        val list = listOf<ProductIncluded>(
+        val list = listOf(
             firstPI,
             secondPI,
             thirdPI,
@@ -116,7 +112,6 @@ class DishDaoTest {
         val firstProduct = Product(1, "1", 1.0, 1.0, 1.0, "1")
         val secondProduct = Product(2, "2", 1.0, 1.0, 1.0, "1")
         val thirdProduct = Product(3, "3", 1.0, 1.0, 1.0, "1")
-        val fourthProduct = Product(4, "4", 1.0, 1.0, 1.0, "1")
         val fifthProduct = Product(5, "5", 1.0, 1.0, 1.0, "1")
         val firstPI = ProductIncluded(1, firstProduct, 1, firstDish, 1, 2.0, "2")
         val secondPI = ProductIncluded(2, secondProduct, 1, firstDish, 2, 2.0, "2")
@@ -126,7 +121,7 @@ class DishDaoTest {
         val sixthPI = ProductIncluded(6, fifthProduct, 2, secondDish, 5, 2.0, "2")
         val seventhPI = ProductIncluded(7, firstProduct, 2, secondDish, 1, 2.0, "2")
 
-        val list = listOf<ProductIncluded>(
+        val list = listOf(
             firstPI,
             secondPI,
             thirdPI,

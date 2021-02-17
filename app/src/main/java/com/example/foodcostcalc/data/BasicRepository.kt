@@ -20,11 +20,7 @@ class BasicRepository(private val basicDao: BasicDao) {
 
     fun getPosition() = basicDao.getPosition()
 
-    fun setSecondPosition(pos: Int){
-        basicDao.setSecondPosition(pos)
-    }
 
-    fun getSecondPosition() = basicDao.getSecondPosition()
 
     fun setFlag(boolean: Boolean) {
         basicDao.setFlag(boolean)

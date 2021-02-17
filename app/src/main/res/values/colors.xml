@@ -4,8 +4,9 @@
     <color name="blue_500">#1a237e</color>
     <color name="blue_700">#000051</color>
     <color name="yellow_200">#ffff00</color>
-    <color name="yellow_700">#c7cc00</color>
-    <color name="yellow_500">#ffff5a</color>>
+    <color name="yellow_700">#c7cc00</color><![CDATA[
+    >
+    ]]>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

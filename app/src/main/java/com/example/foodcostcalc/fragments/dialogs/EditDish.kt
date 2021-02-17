@@ -9,19 +9,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.adapter.EditDishAdapter
-import com.example.foodcostcalc.fragments.Dishes
-import com.example.foodcostcalc.model.ProductIncluded
-import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.DishWithProductsIncluded
-import org.w3c.dom.Text
+import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.viewmodel.AddViewModel
 
 class EditDish : DialogFragment() {
 

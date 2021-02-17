@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -13,29 +12,26 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.foodcostcalc.MainActivity
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
-import com.example.foodcostcalc.fragments.Add
-import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.model.ProductIncluded
-import io.reactivex.internal.operators.parallel.ParallelRunOn
+import com.example.foodcostcalc.viewmodel.AddViewModel
 
 
 class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
-    var unitPosition: Int? = null
-    var productId: Long? = null
+    private var unitPosition: Int? = null
+    private var productId: Long? = null
 
-    var unitList: Array<String> = arrayOf<String>()
+    private var unitList: Array<String> = arrayOf()
     private lateinit var viewModel: AddViewModel
 
     @SuppressLint("ResourceType")
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_edit_product, container, false)
 
@@ -52,10 +48,10 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         /**Get units preferred by the user.*/
         fun getUnits(): Array<out String> {
             var chosenUnits = resources.getStringArray(R.array.piece)
-            if (sharedPreferences.getValueBoolien("metric", true)) {
+            if (sharedPreferences.getValueBoolean("metric", true)) {
                 chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
             }
-            if (sharedPreferences.getValueBoolien("usa", false)) {
+            if (sharedPreferences.getValueBoolean("usa", false)) {
                 chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
             }
             unitList = chosenUnits
@@ -64,7 +60,11 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** Spinner */
         val unitSpinner = view.findViewById<Spinner>(R.id.spinner_edit_product)
-        val unitsAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item,getUnits())
+        val unitsAdapter = ArrayAdapter(
+            requireActivity(),
+            R.layout.support_simple_spinner_dropdown_item,
+            getUnits()
+        )
         with(unitSpinner) {
             adapter = unitsAdapter
             onItemSelectedListener = this@EditProduct
@@ -98,53 +98,61 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
          * Also gets information about every product included with same productID and
          * saves it as list so the product will be edited in every dish as well */
 
-            if (viewModel.getFlag().value == false) {
-                this.dismiss()
-                viewModel.setFlag(true)
-            } else if (viewModel.getFlag().value == true) {
-                productId = productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
-                name.setText(productPassedFromAdapter.name)
-                price.setText(productPassedFromAdapter.pricePerUnit.toString())
-                tax.setText(productPassedFromAdapter.tax.toString())
-                waste.setText(productPassedFromAdapter.waste.toString())
-                unitSpinner.setSelection(unitList.indexOf(productPassedFromAdapter.unit))
+        if (viewModel.getFlag().value == false) {
+            this.dismiss()
+            viewModel.setFlag(true)
+        } else if (viewModel.getFlag().value == true) {
+            productId =
+                productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
+            name.setText(productPassedFromAdapter.name)
+            price.setText(productPassedFromAdapter.pricePerUnit.toString())
+            tax.setText(productPassedFromAdapter.tax.toString())
+            waste.setText(productPassedFromAdapter.waste.toString())
+            unitSpinner.setSelection(unitList.indexOf(productPassedFromAdapter.unit))
 
-
-                viewModel.getCertainProductsIncluded(productId!!).                           // GETS LIST OF PRODUCT INCLUDED
-                observe(viewLifecycleOwner, Observer { listOfProducts ->                     // WITH THE SAME ID AS productID
-                    productIncludedList = listOfProducts                                     // AND SAVES IT IN 'productIncludedList'
-                })
-            }
-
-
+            /**GET LIST OF PRODUCTS INCLUDED
+             * WITH THE SAME ID AS productID
+             * AND SAVE IT IN 'productIncludedList'*/
+            viewModel.getCertainProductsIncluded(productId!!).
+                observe(
+                    viewLifecycleOwner,
+                    Observer { listOfProducts ->
+                        productIncludedList = listOfProducts
+                    })
+        }
 
         /** BUTTON LOGIC*/
         saveButton.setOnClickListener {
-            val productToChange = Product(productId!!,
-                    name.text.toString(),
-                    price.text.toString().toDouble(),
-                    tax.text.toString().toDouble(),
-                    waste.text.toString().toDouble(),
-                    unitList[unitPosition!!])
+            val productToChange = Product(
+                productId!!,
+                name.text.toString(),
+                price.text.toString().toDouble(),
+                tax.text.toString().toDouble(),
+                waste.text.toString().toDouble(),
+                unitList[unitPosition!!]
+            )
             viewModel.editProduct(productToChange)
 
-            productIncludedList.forEach {Log.i("test", "edited!")
-                viewModel.editProductsIncluded(ProductIncluded(it.productIncludedId,
+            productIncludedList.forEach {
+                viewModel.editProductsIncluded(
+                    ProductIncluded(
+                        it.productIncludedId,
                         productToChange,
                         it.dishOwnerId,
                         it.dish,
                         it.productOwnerId,
                         it.weight,
-                        it.weightUnit)
+                        it.weightUnit
+                    )
                 )
             }
+            Thread.sleep(100) // This is here because otherwise dialog gets closed before all viewmodel functions are called
             this.dismiss()
         }
 
 
         deleteButton.setOnClickListener {
             AreYouSure().show(childFragmentManager, TAG)
-
         }
 
 
@@ -158,7 +166,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     companion object {
         fun newInstance(): EditProduct =
-                EditProduct()
+            EditProduct()
 
         const val TAG = "EditProduct"
 
@@ -178,6 +186,6 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        TODO("Not yet implemented")
+        this.dismiss()
     }
 }

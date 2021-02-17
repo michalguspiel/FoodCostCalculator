@@ -2,7 +2,6 @@ package com.example.foodcostcalc.data
 
 import androidx.lifecycle.LiveData
 import com.example.foodcostcalc.model.Product
-import com.example.foodcostcalc.model.ProductIncluded
 
 // Dao must be passed in - it is a dependency
 // You could also instantiate the DAO right inside the class without all the fuss, right?
@@ -17,8 +16,6 @@ class ProductRepository(private val productDao: ProductDao) {
         productDao.addProduct(product)
     }
     fun getProducts() = productDao.getProducts()
-
-    fun getProduct(id: Long) = productDao.getProduct(id)
 
     suspend fun editProduct(newProduct: Product) = productDao.editProduct(newProduct)
 

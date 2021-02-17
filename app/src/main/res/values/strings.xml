@@ -1,26 +1,16 @@
 <resources>
     <string name="app_name">FoodCostCalc</string>
-    <string name="help_button">Help</string>
     <string name="add_stuff">Add product to your list</string>
-    <string name="products">Products</string>
-    <string name="dishes">Menu</string>
     <string name="name">Product name</string>
 
     <string name="price">price</string>
-    <string name="new_dish">Create a new dish</string>
 
     <string name="tax">tax</string>
-    <string name="weight">weight</string>
-    <string name="name_dish">dish name</string>
 
     <string name="waste">waste percent</string>
     <string name="compose">Add product to your dish.</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="create_dish">create dish</string>
     <string name ="cancel">Cancel</string>
-    <string name ="done">done</string>
-    <string name ="fire">fire</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="are_you_sure">Are You sure?</string>
@@ -32,11 +22,8 @@
     <string name="waste_percent_product">waste percent:</string>
     <string name="name_of_new_dish">Name of new Dish</string>
     <string name="add">Add</string>
-    <string name="editbutton">EditButton</string>
     <string name="product_weight">Product weight</string>
     <string name="product_waste">product waste</string>
-    <string name="food_cost_calculator">Food cost calculator</string>
-    <string name="calculate_your_foodcost">Calculate your foodcost</string>
     <string name="amount">amount</string>
     <string name="add_product_to_dish">add product to dish</string>
     <string name="dish_margin">margin</string>
@@ -48,4 +35,23 @@
     <string name="unit">unit:</string>
     <string name="set_your_default_margin">Set your default margin as %</string>
     <string name="set_your_default_dish_tax">Set your default dish tax as %</string>
+    <string name="hamburger_picture">hamburger picture</string>
+    <string name="calculate_your_menu">Calculate your menu</string>
+    <string name="edit_button">edit button</string>
+    <string name="use_metric_units">Use metric units.</string>
+    <string name="use_us_units">Use US units.</string>
+    <string name="choose_dish">Choose dish:</string>
+    <string name="choose_product">Choose product:</string>
+    <string name="search_button">search button</string>
+    <string name="open_side_menu_button">open side menu button</string>
+    <string name="search_by_name">Search by name</string>
+    <string name="cancel_search">cancel search</string>
+    <string name="dish_tax">dish tax</string>
+    <string name="products">Products</string>
+    <string name="dishes">Dishes</string>
+    <string name="add_product">Add product</string>
+    <string name="create_a_new_dish">Create a new dish</string>
+    <string name="add_products_to_your_dish">Add products to your dish</string>
+    <string name="donate_money_to_developer">Donate money to developer</string>
+    <string name="personalize">Personalize</string>
 </resources>

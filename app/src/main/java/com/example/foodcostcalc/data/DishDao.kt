@@ -10,7 +10,7 @@ import com.example.foodcostcalc.model.ProductIncluded
 interface DishDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addDish(dish: Dish)
+    suspend fun addDish(dish: Dish)
 
     @Query("SELECT * FROM dishes ORDER BY dish_name ASC")
     fun getDishes(): LiveData<List<Dish>>

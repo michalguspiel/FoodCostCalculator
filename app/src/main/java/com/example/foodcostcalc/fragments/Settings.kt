@@ -1,6 +1,5 @@
 package com.example.foodcostcalc.fragments
 
-import android.app.Application
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -36,8 +35,8 @@ class Settings : Fragment() {
         if(taxAsString != null) editTaxEditText.setText(taxAsString)
         if(marginAsString != null) editMarginEditText.setText(marginAsString)
 
-        val isMetricChecked = sharedPreference.getValueBoolien("metric",true)
-        val isUsaChecked = sharedPreference.getValueBoolien("usa",false)
+        val isMetricChecked = sharedPreference.getValueBoolean("metric",true)
+        val isUsaChecked = sharedPreference.getValueBoolean("usa",false)
 
         metricCheckBox.isChecked = isMetricChecked
         usaCheckBox.isChecked = isUsaChecked

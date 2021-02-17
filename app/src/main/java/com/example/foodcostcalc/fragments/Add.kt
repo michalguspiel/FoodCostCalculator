@@ -2,7 +2,6 @@ package com.example.foodcostcalc.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
-import com.example.foodcostcalc.MainActivity
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.model.Product
@@ -22,7 +20,7 @@ import java.text.DecimalFormat
 class Add : Fragment(), AdapterView.OnItemSelectedListener {
 
     private var chosenUnit: String = ""
-    var unitList: Array<String> = arrayOf<String>()
+    private var unitList: Array<String> = arrayOf()
 
 
     private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
@@ -53,10 +51,10 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         /**Get units preferred by the user.*/
          fun getUnits(): Array<out String> {
             var chosenUnits = resources.getStringArray(R.array.piece)
-            if (sharedPreferences.getValueBoolien("metric", true)) {
+            if (sharedPreferences.getValueBoolean("metric", true)) {
                 chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
             }
-            if (sharedPreferences.getValueBoolien("usa", false)) {
+            if (sharedPreferences.getValueBoolean("usa", false)) {
                 chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
             }
             unitList = chosenUnits

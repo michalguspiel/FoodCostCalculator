@@ -8,7 +8,6 @@
 
 
     <TextView
-        android:id="@+id/textView4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/set_your_default_dish_tax"
@@ -24,7 +23,10 @@
         app:layout_constraintBottom_toTopOf="@+id/textView6"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="TextView" />
+        tools:text="TextView"
+        android:autofillHints=""
+        android:inputType="numberDecimal"
+        tools:ignore="LabelFor" />
 
     <TextView
         android:id="@+id/textView6"
@@ -45,7 +47,10 @@
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="TextView" />
+        tools:text="TextView"
+        android:autofillHints=""
+        android:inputType="numberDecimal"
+        tools:ignore="LabelFor" />
 
 
     <Button
@@ -71,7 +76,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Use metric units."
+        android:text="@string/use_metric_units"
         app:layout_constraintBottom_toTopOf="@+id/checkBoxUS"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -83,8 +88,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
-        android:text="Use US units."
+        android:text="@string/use_us_units"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkBoxMetric" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

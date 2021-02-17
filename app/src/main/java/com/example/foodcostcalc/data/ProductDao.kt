@@ -3,7 +3,6 @@ package com.example.foodcostcalc.data
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.foodcostcalc.model.Product
-import com.example.foodcostcalc.model.ProductIncluded
 
 /** DATA ACCESS OBJECT */
 @Dao

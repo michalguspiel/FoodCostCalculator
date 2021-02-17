@@ -5,23 +5,22 @@
         <item
             android:id="@+id/nav_add_product"
             android:icon="@drawable/plus"
-            android:title="Add product"/>
+            android:title="@string/add_product"/>
         <item
             android:id="@+id/nav_create_new_dish"
             android:icon="@drawable/serving_dish"
-            android:title="Create a new dish"/>
+            android:title="@string/create_a_new_dish"/>
         <item
             android:id="@+id/nav_add_product_to_dish"
             android:icon="@drawable/grocery"
-            android:title="Add products to your dish"/>
+            android:title="@string/add_products_to_your_dish"/>
         <item
-            android:id="@+id/nav_update"
             android:icon="@drawable/money"
-            android:title="Donate money to developer"/>
+            android:title="@string/donate_money_to_developer"/>
         <item
             android:id="@+id/nav_personalize"
             android:icon="@drawable/settings"
-            android:title="Personalize"/>
+            android:title="@string/personalize"/>
     </group>
 
 

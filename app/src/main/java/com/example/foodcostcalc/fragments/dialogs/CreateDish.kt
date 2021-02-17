@@ -1,6 +1,5 @@
 package com.example.foodcostcalc.fragments.dialogs
 
-import android.app.Application
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -14,8 +13,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
-import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.model.Dish
+import com.example.foodcostcalc.viewmodel.AddViewModel
 
 class CreateDish : DialogFragment() {
 
@@ -23,7 +22,7 @@ class CreateDish : DialogFragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view: View = inflater.inflate(R.layout.fragment_create_dish, container, false)
 
         /** initialize ui with viewmodel*/
