@@ -54,4 +54,6 @@
     <string name="add_products_to_your_dish">Add products to your dish</string>
     <string name="donate_money_to_developer">Donate money to developer</string>
     <string name="personalize">Personalize</string>
+    <string name="total_price">Total Price:</string>
+    <string name="final_price_with_margin_and_tax">Final price with margin and tax:</string>
 </resources>

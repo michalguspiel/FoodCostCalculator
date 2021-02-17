@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
+import com.example.foodcostcalc.adapter.DishAdapter
 import com.example.foodcostcalc.adapter.RecyclerViewAdapter
 import com.example.foodcostcalc.model.DishWithProductsIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
@@ -38,9 +39,9 @@ class Dishes : Fragment() {
             viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer { dish ->
                 val data = mutableListOf<DishWithProductsIncluded>()
                 dish.forEach { data.add(it)}
-                recyclerView.adapter = RecyclerViewAdapter(TAG,
-                        data.filter{it.dish.name.contains(word)} as ArrayList<*>,
-                        childFragmentManager,viewModel)
+                recyclerView.adapter = DishAdapter(TAG,
+                        data.filter{it.dish.name.contains(word)} as ArrayList<DishWithProductsIncluded>,
+                        childFragmentManager,viewModel,requireActivity())
             })
         })
 
