@@ -2,7 +2,6 @@
     android:orientation="vertical"
     android:layout_width="150dp"
     android:layout_height="150dp"
-    android:id="@+id/fragment_create_dish"
     style="@style/Theme.AppCompat.DayNight.Dialog"
     android:layout_gravity="center"
     android:background="@drawable/background_for_dialogs"

@@ -31,6 +31,11 @@ class AddViewModel(application: Application)
         readAllDishData = dishRepository.readAllData
     }
 
+    override fun onCleared() {
+        Log.i("TEST","view model cleared!")
+        super.onCleared()
+    }
+
     fun getProducts() = productRepository.getProducts()
 
     fun getDishes() = dishRepository.getDishes()
@@ -67,7 +72,7 @@ class AddViewModel(application: Application)
 
     fun addProductToDish(product: ProductIncluded) {
         viewModelScope.launch(Dispatchers.IO) {
-            productRepository.addProductToDish(product)
+            dishRepository.addProductToDish(product)
         }
     }
 
@@ -104,9 +109,6 @@ class AddViewModel(application: Application)
 
     fun getPosition() = basicRepository.getPosition()
 
-    fun setSecondPosition(pos: Int) {
-        basicRepository.setSecondPosition(pos)
-    }
 
     fun setFlag(boolean: Boolean) {
         basicRepository.setFlag(boolean)

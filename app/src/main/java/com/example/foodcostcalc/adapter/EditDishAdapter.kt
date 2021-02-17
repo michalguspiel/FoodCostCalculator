@@ -12,11 +12,10 @@ import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
+import com.example.foodcostcalc.fragments.dialogs.AreYouSure
+import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
-import com.example.foodcostcalc.fragments.dialogs.AreYouSure
-import com.example.foodcostcalc.fragments.dialogs.EditDish
-import com.example.foodcostcalc.model.Dish
 
 class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentManager: FragmentManager)
     : RecyclerView.Adapter<EditDishAdapter.EditDishViewHolder>() {
@@ -70,8 +69,7 @@ class EditDishAdapter(private val viewModel: AddViewModel, private val fragmentM
         holder.editTextView.setText(list[position].weight.toString()) // To set EditText with current data
 
         fun setUnit() {
-            var result = ""
-                result = list[position].weightUnit
+            var result = list[position].weightUnit
             if (list[position].weight > 1) result += 's'
             holder.unitTextView.text = result
         }

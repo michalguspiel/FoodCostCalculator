@@ -3,7 +3,6 @@ package com.example.foodcostcalc.data
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.foodcostcalc.model.Product
-import com.example.foodcostcalc.model.ProductIncluded
 
 /** DATA ACCESS OBJECT */
 @Dao
@@ -20,9 +19,6 @@ interface ProductDao {
 
     @Delete
     suspend fun deleteProduct(product: Product)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addProductToDish(productIncluded: ProductIncluded)
 
 
     @Query("SELECT * FROM products WHERE productId = :id")

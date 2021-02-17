@@ -4,7 +4,6 @@
     android:layout_width="270dp"
     android:layout_height="330dp"
     android:layout_gravity="center"
-    android:id="@+id/fragment_edit_product"
     style="@style/Theme.AppCompat.DayNight.Dialog"
     android:background="@drawable/background_for_dialogs"
     android:orientation="vertical">

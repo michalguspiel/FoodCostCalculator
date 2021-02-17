@@ -21,7 +21,7 @@ class Products : Fragment() {
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         val view: View = inflater.inflate(R.layout.fragment_products, container, false)
 
         /** initialize ui with viewmodel*/

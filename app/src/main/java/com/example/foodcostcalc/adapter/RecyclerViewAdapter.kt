@@ -7,19 +7,16 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.fragments.Dishes
 import com.example.foodcostcalc.fragments.Products
 import com.example.foodcostcalc.fragments.dialogs.EditDish
 import com.example.foodcostcalc.fragments.dialogs.EditProduct
-import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.DishWithProductsIncluded
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.viewmodel.AddViewModel
-import java.util.ArrayList
+import java.util.*
 
 
 class RecyclerViewAdapter(val tag: String?, private val list: ArrayList<*>, private val fragmentManager: FragmentManager,val viewModel : AddViewModel)

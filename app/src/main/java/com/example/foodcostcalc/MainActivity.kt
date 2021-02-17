@@ -1,14 +1,9 @@
 package com.example.foodcostcalc
 
-import android.app.Notification
 import android.os.Bundle
-import android.text.Editable
-import android.text.Layout
-import android.text.TextWatcher
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -18,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.fragments.*
 import com.example.foodcostcalc.fragments.dialogs.AddProductToDish
 import com.example.foodcostcalc.fragments.dialogs.CreateDish
-import com.example.foodcostcalc.fragments.dialogs.SearchDialog
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -30,8 +24,7 @@ class MainActivity : AppCompatActivity() {
     private val dishesFragment = Dishes.newInstance()
     private val addFragment = Add.newInstance()
     private val settingsFragment = Settings.newInstance()
-    private val createDishFragment = CreateDish.newInstance()
-    lateinit var drawerLayout: DrawerLayout
+    private lateinit var drawerLayout: DrawerLayout
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +39,7 @@ class MainActivity : AppCompatActivity() {
         fun openFragment(fragment: Fragment) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.container, fragment)
-            transaction.addToBackStack(fragment.tag)
+            transaction.addToBackStack(null)
             transaction.commit()
         }
 
@@ -102,7 +95,9 @@ class MainActivity : AppCompatActivity() {
                             hideSearchToolbar()
                         }
                         R.id.nav_create_new_dish -> {
-                            CreateDish().show(supportFragmentManager, CreateDish.TAG)
+                            val dialogTransaction = supportFragmentManager.beginTransaction()
+                            dialogTransaction.addToBackStack(null)
+                            CreateDish().show(dialogTransaction, CreateDish.TAG)
                         }
                         R.id.nav_add_product_to_dish -> {
                             AddProductToDish().show(supportFragmentManager, AddProductToDish.TAG)

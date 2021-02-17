@@ -52,13 +52,6 @@ class BasicDao{
 
     fun getPosition() = position as LiveData<Int>
 
-    fun setSecondPosition(pos: Int){
-        secondMutablePosition = pos
-        secondPosition.value = secondMutablePosition
-    }
-
-    fun getSecondPosition() = secondPosition as LiveData<Int>
-
     fun setFlag(boolean: Boolean) {
         mutableFlag = boolean
         flag.value = mutableFlag

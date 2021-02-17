@@ -1,11 +1,10 @@
+@file:Suppress("PrivatePropertyName")
+
 package com.example.foodcostcalc.fragments.dialogs
 
-import android.app.Application
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -18,11 +17,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
-import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
-import kotlin.properties.Delegates
-/** TODO improving this class plus refractoring.  */
 
 class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val PRODUCT_SPINNER_ID = 1
@@ -96,7 +92,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     /**Spinner implementation */
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        showToast(activity, "nothing selected ", 3)
+        this.dismiss()
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -104,7 +100,6 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             1 -> {
                 productPosition = position
                 setAdapterList()
-                chosenUnit = unitList.first() // to make sure that first unit from new list is chosen when product is changed.
             }
             2 -> {
                 dishPosition = position
@@ -126,10 +121,11 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         val thisViewModel = viewModel as AddViewModel
 
         /** Get the data about unit settings from shared preferences.
-         * true means that user uses certain units.*/
+         * true means that user uses certain units.
+         * metricAsBoolean is set as true because something needs to be chosen in order for app to work.*/
         val sharedPreferences = SharedPreferences(requireContext())
-        metricAsBoolean = sharedPreferences.getValueBoolien("metric", false)
-        usaAsBoolean =  sharedPreferences.getValueBoolien("usa", false)
+        metricAsBoolean = sharedPreferences.getValueBoolean("metric", true)
+        usaAsBoolean =  sharedPreferences.getValueBoolean("usa", false)
 
         /** binders*/
         val weightOfAddedProduct = view.findViewById<EditText>(R.id.product_weight)
