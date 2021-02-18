@@ -70,7 +70,7 @@ class AreYouSure : DialogFragment() {
 
 
         /**Function, made because of inconsistency in deleting products included associated with dish
-          Even though its recursive it still doesn't work properly* */
+        Even though its recursive it still doesn't work properly* */
         fun deleteAllProductIncluded(list: List<ProductIncluded>) {
             list.forEach { viewModel.deleteProductIncluded(it) }
             var listOfSurvivors = listOf<ProductIncluded>()
@@ -96,7 +96,9 @@ class AreYouSure : DialogFragment() {
         confirmBtn.setOnClickListener {
             viewModel.setFlag(false)
             when (this.tag) {
-                EditProduct.TAG -> viewModel.deleteProduct(productToDelete)
+                EditProduct.TAG -> {
+                    viewModel.deleteProduct(productToDelete)
+                }
                 EditDish.TAG -> {
                     deleteAllProductIncluded(listOfProductsIncludedToErase)
                     viewModel.deleteDish(dishToDelete)

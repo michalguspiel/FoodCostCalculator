@@ -5,6 +5,7 @@ package com.example.foodcostcalc.fragments.dialogs
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -29,44 +30,54 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val unitList = arrayListOf<String>() // list for units, to populate spinner
     private var chosenUnit: String = ""
 
-   /** Initialized here so it can be called outside of 'onCreateView' */
-    lateinit var viewModel :ViewModel
+    /** Initialized here so it can be called outside of 'onCreateView' */
+    lateinit var viewModel: ViewModel
     private lateinit var unitAdapter: ArrayAdapter<*>
+    private lateinit var unitSpinner: Spinner
 
     /**Holder for booleans*/
     private var metricAsBoolean = true
     private var usaAsBoolean = true
+
     /**Holder for type of units*/
     private var unitType = ""
 
 
-    private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
+    private fun showToast(
+        context: FragmentActivity? = activity,
+        message: String,
+        duration: Int = Toast.LENGTH_LONG
+    ) {
         Toast.makeText(context, message, duration).show()
     }
 
     /**First clears unitList then adds correct units,
      *  every time data set changes this function is called.*/
-     private fun changeUnitList() {
+    private fun changeUnitList() {
         unitList.clear()
-        if(metricAsBoolean){
-            when(unitType){
-                "weight" -> unitList += arrayListOf("kilogram","gram")
-                "volume" -> unitList += arrayListOf("milliliter","liter")
-                else ->{ unitList.clear()
+        if (metricAsBoolean) {
+            when (unitType) {
+                "weight" -> unitList += arrayListOf("kilogram", "gram")
+                "volume" -> unitList += arrayListOf("milliliter", "liter")
+                else -> {
+                    unitList.clear()
                     unitList += "piece"
                 }
             }
         }
-        if(usaAsBoolean){
-            when(unitType){
-                "weight" -> unitList += arrayListOf("pound","ounce")
-                "volume" -> unitList += arrayListOf("gallon","fluid ounce")
-                else -> { unitList.clear()
+        if (usaAsBoolean) {
+            when (unitType) {
+                "weight" -> unitList += arrayListOf("pound", "ounce")
+                "volume" -> unitList += arrayListOf("gallon", "fluid ounce")
+                else -> {
+                    unitList.clear()
                     unitList += "piece"
                 }
             }
         }
-    unitAdapter.notifyDataSetChanged()
+        unitAdapter.notifyDataSetChanged()
+        unitSpinner.setSelection(0, false)
+        chosenUnit = unitList.first()
     }
 
 
@@ -88,7 +99,6 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     }
 
 
-
     /**Spinner implementation */
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -100,19 +110,22 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             1 -> {
                 productPosition = position
                 setAdapterList()
+                unitSpinner.setSelection(0) // when the product is chosen first units got chosen immediately
             }
             2 -> {
                 dishPosition = position
             }
             else -> {
                 chosenUnit = unitList[position]
+                Log.i("test", chosenUnit)
             }
         }
     }
+
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.add_products_to_dish, container, false)
 
@@ -125,18 +138,20 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
          * metricAsBoolean is set as true because something needs to be chosen in order for app to work.*/
         val sharedPreferences = SharedPreferences(requireContext())
         metricAsBoolean = sharedPreferences.getValueBoolean("metric", true)
-        usaAsBoolean =  sharedPreferences.getValueBoolean("usa", false)
+        usaAsBoolean = sharedPreferences.getValueBoolean("usa", false)
 
         /** binders*/
         val weightOfAddedProduct = view.findViewById<EditText>(R.id.product_weight)
         val addProductToDishBtn = view.findViewById<ImageButton>(R.id.add_product_to_dish)
         val productSpinner = view.findViewById<Spinner>(R.id.mySpinner)
         val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
-        val unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
+        unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
 
-            /** ADAPTERs FOR SPINNERs */
+        /** ADAPTERs FOR SPINNERs */
         val productList = mutableListOf<String>()
-        thisViewModel.readAllProductData.observe(viewLifecycleOwner, Observer { it.forEach { product -> productList.add(product.name) } })
+        thisViewModel.readAllProductData.observe(
+            viewLifecycleOwner,
+            Observer { it.forEach { product -> productList.add(product.name) } })
         val productAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, productList)
         with(productSpinner)
         {
@@ -150,7 +165,9 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         productAdapter.notifyDataSetChanged()
 
         val dishList = mutableListOf<String>()
-        (viewModel as AddViewModel).readAllDishData.observe(viewLifecycleOwner, Observer { it.forEach { dish -> dishList.add(dish.name) } })
+        (viewModel as AddViewModel).readAllDishData.observe(
+            viewLifecycleOwner,
+            Observer { it.forEach { dish -> dishList.add(dish.name) } })
         val dishesAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, dishList)
         with(dishSpinner) {
             adapter = dishesAdapter
@@ -162,11 +179,12 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         }
         dishesAdapter.notifyDataSetChanged()
 
-        unitAdapter = ArrayAdapter(requireActivity(),R.layout.support_simple_spinner_dropdown_item,unitList)
+        unitAdapter =
+            ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, unitList)
         unitAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        with(unitSpinner){
+        with(unitSpinner) {
             adapter = unitAdapter
-            setSelection(0,false)
+            setSelection(0, false)
             onItemSelectedListener = this@AddProductToDish
             prompt = "Select unit"
             gravity = Gravity.CENTER
@@ -201,17 +219,24 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                 val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
                 val chosenProduct = thisViewModel.readAllProductData.value?.get(productPosition!!)
                 val weight = weightOfAddedProduct.text.toString().toDouble()
-                thisViewModel.addProductToDish(ProductIncluded(0,
+                thisViewModel.addProductToDish(
+                    ProductIncluded(
+                        0,
                         chosenProduct!!,
                         chosenDish!!.dishId,
                         chosenDish,
                         chosenProduct.productId,
                         weight,
                         chosenUnit
-                ))
+                    )
+                )
             }
             weightOfAddedProduct.text.clear()
-            Toast.makeText(requireContext(), "${thisViewModel.readAllProductData.value?.get(productPosition!!)?.name} added.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireContext(),
+                "${thisViewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
 
@@ -224,7 +249,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     companion object {
         fun newInstance(): AddProductToDish =
-                AddProductToDish()
+            AddProductToDish()
 
         const val TAG = "AddProductToDish"
     }

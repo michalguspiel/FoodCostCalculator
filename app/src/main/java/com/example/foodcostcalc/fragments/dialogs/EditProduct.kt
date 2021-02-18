@@ -96,30 +96,33 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
          * next chosen product
          *
          * Also gets information about every product included with same productID and
-         * saves it as list so the product will be edited in every dish as well */
+         * saves it as list so the product will be edited in every dish as well
+         *
+         * All of this needs to be inside Observer because otherwise dialog isn't closed when
+         * product is deleted.*/
 
-        if (viewModel.getFlag().value == false) {
-            this.dismiss()
-            viewModel.setFlag(true)
-        } else if (viewModel.getFlag().value == true) {
-            productId =
-                productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
-            name.setText(productPassedFromAdapter.name)
-            price.setText(productPassedFromAdapter.pricePerUnit.toString())
-            tax.setText(productPassedFromAdapter.tax.toString())
-            waste.setText(productPassedFromAdapter.waste.toString())
-            unitSpinner.setSelection(unitList.indexOf(productPassedFromAdapter.unit))
-
-            /**GET LIST OF PRODUCTS INCLUDED
-             * WITH THE SAME ID AS productID
-             * AND SAVE IT IN 'productIncludedList'*/
-            viewModel.getCertainProductsIncluded(productId!!).
-                observe(
+        viewModel.getFlag().observe(viewLifecycleOwner, Observer {  flag ->
+            if (flag == false) {
+                this.dismiss()
+                viewModel.setFlag(true)
+            } else if (flag == true) {
+                productId = productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
+                name.setText(productPassedFromAdapter.name)
+                price.setText(productPassedFromAdapter.pricePerUnit.toString())
+                tax.setText(productPassedFromAdapter.tax.toString())
+                waste.setText(productPassedFromAdapter.waste.toString())
+                unitSpinner.setSelection(unitList.indexOf(productPassedFromAdapter.unit))
+                /**GET LIST OF PRODUCTS INCLUDED
+                 * WITH THE SAME ID AS productID
+                 * AND SAVE IT IN 'productIncludedList
+                 * IT NEEDS TO BE HERE BECAUSE IF FLAG IS FALSE productId DOESN'T EXIST*/
+                viewModel.getCertainProductsIncluded(productId!!).observe(
                     viewLifecycleOwner,
                     Observer { listOfProducts ->
                         productIncludedList = listOfProducts
                     })
-        }
+            }
+        })
 
         /** BUTTON LOGIC*/
         saveButton.setOnClickListener {
