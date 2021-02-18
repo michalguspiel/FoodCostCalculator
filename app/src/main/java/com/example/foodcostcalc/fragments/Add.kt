@@ -45,6 +45,9 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         val calculateWasteBtn = view.findViewById<Button>(R.id.count_waste_percent_btn)
         val calcWasteWeight = view.findViewById<EditText>(R.id.waste_calc_product_waste)
         val calcProductWeight = view.findViewById<EditText>(R.id.waste_calc_product_weight)
+        val calcPricePerPieceBtn = view.findViewById<Button>(R.id.count_price_per_piece_btn)
+        val calcQuantityBox      = view.findViewById<EditText>(R.id.calc_quantity_box)
+        val calcPricePerBox      = view.findViewById<EditText>(R.id.calc_price_per_box)
 
          val sharedPreferences = SharedPreferences(requireContext())
 
@@ -96,6 +99,14 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
             }
 
 
+        fun calculatePricePerPiece(pricePerBox: Double,quantityInBox: Int){
+          val result = pricePerBox/quantityInBox
+          price.setText(result.toString())
+          calcPricePerBox.text.clear()
+          calcQuantityBox.text.clear()
+        }
+
+
         /** BUTTONS FUNCTIONALITY */
 
         addButton.setOnClickListener {
@@ -125,6 +136,15 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
             if (calcProductWeight.text.isNotEmpty() && calcWasteWeight.text.isNotEmpty()){
                 calculateWaste(calcProductWeight.text.toString().toDouble(),
                                 calcWasteWeight.text.toString().toDouble())
+            }
+        }
+
+
+        calcPricePerPieceBtn.setOnClickListener {
+            if(calcPricePerBox.text.isNotEmpty()  && calcQuantityBox.text.isNotEmpty()){
+                calculatePricePerPiece(calcPricePerBox.text.toString().toDouble(),
+                    calcQuantityBox.text.toString().toInt())
+
             }
         }
 

@@ -10,16 +10,19 @@
 
 
     <TextView android:id="@+id/product_name_in_dish_row"
-        android:layout_width="190dp"
+        android:layout_width="175dp"
         android:layout_height="wrap_content"
         android:gravity="start"
         android:textStyle="normal"
         android:textSize="14sp"
         android:textColor="#000000"
         />
+    <Space
+        android:layout_width="5dp"
+        android:layout_height="match_parent" />
 
     <TextView android:id="@+id/product_weight_in_dish_row"
-        android:layout_width="70dp"
+        android:layout_width="50dp"
         android:layout_height="wrap_content"
         android:gravity="end"
         android:textStyle="normal"
@@ -28,8 +31,9 @@
         android:layout_marginEnd="2dp"
       />
 
+
     <TextView android:id="@+id/product_weight_unit_in_dish_row"
-        android:layout_width="40dp"
+        android:layout_width="25dp"
         android:layout_height="wrap_content"
         android:gravity="start"
         android:textStyle="normal"
@@ -37,15 +41,17 @@
         android:textColor="#000000"
         />
 
+    <Space
+        android:layout_width="5dp"
+        android:layout_height="match_parent" />
 
-
-    <TextView android:id="@+id/product_price_in_dish_row"
-        android:layout_width="70dp"
+    <TextView
+        android:id="@+id/product_price_in_dish_row"
+        android:layout_width="60dp"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:textStyle="normal"
-        android:textSize="14sp"
         android:textColor="#000000"
-      />
+        android:textSize="14sp"
+        android:textStyle="normal" />
 
 </LinearLayout>

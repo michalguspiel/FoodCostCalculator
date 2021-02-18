@@ -89,6 +89,9 @@
         android:text="@string/add_stuff" />
 
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="40dp"/>
 
     <TextView
         android:layout_width="wrap_content"
@@ -130,11 +133,54 @@
             android:text="@string/calculate" />
 
 
+    </LinearLayout>
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="20dp"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:text="Calculate price per piece" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_gravity="center">
+
+        <EditText
+            android:id="@+id/calc_price_per_box"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:hint="box price"
+            android:inputType="numberDecimal"
+            android:autofillHints="" />
+
+        <EditText
+            android:id="@+id/calc_quantity_box"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:hint="quantity in box"
+            android:inputType="numberDecimal"
+            android:autofillHints="" />
+
+
+        <Button
+            android:id="@+id/count_price_per_piece_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_gradient"
+            android:padding="8dp"
+            android:textColor="@color/white"
+            android:layout_margin="8dp"
+            android:text="@string/calculate" />
 
     </LinearLayout>
 
 
-
-
-</LinearLayout>
+    </LinearLayout>

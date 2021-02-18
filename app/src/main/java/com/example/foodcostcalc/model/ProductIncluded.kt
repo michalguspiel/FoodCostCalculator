@@ -22,6 +22,7 @@ data class ProductIncluded(@PrimaryKey(autoGenerate = true) val productIncludedI
 ) {
     @Ignore
     val unitAbbreviation: String = when(weightUnit){
+        "piece" -> "pce"
         "kilogram" -> "kg"
         "gram" -> "g"
         "pound" -> "lb"
