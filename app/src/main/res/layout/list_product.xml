@@ -14,7 +14,7 @@
         android:padding="16dp"        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:textAppearance="@style/TextAppearance.AppCompat.Display1"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textSize="16sp" />
 
     <ImageButton
@@ -24,7 +24,7 @@
         android:layout_gravity="start"
         android:layout_weight="1"
         android:background="@null"
-        app:srcCompat="@drawable/edit_right"
+        app:srcCompat="@drawable/ic_edit"
         android:contentDescription="@string/edit_button" />
 
     </LinearLayout>

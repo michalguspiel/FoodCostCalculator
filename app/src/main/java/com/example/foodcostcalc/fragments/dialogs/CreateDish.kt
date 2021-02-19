@@ -1,5 +1,6 @@
 package com.example.foodcostcalc.fragments.dialogs
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -11,10 +12,13 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import com.androidnetworking.AndroidNetworking.cancel
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.viewmodel.AddViewModel
+
+
 
 class CreateDish : DialogFragment() {
 
@@ -47,6 +51,7 @@ class CreateDish : DialogFragment() {
                 val dish = Dish(0, dishName.text.toString(),margin,tax)
                 viewModel.addDishes(dish)
                 this.dismiss()
+
             } else Toast.makeText(activity, "Can't make nameless dish!", Toast.LENGTH_SHORT).show()
         }
 
