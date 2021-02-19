@@ -36,7 +36,7 @@ class Products : Fragment() {
             val data = mutableListOf<Product>()
             products.forEach { data.add(it) }
             recyclerView.adapter = RecyclerViewAdapter(TAG,
-                    data.filter { it.name.contains(word) } as ArrayList<*>
+                    data.filter { it.name.toLowerCase().contains(word.toLowerCase()) } as ArrayList<*>
                     , childFragmentManager,
             viewModel)
 

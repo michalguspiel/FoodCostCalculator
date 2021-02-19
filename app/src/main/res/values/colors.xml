@@ -4,9 +4,20 @@
     <color name="blue_500">#1a237e</color>
     <color name="blue_700">#000051</color>
     <color name="yellow_200">#ffff00</color>
-    <color name="yellow_700">#c7cc00</color><![CDATA[
+    <color name="yellow_700">#c7cc00</color>
+    <color name="gray_700">#302F2F</color>
+    <color name="gray_500">#454545</color>
+    <color name="gray_200">#737272</color>
+    <color name="orange_200">#FFAD33</color>
+    <color name="orange_500">#FF9800</color>
+    <color name="orange_700">#CF7E06</color>
+
+
+
+    <![CDATA[
     >
     ]]>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

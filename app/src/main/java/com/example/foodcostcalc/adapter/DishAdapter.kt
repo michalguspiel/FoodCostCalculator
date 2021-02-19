@@ -27,6 +27,10 @@ class DishAdapter(val tag: String?,
     : RecyclerView.Adapter<DishAdapter.RecyclerViewHolder>() {
 
     class RecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        //I want to open ListView in each layout by clicking on each dish box.
+        val eachLinearLayout : LinearLayout = view.findViewById(R.id.linear_layout_dish_card)
+
+
         val dishNameTextView: TextView   = view.findViewById(R.id.dish_name_in_adapter)
         val dishMarginTextView :TextView = view.findViewById(R.id.dish_margin_in_adapter)
         val dishTaxTextView : TextView   = view.findViewById(R.id.dish_tax_in_adapter)
@@ -50,17 +54,8 @@ class DishAdapter(val tag: String?,
 
     @SuppressLint("WrongConstant", "ShowToast", "SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
-        holder.dishNameTextView.text    = list[position].dish.name
-        holder.dishMarginTextView.text  = "Margin: ${list[position].dish.marginPercent}%"
-        holder.dishTaxTextView.text     = "Tax: ${list[position].dish.dishTax}%"
-        holder.totalPriceOfDish.text    = list[position].formattedTotalPrice
-        holder.finalPriceWithMarginAndTax.text = list[position].formattedPriceWithMarginAndTax
-        holder.listView.adapter         = DishListViewAdapter(activity,list[position].productIncluded)
-
-        holder.editButton.setOnClickListener {
-            EditDish().show(fragmentManager, EditDish.TAG)
-            EditDish.dishPassedFromAdapter = list[position]
-        }
+       /**Computes height of listView based on each row height, includes dividers.
+        * I'm using this approach so listView size is set and doesn't need to be scrollable. */
         fun getListSize(): Int {
             var result = 0
             for (eachProduct in list[position].productIncluded.indices){
@@ -68,9 +63,31 @@ class DishAdapter(val tag: String?,
                 listItem.measure(0, View.MeasureSpec.UNSPECIFIED)
                 result += listItem.measuredHeight
             }
-           return result + (holder.listView.getDividerHeight() * (holder.listView.adapter.getCount() - 1))
+            return result + (holder.listView.dividerHeight * (holder.listView.adapter.count - 1))
         }
-        holder.listView.layoutParams = LinearLayout.LayoutParams(holder.listView.layoutParams.width,getListSize())
+
+
+        holder.dishNameTextView.text    = list[position].dish.name
+        holder.dishMarginTextView.text  = "Margin: ${list[position].dish.marginPercent}%"
+        holder.dishTaxTextView.text     = "Tax: ${list[position].dish.dishTax}%"
+        holder.totalPriceOfDish.text    = list[position].formattedTotalPrice
+        holder.finalPriceWithMarginAndTax.text = list[position].formattedPriceWithMarginAndTax
+
+        holder.editButton.setOnClickListener {
+            EditDish().show(fragmentManager, EditDish.TAG)
+            EditDish.dishPassedFromAdapter = list[position]
+        }
+
+        holder.eachLinearLayout.setOnClickListener {
+            if(holder.listView.adapter == null){
+                holder.listView.adapter  = DishListViewAdapter(activity,list[position].productIncluded)
+                holder.listView.layoutParams = LinearLayout.LayoutParams(holder.listView.layoutParams.width,getListSize())
+            }
+            else {
+                holder.listView.adapter = null
+                holder.listView.layoutParams = LinearLayout.LayoutParams(holder.listView.layoutParams.width,0)
+            }
+        }
 
         }
     }

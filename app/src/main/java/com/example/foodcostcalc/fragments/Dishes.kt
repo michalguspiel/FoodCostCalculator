@@ -40,7 +40,7 @@ class Dishes : Fragment() {
                 val data = mutableListOf<DishWithProductsIncluded>()
                 dish.forEach { data.add(it)}
                 recyclerView.adapter = DishAdapter(TAG,
-                        data.filter{it.dish.name.contains(word)} as ArrayList<DishWithProductsIncluded>,
+                        data.filter{it.dish.name.toLowerCase().contains(word.toLowerCase())} as ArrayList<DishWithProductsIncluded>,
                         childFragmentManager,viewModel,requireActivity())
             })
         })

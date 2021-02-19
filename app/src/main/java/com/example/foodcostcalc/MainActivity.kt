@@ -8,6 +8,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.fragments.*
@@ -34,13 +35,19 @@ class MainActivity : AppCompatActivity() {
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
 
-
         /** Open Fragment */
         fun openFragment(fragment: Fragment) {
             val transaction = supportFragmentManager.beginTransaction()
             transaction.replace(R.id.container, fragment)
             transaction.addToBackStack(null)
             transaction.commit()
+        }
+
+        /**Open Dialog*/
+        fun openDialog(dialog: DialogFragment) {
+            val transaction = supportFragmentManager.beginTransaction()
+            transaction.addToBackStack(null)
+            dialog.show(transaction, dialog.tag)
         }
 
         /** Toolbar  */
@@ -88,48 +95,46 @@ class MainActivity : AppCompatActivity() {
         toggle.syncState()
 
         val sideNavigationClickListener =
-                NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
-                    when (item.itemId) {
-                        R.id.nav_add_product -> {
-                            openFragment(addFragment)
-                            hideSearchToolbar()
-                        }
-                        R.id.nav_create_new_dish -> {
-                            val dialogTransaction = supportFragmentManager.beginTransaction()
-                            dialogTransaction.addToBackStack(null)
-                            CreateDish().show(dialogTransaction, CreateDish.TAG)
-                        }
-                        R.id.nav_add_product_to_dish -> {
-                            AddProductToDish().show(supportFragmentManager, AddProductToDish.TAG)
-                        }
-                        R.id.nav_personalize -> {
-                            openFragment(settingsFragment)
-                            hideSearchToolbar()
-                        }
+            NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
+                when (item.itemId) {
+                    R.id.nav_add_product -> {
+                        openFragment(addFragment)
+                        hideSearchToolbar()
                     }
-
-                    drawerLayout.closeDrawer(GravityCompat.START)
-                    return@OnNavigationItemSelectedListener true
+                    R.id.nav_create_new_dish -> {
+                        openDialog(CreateDish())
+                    }
+                    R.id.nav_add_product_to_dish -> {
+                        openDialog(AddProductToDish())
+                    }
+                    R.id.nav_personalize -> {
+                        openFragment(settingsFragment)
+                        hideSearchToolbar()
+                    }
                 }
+
+                drawerLayout.closeDrawer(GravityCompat.START)
+                return@OnNavigationItemSelectedListener true
+            }
 
         /**Bottom Navigation menu */
         val menuNavigationClickListener =
-                BottomNavigationView.OnNavigationItemSelectedListener { item ->
-                    when (item.itemId) {
-                        R.id.navigation_products -> {
-                            openFragment(productsFragment)
-                            setSearchToolbar()
-                            return@OnNavigationItemSelectedListener true
-                        }
-                        R.id.navigation_dishes -> {
-                            openFragment(dishesFragment)
-                            setSearchToolbar()
-
-                            return@OnNavigationItemSelectedListener true
-                        }
+            BottomNavigationView.OnNavigationItemSelectedListener { item ->
+                when (item.itemId) {
+                    R.id.navigation_products -> {
+                        openFragment(productsFragment)
+                        setSearchToolbar()
+                        return@OnNavigationItemSelectedListener true
                     }
-                    false
+                    R.id.navigation_dishes -> {
+                        openFragment(dishesFragment)
+                        setSearchToolbar()
+
+                        return@OnNavigationItemSelectedListener true
+                    }
                 }
+                false
+            }
 
         openFragment(productsFragment)
         val bottomNavigation: BottomNavigationView = findViewById(R.id.navigationView)

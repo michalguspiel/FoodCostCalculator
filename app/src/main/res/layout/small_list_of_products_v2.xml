@@ -19,7 +19,7 @@
         android:layout_width="110dp"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:textColor="@color/white"
+        android:textColor="@color/black"
         android:textAppearance="?attr/textAppearanceHeadline6"
         android:textSize="16sp" />
 

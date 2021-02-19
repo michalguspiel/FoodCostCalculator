@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="56dp"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@color/blue_500"
+    android:background="@color/gray_700"
     android:orientation="vertical"
     app:popupTheme="@style/MyAppTheme"
     tools:context=".MainActivity">
@@ -31,7 +31,7 @@
             android:id="@+id/side_menu_button"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            app:srcCompat="@drawable/menu"
+            app:srcCompat="@drawable/ic_menu_1_"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             android:background="@null"
