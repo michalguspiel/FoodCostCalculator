@@ -9,14 +9,14 @@
     android:layout_marginBottom="4dp">
 
 
-    <TextView android:id="@+id/product_name_in_dish_row"
-        android:layout_width="175dp"
+    <TextView
+        android:id="@+id/product_name_in_dish_row"
+        android:layout_width="170dp"
         android:layout_height="wrap_content"
         android:gravity="start"
-        android:textStyle="normal"
-        android:textSize="14sp"
         android:textColor="#000000"
-        />
+        android:textSize="14sp"
+        android:textStyle="normal" />
     <Space
         android:layout_width="5dp"
         android:layout_height="match_parent" />

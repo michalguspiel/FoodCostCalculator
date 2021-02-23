@@ -4,13 +4,13 @@
     android:layout_height="wrap_content"
     style="@style/Theme.AppCompat.DayNight.Dialog"
     android:layout_gravity="center"
-    android:background="@drawable/background_for_dialogs"
+    android:background="@drawable/border"
     >
     <EditText
         android:id="@+id/new_dish_edittext"
-        android:inputType="textEmailAddress"
+        android:inputType="text"
         android:layout_width="match_parent"
-        android:textColor="@color/blue_500"
+        android:textColor="@color/black"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginLeft="4dp"

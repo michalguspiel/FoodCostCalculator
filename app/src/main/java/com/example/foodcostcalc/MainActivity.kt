@@ -1,5 +1,6 @@
 package com.example.foodcostcalc
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
@@ -7,9 +8,12 @@ import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.fragments.*
 import com.example.foodcostcalc.fragments.dialogs.AddProductToDish
@@ -18,7 +22,75 @@ import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 
+
 class MainActivity : AppCompatActivity() {
+
+    lateinit var searchBtn: ImageButton
+    lateinit var menuBtn: ImageButton
+    lateinit var searchTextField: EditText
+    lateinit var backBtn: ImageButton
+    lateinit var bottomNavigation: BottomNavigationView
+    
+
+    /**Hide everything on toolbar but side menu button. */
+    fun hideSearchToolbar() {
+        searchBtn.visibility = View.GONE
+        searchTextField.visibility = View.GONE
+        backBtn.visibility = View.GONE
+        menuBtn.visibility = View.VISIBLE
+    }
+
+    /**Show search field and search button on toolbar. */
+    fun setSearchToolbar() {
+        searchBtn.visibility = View.VISIBLE
+        searchTextField.visibility = View.VISIBLE
+        searchTextField.hint = "Search by name"
+    }
+
+    override fun onBackPressed() {
+        if (searchTextField.isVisible && searchTextField.text.isNotEmpty()) {
+            backBtn.performClick()
+        }
+        else  if (supportFragmentManager.backStackEntryCount == 1) {
+            finish()
+        }
+        else {
+            super.onBackPressed()
+            backBtn.performClick() //clear search bar
+            when (supportFragmentManager.fragments.last()) { // to setup correct toolbar
+                addFragment -> hideSearchToolbar()
+                settingsFragment -> hideSearchToolbar()
+                dishesFragment -> {
+                    setSearchToolbar()
+
+                }
+                productsFragment -> {
+                    setSearchToolbar()
+                }
+            }
+        }
+    }
+
+    private fun replaceFragment(fragment: Fragment, fragmentTag: String) {
+        val backStateName = fragment.javaClass.name
+        val manager: FragmentManager = supportFragmentManager
+        val fragmentPopped = manager.popBackStackImmediate(backStateName, 0)
+
+        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) { //fragment not in back stack, create it.
+            val ft: FragmentTransaction = manager.beginTransaction()
+            ft.replace(R.id.container, fragment, fragmentTag)
+            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+            ft.addToBackStack(backStateName)
+            ft.commit()
+        }
+        if (fragment == productsFragment || fragment == dishesFragment) backBtn.performClick() // to clear search while switching fragments.
+    }
+
+    private fun openDialog(dialog: DialogFragment) {
+        val transaction = supportFragmentManager.beginTransaction()
+        transaction.addToBackStack(dialog.tag)
+        dialog.show(transaction, dialog.tag)
+    }
 
 
     private val productsFragment = Products.newInstance()
@@ -35,27 +107,15 @@ class MainActivity : AppCompatActivity() {
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
 
-        /** Open Fragment */
-        fun openFragment(fragment: Fragment) {
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.replace(R.id.container, fragment)
-            transaction.addToBackStack(null)
-            transaction.commit()
-        }
-
-        /**Open Dialog*/
-        fun openDialog(dialog: DialogFragment) {
-            val transaction = supportFragmentManager.beginTransaction()
-            transaction.addToBackStack(null)
-            dialog.show(transaction, dialog.tag)
-        }
-
+        bottomNavigation = findViewById(R.id.navigationView)
         /** Toolbar  */
-        val menuBtn = findViewById<ImageButton>(R.id.side_menu_button)
-        val searchBtn = findViewById<ImageButton>(R.id.search_button)
-        val searchTextField = findViewById<EditText>(R.id.toolbar_text_field)
-        val backBtn = findViewById<ImageButton>(R.id.search_back)
+        menuBtn = findViewById(R.id.side_menu_button)
+        searchBtn = findViewById(R.id.search_button)
+        searchTextField = findViewById(R.id.toolbar_text_field)
+        backBtn = findViewById(R.id.search_back)
+
         backBtn.visibility = View.GONE
+
         menuBtn.setOnClickListener {
             drawerLayout.open()
         }
@@ -71,20 +131,6 @@ class MainActivity : AppCompatActivity() {
             menuBtn.visibility = View.VISIBLE
         }
 
-        /**Hide everything on toolbar but side menu button. */
-        fun hideSearchToolbar() {
-            searchBtn.visibility = View.GONE
-            searchTextField.visibility = View.GONE
-            backBtn.visibility = View.GONE
-            menuBtn.visibility = View.VISIBLE
-        }
-
-        /**Show search field and search button on toolbar. */
-        fun setSearchToolbar() {
-            searchBtn.visibility = View.VISIBLE
-            searchTextField.visibility = View.VISIBLE
-            searchTextField.hint = "Search by name"
-        }
 
         /**Side drawer menu */
         drawerLayout = findViewById(R.id.drawer_layout)
@@ -98,7 +144,7 @@ class MainActivity : AppCompatActivity() {
             NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
                 when (item.itemId) {
                     R.id.nav_add_product -> {
-                        openFragment(addFragment)
+                        replaceFragment(addFragment, Add.TAG)
                         hideSearchToolbar()
                     }
                     R.id.nav_create_new_dish -> {
@@ -108,7 +154,7 @@ class MainActivity : AppCompatActivity() {
                         openDialog(AddProductToDish())
                     }
                     R.id.nav_personalize -> {
-                        openFragment(settingsFragment)
+                        replaceFragment(settingsFragment, Settings.TAG)
                         hideSearchToolbar()
                     }
                 }
@@ -122,23 +168,21 @@ class MainActivity : AppCompatActivity() {
             BottomNavigationView.OnNavigationItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.navigation_products -> {
-                        openFragment(productsFragment)
+                        replaceFragment(productsFragment, Products.TAG)
                         setSearchToolbar()
                         return@OnNavigationItemSelectedListener true
                     }
                     R.id.navigation_dishes -> {
-                        openFragment(dishesFragment)
+                        replaceFragment(dishesFragment, Dishes.TAG)
                         setSearchToolbar()
-
                         return@OnNavigationItemSelectedListener true
                     }
                 }
                 false
             }
-
-        openFragment(productsFragment)
-        val bottomNavigation: BottomNavigationView = findViewById(R.id.navigationView)
+        replaceFragment(productsFragment, Products.TAG)
         bottomNavigation.setOnNavigationItemSelectedListener(menuNavigationClickListener)
+
         val sideNavigation: NavigationView = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
     }
