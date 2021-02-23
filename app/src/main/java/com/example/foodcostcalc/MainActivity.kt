@@ -1,14 +1,18 @@
 package com.example.foodcostcalc
 
 import android.app.Activity
+import android.content.ClipData
 import android.os.Bundle
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.forEach
 import androidx.core.view.isVisible
+import androidx.core.view.iterator
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -30,10 +34,20 @@ class MainActivity : AppCompatActivity() {
     lateinit var searchTextField: EditText
     lateinit var backBtn: ImageButton
     lateinit var bottomNavigation: BottomNavigationView
-    
+    lateinit var menuNavigationClickListener: BottomNavigationView.OnNavigationItemSelectedListener
+
+
+    /**Uncheck all items in menu*/
+    fun BottomNavigationView.uncheckAllItems() {
+        menu.setGroupCheckable(0, true, false)
+        for (i in 0 until menu.size()) {
+            menu.getItem(i).isChecked = false
+        }
+        menu.setGroupCheckable(0, true, true)
+    }
 
     /**Hide everything on toolbar but side menu button. */
-    fun hideSearchToolbar() {
+    private fun hideSearchToolbar() {
         searchBtn.visibility = View.GONE
         searchTextField.visibility = View.GONE
         backBtn.visibility = View.GONE
@@ -41,7 +55,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**Show search field and search button on toolbar. */
-    fun setSearchToolbar() {
+    private fun setSearchToolbar() {
         searchBtn.visibility = View.VISIBLE
         searchTextField.visibility = View.VISIBLE
         searchTextField.hint = "Search by name"
@@ -50,22 +64,27 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         if (searchTextField.isVisible && searchTextField.text.isNotEmpty()) {
             backBtn.performClick()
-        }
-        else  if (supportFragmentManager.backStackEntryCount == 1) {
+        } else if (supportFragmentManager.backStackEntryCount == 1) {
             finish()
-        }
-        else {
+        } else {
             super.onBackPressed()
             backBtn.performClick() //clear search bar
             when (supportFragmentManager.fragments.last()) { // to setup correct toolbar
-                addFragment -> hideSearchToolbar()
-                settingsFragment -> hideSearchToolbar()
+                addFragment -> {
+                    hideSearchToolbar()
+                    bottomNavigation.uncheckAllItems()
+                }
+                settingsFragment -> {
+                    hideSearchToolbar()
+                    bottomNavigation.uncheckAllItems()
+                }
                 dishesFragment -> {
                     setSearchToolbar()
-
+                    bottomNavigation.selectedItemId = R.id.navigation_dishes
                 }
                 productsFragment -> {
                     setSearchToolbar()
+                    bottomNavigation.selectedItemId = R.id.navigation_products
                 }
             }
         }
@@ -75,8 +94,7 @@ class MainActivity : AppCompatActivity() {
         val backStateName = fragment.javaClass.name
         val manager: FragmentManager = supportFragmentManager
         val fragmentPopped = manager.popBackStackImmediate(backStateName, 0)
-
-        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) { //fragment not in back stack, create it.
+        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) { //if fragment isn't in backStack, create it
             val ft: FragmentTransaction = manager.beginTransaction()
             ft.replace(R.id.container, fragment, fragmentTag)
             ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
@@ -145,7 +163,9 @@ class MainActivity : AppCompatActivity() {
                 when (item.itemId) {
                     R.id.nav_add_product -> {
                         replaceFragment(addFragment, Add.TAG)
+                        bottomNavigation.uncheckAllItems()
                         hideSearchToolbar()
+
                     }
                     R.id.nav_create_new_dish -> {
                         openDialog(CreateDish())
@@ -155,7 +175,10 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.nav_personalize -> {
                         replaceFragment(settingsFragment, Settings.TAG)
+                        bottomNavigation.uncheckAllItems()
                         hideSearchToolbar()
+
+
                     }
                 }
 
@@ -164,7 +187,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         /**Bottom Navigation menu */
-        val menuNavigationClickListener =
+        menuNavigationClickListener =
             BottomNavigationView.OnNavigationItemSelectedListener { item ->
                 when (item.itemId) {
                     R.id.navigation_products -> {
@@ -178,10 +201,11 @@ class MainActivity : AppCompatActivity() {
                         return@OnNavigationItemSelectedListener true
                     }
                 }
-                false
+                true
             }
         replaceFragment(productsFragment, Products.TAG)
         bottomNavigation.setOnNavigationItemSelectedListener(menuNavigationClickListener)
+
 
         val sideNavigation: NavigationView = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
