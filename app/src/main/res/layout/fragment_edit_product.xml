@@ -5,7 +5,7 @@
     android:layout_height="330dp"
     android:layout_gravity="center"
     style="@style/Theme.AppCompat.DayNight.Dialog"
-    android:background="@drawable/background_for_dialogs"
+    android:background="@drawable/border"
     android:orientation="vertical">
 
     <LinearLayout

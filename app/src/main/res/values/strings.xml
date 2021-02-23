@@ -2,14 +2,10 @@
     <string name="app_name">FoodCostCalc</string>
     <string name="add_stuff">Add product to your list</string>
     <string name="name">Product name</string>
-
-    <string name="price">price</string>
-
-    <string name="tax">tax</string>
-
-    <string name="waste">waste percent</string>
-    <string name="compose">Add product to your dish.</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="price">Price</string>
+    <string name="tax">Tax</string>
+    <string name="waste">Waste %</string>
+    <string name="compose">Add product to your dish</string>
     <string name ="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
@@ -23,7 +19,7 @@
     <string name="name_of_new_dish">Name of new Dish</string>
     <string name="add">Add</string>
     <string name="product_weight">Product weight</string>
-    <string name="product_waste">product waste</string>
+    <string name="product_waste">Waste weight</string>
     <string name="amount">amount</string>
     <string name="add_product_to_dish">add product to dish</string>
     <string name="dish_margin">margin</string>
@@ -56,4 +52,7 @@
     <string name="personalize">Personalize</string>
     <string name="total_price">Total Price:</string>
     <string name="final_price_with_margin_and_tax">Final price with margin and tax:</string>
+    <string name="calculate_price_per_piece">Calculate price per piece</string>
+    <string name="box_price">Box price</string>
+    <string name="quantity">Quantity</string>
 </resources>

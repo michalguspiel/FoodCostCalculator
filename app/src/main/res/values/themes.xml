@@ -3,12 +3,12 @@
     <style name="Theme.FoodCostCalc" parent="Theme.AppCompat.DayNight.DarkActionBar">
 
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/blue_500</item>
-        <item name="colorPrimaryVariant">@color/blue_700</item>
-        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimary">@color/gray_500</item>
+        <item name="colorPrimaryVariant">@color/gray_700</item>
+        <item name="colorOnPrimary">@color/black</item>
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/yellow_200</item>
-        <item name="colorSecondaryVariant">@color/yellow_700</item>
+        <item name="colorSecondary">@color/orange_500</item>
+        <item name="colorSecondaryVariant">@color/orange_200</item>
         <item name="colorOnSecondary">@color/black</item>
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@android:color/transparent</item>
