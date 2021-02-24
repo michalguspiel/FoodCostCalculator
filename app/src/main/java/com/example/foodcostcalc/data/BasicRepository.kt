@@ -1,8 +1,16 @@
 package com.example.foodcostcalc.data
 
 import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 
 class BasicRepository(private val basicDao: BasicDao) {
+
+    fun getProductIncludedInHalfProduct() = basicDao.getProductIncludedInHalfProduct()
+
+
+    fun setProductIncludedInHalfProduct(product: ProductIncludedInHalfProduct){
+        basicDao.setProductIncludedInHalfProduct(product)
+    }
 
     fun getWhatToSearchFor()    = basicDao.getWhatToSearchFor()
 

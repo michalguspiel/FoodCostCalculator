@@ -48,8 +48,8 @@ class EditDish : DialogFragment() {
         val actualRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
         val recyclerAdapter = EditDishAdapter(viewModel, childFragmentManager)
         actualRecyclerView.adapter = recyclerAdapter
-        val saveBtn = view.findViewById<Button>(R.id.save_dish_changes_button)
-        val deleteBtn = view.findViewById<Button>(R.id.delete_dish_button)
+        val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
+        val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)
 
         /**Send data about which dish is being edited
          * so .setPosition(index of this dish in main list)*/

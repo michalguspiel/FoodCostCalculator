@@ -9,6 +9,7 @@ import com.example.foodcostcalc.data.*
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 import kotlinx.coroutines.*
 
 class AddViewModel(application: Application)
@@ -127,5 +128,12 @@ class AddViewModel(application: Application)
     }
 
     fun getWhatToSearchFor() = basicRepository.getWhatToSearchFor()
+
+    fun setProductIncludedInHalfProduct(product: ProductIncludedInHalfProduct) {
+        basicRepository.setProductIncludedInHalfProduct(product)
+    }
+
+    fun getProductIncludedInHalfProduct() = basicRepository.getProductIncludedInHalfProduct()
+
 
 }

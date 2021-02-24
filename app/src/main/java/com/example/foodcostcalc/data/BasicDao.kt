@@ -3,6 +3,7 @@ package com.example.foodcostcalc.data
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 
 class BasicDao{
     /** Data access object to basic database  */
@@ -21,6 +22,8 @@ class BasicDao{
     private var searchWord: String = ""
     private val searchWordLive = MutableLiveData<String>()
 
+    private var productIncludedInHalfProduct: ProductIncludedInHalfProduct? = null
+    private val productIncludedInHalfProductLive = MutableLiveData<ProductIncludedInHalfProduct>()
 
     init {
         position.value = mutablePosition
@@ -28,7 +31,16 @@ class BasicDao{
         flag.value = mutableFlag
         productIncludedLive.value = productIncluded
         searchWordLive.value = searchWord
+        productIncludedInHalfProductLive.value = productIncludedInHalfProduct
     }
+
+    fun setProductIncludedInHalfProduct(product: ProductIncludedInHalfProduct){
+        productIncludedInHalfProduct = product
+        productIncludedInHalfProductLive.value = productIncludedInHalfProduct
+    }
+
+    fun getProductIncludedInHalfProduct() = productIncludedInHalfProductLive as LiveData<ProductIncludedInHalfProduct>
+
 
     fun searchFor(word: String){
         searchWord = word

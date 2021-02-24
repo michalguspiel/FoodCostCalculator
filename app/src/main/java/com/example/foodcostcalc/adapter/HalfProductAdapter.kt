@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.fragments.dialogs.EditDish
+import com.example.foodcostcalc.fragments.dialogs.EditHalfProduct
 import com.example.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
 
@@ -56,7 +57,8 @@ class HalfProductAdapter(private val list: ArrayList<HalfProductWithProductsIncl
 
 
         holder.editButton.setOnClickListener {
-            //editThisHalfProduct
+            EditHalfProduct().show(fragmentManager,EditHalfProduct.TAG)
+            EditHalfProduct.halfProductPassedFromAdapter = list[position]
         }
 
         holder.eachLinearLayout.setOnClickListener {

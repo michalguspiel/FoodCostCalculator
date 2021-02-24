@@ -16,7 +16,7 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp"
         android:layout_marginBottom="4dp"
-        android:hint="@string/name_of_new_dish"
+        android:hint="Half product"
         android:autofillHints="" />
 
     <Spinner

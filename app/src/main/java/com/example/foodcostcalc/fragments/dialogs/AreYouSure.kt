@@ -11,16 +11,18 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
-import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.Product
-import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.*
 import com.example.foodcostcalc.viewmodel.AddViewModel
+import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
 
 class AreYouSure : DialogFragment() {
 
+    private lateinit var halfProductViewModel: HalfProductsViewModel
     private lateinit var viewModel: AddViewModel
     private lateinit var dishToDelete: Dish
     private lateinit var productToDelete: Product
+    private lateinit var halfProductToDelete : HalfProduct
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,6 +33,7 @@ class AreYouSure : DialogFragment() {
 
         /** initialize ui with viewmodel*/
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+        halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
 
         /** Binders*/
         val confirmBtn = view.findViewById<Button>(R.id.button_yes)
@@ -43,6 +46,8 @@ class AreYouSure : DialogFragment() {
         /**List of products included, initially empty, gets populated by every product included in dish
          * that is about to get deleted.*/
         var listOfProductsIncludedToErase = listOf<ProductIncluded>()
+        /**Same as above*/
+        var listOfProductsIncludedInHalfProductToErase = listOf<ProductIncludedInHalfProduct>()
 
         /**Observe data to set positions to provide parameters for delete methods */
         viewModel.getPosition().observe(viewLifecycleOwner, Observer { position ->
@@ -62,15 +67,29 @@ class AreYouSure : DialogFragment() {
                     })
             }
         })
+        /**Same as above but with Products included in half product*/
+        halfProductViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+            if(this.tag == EditHalfProduct.TAG){
+                halfProductToDelete = halfProduct[pos!!]
+                halfProductViewModel.getProductsIncludedFromHalfProduct(halfProductToDelete.halfProductId)
+                    .observe(viewLifecycleOwner, Observer { listOfProductsIncludedInHalfProduct ->
+                        listOfProductsIncludedInHalfProductToErase = listOfProductsIncludedInHalfProduct
+                    })
+            }
+        })
 
         /**Get product to delete only if this was called from EditProduct.*/
         viewModel.getProducts().observe(viewLifecycleOwner, Observer { product ->
             if (this.tag == EditProduct.TAG) productToDelete = product[pos!!]
         })
 
+        /**Get Half product to delete only if this was called from EditHalfProduct*/
+        halfProductViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+            if(this.tag == EditHalfProduct.TAG)  halfProductToDelete = halfProduct[pos!!]
+        })
 
-        /**Function, made because of inconsistency in deleting products included associated with dish
-        Even though its recursive it still doesn't work properly* */
+
+        /**Function, made because of inconsistency in deleting products included associated with dish* */
         fun deleteAllProductIncluded(list: List<ProductIncluded>) {
             list.forEach { viewModel.deleteProductIncluded(it) }
             var listOfSurvivors = listOf<ProductIncluded>()
@@ -103,10 +122,20 @@ class AreYouSure : DialogFragment() {
                     deleteAllProductIncluded(listOfProductsIncludedToErase)
                     viewModel.deleteDish(dishToDelete)
                 }
+                EditHalfProduct.TAG ->{
+                    listOfProductsIncludedInHalfProductToErase.forEach { halfProductViewModel.deleteProductIncludedInHalfProduct(it)}
+                    halfProductViewModel.deleteHalfProducts(halfProductToDelete)
+                }
+
                 "EditDishAdapter" -> viewModel.getDishesWithProductsIncluded()
                     .observe(
                         viewLifecycleOwner,
                         Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })
+                "EditHalfProductAdapter" -> halfProductViewModel.getHalfProductWithProductIncluded()
+                    .observe(
+                        viewLifecycleOwner,
+                        Observer { halfProductViewModel.deleteProductIncludedInHalfProduct(viewModel.getProductIncludedInHalfProduct().value!!) }
+                    )
                 else -> this.dismiss()
             }
             Thread.sleep(100) // This is here because otherwise dialog gets closed before viewmodel functions are called

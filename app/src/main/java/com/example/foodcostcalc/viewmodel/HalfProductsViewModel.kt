@@ -84,5 +84,11 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
 
     fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
 
+    fun getProductsIncludedFromHalfProduct(halfProductId: Long)
+    = productIncludedInHalfProductRepository.getProductsIncludedFromHalfProduct(halfProductId)
+
+
+
+
 
 }

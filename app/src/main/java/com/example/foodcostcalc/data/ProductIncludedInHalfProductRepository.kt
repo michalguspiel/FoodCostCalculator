@@ -17,6 +17,10 @@ class ProductIncludedInHalfProductRepository(private val productIncludedInHalfPr
     suspend fun deleteProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
     = productIncludedInHalfProductDao.deleteProductIncludedInHalfProduct(productIncludedInHalfProduct)
 
+    fun getProductsIncludedFromHalfProduct(halfProductId: Long)
+    = productIncludedInHalfProductDao.getProductsFromHalfProduct(halfProductId)
+
+
     companion object{
         @Volatile
         private var instance:ProductIncludedInHalfProductRepository? = null

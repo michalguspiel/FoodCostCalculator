@@ -6,6 +6,8 @@ class HalfProductWithProductsIncludedRepository(private val halfProductWithProdu
 
     val readAllData = halfProductWithProductsIncludedDao.getHalfProductsWithProductsIncluded()
 
+
+
     companion object{
         @Volatile
         private var instance:HalfProductWithProductsIncludedRepository? = null
