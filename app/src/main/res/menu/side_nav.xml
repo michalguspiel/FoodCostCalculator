@@ -15,8 +15,13 @@
             android:icon="@drawable/grocery"
             android:title="@string/add_products_to_your_dish"/>
         <item
+            android:id="@+id/nav_create_half_product"
             android:icon="@drawable/money"
-            android:title="@string/donate_money_to_developer"/>
+            android:title="Create half product"/>
+        <item
+            android:id="@+id/nav_add_product_to_half_product"
+            android:icon="@drawable/money"
+            android:title="Add product to half product"/>
         <item
             android:id="@+id/nav_personalize"
             android:icon="@drawable/settings"

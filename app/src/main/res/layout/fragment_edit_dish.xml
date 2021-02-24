@@ -6,7 +6,7 @@
     android:layout_gravity="center"
     style="@style/Theme.AppCompat.DayNight.Dialog"
     android:orientation="vertical"
-    android:background="@drawable/background_for_dialogs">
+    android:background="@drawable/border">
 
     <LinearLayout
         android:layout_width="wrap_content"

@@ -27,10 +27,7 @@ class DishAdapter(val tag: String?,
     : RecyclerView.Adapter<DishAdapter.RecyclerViewHolder>() {
 
     class RecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        //I want to open ListView in each layout by clicking on each dish box.
         val eachLinearLayout : LinearLayout = view.findViewById(R.id.linear_layout_dish_card)
-
-
         val dishNameTextView: TextView   = view.findViewById(R.id.dish_name_in_adapter)
         val dishMarginTextView :TextView = view.findViewById(R.id.dish_margin_in_adapter)
         val dishTaxTextView : TextView   = view.findViewById(R.id.dish_tax_in_adapter)

@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
-            android:text="@string/choose_dish"
+            android:text="Choose half product"
             android:textColor="@color/blue_700"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -35,7 +35,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Spinner
-            android:id="@+id/dishSpinner"
+            android:id="@+id/half_product_spinner"
             android:layout_width="200dp"
             android:layout_height="35dp"
             android:layout_gravity="center"
@@ -75,7 +75,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <Spinner
-            android:id="@+id/mySpinner"
+            android:id="@+id/product_spinner"
             android:layout_width="200dp"
             android:layout_height="35dp"
             android:spinnerMode="dialog"
@@ -87,7 +87,7 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <Spinner
-        android:id="@+id/unitSpinner"
+        android:id="@+id/unit_spinner"
         android:layout_width="150dp"
         android:layout_height="35dp"
         android:layout_margin="4dp"
@@ -109,7 +109,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp"
         android:gravity="start"
-        android:text="@string/compose"
+        android:text="Add products to half product"
         android:textColor="@color/blue_700"
         android:textSize="16sp"
         android:textStyle="bold"

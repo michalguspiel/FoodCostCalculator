@@ -51,7 +51,7 @@ class Settings : Fragment() {
             if(usaCheckBox.isChecked) sharedPreference.save("usa",true)
             else sharedPreference.save("usa",false)
 
-            Toast.makeText(requireContext(),"data saved!",Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(),"Settings saved!",Toast.LENGTH_SHORT).show()
         }
 
 

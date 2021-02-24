@@ -21,7 +21,9 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.fragments.*
 import com.example.foodcostcalc.fragments.dialogs.AddProductToDish
+import com.example.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
 import com.example.foodcostcalc.fragments.dialogs.CreateDish
+import com.example.foodcostcalc.fragments.dialogs.CreateHalfProduct
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -82,6 +84,10 @@ class MainActivity : AppCompatActivity() {
                     setSearchToolbar()
                     bottomNavigation.selectedItemId = R.id.navigation_dishes
                 }
+                halfProductsFragment -> {
+                    setSearchToolbar()
+                    bottomNavigation.selectedItemId = R.id.navigation_half_products
+                }
                 productsFragment -> {
                     setSearchToolbar()
                     bottomNavigation.selectedItemId = R.id.navigation_products
@@ -101,7 +107,10 @@ class MainActivity : AppCompatActivity() {
             ft.addToBackStack(backStateName)
             ft.commit()
         }
-        if (fragment == productsFragment || fragment == dishesFragment) backBtn.performClick() // to clear search while switching fragments.
+        if (fragment == productsFragment ||
+            fragment == dishesFragment ||
+            fragment == halfProductsFragment
+        ) backBtn.performClick() // to clear search while switching fragments.
     }
 
     private fun openDialog(dialog: DialogFragment) {
@@ -115,6 +124,7 @@ class MainActivity : AppCompatActivity() {
     private val dishesFragment = Dishes.newInstance()
     private val addFragment = Add.newInstance()
     private val settingsFragment = Settings.newInstance()
+    private val halfProductsFragment = HalfProducts.newInstance()
     private lateinit var drawerLayout: DrawerLayout
 
 
@@ -177,10 +187,13 @@ class MainActivity : AppCompatActivity() {
                         replaceFragment(settingsFragment, Settings.TAG)
                         bottomNavigation.uncheckAllItems()
                         hideSearchToolbar()
-
-
                     }
-                }
+                    R.id.nav_create_half_product ->{
+                        openDialog(CreateHalfProduct())
+                    }
+                    R.id.nav_add_product_to_half_product ->
+                        openDialog(AddProductToHalfProduct())
+                    }
 
                 drawerLayout.closeDrawer(GravityCompat.START)
                 return@OnNavigationItemSelectedListener true
@@ -197,6 +210,11 @@ class MainActivity : AppCompatActivity() {
                     }
                     R.id.navigation_dishes -> {
                         replaceFragment(dishesFragment, Dishes.TAG)
+                        setSearchToolbar()
+                        return@OnNavigationItemSelectedListener true
+                    }
+                    R.id.navigation_half_products -> {
+                        replaceFragment(halfProductsFragment, HalfProducts.TAG)
                         setSearchToolbar()
                         return@OnNavigationItemSelectedListener true
                     }

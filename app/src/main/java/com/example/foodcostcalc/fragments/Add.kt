@@ -1,6 +1,7 @@
 package com.example.foodcostcalc.fragments
 
 import android.annotation.SuppressLint
+import android.content.res.Resources
 import android.os.Bundle
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -11,16 +12,18 @@ import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
+import com.example.foodcostcalc.getUnits
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
 
+
 class Add : Fragment(), AdapterView.OnItemSelectedListener {
 
     private var chosenUnit: String = ""
-    private var unitList: Array<String> = arrayOf()
+    private var unitList: MutableList<String> = mutableListOf()
 
 
     private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
@@ -51,23 +54,12 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
 
          val sharedPreferences = SharedPreferences(requireContext())
 
-        /**Get units preferred by the user.*/
-         fun getUnits(): Array<out String> {
-            var chosenUnits = resources.getStringArray(R.array.piece)
-            if (sharedPreferences.getValueBoolean("metric", true)) {
-                chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
-            }
-            if (sharedPreferences.getValueBoolean("usa", false)) {
-                chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
-            }
-            unitList = chosenUnits
-            return chosenUnits
-        }
+        unitList = getUnits(resources,sharedPreferences)
 
 
         /**Spinner adapter*/
         val unitSpinner = view.findViewById<Spinner>(R.id.units_spinner)
-        val unitsAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, getUnits())
+        val unitsAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, unitList)
         with(unitSpinner) {
             setSelection(0, false)
             adapter = unitsAdapter

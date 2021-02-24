@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
+import com.example.foodcostcalc.getUnits
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.viewmodel.AddViewModel
@@ -23,8 +24,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     private var unitPosition: Int? = null
     private var productId: Long? = null
-
-    private var unitList: Array<String> = arrayOf()
+    private var unitList: MutableList<String> = mutableListOf()
     private lateinit var viewModel: AddViewModel
 
     @SuppressLint("ResourceType")
@@ -38,32 +38,33 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         /** initialize ui with viewmodel*/
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
+        fun MutableList<String>.filterWeight(): MutableList<String> {
+         return   filter { it == "per kilogram" || it == "per pound" }.toMutableList()
+        }
 
-        /** empty list which gets populated by every 'ProductIncluded' that has the same
-         * ID as edited product. */
-        var productIncludedList = listOf<ProductIncluded>()
+        fun MutableList<String>.filterVol(): MutableList<String> {
+            return filter { it == "per liter" || it == "per gallon" }.toMutableList()
+        }
 
         val sharedPreferences = SharedPreferences(requireContext())
+        unitList = getUnits(resources, sharedPreferences)
+        unitList = when (productPassedFromAdapter.unit) {
+            "per piece" -> mutableListOf("per piece")
+            "per kilogram" -> unitList.filterWeight()
+            "per liter" -> unitList.filterVol()
+            "per pound" -> unitList.filterWeight()
+            "per gallon" ->  unitList.filterVol()
+            else -> mutableListOf("error!")
 
-        /**Get units preferred by the user.*/
-        fun getUnits(): Array<out String> {
-            var chosenUnits = resources.getStringArray(R.array.piece)
-            if (sharedPreferences.getValueBoolean("metric", true)) {
-                chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
-            }
-            if (sharedPreferences.getValueBoolean("usa", false)) {
-                chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
-            }
-            unitList = chosenUnits
-            return chosenUnits
         }
+
 
         /** Spinner */
         val unitSpinner = view.findViewById<Spinner>(R.id.spinner_edit_product)
         val unitsAdapter = ArrayAdapter(
             requireActivity(),
             R.layout.support_simple_spinner_dropdown_item,
-            getUnits()
+            unitList
         )
         with(unitSpinner) {
             adapter = unitsAdapter
@@ -87,6 +88,10 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
             viewModel.setPosition(products.indexOf(productPassedFromAdapter))
         })
 
+        /** empty list which gets populated by every 'ProductIncluded' that has the same
+         * ID as edited product. */
+        var productIncludedList = listOf<ProductIncluded>()
+
         /** OBSERVE DATA FROM VIEWMODEL
          * Sets every text field value appropriate to edited product
          *
@@ -101,12 +106,13 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
          * All of this needs to be inside Observer because otherwise dialog isn't closed when
          * product is deleted.*/
 
-        viewModel.getFlag().observe(viewLifecycleOwner, Observer {  flag ->
+        viewModel.getFlag().observe(viewLifecycleOwner, Observer { flag ->
             if (flag == false) {
                 this.dismiss()
                 viewModel.setFlag(true)
             } else if (flag == true) {
-                productId = productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
+                productId =
+                    productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
                 name.setText(productPassedFromAdapter.name)
                 price.setText(productPassedFromAdapter.pricePerUnit.toString())
                 tax.setText(productPassedFromAdapter.tax.toString())

@@ -21,5 +21,14 @@
     </style>
 
 
+    <style name="FoodCostCalc.Button" parent="TextAppearance.MaterialComponents.Button">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">20dp</item>
+        <item name="colorPrimary">@color/gray_500</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorSecondary">@color/gray_700</item>
+
+    </style>
+
 </resources>
 

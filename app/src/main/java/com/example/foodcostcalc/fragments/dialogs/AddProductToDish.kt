@@ -18,7 +18,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
+import com.example.foodcostcalc.changeUnitList
 import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.setAdapterList
 import com.example.foodcostcalc.viewmodel.AddViewModel
 
 class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
@@ -51,53 +53,6 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         Toast.makeText(context, message, duration).show()
     }
 
-    /**First clears unitList then adds correct units,
-     *  every time data set changes this function is called.*/
-    private fun changeUnitList() {
-        unitList.clear()
-        if (metricAsBoolean) {
-            when (unitType) {
-                "weight" -> unitList += arrayListOf("kilogram", "gram")
-                "volume" -> unitList += arrayListOf("milliliter", "liter")
-                else -> {
-                    unitList.clear()
-                    unitList += "piece"
-                }
-            }
-        }
-        if (usaAsBoolean) {
-            when (unitType) {
-                "weight" -> unitList += arrayListOf("pound", "ounce")
-                "volume" -> unitList += arrayListOf("gallon", "fluid ounce")
-                else -> {
-                    unitList.clear()
-                    unitList += "piece"
-                }
-            }
-        }
-        unitAdapter.notifyDataSetChanged()
-        unitSpinner.setSelection(0, false)
-        chosenUnit = unitList.first()
-    }
-
-
-    /**Get chosen product and set correct type of units */
-    private fun setAdapterList() {
-        val thisViewModel = viewModel as AddViewModel
-        unitType = when (thisViewModel.readAllProductData.value?.get(productPosition!!)?.unit) {
-            "per kilogram", "per pound" -> {
-                "weight"
-            }
-            "per liter", "per gallon" -> {
-                "volume"
-            }
-            else -> {
-                "piece"
-            }
-        }
-        changeUnitList()
-    }
-
 
     /**Spinner implementation */
 
@@ -109,7 +64,11 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         when (parent?.id) {
             1 -> {
                 productPosition = position
-                setAdapterList()
+                unitType = setAdapterList(viewModel as AddViewModel,position)
+                unitList.changeUnitList(unitType,metricAsBoolean,usaAsBoolean)
+                unitAdapter.notifyDataSetChanged()
+                unitSpinner.setSelection(0, false)
+                chosenUnit = unitList.first()
                 unitSpinner.setSelection(0) // when the product is chosen first units got chosen immediately
             }
             2 -> {
@@ -141,8 +100,8 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         usaAsBoolean = sharedPreferences.getValueBoolean("usa", false)
 
         /** binders*/
-        val weightOfAddedProduct = view.findViewById<EditText>(R.id.product_weight)
-        val addProductToDishBtn = view.findViewById<ImageButton>(R.id.add_product_to_dish)
+        val weightOfAddedProduct = view.findViewById<EditText>(R.id.product_weight_in_half_product)
+        val addProductToDishBtn = view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
         val productSpinner = view.findViewById<Spinner>(R.id.mySpinner)
         val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
         unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)

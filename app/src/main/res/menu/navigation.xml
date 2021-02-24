@@ -7,6 +7,11 @@
         android:title="@string/products"/>
 
     <item
+        android:id="@+id/navigation_half_products"
+        android:icon="@drawable/ic_food_bank"
+        android:title="Half products"/>
+
+    <item
         android:id="@+id/navigation_dishes"
         android:icon="@drawable/ic_food_bank"
         android:title="@string/dishes"/>
