@@ -8,9 +8,7 @@ import com.example.foodcostcalc.data.AppRoomDataBase
 import com.example.foodcostcalc.data.HalfProductRepository
 import com.example.foodcostcalc.data.HalfProductWithProductsIncludedRepository
 import com.example.foodcostcalc.data.ProductIncludedInHalfProductRepository
-import com.example.foodcostcalc.model.HalfProduct
-import com.example.foodcostcalc.model.HalfProductWithProductsIncluded
-import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.example.foodcostcalc.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -18,6 +16,7 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
 
     val readAllHalfProductData: LiveData<List<HalfProduct>>
     val readAllProductIncludedInHalfProductData: LiveData<List<ProductIncludedInHalfProduct>>
+    val readAllProductIncludedInHalfProductDataNotAsc: LiveData<List<ProductIncludedInHalfProduct>>
     val readAllHalfProductWithProductsIncludedData: LiveData<List<HalfProductWithProductsIncluded>>
 
     private val halfProductRepository: HalfProductRepository
@@ -37,6 +36,7 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
 
         readAllHalfProductData = halfProductRepository.readAllData
         readAllProductIncludedInHalfProductData = productIncludedInHalfProductRepository.readAllData
+        readAllProductIncludedInHalfProductDataNotAsc = productIncludedInHalfProductRepository.readAllDataNotAsc
         readAllHalfProductWithProductsIncludedData = halfProductWithProductsIncludedRepository.readAllData
     }
 
@@ -80,6 +80,20 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
             productIncludedInHalfProductRepository.deleteProductIncludedInHalfProduct(productIncludedInHalfProduct)
         }
 
+    }
+
+    fun addHalfProductWithProductsIncludedCrossRef(halfProductWithProductsIncludedCrossRef: HalfProductWithProductsIncludedCrossRef){
+        viewModelScope.launch(Dispatchers.IO) {
+            halfProductWithProductsIncludedRepository
+                .addHalfProductWithProductsIncludedCrossRef(halfProductWithProductsIncludedCrossRef)
+        }
+    }
+
+    fun addHalfProductToDish(dishWithHalfProductCrossRef: DishWithHalfProductCrossRef){
+        viewModelScope.launch(Dispatchers.IO){
+            halfProductWithProductsIncludedRepository
+                .addHalfProductToDish(dishWithHalfProductCrossRef)
+        }
     }
 
     fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData

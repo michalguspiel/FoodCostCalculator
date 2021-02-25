@@ -44,7 +44,7 @@ class HalfProductAdapter(private val list: ArrayList<HalfProductWithProductsIncl
          * I'm using this approach so listView size is set and doesn't need to be scrollable. */
         fun getListSize(): Int {
             var result = 0
-            for (eachProduct in list[position].productIncludedInHalfProduct.indices){
+            for (eachProduct in  list[position].halfProductsList.indices){
                 val listItem = holder.listView.adapter.getView(eachProduct,null,holder.listView)
                 listItem.measure(0, View.MeasureSpec.UNSPECIFIED)
                 result += listItem.measuredHeight
@@ -53,7 +53,7 @@ class HalfProductAdapter(private val list: ArrayList<HalfProductWithProductsIncl
         }
         holder.halfProductName.text                 = list[position].halfProduct.name
         holder.unitOfHalfProduct.text               = list[position].halfProduct.halfProductUnit
-        holder.finalPriceOfHalfProductPerUnit.text  = list[position].formattedTotalPrice
+        holder.finalPriceOfHalfProductPerUnit.text  = "999" //TODO
 
 
         holder.editButton.setOnClickListener {
@@ -63,7 +63,7 @@ class HalfProductAdapter(private val list: ArrayList<HalfProductWithProductsIncl
 
         holder.eachLinearLayout.setOnClickListener {
             if(holder.listView.adapter == null){
-                holder.listView.adapter  = HalfProductListViewAdapter(activity,list[position].productIncludedInHalfProduct)
+                holder.listView.adapter  = HalfProductListViewAdapter(activity, list[position].halfProductsList)
                 holder.listView.layoutParams = LinearLayout.LayoutParams(holder.listView.layoutParams.width,getListSize())
             }
             else {

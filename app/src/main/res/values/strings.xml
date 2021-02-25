@@ -38,6 +38,8 @@
     <string name="use_us_units">Use US units.</string>
     <string name="choose_dish">Choose dish:</string>
     <string name="choose_product">Choose product:</string>
+    <string name="choose_half_product">Choose half product:</string>
+
     <string name="search_button">search button</string>
     <string name="open_side_menu_button">open side menu button</string>
     <string name="search_by_name">Search by name</string>

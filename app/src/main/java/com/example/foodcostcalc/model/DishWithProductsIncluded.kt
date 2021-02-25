@@ -14,6 +14,8 @@ import java.text.NumberFormat
         )
         val productIncluded: List<ProductIncluded>
     ) {
+
+
         @Ignore
         val totalPrice:Double = productIncluded.map { it.totalPriceOfThisProduct }.sum()
         @Ignore

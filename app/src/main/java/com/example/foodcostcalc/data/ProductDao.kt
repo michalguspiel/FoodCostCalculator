@@ -20,12 +20,6 @@ interface ProductDao {
     @Delete
     suspend fun deleteProduct(product: Product)
 
-
     @Query("SELECT * FROM products WHERE productId = :id")
     fun getProduct(id: Long): LiveData<Product>
-
-
-
-
-
 }

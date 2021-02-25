@@ -8,6 +8,9 @@ import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 class ProductIncludedInHalfProductRepository(private val productIncludedInHalfProductDao: ProductIncludedInHalfProductDao) {
     val readAllData : LiveData<List<ProductIncludedInHalfProduct>> = productIncludedInHalfProductDao.getAllProductIncludedInHalfProduct()
 
+    val readAllDataNotAsc : LiveData<List<ProductIncludedInHalfProduct>> =
+        productIncludedInHalfProductDao.getAllProductIncludedInHalfProductNotAsc()
+
     suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
     = productIncludedInHalfProductDao.addProductIncludedInHalfProduct(productIncludedInHalfProduct)
 

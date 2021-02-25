@@ -60,7 +60,7 @@
         app:layout_constraintTop_toBottomOf="@id/constraint_1">
 
         <TextView
-            android:id="@+id/textView5"
+            android:id="@+id/choose_product_half_product"
             android:layout_width="115dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -81,7 +81,7 @@
             android:spinnerMode="dialog"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView5"
+            app:layout_constraintStart_toEndOf="@+id/choose_product_half_product"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

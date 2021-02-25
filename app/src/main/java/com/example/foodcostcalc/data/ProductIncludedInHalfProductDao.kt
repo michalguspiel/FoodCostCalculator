@@ -11,6 +11,9 @@ interface ProductIncludedInHalfProductDao {
     @Query("SELECT * FROM PRODUCTINCLUDEDINHALFPRODUCT ORDER BY product_name ASC")
     fun getAllProductIncludedInHalfProduct(): LiveData<List<ProductIncludedInHalfProduct>>
 
+    @Query("SELECT * FROM PRODUCTINCLUDEDINHALFPRODUCT")
+    fun getAllProductIncludedInHalfProductNotAsc(): LiveData<List<ProductIncludedInHalfProduct>>
+
     @Insert
     suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
 

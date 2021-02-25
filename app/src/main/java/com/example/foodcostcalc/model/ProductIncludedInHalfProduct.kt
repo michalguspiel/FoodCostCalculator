@@ -9,7 +9,7 @@ import java.text.NumberFormat
 
 @Entity
 data class ProductIncludedInHalfProduct(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true) val productIncludedInHalfProductId: Long,
     @Embedded val productIncluded: Product,
     val halfProductOwnerId: Long,
     @Embedded val halfProduct: HalfProduct,

@@ -18,6 +18,7 @@ import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.changeUnitList
 import com.example.foodcostcalc.fragments.Add
 import com.example.foodcostcalc.model.HalfProduct
+import com.example.foodcostcalc.model.HalfProductWithProductsIncludedCrossRef
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 import com.example.foodcostcalc.setAdapterList
@@ -55,7 +56,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         val view = inflater.inflate(R.layout.add_product_to_half_product, container, false)
         halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-
+        val hpViewModel = halfProductViewModel as HalfProductsViewModel
 
         /**Binders*/
         val addProductButton = view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
@@ -152,13 +153,13 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 ).show()
             } else {
                 val chosenHalfProduct =
-                    (halfProductViewModel as HalfProductsViewModel).readAllHalfProductData.value?.get(
+                    hpViewModel.readAllHalfProductData.value?.get(
                         halfProductPosition!!
                     )
                 val chosenProduct =
                     (viewModel as AddViewModel).readAllProductData.value?.get(productPosition!!)
                 val weight = weightEditTextField.text.toString().toDouble()
-                (halfProductViewModel as HalfProductsViewModel).addProductIncludedInHalfProduct(
+                hpViewModel.addProductIncludedInHalfProduct(
                     ProductIncludedInHalfProduct(
                         0,
                         chosenProduct!!,
@@ -169,6 +170,15 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                         chosenUnit
                     )
                 )
+                hpViewModel.readAllProductIncludedInHalfProductDataNotAsc.observe(viewLifecycleOwner,
+                    Observer { val requiredID = it.last().productIncludedInHalfProductId
+                        hpViewModel.addHalfProductWithProductsIncludedCrossRef( // To create cross reference
+                            HalfProductWithProductsIncludedCrossRef(
+                                chosenHalfProduct.halfProductId,
+                                requiredID
+                            )
+                        )})
+
                 weightEditTextField.text.clear()
                 Toast.makeText(
                     requireContext(),
