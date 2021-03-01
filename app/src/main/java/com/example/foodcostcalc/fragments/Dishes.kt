@@ -12,7 +12,9 @@ import com.example.foodcostcalc.R
 import com.example.foodcostcalc.adapter.DishAdapter
 import com.example.foodcostcalc.adapter.RecyclerViewAdapter
 import com.example.foodcostcalc.model.DishWithProductsIncluded
+import com.example.foodcostcalc.model.GrandDish
 import com.example.foodcostcalc.viewmodel.AddViewModel
+import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
 import java.util.*
 
 class Dishes : Fragment() {
@@ -29,7 +31,7 @@ class Dishes : Fragment() {
 
 
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-
+        val halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
 
         /**Implementing adapter for recycler view. */
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_dishes)
@@ -37,12 +39,13 @@ class Dishes : Fragment() {
 
         /** Observe what is in the search box in LIVEDATA */
         viewModel.getWhatToSearchFor().observe(viewLifecycleOwner, Observer { word ->
-            viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer { dish ->
-                val data = mutableListOf<DishWithProductsIncluded>()
+            viewModel.getGrandDishes().observe(viewLifecycleOwner, Observer { dish ->
+                val data = mutableListOf<GrandDish>()
+
                 dish.forEach { data.add(it)}
                 recyclerView.adapter = DishAdapter(TAG,
-                        data.filter{it.dish.name.toLowerCase().contains(word.toLowerCase())} as ArrayList<DishWithProductsIncluded>,
-                        childFragmentManager,viewModel,requireActivity())
+                        data.filter{it.dish.name.toLowerCase().contains(word.toLowerCase())} as ArrayList<GrandDish>,
+                        childFragmentManager,viewModel,halfProductViewModel,viewLifecycleOwner,requireActivity())
             })
         })
 

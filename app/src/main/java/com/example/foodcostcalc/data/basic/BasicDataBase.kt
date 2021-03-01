@@ -1,4 +1,4 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.basic
 
 
 /** Basic database is temporary, every time app closes everything from here disappears

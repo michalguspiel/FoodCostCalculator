@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
@@ -19,9 +20,10 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.changeUnitList
-import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.*
 import com.example.foodcostcalc.setAdapterList
 import com.example.foodcostcalc.viewmodel.AddViewModel
+import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
 
 class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val PRODUCT_SPINNER_ID = 1
@@ -32,8 +34,12 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val unitList = arrayListOf<String>() // list for units, to populate spinner
     private var chosenUnit: String = ""
 
+    private lateinit var halfProductToAdd: HalfProduct
+
+
     /** Initialized here so it can be called outside of 'onCreateView' */
     lateinit var viewModel: ViewModel
+    lateinit var halfProductViewModel: ViewModel
     private lateinit var unitAdapter: ArrayAdapter<*>
     private lateinit var unitSpinner: Spinner
 
@@ -43,6 +49,9 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     /**Holder for type of units*/
     private var unitType = ""
+
+
+    var listOfProductsIncludedInHalfProductToAdd = listOf<ProductIncludedInHalfProduct>()
 
 
     private fun showToast(
@@ -64,8 +73,8 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         when (parent?.id) {
             1 -> {
                 productPosition = position
-                unitType = setAdapterList(viewModel as AddViewModel,position)
-                unitList.changeUnitList(unitType,metricAsBoolean,usaAsBoolean)
+                unitType = setAdapterList(viewModel as AddViewModel, position)
+                unitList.changeUnitList(unitType, metricAsBoolean, usaAsBoolean)
                 unitAdapter.notifyDataSetChanged()
                 unitSpinner.setSelection(0, false)
                 chosenUnit = unitList.first()
@@ -81,6 +90,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         }
     }
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -91,6 +101,9 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         /** initialize ui with viewmodel*/
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
         val thisViewModel = viewModel as AddViewModel
+        halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
+        val hpViewModel = halfProductViewModel as HalfProductsViewModel
+
 
         /** Get the data about unit settings from shared preferences.
          * true means that user uses certain units.
@@ -101,12 +114,25 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** binders*/
         val weightOfAddedProduct = view.findViewById<EditText>(R.id.product_weight_in_half_product)
-        val addProductToDishBtn = view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
+        val addProductToDishBtn =
+            view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
         val productSpinner = view.findViewById<Spinner>(R.id.mySpinner)
         val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
-        unitSpinner = view.findViewById<Spinner>(R.id.unitSpinner)
+        val switch = view.findViewById<SwitchCompat>(R.id.product_halfproduct_switch)
+        val chooseProductTextView = view.findViewById<TextView>(R.id.choose_product_half_product)
+        unitSpinner = view.findViewById(R.id.unitSpinner)
+
 
         /** ADAPTERs FOR SPINNERs */
+        val halfProductList = mutableListOf<String>()
+        (halfProductViewModel as HalfProductsViewModel).getHalfProducts()
+            .observe(viewLifecycleOwner,
+                Observer { halfProducts ->
+                    halfProducts.forEach { halfProductList.add(it.name) }
+                })
+        val halfProductAdapter =
+            ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProductList)
+
         val productList = mutableListOf<String>()
         thisViewModel.readAllProductData.observe(
             viewLifecycleOwner,
@@ -150,6 +176,18 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             id = UNIT_SPINNER_ID
         }
 
+        /**SWITCH LOGIC*/
+        switch.setOnCheckedChangeListener { compoundButton: CompoundButton, isChecked: Boolean ->
+            if (isChecked) {
+                chooseProductTextView.text = resources.getString(R.string.choose_half_product)
+                productSpinner.adapter = halfProductAdapter
+            } else {
+                chooseProductTextView.text = resources.getString(R.string.choose_product)
+                productSpinner.adapter = productAdapter
+
+            }
+        }
+
         /**OBSERVING 'LIVEDATA' FROM ADDVIEWMODEL
          *  WHICH OBSERVES 'LIVEDATA' IN REPOSITORY
          *  WHICH OBSERVES 'LIVEDATA' FROM DAO*/
@@ -172,12 +210,14 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** BUTTON LOGIC*/
         addProductToDishBtn.setOnClickListener {
+
             if (weightOfAddedProduct.text.isNullOrEmpty()) {
                 showToast(message = "You can't add product without weight.")
-            } else {
+            } else if (!switch.isChecked) {
                 val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
-                val chosenProduct = thisViewModel.readAllProductData.value?.get(productPosition!!)
                 val weight = weightOfAddedProduct.text.toString().toDouble()
+
+                val chosenProduct = thisViewModel.readAllProductData.value?.get(productPosition!!)
                 thisViewModel.addProductToDish(
                     ProductIncluded(
                         0,
@@ -189,13 +229,40 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                         chosenUnit
                     )
                 )
+
+                weightOfAddedProduct.text.clear()
+                Toast.makeText(
+                    requireContext(),
+                    "${thisViewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+
+                val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
+                val weight = weightOfAddedProduct.text.toString().toDouble()
+
+                hpViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+                    halfProductToAdd = halfProduct[productPosition!!]
+                })
+
+                hpViewModel.addHalfProductIncludedInDish(
+                    HalfProductIncludedInDish(
+                        0,
+                        chosenDish!!,
+                        chosenDish.dishId,
+                        halfProductToAdd,
+                        halfProductToAdd.halfProductId,
+                        weight,
+                        chosenUnit
+                    )
+                )
+                weightOfAddedProduct.text.clear()
+                Toast.makeText(
+                    requireContext(),
+                    "${halfProductToAdd.name} added.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            weightOfAddedProduct.text.clear()
-            Toast.makeText(
-                requireContext(),
-                "${thisViewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
-                Toast.LENGTH_SHORT
-            ).show()
         }
 
 

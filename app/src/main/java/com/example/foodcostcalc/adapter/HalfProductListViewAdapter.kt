@@ -27,7 +27,7 @@ class HalfProductListViewAdapter(private val context: Activity, private val prod
 
 
         productNameText.text = productIncludedInHalfProductList[position].productIncluded.name
-        productWeightText.text = productIncludedInHalfProductList[position].formattedWeightInCaseSomeoneIsCrazy
+        productWeightText.text = productIncludedInHalfProductList[position].formattedWeight
         productPriceText.text = productIncludedInHalfProductList[position].finalFormatPriceOfProduct
         productUnit.text = productIncludedInHalfProductList[position].unitAbbreviation
         return rowView

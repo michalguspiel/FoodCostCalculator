@@ -1,4 +1,4 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.dish
 
 import androidx.lifecycle.LiveData
 import com.example.foodcostcalc.model.Dish
@@ -11,6 +11,8 @@ class DishRepository(private val dishDao: DishDao) {
     suspend fun addDish(dish: Dish) {
         dishDao.addDish(dish)
     }
+
+    fun getGrandDishes() = dishDao.getGrandDishes()
 
     fun getDishes() = dishDao.getDishes()
 

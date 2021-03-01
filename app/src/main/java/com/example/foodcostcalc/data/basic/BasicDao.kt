@@ -1,7 +1,8 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.basic
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.foodcostcalc.model.HalfProductIncludedInDish
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 
@@ -13,6 +14,7 @@ class BasicDao{
     private var secondMutablePosition: Int? = null
     private val secondPosition = MutableLiveData<Int>()
 
+    /**Flag provides an information if product/dish was just deleted and if fragment should close itself */
     private var mutableFlag: Boolean = true
     private val flag = MutableLiveData<Boolean>()
 
@@ -25,6 +27,10 @@ class BasicDao{
     private var productIncludedInHalfProduct: ProductIncludedInHalfProduct? = null
     private val productIncludedInHalfProductLive = MutableLiveData<ProductIncludedInHalfProduct>()
 
+    private var halfProductIncluded : HalfProductIncludedInDish? = null
+    private val halfProductIncludedLive = MutableLiveData<HalfProductIncludedInDish>()
+
+
     init {
         position.value = mutablePosition
         secondPosition.value = secondMutablePosition
@@ -32,6 +38,7 @@ class BasicDao{
         productIncludedLive.value = productIncluded
         searchWordLive.value = searchWord
         productIncludedInHalfProductLive.value = productIncludedInHalfProduct
+        halfProductIncludedLive.value = halfProductIncluded
     }
 
     fun setProductIncludedInHalfProduct(product: ProductIncludedInHalfProduct){
@@ -57,6 +64,14 @@ class BasicDao{
     fun getProductIncluded() = productIncludedLive as LiveData<ProductIncluded>
 
 
+    fun setHalfProductIncluded(halfProduct : HalfProductIncludedInDish){
+        halfProductIncluded = halfProduct
+        halfProductIncludedLive.value = halfProductIncluded
+    }
+
+    fun getHalfProductIncluded() = halfProductIncludedLive as LiveData<HalfProductIncludedInDish>
+
+
     fun setPosition(pos: Int){
         mutablePosition = pos
         position.value = mutablePosition
@@ -70,6 +85,8 @@ class BasicDao{
     }
 
     fun getFlag() = flag as LiveData<Boolean>
+
+
 
 
 }

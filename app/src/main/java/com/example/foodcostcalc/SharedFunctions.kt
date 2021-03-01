@@ -1,6 +1,7 @@
 package com.example.foodcostcalc
 
 import android.content.res.Resources
+import androidx.room.Ignore
 import com.example.foodcostcalc.fragments.dialogs.AddProductToDish
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import java.text.DecimalFormat
@@ -12,6 +13,19 @@ fun formatPriceOrWeight(number: Double):String{
 }
 
 
+
+
+fun unitAbbreviation(unit: String): String =  when(unit){
+    "piece" -> "pce"
+    "kilogram" -> "kg"
+    "gram" -> "g"
+    "pound" -> "lb"
+    "ounce" -> "oz"
+    "liter" -> "l"
+    "milliliter" -> "ml"
+    "gallon" -> "gal"
+    else -> "fl oz"
+}
 
 
 /**Get units preferred by the user.*/

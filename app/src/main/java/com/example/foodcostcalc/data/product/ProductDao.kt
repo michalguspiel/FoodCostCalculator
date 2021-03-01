@@ -1,4 +1,4 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.product
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
@@ -20,12 +20,6 @@ interface ProductDao {
     @Delete
     suspend fun deleteProduct(product: Product)
 
-
     @Query("SELECT * FROM products WHERE productId = :id")
     fun getProduct(id: Long): LiveData<Product>
-
-
-
-
-
 }

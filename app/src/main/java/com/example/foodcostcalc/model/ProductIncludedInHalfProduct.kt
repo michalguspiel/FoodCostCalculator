@@ -9,17 +9,16 @@ import java.text.NumberFormat
 
 @Entity
 data class ProductIncludedInHalfProduct(
-    @PrimaryKey(autoGenerate = true) val id: Long,
+    @PrimaryKey(autoGenerate = true) val productIncludedInHalfProductId: Long,
     @Embedded val productIncluded: Product,
-    val halfProductOwnerId: Long,
     @Embedded val halfProduct: HalfProduct,
-    val productOwnerId: Long,
+    val halfProductHostId : Long,
     var weight: Double,
     val weightUnit: String
 ) {
 
     @Ignore
-    val unitAbbreviation: String = when(weightUnit){
+    val unitAbbreviation: String = when (weightUnit) {
         "piece" -> "pce"
         "kilogram" -> "kg"
         "gram" -> "g"
@@ -68,6 +67,7 @@ data class ProductIncludedInHalfProduct(
     val finalFormatPriceOfProduct: String = NumberFormat.getCurrencyInstance().format(
         totalPriceOfThisProduct
     )
+
     @Ignore
-    val formattedWeightInCaseSomeoneIsCrazy = formatPriceOrWeight(weight)
+    val formattedWeight = formatPriceOrWeight(weight)
 }

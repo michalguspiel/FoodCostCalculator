@@ -1,9 +1,10 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.dish
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.DishWithProductsIncluded
+import com.example.foodcostcalc.model.GrandDish
 import com.example.foodcostcalc.model.ProductIncluded
 
 @Dao
@@ -14,6 +15,10 @@ interface DishDao {
 
     @Query("SELECT * FROM dishes ORDER BY dish_name ASC")
     fun getDishes(): LiveData<List<Dish>>
+
+    @Transaction
+    @Query("SELECT * FROM DISHES ORDER BY DISH_NAME ASC")
+    fun getGrandDishes() : LiveData<List<GrandDish>>
 
     @Update
     suspend fun editDish(dish: Dish)

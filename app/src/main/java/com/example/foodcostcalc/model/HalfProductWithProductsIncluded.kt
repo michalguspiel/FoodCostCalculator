@@ -1,23 +1,28 @@
 package com.example.foodcostcalc.model
 
-import androidx.room.Embedded
-import androidx.room.Ignore
-import androidx.room.Relation
+import androidx.room.*
 import java.text.NumberFormat
 
-data class HalfProductWithProductsIncluded (
+data class HalfProductWithProductsIncluded(
     @Embedded val halfProduct: HalfProduct,
     @Relation(
         parentColumn = "halfProductId",
-        entityColumn = "halfProductOwnerId"
+        entityColumn = "halfProductHostId"
     )
-    val productIncludedInHalfProduct: List<ProductIncludedInHalfProduct>
-
-        ){
+    val halfProductsList: List<ProductIncludedInHalfProduct>
+) {
+    fun totalWeight(): Double {
+        return if (halfProduct.halfProductUnit == "per piece") 1.0
+        else halfProductsList.map { it.weight }.sum()
+    }
+    fun pricePerUnit(): Double {    //TODO Functions that compute price per unit and total weight
+        return if (halfProduct.halfProductUnit == "per piece") halfProductsList.map { it.totalPriceOfThisProduct }.sum()
+        else {
+            val totalPrice = halfProductsList.map { it.totalPriceOfThisProduct }.sum()
+            totalPrice * 1000 / totalWeight()
+        }
+    }
     @Ignore
-    val totalPricePerUnit = productIncludedInHalfProduct.map { it.totalPriceOfThisProduct}.sum()
-
-    @Ignore
-    val formattedTotalPrice = NumberFormat.getCurrencyInstance().format(totalPricePerUnit)
+    val formattedPricePerUnit = NumberFormat.getCurrencyInstance().format(pricePerUnit())
 
 }

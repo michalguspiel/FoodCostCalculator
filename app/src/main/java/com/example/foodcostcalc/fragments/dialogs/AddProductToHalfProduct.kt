@@ -16,9 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.changeUnitList
-import com.example.foodcostcalc.fragments.Add
-import com.example.foodcostcalc.model.HalfProduct
-import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 import com.example.foodcostcalc.setAdapterList
 import com.example.foodcostcalc.viewmodel.AddViewModel
@@ -40,6 +37,8 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
     private var metricAsBoolean = true
     private var usaAsBoolean = true
 
+    var requiredId:Long? = null
+
     /** Initialized here so it can be called outside of 'onCreateView' */
     lateinit var viewModel: ViewModel
     lateinit var halfProductViewModel: ViewModel
@@ -55,7 +54,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         val view = inflater.inflate(R.layout.add_product_to_half_product, container, false)
         halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-
+        val hpViewModel = halfProductViewModel as HalfProductsViewModel
 
         /**Binders*/
         val addProductButton = view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
@@ -141,6 +140,8 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 }
             })
 
+
+
         /**Button Logic*/
 
         addProductButton.setOnClickListener {
@@ -152,23 +153,24 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 ).show()
             } else {
                 val chosenHalfProduct =
-                    (halfProductViewModel as HalfProductsViewModel).readAllHalfProductData.value?.get(
+                    hpViewModel.readAllHalfProductData.value?.get(
                         halfProductPosition!!
                     )
                 val chosenProduct =
                     (viewModel as AddViewModel).readAllProductData.value?.get(productPosition!!)
                 val weight = weightEditTextField.text.toString().toDouble()
-                (halfProductViewModel as HalfProductsViewModel).addProductIncludedInHalfProduct(
+                hpViewModel.addProductIncludedInHalfProduct(
                     ProductIncludedInHalfProduct(
                         0,
                         chosenProduct!!,
-                        chosenHalfProduct!!.halfProductId,
-                        chosenHalfProduct,
-                        chosenProduct.productId,
+                        chosenHalfProduct!!,
+                        chosenHalfProduct.halfProductId,
                         weight,
                         chosenUnit
                     )
                 )
+
+
                 weightEditTextField.text.clear()
                 Toast.makeText(
                     requireContext(),

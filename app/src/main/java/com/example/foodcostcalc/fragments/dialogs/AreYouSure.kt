@@ -113,29 +113,46 @@ class AreYouSure : DialogFragment() {
          */
 
         confirmBtn.setOnClickListener {
-            viewModel.setFlag(false)
             when (this.tag) {
                 EditProduct.TAG -> {
+                    viewModel.setFlag(false) //flag provides an information to fragment that this object was just deleted and fragment should close itself
                     viewModel.deleteProduct(productToDelete)
                 }
                 EditDish.TAG -> {
+                    viewModel.setFlag(false)
                     deleteAllProductIncluded(listOfProductsIncludedToErase)
                     viewModel.deleteDish(dishToDelete)
                 }
                 EditHalfProduct.TAG ->{
+                    viewModel.setFlag(false)
                     listOfProductsIncludedInHalfProductToErase.forEach { halfProductViewModel.deleteProductIncludedInHalfProduct(it)}
                     halfProductViewModel.deleteHalfProducts(halfProductToDelete)
                 }
 
-                "EditDishAdapter" -> viewModel.getDishesWithProductsIncluded()
-                    .observe(
-                        viewLifecycleOwner,
-                        Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })
-                "EditHalfProductAdapter" -> halfProductViewModel.getHalfProductWithProductIncluded()
-                    .observe(
-                        viewLifecycleOwner,
-                        Observer { halfProductViewModel.deleteProductIncludedInHalfProduct(viewModel.getProductIncludedInHalfProduct().value!!) }
-                    )
+                "EditDishAdapter" -> {
+                    viewModel.setFlag(false)
+                    viewModel.getDishesWithProductsIncluded()
+                        .observe(
+                            viewLifecycleOwner,
+                            Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })
+                }
+                "EditHalfProductAdapter" -> {
+                    halfProductViewModel.getHalfProductWithProductIncluded()
+                        .observe(
+                            viewLifecycleOwner,
+                            Observer {
+                                halfProductViewModel.deleteProductIncludedInHalfProduct(
+                                    viewModel.getProductIncludedInHalfProduct().value!!
+                                )
+                            }
+                        )
+                }
+                "EditDishAdapterDeleteHalfProduct" -> {
+                    viewModel.getHalfProductIncluded().observe(viewLifecycleOwner,
+                        Observer { halfProductIncluded ->
+                            halfProductViewModel.deleteHalfProductIncludedInDish(halfProductIncluded)
+                        })
+                }
                 else -> this.dismiss()
             }
             Thread.sleep(100) // This is here because otherwise dialog gets closed before viewmodel functions are called
