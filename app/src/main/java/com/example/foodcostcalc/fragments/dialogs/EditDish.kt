@@ -15,10 +15,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.adapter.EditDishAdapter
-import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.DishWithProductsIncluded
-import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.*
 import com.example.foodcostcalc.viewmodel.AddViewModel
+import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
 
 class EditDish : DialogFragment() {
 
@@ -32,7 +31,7 @@ class EditDish : DialogFragment() {
 
         /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-
+        val hpViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
 
         val name = view.findViewById<EditText>(R.id.edit_dish_name)
         val marginEditText = view.findViewById<EditText>(R.id.edit_margin)
@@ -46,7 +45,7 @@ class EditDish : DialogFragment() {
          * lets see wheres that gonna bring me
          * */
         val actualRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
-        val recyclerAdapter = EditDishAdapter(viewModel, childFragmentManager)
+        val recyclerAdapter = EditDishAdapter(viewModel,hpViewModel, childFragmentManager)
         actualRecyclerView.adapter = recyclerAdapter
         val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
         val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)
@@ -58,23 +57,29 @@ class EditDish : DialogFragment() {
         })
 
         /** Observe data from viewmodel */
-        viewModel.getDishesWithProductsIncluded().observe(viewLifecycleOwner, Observer {
-            if (viewModel.getFlag().value == false) {
-                this.dismiss()
-                viewModel.setFlag(true)
-            } else if (viewModel.getFlag().value == true) {
+        viewModel.getGrandDishes().observe(viewLifecycleOwner, Observer {
+          //  if (viewModel.getFlag().value == false) {
+           //     viewModel.setFlag(true)
+            //    this.dismiss()
+            //} else if (viewModel.getFlag().value == true) {
                 name.setText(dishPassedFromAdapter.dish.name)
                 marginEditText.setText(dishPassedFromAdapter.dish.marginPercent.toString())
                 taxEditText.setText(dishPassedFromAdapter.dish.dishTax.toString())
-                viewModel.getIngredientsFromDish(dishPassedFromAdapter.dish.dishId).observe(viewLifecycleOwner, Observer { eachProduct ->
-                    val testData = mutableListOf<ProductIncluded>()
-                    testData.addAll(eachProduct)
-                    recyclerAdapter.switchLists(testData)
-                })
-
-            }
-
         })
+                viewModel.getIngredientsFromDish(dishPassedFromAdapter.dish.dishId).observe(viewLifecycleOwner, Observer { Products ->
+                    val listOfProducts = mutableListOf<ProductIncluded>()
+                    listOfProducts.addAll(Products)
+                    recyclerAdapter.switchLists(listOfProducts)
+                })
+                hpViewModel.getHalfProductsFromDish(dishPassedFromAdapter.dish.dishId).observe(viewLifecycleOwner,
+                    Observer { halfProducts ->
+                    val listOfHalfProducts = mutableListOf<HalfProductIncludedInDish>()
+                    listOfHalfProducts.addAll(halfProducts)
+                    recyclerAdapter.switchSecondList(listOfHalfProducts)
+                    })
+            //}
+
+
 
         /** BUTTON LOGIC*/
 
@@ -103,6 +108,7 @@ class EditDish : DialogFragment() {
                 EditDish()
 
         const val TAG = "EditDish"
-        lateinit var dishPassedFromAdapter: DishWithProductsIncluded
+        lateinit var dishPassedFromAdapter: GrandDish
+      //  lateinit var grandDishPassedFromAdapter: GrandDish
     }
 }

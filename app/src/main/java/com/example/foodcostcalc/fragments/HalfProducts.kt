@@ -40,9 +40,9 @@ class HalfProducts: Fragment() {
             halfProductViewModel.getHalfProductWithProductIncluded().observe(viewLifecycleOwner, Observer { dish ->
                 val data = mutableListOf<HalfProductWithProductsIncluded>()
                 dish.forEach { data.add(it)}
-                recyclerView.adapter = HalfProductAdapter(
+                recyclerView.adapter = HalfProductAdapter(viewLifecycleOwner,
                     data.filter{it.halfProduct.name.toLowerCase().contains(word.toLowerCase())} as ArrayList<HalfProductWithProductsIncluded>,
-                    childFragmentManager,viewModel,requireActivity())
+                    childFragmentManager,viewModel,halfProductViewModel,requireActivity())
             })
         })
 

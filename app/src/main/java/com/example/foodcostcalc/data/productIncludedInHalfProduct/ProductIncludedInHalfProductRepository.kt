@@ -1,8 +1,6 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.productIncludedInHalfProduct
 
 import androidx.lifecycle.LiveData
-import com.example.foodcostcalc.model.HalfProduct
-import com.example.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 
 class ProductIncludedInHalfProductRepository(private val productIncludedInHalfProductDao: ProductIncludedInHalfProductDao) {
@@ -24,13 +22,14 @@ class ProductIncludedInHalfProductRepository(private val productIncludedInHalfPr
     = productIncludedInHalfProductDao.getProductsFromHalfProduct(halfProductId)
 
 
+
     companion object{
         @Volatile
-        private var instance:ProductIncludedInHalfProductRepository? = null
+        private var instance: ProductIncludedInHalfProductRepository? = null
 
         fun getInstance(productIncludedInHalfProductDao: ProductIncludedInHalfProductDao) =
-            instance?: synchronized(this){
-                instance?: ProductIncludedInHalfProductRepository(productIncludedInHalfProductDao).also { instance = it }
+            instance ?: synchronized(this){
+                instance ?: ProductIncludedInHalfProductRepository(productIncludedInHalfProductDao).also { instance = it }
             }
     }
 }

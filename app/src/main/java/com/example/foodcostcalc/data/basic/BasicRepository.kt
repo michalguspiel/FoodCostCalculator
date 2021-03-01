@@ -1,5 +1,6 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.basic
 
+import com.example.foodcostcalc.model.HalfProductIncludedInDish
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 
@@ -37,8 +38,15 @@ class BasicRepository(private val basicDao: BasicDao) {
     fun getFlag() = basicDao.getFlag()
 
 
+
+    fun setHalfProductIncluded(halfProductIncluded : HalfProductIncludedInDish){
+        basicDao.setHalfProductIncluded(halfProductIncluded)
+    }
+
+    fun getHalfProductIncluded() = basicDao.getHalfProductIncluded()
+
+
     companion object {
-        // Singleton instantiation you already know and love
         @Volatile
         private var instance: BasicRepository? = null
 

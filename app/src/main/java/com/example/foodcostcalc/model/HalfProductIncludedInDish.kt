@@ -1,18 +1,20 @@
 package com.example.foodcostcalc.model
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
 
-/**Its half product but with products included in it and reference to dish owner*/
 @Entity
 data class HalfProductIncludedInDish(
     @PrimaryKey(autoGenerate = true) val halfProductIncludedInDishId: Long,
-    @Embedded val halfProductWithProductsIncluded : HalfProductWithProductsIncluded,
-    val mainDishOwnerId: Long,
-    @Embedded val dish : Dish,
-    val halfProductWithProductsIncludedId: Long,
+    @Embedded val dish: Dish,
+    val dishOwnerId: Long,
+    @Embedded val halfProduct: HalfProduct,
+    val halfProductOwnerId: Long,
     var weight: Double,
     var unit: String
+
 ) {
+
+    //@Ignore
+    // val totalPrice = productsIncludedList.map { it.totalPriceOfThisProduct }.sum() / weight //TODO implement real formula
+
 }

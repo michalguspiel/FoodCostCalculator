@@ -4,6 +4,11 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.foodcostcalc.data.dish.DishDao
+import com.example.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedDao
+import com.example.foodcostcalc.data.halfproduct.HalfProductDao
+import com.example.foodcostcalc.data.product.ProductDao
+import com.example.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductDao
 import com.example.foodcostcalc.model.*
 
 @Database(
@@ -11,8 +16,7 @@ import com.example.foodcostcalc.model.*
         ProductIncluded::class,
         HalfProduct::class,
         ProductIncludedInHalfProduct::class,
-        HalfProductWithProductsIncludedCrossRef::class,
-               DishWithHalfProductCrossRef::class]
+        HalfProductIncludedInDish::class]
     , version = 1, exportSchema = false
 )
 abstract class AppRoomDataBase : RoomDatabase() {

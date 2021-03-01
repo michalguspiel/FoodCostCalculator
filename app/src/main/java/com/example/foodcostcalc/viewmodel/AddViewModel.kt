@@ -6,10 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.foodcostcalc.data.*
-import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.Product
-import com.example.foodcostcalc.model.ProductIncluded
-import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.example.foodcostcalc.data.basic.BasicDataBase
+import com.example.foodcostcalc.data.basic.BasicRepository
+import com.example.foodcostcalc.data.dish.DishRepository
+import com.example.foodcostcalc.data.product.ProductRepository
+import com.example.foodcostcalc.model.*
 import kotlinx.coroutines.*
 
 class AddViewModel(application: Application)
@@ -40,6 +41,8 @@ class AddViewModel(application: Application)
     fun getProducts() = productRepository.getProducts()
 
     fun getDishes() = dishRepository.getDishes()
+
+    fun getGrandDishes() = dishRepository.getGrandDishes()
 
     fun addProducts(product: Product) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -104,6 +107,9 @@ class AddViewModel(application: Application)
     fun getCertainProductsIncluded(id: Long) = dishRepository.getCertainProductIncluded(id)
 
 
+
+
+
     fun setPosition(pos: Int) {
         basicRepository.setPosition(pos)
     }
@@ -122,6 +128,13 @@ class AddViewModel(application: Application)
     fun setProductIncluded(product: ProductIncluded) {
         basicRepository.setProductIncluded(product)
     }
+
+    fun setHalfProductIncluded(halfProductIncluded : HalfProductIncludedInDish){
+        basicRepository.setHalfProductIncluded(halfProductIncluded)
+    }
+
+    fun getHalfProductIncluded() = basicRepository.getHalfProductIncluded()
+
 
     fun searchFor(word: String) {
         basicRepository.searchFor(word)

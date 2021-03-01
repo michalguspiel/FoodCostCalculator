@@ -16,10 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.changeUnitList
-import com.example.foodcostcalc.fragments.Add
-import com.example.foodcostcalc.model.HalfProduct
-import com.example.foodcostcalc.model.HalfProductWithProductsIncludedCrossRef
-import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 import com.example.foodcostcalc.setAdapterList
 import com.example.foodcostcalc.viewmodel.AddViewModel
@@ -40,6 +36,8 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
     /**Holder for booleans*/
     private var metricAsBoolean = true
     private var usaAsBoolean = true
+
+    var requiredId:Long? = null
 
     /** Initialized here so it can be called outside of 'onCreateView' */
     lateinit var viewModel: ViewModel
@@ -142,6 +140,8 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 }
             })
 
+
+
         /**Button Logic*/
 
         addProductButton.setOnClickListener {
@@ -163,21 +163,13 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                     ProductIncludedInHalfProduct(
                         0,
                         chosenProduct!!,
-                        chosenHalfProduct!!.halfProductId,
-                        chosenHalfProduct,
-                        chosenProduct.productId,
+                        chosenHalfProduct!!,
+                        chosenHalfProduct.halfProductId,
                         weight,
                         chosenUnit
                     )
                 )
-                hpViewModel.readAllProductIncludedInHalfProductDataNotAsc.observe(viewLifecycleOwner,
-                    Observer { val requiredID = it.last().productIncludedInHalfProductId
-                        hpViewModel.addHalfProductWithProductsIncludedCrossRef( // To create cross reference
-                            HalfProductWithProductsIncludedCrossRef(
-                                chosenHalfProduct.halfProductId,
-                                requiredID
-                            )
-                        )})
+
 
                 weightEditTextField.text.clear()
                 Toast.makeText(

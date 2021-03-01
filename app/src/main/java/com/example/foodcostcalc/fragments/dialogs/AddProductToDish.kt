@@ -20,9 +20,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.SharedPreferences
 import com.example.foodcostcalc.changeUnitList
-import com.example.foodcostcalc.model.DishWithHalfProductCrossRef
-import com.example.foodcostcalc.model.Product
-import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.*
 import com.example.foodcostcalc.setAdapterList
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
@@ -36,9 +34,12 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val unitList = arrayListOf<String>() // list for units, to populate spinner
     private var chosenUnit: String = ""
 
+    private lateinit var halfProductToAdd: HalfProduct
+
+
     /** Initialized here so it can be called outside of 'onCreateView' */
     lateinit var viewModel: ViewModel
-    lateinit var halfProductViewModel : ViewModel
+    lateinit var halfProductViewModel: ViewModel
     private lateinit var unitAdapter: ArrayAdapter<*>
     private lateinit var unitSpinner: Spinner
 
@@ -48,6 +49,9 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     /**Holder for type of units*/
     private var unitType = ""
+
+
+    var listOfProductsIncludedInHalfProductToAdd = listOf<ProductIncludedInHalfProduct>()
 
 
     private fun showToast(
@@ -121,11 +125,13 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** ADAPTERs FOR SPINNERs */
         val halfProductList = mutableListOf<String>()
-        (halfProductViewModel as HalfProductsViewModel).getHalfProducts().observe(viewLifecycleOwner,
-            Observer { halfProducts ->
-                halfProducts.forEach { halfProductList.add(it.name) }
-            })
-        val halfProductAdapter = ArrayAdapter(requireActivity(),R.layout.spinner_layout,halfProductList)
+        (halfProductViewModel as HalfProductsViewModel).getHalfProducts()
+            .observe(viewLifecycleOwner,
+                Observer { halfProducts ->
+                    halfProducts.forEach { halfProductList.add(it.name) }
+                })
+        val halfProductAdapter =
+            ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProductList)
 
         val productList = mutableListOf<String>()
         thisViewModel.readAllProductData.observe(
@@ -204,12 +210,13 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** BUTTON LOGIC*/
         addProductToDishBtn.setOnClickListener {
-            val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
-            val weight = weightOfAddedProduct.text.toString().toDouble()
 
             if (weightOfAddedProduct.text.isNullOrEmpty()) {
                 showToast(message = "You can't add product without weight.")
             } else if (!switch.isChecked) {
+                val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
+                val weight = weightOfAddedProduct.text.toString().toDouble()
+
                 val chosenProduct = thisViewModel.readAllProductData.value?.get(productPosition!!)
                 thisViewModel.addProductToDish(
                     ProductIncluded(
@@ -229,20 +236,33 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                     "${thisViewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
                     Toast.LENGTH_SHORT
                 ).show()
+            } else {
+
+                val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
+                val weight = weightOfAddedProduct.text.toString().toDouble()
+
+                hpViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+                    halfProductToAdd = halfProduct[productPosition!!]
+                })
+
+                hpViewModel.addHalfProductIncludedInDish(
+                    HalfProductIncludedInDish(
+                        0,
+                        chosenDish!!,
+                        chosenDish.dishId,
+                        halfProductToAdd,
+                        halfProductToAdd.halfProductId,
+                        weight,
+                        chosenUnit
+                    )
+                )
+                weightOfAddedProduct.text.clear()
+                Toast.makeText(
+                    requireContext(),
+                    "${halfProductToAdd.name} added.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
-            else{
-
-                hpViewModel.readAllHalfProductWithProductsIncludedData.observe(viewLifecycleOwner,
-                    Observer { hpViewModel
-                        .addHalfProductToDish(DishWithHalfProductCrossRef(chosenDish!!.dishId,
-                            it[productPosition!!].halfProduct.halfProductId,
-                            weight))
-                         })
-
-
-
-            }
-
         }
 
 

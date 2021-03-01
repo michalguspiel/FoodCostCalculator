@@ -1,4 +1,4 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.product
 
 import androidx.lifecycle.LiveData
 import androidx.room.*

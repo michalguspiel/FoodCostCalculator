@@ -6,7 +6,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
-/**  Its a product but with dishOwnerId ref and weight */
+/**  Its a product but with dishOwnerId reference and weight */
 @Entity
 data class ProductIncluded(@PrimaryKey(autoGenerate = true) val productIncludedId: Long,
                            @Embedded val productIncluded: Product,
@@ -16,18 +16,7 @@ data class ProductIncluded(@PrimaryKey(autoGenerate = true) val productIncludedI
                            var weight: Double,
                            val weightUnit: String
 ) {
-    @Ignore
-    val unitAbbreviation: String = when(weightUnit){
-        "piece" -> "pce"
-        "kilogram" -> "kg"
-        "gram" -> "g"
-        "pound" -> "lb"
-        "ounce" -> "oz"
-        "liter" -> "l"
-        "milliliter" -> "ml"
-        "gallon" -> "gal"
-        else -> "fl oz"
-    }
+
 
     @Ignore
     val totalPriceOfThisProduct: Double = this.productIncluded.priceAfterWasteAndTax *
@@ -64,7 +53,7 @@ data class ProductIncluded(@PrimaryKey(autoGenerate = true) val productIncludedI
     @Ignore
     val finalFormatPriceOfProduct: String = NumberFormat.getCurrencyInstance().format(totalPriceOfThisProduct.toDouble())
     @Ignore
-    val formattedWeightInCaseSomeoneIsCrazy = formatPriceOrWeight(weight)
+    val formattedWeight = formatPriceOrWeight(weight)
 
 }
 

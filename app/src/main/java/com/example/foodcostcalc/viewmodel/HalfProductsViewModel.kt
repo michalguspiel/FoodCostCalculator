@@ -5,9 +5,9 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.example.foodcostcalc.data.AppRoomDataBase
-import com.example.foodcostcalc.data.HalfProductRepository
-import com.example.foodcostcalc.data.HalfProductWithProductsIncludedRepository
-import com.example.foodcostcalc.data.ProductIncludedInHalfProductRepository
+import com.example.foodcostcalc.data.halfproduct.HalfProductRepository
+import com.example.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
+import com.example.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
 import com.example.foodcostcalc.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +17,6 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
     val readAllHalfProductData: LiveData<List<HalfProduct>>
     val readAllProductIncludedInHalfProductData: LiveData<List<ProductIncludedInHalfProduct>>
     val readAllProductIncludedInHalfProductDataNotAsc: LiveData<List<ProductIncludedInHalfProduct>>
-    val readAllHalfProductWithProductsIncludedData: LiveData<List<HalfProductWithProductsIncluded>>
 
     private val halfProductRepository: HalfProductRepository
     private val productIncludedInHalfProductRepository: ProductIncludedInHalfProductRepository
@@ -37,8 +36,11 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
         readAllHalfProductData = halfProductRepository.readAllData
         readAllProductIncludedInHalfProductData = productIncludedInHalfProductRepository.readAllData
         readAllProductIncludedInHalfProductDataNotAsc = productIncludedInHalfProductRepository.readAllDataNotAsc
-        readAllHalfProductWithProductsIncludedData = halfProductWithProductsIncludedRepository.readAllData
+     //   readAllHalfProductWithProductsIncludedData = halfProductWithProductsIncludedRepository.readAllData
     }
+
+
+    fun getHalfProductsFromDish(dishId: Long) = halfProductRepository.getHalfProductsFromDish(dishId)
 
     fun getHalfProducts() = halfProductRepository.readAllData
 
@@ -61,8 +63,6 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
 
     }
 
-    fun getProductsIncludedInHalfProduct() = productIncludedInHalfProductRepository.readAllData
-
     fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct){
         viewModelScope.launch(Dispatchers.IO) {
             productIncludedInHalfProductRepository.addProductIncludedInHalfProduct(productIncludedInHalfProduct)
@@ -82,19 +82,31 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
 
     }
 
-    fun addHalfProductWithProductsIncludedCrossRef(halfProductWithProductsIncludedCrossRef: HalfProductWithProductsIncludedCrossRef){
-        viewModelScope.launch(Dispatchers.IO) {
-            halfProductWithProductsIncludedRepository
-                .addHalfProductWithProductsIncludedCrossRef(halfProductWithProductsIncludedCrossRef)
+
+    fun addHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish){
+        viewModelScope.launch(Dispatchers.IO){
+            halfProductRepository
+                .addHalfProductIncludedInDish(halfProductIncludedInDish)
         }
     }
 
-    fun addHalfProductToDish(dishWithHalfProductCrossRef: DishWithHalfProductCrossRef){
+    fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish){
         viewModelScope.launch(Dispatchers.IO){
-            halfProductWithProductsIncludedRepository
-                .addHalfProductToDish(dishWithHalfProductCrossRef)
+            halfProductRepository
+                .editHalfProductIncludedInDish(halfProductIncludedInDish)
+        }
+
+    } fun deleteHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish){
+        viewModelScope.launch(Dispatchers.IO){
+            halfProductRepository
+                .deleteHalfProductIncludedInDish(halfProductIncludedInDish)
         }
     }
+
+
+    fun getCertainHalfProductWithProductsIncluded(halfProductId: Long)
+    = halfProductWithProductsIncludedRepository.getCertainHalfProductWithProductsIncluded(halfProductId)
+
 
     fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
 

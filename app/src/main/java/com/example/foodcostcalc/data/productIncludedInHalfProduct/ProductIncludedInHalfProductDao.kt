@@ -1,4 +1,4 @@
-package com.example.foodcostcalc.data
+package com.example.foodcostcalc.data.productIncludedInHalfProduct
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
@@ -26,5 +26,6 @@ interface ProductIncludedInHalfProductDao {
     @Transaction
     @Query("SELECT * FROM ProductIncludedInHalfProduct WHERE halfProductId = :halfProductId ORDER BY product_name ASC")
     fun getProductsFromHalfProduct(halfProductId: Long): LiveData<List<ProductIncludedInHalfProduct>>
+
 
 }

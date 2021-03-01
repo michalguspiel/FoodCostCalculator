@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
+import com.example.foodcostcalc.data.dish.DishDao
 import com.example.foodcostcalc.getOrAwaitValue
 import com.example.foodcostcalc.model.Dish
 import com.example.foodcostcalc.model.Product

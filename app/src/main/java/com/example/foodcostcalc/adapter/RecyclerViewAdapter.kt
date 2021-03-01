@@ -14,6 +14,7 @@ import com.example.foodcostcalc.fragments.Products
 import com.example.foodcostcalc.fragments.dialogs.EditDish
 import com.example.foodcostcalc.fragments.dialogs.EditProduct
 import com.example.foodcostcalc.model.DishWithProductsIncluded
+import com.example.foodcostcalc.model.GrandDish
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import java.util.*
@@ -54,7 +55,7 @@ class RecyclerViewAdapter(val tag: String?, private val list: ArrayList<*>, priv
                 }
                 Dishes.TAG -> {
                     EditDish().show(fragmentManager, EditDish.TAG)
-                    EditDish.dishPassedFromAdapter = list[position] as DishWithProductsIncluded
+                    EditDish.dishPassedFromAdapter = list[position] as GrandDish
                 }
                 else -> {
                 }
