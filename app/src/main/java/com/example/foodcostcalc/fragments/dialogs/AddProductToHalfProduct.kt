@@ -2,6 +2,7 @@ package com.example.foodcostcalc.fragments.dialogs
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -13,11 +14,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.foodcostcalc.R
-import com.example.foodcostcalc.SharedPreferences
-import com.example.foodcostcalc.changeUnitList
+import com.example.foodcostcalc.*
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
-import com.example.foodcostcalc.setAdapterList
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
 
@@ -30,6 +28,10 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
     private val unitList = arrayListOf<String>() // list for units, to populate spinner
     private var chosenUnit: String = ""
 
+    private var halfProductUnit     = ""
+    private var chosenProductName   = ""
+    private var halfProductUnitType = ""
+
     /**Holder for type of units*/
     private var unitType = ""
 
@@ -37,14 +39,15 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
     private var metricAsBoolean = true
     private var usaAsBoolean = true
 
-    var requiredId:Long? = null
-
     /** Initialized here so it can be called outside of 'onCreateView' */
     lateinit var viewModel: ViewModel
     lateinit var halfProductViewModel: ViewModel
     private lateinit var unitAdapter: ArrayAdapter<*>
     private lateinit var unitSpinner: Spinner
+    lateinit var weightPerPieceEditText: EditText
 
+    var isProductPiece: Boolean = false
+    var isHalfProductPiece: Boolean = true
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -56,12 +59,18 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
         val hpViewModel = halfProductViewModel as HalfProductsViewModel
 
+
         /**Binders*/
         val addProductButton = view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
         val weightEditTextField = view.findViewById<EditText>(R.id.product_weight_in_half_product)
         val halfProductSpinner = view.findViewById<Spinner>(R.id.half_product_spinner)
         val productSpinner = view.findViewById<Spinner>(R.id.product_spinner)
+        weightPerPieceEditText = view.findViewById(R.id.weight_for_piece)
+        weightPerPieceEditText.visibility = View.GONE // Initially off
+
         unitSpinner = view.findViewById(R.id.unit_spinner)
+
+
 
         /** Get the data about unit settings from shared preferences.
          * true means that user uses certain units.
@@ -116,6 +125,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
             id = UNIT_SPINNER_ID
         }
 
+
         /**OBSERVING 'LIVEDATA' FROM ADDVIEWMODEL
          *  WHICH OBSERVES 'LIVEDATA' IN REPOSITORY
          *  WHICH OBSERVES 'LIVEDATA' FROM DAO*/
@@ -139,9 +149,6 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                     halfProductAdapter.notifyDataSetChanged()
                 }
             })
-
-
-
         /**Button Logic*/
 
         addProductButton.setOnClickListener {
@@ -159,26 +166,34 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 val chosenProduct =
                     (viewModel as AddViewModel).readAllProductData.value?.get(productPosition!!)
                 val weight = weightEditTextField.text.toString().toDouble()
-                hpViewModel.addProductIncludedInHalfProduct(
-                    ProductIncludedInHalfProduct(
-                        0,
-                        chosenProduct!!,
-                        chosenHalfProduct!!,
-                        chosenHalfProduct.halfProductId,
-                        weight,
-                        chosenUnit
+                if (!isHalfProductPiece && isProductPiece && weightPerPieceEditText.text.isEmpty()) {
+                    Toast.makeText(
+                        requireContext(),
+                        "You need to provide $halfProductUnitType of this product!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                } else {
+                    hpViewModel.addProductIncludedInHalfProduct(
+                        ProductIncludedInHalfProduct(
+                            0,
+                            chosenProduct!!,
+                            chosenHalfProduct!!,
+                            chosenHalfProduct.halfProductId,
+                            weight,
+                            chosenUnit,
+                            if (!isHalfProductPiece && isProductPiece) weightPerPieceEditText.text.toString().toDouble() else 1.0
+                        )
                     )
-                )
 
 
-                weightEditTextField.text.clear()
-                Toast.makeText(
-                    requireContext(),
-                    "${(viewModel as AddViewModel).readAllProductData.value?.get(productPosition!!)?.name} added.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                    weightEditTextField.text.clear()
+                    Toast.makeText(
+                        requireContext(),
+                        "${(viewModel as AddViewModel).readAllProductData.value?.get(productPosition!!)?.name} added.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
-
 
         }
 
@@ -195,19 +210,41 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         const val TAG = "AddProductToHalfProduct"
     }
 
+
+    fun setTextField() {
+        if (isProductPiece && !isHalfProductPiece) {
+            weightPerPieceEditText.visibility = View.VISIBLE
+            weightPerPieceEditText.hint = "$chosenProductName ${perUnitToAbbreviation(halfProductUnit)}."
+        } else weightPerPieceEditText.visibility = View.GONE
+    }
+
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             1 -> {
                 productPosition = position
-                unitType = setAdapterList(viewModel as AddViewModel, position)
+                val chosenProduct =
+                    (viewModel as AddViewModel).readAllProductData.value?.get(position)
+                unitType = setAdapterList(
+                    chosenProduct?.unit
+                )
+                chosenProductName = chosenProduct!!.name
                 unitList.changeUnitList(unitType, metricAsBoolean, usaAsBoolean)
                 unitAdapter.notifyDataSetChanged()
                 unitSpinner.setSelection(0, false)
                 chosenUnit = unitList.first()
                 unitSpinner.setSelection(0) // when the product is chosen first units got chosen immediately
+                isProductPiece = (viewModel as AddViewModel)
+                    .readAllProductData.value!![productPosition!!].unit == "per piece"
+                setTextField()
             }
             2 -> {
                 halfProductPosition = position
+                val thisHalfProduct = (halfProductViewModel as HalfProductsViewModel)
+                    .readAllHalfProductData.value!![halfProductPosition!!]
+                halfProductUnit = thisHalfProduct.halfProductUnit
+                isHalfProductPiece = thisHalfProduct.halfProductUnit == "per piece"
+                halfProductUnitType = setAdapterList(thisHalfProduct.halfProductUnit)
+                setTextField()
             }
             else -> {
                 chosenUnit = unitList[position]

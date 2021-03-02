@@ -17,13 +17,11 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.foodcostcalc.R
-import com.example.foodcostcalc.SharedPreferences
-import com.example.foodcostcalc.changeUnitList
+import com.example.foodcostcalc.*
 import com.example.foodcostcalc.model.*
-import com.example.foodcostcalc.setAdapterList
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
+import io.reactivex.internal.operators.single.SingleDelayWithCompletable
 
 class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val PRODUCT_SPINNER_ID = 1
@@ -34,6 +32,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val unitList = arrayListOf<String>() // list for units, to populate spinner
     private var chosenUnit: String = ""
 
+    private lateinit var switch: SwitchCompat
     private lateinit var halfProductToAdd: HalfProduct
 
 
@@ -49,9 +48,6 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     /**Holder for type of units*/
     private var unitType = ""
-
-
-    var listOfProductsIncludedInHalfProductToAdd = listOf<ProductIncludedInHalfProduct>()
 
 
     private fun showToast(
@@ -73,7 +69,13 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         when (parent?.id) {
             1 -> {
                 productPosition = position
-                unitType = setAdapterList(viewModel as AddViewModel, position)
+                if (!switch.isChecked) unitType = setAdapterList(
+                        (viewModel as AddViewModel).readAllProductData.value?.get(position)?.unit
+                )
+                if (switch.isChecked) unitType = setAdapterList(
+                        (halfProductViewModel as HalfProductsViewModel)
+                            .readAllHalfProductData.value?.get(position)?.halfProductUnit
+                    )
                 unitList.changeUnitList(unitType, metricAsBoolean, usaAsBoolean)
                 unitAdapter.notifyDataSetChanged()
                 unitSpinner.setSelection(0, false)
@@ -118,7 +120,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
         val productSpinner = view.findViewById<Spinner>(R.id.mySpinner)
         val dishSpinner = view.findViewById<Spinner>(R.id.dishSpinner)
-        val switch = view.findViewById<SwitchCompat>(R.id.product_halfproduct_switch)
+        switch = view.findViewById<SwitchCompat>(R.id.product_halfproduct_switch)
         val chooseProductTextView = view.findViewById<TextView>(R.id.choose_product_half_product)
         unitSpinner = view.findViewById(R.id.unitSpinner)
 
@@ -237,10 +239,8 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-
                 val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
                 val weight = weightOfAddedProduct.text.toString().toDouble()
-
                 hpViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
                     halfProductToAdd = halfProduct[productPosition!!]
                 })

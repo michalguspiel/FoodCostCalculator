@@ -1,6 +1,7 @@
 package com.example.foodcostcalc.adapter
 
 import android.app.Activity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,7 +68,8 @@ class HalfProductAdapter(
         holder.unitOfHalfProduct.text = list[position].halfProduct.halfProductUnit
              halfProductViewModel
             .getCertainHalfProductWithProductsIncluded(list[position].halfProduct.halfProductId).observe(viewLifeCycleOwner,
-                Observer { holder.finalPriceOfHalfProductPerUnit.text = it.formattedPricePerUnit })
+                Observer { holder.finalPriceOfHalfProductPerUnit.text = it.formattedPricePerUnit
+                })
 
 
         holder.editButton.setOnClickListener {

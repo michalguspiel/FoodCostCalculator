@@ -23,9 +23,9 @@ class EditDish : DialogFragment() {
 
 
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_edit_dish, container, false)
 
@@ -44,8 +44,9 @@ class EditDish : DialogFragment() {
          * every index of product included has its own index in weight collection
          * lets see wheres that gonna bring me
          * */
-        val actualRecyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
-        val recyclerAdapter = EditDishAdapter(viewModel,hpViewModel, childFragmentManager)
+        val actualRecyclerView =
+            view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
+        val recyclerAdapter = EditDishAdapter(viewModel, hpViewModel, childFragmentManager)
         actualRecyclerView.adapter = recyclerAdapter
         val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
         val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)
@@ -58,36 +59,41 @@ class EditDish : DialogFragment() {
 
         /** Observe data from viewmodel */
         viewModel.getGrandDishes().observe(viewLifecycleOwner, Observer {
-          //  if (viewModel.getFlag().value == false) {
-           //     viewModel.setFlag(true)
-            //    this.dismiss()
-            //} else if (viewModel.getFlag().value == true) {
-                name.setText(dishPassedFromAdapter.dish.name)
-                marginEditText.setText(dishPassedFromAdapter.dish.marginPercent.toString())
-                taxEditText.setText(dishPassedFromAdapter.dish.dishTax.toString())
+            if (viewModel.getFlag().value == false) {
+                viewModel.setFlag(true)
+                this.dismiss()
+            }
+            name.setText(dishPassedFromAdapter.dish.name)
+            marginEditText.setText(dishPassedFromAdapter.dish.marginPercent.toString())
+            taxEditText.setText(dishPassedFromAdapter.dish.dishTax.toString())
         })
-                viewModel.getIngredientsFromDish(dishPassedFromAdapter.dish.dishId).observe(viewLifecycleOwner, Observer { Products ->
-                    val listOfProducts = mutableListOf<ProductIncluded>()
-                    listOfProducts.addAll(Products)
-                    recyclerAdapter.switchLists(listOfProducts)
-                })
-                hpViewModel.getHalfProductsFromDish(dishPassedFromAdapter.dish.dishId).observe(viewLifecycleOwner,
-                    Observer { halfProducts ->
+        viewModel.getIngredientsFromDish(dishPassedFromAdapter.dish.dishId)
+            .observe(viewLifecycleOwner, Observer { Products ->
+                val listOfProducts = mutableListOf<ProductIncluded>()
+                listOfProducts.addAll(Products)
+                recyclerAdapter.switchLists(listOfProducts)
+            })
+        hpViewModel.getHalfProductsFromDish(dishPassedFromAdapter.dish.dishId)
+            .observe(viewLifecycleOwner,
+                Observer { halfProducts ->
                     val listOfHalfProducts = mutableListOf<HalfProductIncludedInDish>()
                     listOfHalfProducts.addAll(halfProducts)
                     recyclerAdapter.switchSecondList(listOfHalfProducts)
-                    })
-            //}
-
+                })
+        //}
 
 
         /** BUTTON LOGIC*/
 
         saveBtn.setOnClickListener {
-            recyclerAdapter.save(Dish(dishPassedFromAdapter.dish.dishId,
+            recyclerAdapter.save(
+                Dish(
+                    dishPassedFromAdapter.dish.dishId,
                     name.text.toString(),
                     marginEditText.text.toString().toDouble(),
-                    taxEditText.text.toString().toDouble()))
+                    taxEditText.text.toString().toDouble()
+                )
+            )
             this.dismiss()
         }
 
@@ -105,10 +111,10 @@ class EditDish : DialogFragment() {
 
     companion object {
         fun newInstance(): EditDish =
-                EditDish()
+            EditDish()
 
         const val TAG = "EditDish"
         lateinit var dishPassedFromAdapter: GrandDish
-      //  lateinit var grandDishPassedFromAdapter: GrandDish
+        //  lateinit var grandDishPassedFromAdapter: GrandDish
     }
 }

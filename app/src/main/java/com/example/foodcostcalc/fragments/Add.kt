@@ -71,29 +71,34 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
 
         /**Functions*/
 
+
+        fun  formatResultAndCheckCommas(number: Double):String {
+            val df = DecimalFormat("#.##")
+            df.roundingMode = RoundingMode.CEILING
+            val formattedResult = df.format(number)
+            var formattedResultCheck = ""
+            for (eachChar in formattedResult) {
+                formattedResultCheck += if (eachChar == ',') '.'
+                else eachChar
+            }
+            return formattedResultCheck
+        }
+
         /** Calculates waste % from given product weight and waste weight,
          * formattedResultCheck works as safety for devices that formats number to
          * for example 21,21 */
         fun calculateWaste(calcWeight: Double, calcWaste: Double): String {
                 val result = (100 * calcWaste) / calcWeight
-                val df = DecimalFormat("#.##")
-                df.roundingMode = RoundingMode.CEILING
-                val formattedResult = df.format(result)
-                var formattedResultCheck = ""
-                for (eachChar in formattedResult) {
-                    formattedResultCheck += if (eachChar == ',') '.'
-                    else eachChar
-                }
-                waste.setText(formattedResultCheck)
+                waste.setText(formatResultAndCheckCommas(result))
                 calcProductWeight.text.clear()
                 calcWasteWeight.text.clear()
-                return formattedResultCheck // returns this only in order to test it
+                return formatResultAndCheckCommas(result) // returns this only in order to test it
             }
 
 
-        fun calculatePricePerPiece(pricePerBox: Double,quantityInBox: Int){
+        fun calculatePricePerPiece(pricePerBox: Double,quantityInBox: Double){
           val result = pricePerBox/quantityInBox
-          price.setText(result.toString())
+          price.setText(formatResultAndCheckCommas(result))
           calcPricePerBox.text.clear()
           calcQuantityBox.text.clear()
         }
@@ -135,8 +140,7 @@ class Add : Fragment(), AdapterView.OnItemSelectedListener {
         calcPricePerPieceBtn.setOnClickListener {
             if(calcPricePerBox.text.isNotEmpty()  && calcQuantityBox.text.isNotEmpty()){
                 calculatePricePerPiece(calcPricePerBox.text.toString().toDouble(),
-                    calcQuantityBox.text.toString().toInt())
-
+                    calcQuantityBox.text.toString().toDouble())
             }
         }
 
