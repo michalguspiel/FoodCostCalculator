@@ -4,27 +4,27 @@
     <group>
         <item
             android:id="@+id/nav_add_product"
-            android:icon="@drawable/plus"
+            android:icon="@drawable/ic_add"
             android:title="@string/add_product"/>
         <item
             android:id="@+id/nav_create_new_dish"
-            android:icon="@drawable/serving_dish"
+            android:icon="@drawable/ic_serving_dish"
             android:title="@string/create_a_new_dish"/>
         <item
             android:id="@+id/nav_add_product_to_dish"
-            android:icon="@drawable/grocery"
+            android:icon="@drawable/ic_grocery"
             android:title="@string/add_products_to_your_dish"/>
         <item
             android:id="@+id/nav_create_half_product"
-            android:icon="@drawable/money"
+            android:icon="@drawable/ic_croissant"
             android:title="Create half product"/>
         <item
             android:id="@+id/nav_add_product_to_half_product"
-            android:icon="@drawable/money"
+            android:icon="@drawable/ic_bread"
             android:title="Add product to half product"/>
         <item
             android:id="@+id/nav_personalize"
-            android:icon="@drawable/settings"
+            android:icon="@drawable/ic_settings"
             android:title="@string/personalize"/>
     </group>
 

@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.example.foodcostcalc.R
+import com.example.foodcostcalc.calculatePrice
+import com.example.foodcostcalc.formatPrice
 import com.example.foodcostcalc.model.GrandDish
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.unitAbbreviation
@@ -49,7 +51,12 @@ class DishListViewAdapter(private val context: Activity,
             halfProductsViewModel
                 .getCertainHalfProductWithProductsIncluded(grandDish.halfProducts[thisPosition].halfProductOwnerId)
                 .observe(viewLifecycleOwner,
-                Observer { productPriceText.text = it.formattedPricePerUnit })
+                Observer { productPriceText.text =
+                    formatPrice(
+                        calculatePrice(it.pricePerUnit(),grandDish.halfProducts[thisPosition].weight,
+                            it.halfProduct.halfProductUnit, grandDish.halfProducts[thisPosition].unit)
+                        )
+                })
 
             productUnit.text = unitAbbreviation(grandDish.halfProducts[thisPosition].unit)
         }

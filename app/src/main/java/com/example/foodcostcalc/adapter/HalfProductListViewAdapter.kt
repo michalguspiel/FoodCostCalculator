@@ -9,6 +9,7 @@ import android.widget.TextView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.example.foodcostcalc.unitAbbreviation
 
 class HalfProductListViewAdapter(private val context: Activity, private val productIncludedInHalfProductList: List<ProductIncludedInHalfProduct>)
     : ArrayAdapter<ProductIncludedInHalfProduct>(context, R.layout.listview_dish_row, productIncludedInHalfProductList) {
@@ -29,7 +30,7 @@ class HalfProductListViewAdapter(private val context: Activity, private val prod
         productNameText.text = productIncludedInHalfProductList[position].productIncluded.name
         productWeightText.text = productIncludedInHalfProductList[position].formattedWeight
         productPriceText.text = productIncludedInHalfProductList[position].finalFormatPriceOfProduct
-        productUnit.text = productIncludedInHalfProductList[position].unitAbbreviation
+        productUnit.text = unitAbbreviation(productIncludedInHalfProductList[position].weightUnit)
         return rowView
     }
 }

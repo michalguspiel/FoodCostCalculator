@@ -76,10 +76,10 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         /** Observe data from viewmodel */
         halfProductViewModel.getHalfProductWithProductIncluded()
             .observe(viewLifecycleOwner, Observer {
-               // if (addViewModel.getFlag().value == false) {
-                //    this.dismiss()
-                 //   addViewModel.setFlag(true)
-               // } else {
+                if (addViewModel.getFlag().value == false) {
+                    this.dismiss()
+                    addViewModel.setFlag(true)
+                } else {
                     name.setText(halfProductPassedFromAdapter.halfProduct.name)
                     halfProductViewModel
                         .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapter.halfProduct.halfProductId)
@@ -88,7 +88,7 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                             testData.addAll(eachProduct)
                             recyclerViewAdapter.switchLists(testData)
                         })
-               // }
+                }
             })
 
         /**Button logic*/

@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/navigation_products"
-        android:icon="@drawable/ic_kitchen_24px"
+        android:icon="@drawable/ic_apple_1_"
         android:title="@string/products"/>
 
     <item
         android:id="@+id/navigation_half_products"
-        android:icon="@drawable/ic_food_bank"
-        android:title="Half products"/>
+        android:icon="@drawable/ic_jam"
+        android:title="@string/half_products"/>
 
     <item
         android:id="@+id/navigation_dishes"
-        android:icon="@drawable/ic_food_bank"
+        android:icon="@drawable/ic_food"
         android:title="@string/dishes"/>
 
 

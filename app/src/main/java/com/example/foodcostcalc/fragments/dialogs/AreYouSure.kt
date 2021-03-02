@@ -130,7 +130,6 @@ class AreYouSure : DialogFragment() {
                 }
 
                 "EditDishAdapter" -> {
-                    viewModel.setFlag(false)
                     viewModel.getDishesWithProductsIncluded()
                         .observe(
                             viewLifecycleOwner,
