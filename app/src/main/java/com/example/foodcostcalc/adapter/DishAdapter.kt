@@ -96,7 +96,6 @@ class DishAdapter(
             halfProductsViewModel
                 .getCertainHalfProductWithProductsIncluded(it.halfProductOwnerId)
                 .observe(viewLifecycleOwner, Observer { halfProductWithProductsIncluded ->
-                    Log.i("test", halfProductWithProductsIncluded.pricePerUnit().toString())
                     holder.totalPrice = (holder.totalPrice +
                             calculatePrice(halfProductWithProductsIncluded.pricePerUnit(),it.weight,
                             halfProductWithProductsIncluded.halfProduct.halfProductUnit,it.unit))

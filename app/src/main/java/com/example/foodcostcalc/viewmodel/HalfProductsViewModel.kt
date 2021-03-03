@@ -36,11 +36,12 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
         readAllHalfProductData = halfProductRepository.readAllData
         readAllProductIncludedInHalfProductData = productIncludedInHalfProductRepository.readAllData
         readAllProductIncludedInHalfProductDataNotAsc = productIncludedInHalfProductRepository.readAllDataNotAsc
-     //   readAllHalfProductWithProductsIncludedData = halfProductWithProductsIncludedRepository.readAllData
     }
 
 
     fun getHalfProductsFromDish(dishId: Long) = halfProductRepository.getHalfProductsFromDish(dishId)
+
+    fun getHalfProductsFromDishByHalfProduct(productId: Long) = halfProductRepository.getHalfProductsFromDishByHalfProduct(productId)
 
     fun getHalfProducts() = halfProductRepository.readAllData
 
@@ -113,6 +114,8 @@ class HalfProductsViewModel(application: Application) : AndroidViewModel(applica
     fun getProductsIncludedFromHalfProduct(halfProductId: Long)
     = productIncludedInHalfProductRepository.getProductsIncludedFromHalfProduct(halfProductId)
 
+    fun getCertainProductsIncluded(productId: Long)
+    = productIncludedInHalfProductRepository.getCertainProductsIncluded(productId)
 
 
 

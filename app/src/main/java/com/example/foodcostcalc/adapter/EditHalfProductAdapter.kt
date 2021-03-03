@@ -9,17 +9,18 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.fragments.dialogs.AreYouSure
-import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.HalfProduct
-import com.example.foodcostcalc.model.ProductIncluded
-import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.example.foodcostcalc.model.*
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
 
-class EditHalfProductAdapter(private val viewModel: HalfProductsViewModel,private val basicViewModel: AddViewModel, private val fragmentManager: FragmentManager):
+class EditHalfProductAdapter(private val viewModel: HalfProductsViewModel,
+                             private val basicViewModel: AddViewModel,
+                             private val fragmentManager: FragmentManager):
 RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
 
     /**List of ProductIncluded which this adapter works on,
@@ -33,6 +34,9 @@ RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
      * and afterwards override original list with this one(with save btn)*/
     var cloneOfList: MutableList<ProductIncludedInHalfProduct> = mutableListOf()
 
+
+
+
     fun switchLists(passedList: MutableList<ProductIncludedInHalfProduct>) {
         this.list = passedList
         cloneOfList = passedList
@@ -40,11 +44,24 @@ RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
     }
 
 
-    fun save(halfProduct: HalfProduct) {
+
+    fun save(halfProduct: HalfProduct, viewLifecycleOwner: LifecycleOwner) {
         viewModel.editHalfProducts(halfProduct)
         notifyDataSetChanged()
         cloneOfList.forEach { viewModel.editProductIncludedInHalfProduct(it) }
-    }
+
+        /**So every Half product in dish is also edited.*/
+    viewModel.getHalfProductsFromDishByHalfProduct(halfProduct.halfProductId).observe(viewLifecycleOwner,
+        Observer { halfProductList ->
+         halfProductList.forEach { viewModel.editHalfProductIncludedInDish(
+             HalfProductIncludedInDish(
+             it.halfProductIncludedInDishId,it.dish,it.dishOwnerId,halfProduct,halfProduct.halfProductId,it.weight,it.unit
+         )
+         ) }
+        })
+
+        }
+
 
     class EditHalfProductHolder(view: View):RecyclerView.ViewHolder(view) {
         val nameTextView: TextView = view.findViewById(R.id.edit_dish_product_name)
@@ -56,6 +73,7 @@ RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditHalfProductHolder {
         val adapterLayout = LayoutInflater.from(parent.context)
             .inflate(R.layout.small_list_of_products_v2, parent, false)
+
         return EditHalfProductHolder(adapterLayout)
     }
 

@@ -12,6 +12,8 @@ class HalfProductRepository(private val halfProductDao: HalfProductDao) {
 
     fun getHalfProductsFromDish(dishId: Long) = halfProductDao.getHalfProductsFromDish(dishId)
 
+    fun getHalfProductsFromDishByHalfProduct(productId: Long) = halfProductDao.getHalfProductsFromDishByHalfProduct(productId)
+
     suspend fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish)
     = halfProductDao.editHalfProductIncludedInDish(halfProductIncludedInDish)
 
