@@ -13,10 +13,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
-import com.example.foodcostcalc.R
-import com.example.foodcostcalc.SharedPreferences
+import com.example.foodcostcalc.*
 import com.example.foodcostcalc.adapter.EditHalfProductAdapter
-import com.example.foodcostcalc.getUnits
 import com.example.foodcostcalc.model.HalfProduct
 import com.example.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
@@ -54,6 +52,15 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         val sharedPreferences = SharedPreferences(requireContext())
 
         unitList = getUnits(resources, sharedPreferences)
+        unitList = when (EditHalfProduct.halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
+            "per piece" -> mutableListOf("per piece")
+            "per kilogram" -> unitList.filterWeight()
+            "per liter" -> unitList.filterVol()
+            "per pound" -> unitList.filterWeight()
+            "per gallon" ->  unitList.filterVol()
+            else -> mutableListOf("error!")
+
+        }
 
         /**Spinner adapter*/
         val unitSpinnerAdapter =
@@ -99,7 +106,7 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                     halfProductPassedFromAdapter.halfProduct.halfProductId,
                     name.text.toString(),
                     chosenUnit // chosen unit from spinner
-                )
+                ), viewLifecycleOwner
             )
             this.dismiss()
         }

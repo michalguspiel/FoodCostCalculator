@@ -14,7 +14,4 @@ data class HalfProductIncludedInDish(
 
 ) {
 
-    //@Ignore
-    // val totalPrice = productsIncludedList.map { it.totalPriceOfThisProduct }.sum() / weight //TODO implement real formula
-
 }

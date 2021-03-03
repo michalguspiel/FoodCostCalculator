@@ -1,11 +1,13 @@
 package com.example.foodcostcalc.adapter
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import com.example.foodcostcalc.R
@@ -25,10 +27,12 @@ class DishListViewAdapter(private val context: Activity,
         + grandDish.halfProducts) {
 
 
+    @SuppressLint("ViewHolder")
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
 
         val inflater = context.layoutInflater
-        val rowView = inflater.inflate(R.layout.listview_dish_row, null, true)
+        val rowView = inflater.inflate(R.layout.listview_dish_row,
+            parent, false)
 
         val productNameText = rowView.findViewById<TextView>(R.id.product_name_in_dish_row)
         val productWeightText = rowView.findViewById<TextView>(R.id.product_weight_in_dish_row)
@@ -42,11 +46,13 @@ class DishListViewAdapter(private val context: Activity,
             productPriceText.text = grandDish.productsIncluded[position].finalFormatPriceOfProduct
             productUnit.text = unitAbbreviation(grandDish.productsIncluded[position].weightUnit)
         }
+
         /**To populate rest with halfProducts*/
         else if (position >= grandDish.productsIncluded.size)  {
             var thisPosition = position - grandDish.productsIncluded.size // to start counting position from new list
             productNameText.text = grandDish.halfProducts[thisPosition].halfProduct.name
             productWeightText.text = grandDish.halfProducts[thisPosition].weight.toString()
+
 
             halfProductsViewModel
                 .getCertainHalfProductWithProductsIncluded(grandDish.halfProducts[thisPosition].halfProductOwnerId)

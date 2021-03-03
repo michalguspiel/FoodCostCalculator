@@ -22,6 +22,9 @@ fun addHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedI
 @Query("SELECT * FROM HALFPRODUCTINCLUDEDINDISH WHERE dishOwnerId = :dishId ORDER BY name ASC")
 fun getHalfProductsFromDish(dishId: Long): LiveData<List<HalfProductIncludedInDish>>
 
+@Query("SELECT * FROM HALFPRODUCTINCLUDEDINDISH WHERE halfProductId =:halfProductId")
+fun getHalfProductsFromDishByHalfProduct(halfProductId: Long): LiveData<List<HalfProductIncludedInDish>>
+
 @Update
 suspend fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish)
 

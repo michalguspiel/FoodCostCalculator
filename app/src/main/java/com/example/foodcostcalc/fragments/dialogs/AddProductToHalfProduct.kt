@@ -65,6 +65,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         val weightEditTextField = view.findViewById<EditText>(R.id.product_weight_in_half_product)
         val halfProductSpinner = view.findViewById<Spinner>(R.id.half_product_spinner)
         val productSpinner = view.findViewById<Spinner>(R.id.product_spinner)
+        val infoButton = view.findViewById<ImageButton>(R.id.info_button)
         weightPerPieceEditText = view.findViewById(R.id.weight_for_piece)
         weightPerPieceEditText.visibility = View.GONE // Initially off
 
@@ -150,6 +151,9 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 }
             })
         /**Button Logic*/
+
+        infoButton.setOnClickListener { InformationDialog().show(this.parentFragmentManager, TAG) }
+
 
         addProductButton.setOnClickListener {
             if (weightEditTextField.text.isNullOrEmpty()) {

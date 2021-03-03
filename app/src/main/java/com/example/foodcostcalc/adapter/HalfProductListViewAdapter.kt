@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
+import android.widget.Toast
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.model.ProductIncluded
 import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
@@ -26,11 +27,31 @@ class HalfProductListViewAdapter(private val context: Activity, private val prod
         val productUnit         = rowView.findViewById<TextView>(R.id.product_weight_unit_in_dish_row)
 
 
+        fun totalWeightMessage():String {
+            val isWeight = productIncludedInHalfProductList[position].halfProduct.halfProductUnit == "per kilogram" ||
+                    productIncludedInHalfProductList[position].halfProduct.halfProductUnit == "per pound"
+            val unitType: String = if(isWeight) " of weight " else " of volume "
+         return productIncludedInHalfProductList[position].productIncluded.name +
+                 unitType +
+                 productIncludedInHalfProductList[position].totalWeightForPiece.toString() + " " +
+                         unitAbbreviation(productIncludedInHalfProductList[position].halfProduct.halfProductUnit.drop(4)) +"."
+        }
+
 
         productNameText.text = productIncludedInHalfProductList[position].productIncluded.name
         productWeightText.text = productIncludedInHalfProductList[position].formattedWeight
         productPriceText.text = productIncludedInHalfProductList[position].finalFormatPriceOfProduct
         productUnit.text = unitAbbreviation(productIncludedInHalfProductList[position].weightUnit)
+
+
+
+        rowView.setOnClickListener {
+         if(productIncludedInHalfProductList[position].weightUnit == "piece") {
+             Toast.makeText(context, totalWeightMessage(),Toast.LENGTH_SHORT).show()
+         }
+            else Toast.makeText(context,productIncludedInHalfProductList[position].productIncluded.name,Toast.LENGTH_SHORT).show()
+        }
+
         return rowView
     }
 }

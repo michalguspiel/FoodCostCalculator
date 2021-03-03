@@ -19,6 +19,14 @@ fun formatPrice(number: Double): String {
         .format(number)
 }
 
+fun MutableList<String>.filterWeight(): MutableList<String> {
+    return   filter { it == "per kilogram" || it == "per pound" }.toMutableList()
+}
+
+fun MutableList<String>.filterVol(): MutableList<String> {
+    return filter { it == "per liter" || it == "per gallon" }.toMutableList()
+}
+
 
 fun unitAbbreviation(unit: String): String = when (unit) {
     "piece" -> "pce"

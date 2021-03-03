@@ -19,6 +19,8 @@ data class ProductIncludedInHalfProduct(
     var weightOfPiece: Double = 1.0
 ) {
 
+    @Ignore
+    val totalWeightForPiece = weight * weightOfPiece
 
     @Ignore
     val totalPriceOfThisProduct: Double = calculatePrice(this.productIncluded.priceAfterWasteAndTax,this.weight,this.productIncluded.unit,this.weightUnit)

@@ -12,12 +12,12 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.example.foodcostcalc.R
-import com.example.foodcostcalc.SharedPreferences
-import com.example.foodcostcalc.getUnits
+import com.example.foodcostcalc.*
 import com.example.foodcostcalc.model.Product
 import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.ProductIncludedInHalfProduct
 import com.example.foodcostcalc.viewmodel.AddViewModel
+import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
 
 
 class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
@@ -26,7 +26,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
     private var productId: Long? = null
     private var unitList: MutableList<String> = mutableListOf()
     private lateinit var viewModel: AddViewModel
-
+    private lateinit var halfProductViewModel: HalfProductsViewModel
     @SuppressLint("ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -37,14 +37,8 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** initialize ui with viewmodel*/
         viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+        halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
 
-        fun MutableList<String>.filterWeight(): MutableList<String> {
-         return   filter { it == "per kilogram" || it == "per pound" }.toMutableList()
-        }
-
-        fun MutableList<String>.filterVol(): MutableList<String> {
-            return filter { it == "per liter" || it == "per gallon" }.toMutableList()
-        }
 
         val sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources, sharedPreferences)
@@ -88,9 +82,10 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
             viewModel.setPosition(products.indexOf(productPassedFromAdapter))
         })
 
-        /** empty list which gets populated by every 'ProductIncluded' that has the same
-         * ID as edited product. */
+        /** empty lists which gets populated by every 'ProductIncluded' and
+         * 'ProductIncludedInHalfProduct' that has the same ID as edited product. */
         var productIncludedList = listOf<ProductIncluded>()
+        var productIncludedInHalfProductList = listOf<ProductIncludedInHalfProduct>()
 
         /** OBSERVE DATA FROM VIEWMODEL
          * Sets every text field value appropriate to edited product
@@ -111,8 +106,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                 this.dismiss()
                 viewModel.setFlag(true)
             } else if (flag == true) {
-                productId =
-                    productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
+                productId = productPassedFromAdapter.productId                               // SAVES ID OF EDITED PRODUCT IN 'productID'
                 name.setText(productPassedFromAdapter.name)
                 price.setText(productPassedFromAdapter.pricePerUnit.toString())
                 tax.setText(productPassedFromAdapter.tax.toString())
@@ -127,6 +121,11 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                     Observer { listOfProducts ->
                         productIncludedList = listOfProducts
                     })
+                halfProductViewModel.getCertainProductsIncluded(productId!!).observe(viewLifecycleOwner,
+                Observer { listOfProducts ->
+                    productIncludedInHalfProductList = listOfProducts
+                })
+
             }
         })
 
@@ -152,6 +151,19 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                         it.productOwnerId,
                         it.weight,
                         it.weightUnit
+                    )
+                )
+            }
+            productIncludedInHalfProductList.forEach {
+                halfProductViewModel.editProductIncludedInHalfProduct(
+                    ProductIncludedInHalfProduct(
+                        it.productIncludedInHalfProductId,
+                        productToChange,
+                        it.halfProduct,
+                        it.halfProductHostId,
+                        it.weight,
+                        it.weightUnit,
+                        it.weightOfPiece
                     )
                 )
             }

@@ -151,8 +151,12 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="@null"
+            android:layout_marginStart="4dp"
+
+            android:layout_gravity="center_vertical"
             android:contentDescription="@string/add_product_to_dish"
-            app:srcCompat="@android:drawable/ic_input_add" />
+            app:srcCompat="@drawable/ic_plus"/>
 
     </LinearLayout>
 
@@ -169,6 +173,17 @@
         android:layout_height="wrap_content"
         app:barrierDirection="left"
         app:constraint_referenced_ids="weight_for_piece" />
+
+    <ImageButton
+        android:id="@+id/info_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="4dp"
+        android:background="@null"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_information" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
