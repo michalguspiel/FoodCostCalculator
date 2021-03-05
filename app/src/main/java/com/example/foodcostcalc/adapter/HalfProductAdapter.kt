@@ -53,6 +53,8 @@ class HalfProductAdapter(
 
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
 
+      
+
         /**Computes height of listView based on each row height, includes dividers.
          * I'm using this approach so listView size is set and doesn't need to be scrollable. */
         fun getListSize(): Int {
@@ -68,7 +70,7 @@ class HalfProductAdapter(
         holder.unitOfHalfProduct.text = list[position].halfProduct.halfProductUnit
              halfProductViewModel
             .getCertainHalfProductWithProductsIncluded(list[position].halfProduct.halfProductId).observe(viewLifeCycleOwner,
-                Observer { holder.finalPriceOfHalfProductPerUnit.text = it.formattedPricePerUnit
+                Observer { if(it != null) holder.finalPriceOfHalfProductPerUnit.text = it.formattedPricePerUnit
                 })
 
 

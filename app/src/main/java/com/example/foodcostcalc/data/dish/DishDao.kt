@@ -39,7 +39,7 @@ interface DishDao {
     fun getAllProductsIncluded(): LiveData<List<ProductIncluded>>
 
     @Transaction
-    @Query("SELECT * FROM productincluded WHERE dishOwnerId = :dishId ORDER BY product_name ASC")
+    @Query("SELECT * FROM productincluded WHERE dishOwnerId = :dishId ")
     fun getIngredientsFromDish(dishId: Long): LiveData<List<ProductIncluded>>
 
     @Transaction
