@@ -57,12 +57,12 @@ class DishListViewAdapter(private val context: Activity,
             halfProductsViewModel
                 .getCertainHalfProductWithProductsIncluded(grandDish.halfProducts[thisPosition].halfProductOwnerId)
                 .observe(viewLifecycleOwner,
-                Observer { productPriceText.text =
-                    formatPrice(
-                        calculatePrice(it.pricePerUnit(),grandDish.halfProducts[thisPosition].weight,
-                            it.halfProduct.halfProductUnit, grandDish.halfProducts[thisPosition].unit)
-                        )
-                })
+                    { productPriceText.text =
+                        formatPrice(
+                            calculatePrice(it.pricePerUnit(),grandDish.halfProducts[thisPosition].weight,
+                                it.halfProduct.halfProductUnit, grandDish.halfProducts[thisPosition].unit)
+                            )
+                    })
 
             productUnit.text = unitAbbreviation(grandDish.halfProducts[thisPosition].unit)
         }

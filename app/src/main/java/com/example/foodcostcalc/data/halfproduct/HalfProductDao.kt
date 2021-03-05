@@ -19,7 +19,7 @@ fun getHalfProducts(): LiveData<List<HalfProduct>>
 @Insert(onConflict = OnConflictStrategy.REPLACE)
 fun addHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish)
 
-@Query("SELECT * FROM HALFPRODUCTINCLUDEDINDISH WHERE dishOwnerId = :dishId ORDER BY name ASC")
+@Query("SELECT * FROM HALFPRODUCTINCLUDEDINDISH WHERE dishOwnerId = :dishId ")
 fun getHalfProductsFromDish(dishId: Long): LiveData<List<HalfProductIncludedInDish>>
 
 @Query("SELECT * FROM HALFPRODUCTINCLUDEDINDISH WHERE halfProductId =:halfProductId")

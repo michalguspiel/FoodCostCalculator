@@ -3,6 +3,7 @@ package com.example.foodcostcalc.adapter
 
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,30 +15,23 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.foodcostcalc.R
 import com.example.foodcostcalc.fragments.HalfProducts
 import com.example.foodcostcalc.fragments.dialogs.AreYouSure
-import com.example.foodcostcalc.model.Dish
-import com.example.foodcostcalc.model.HalfProduct
-import com.example.foodcostcalc.model.HalfProductIncludedInDish
-import com.example.foodcostcalc.model.ProductIncluded
+import com.example.foodcostcalc.model.*
 import com.example.foodcostcalc.viewmodel.AddViewModel
 import com.example.foodcostcalc.viewmodel.HalfProductsViewModel
 
 class EditDishAdapter(
     private val viewModel: AddViewModel,
     private val hpViewModel: HalfProductsViewModel,
-    private val fragmentManager: FragmentManager
+    private val fragmentManager: FragmentManager,
+    private val grandDish: GrandDish
 ) : RecyclerView.Adapter<EditDishAdapter.EditDishViewHolder>() {
 
-    /**List of ProductIncluded which this adapter works on,
-     * initially empty,gets populated with method 'switchLists'
-     * it works like this so after save button is hit
-     * this list have the same ProductsIncluded as 'cloneOfList'*/
-    var listOfProductsIncluded: MutableList<ProductIncluded> = mutableListOf()
-    var listOfHalfProducts: MutableList<HalfProductIncludedInDish> = mutableListOf()
 
-
-    /**List of same ProductsIncluded as a data which populates an adapter
+    /**Clones of main lists which populates an adapter
      * created in order to change this list with each holder edit text field
-     * and afterwards override original list with this one(with save btn)*/
+     * and with save button override original lists with this ones.
+     *
+     * It works like this so its possible to change weight of each product at once.*/
     var cloneOfListOfProductsIncluded: MutableList<ProductIncluded> = mutableListOf()
     var cloneOfListOfHalfProducts: MutableList<HalfProductIncludedInDish> = mutableListOf()
 
@@ -51,27 +45,16 @@ class EditDishAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditDishViewHolder {
         val adapterLayout = LayoutInflater.from(parent.context)
             .inflate(R.layout.small_list_of_products_v2, parent, false)
+        cloneOfListOfProductsIncluded = grandDish.productsIncluded.toMutableList()
+        cloneOfListOfHalfProducts = grandDish.halfProducts.toMutableList()
+
         return EditDishViewHolder(adapterLayout)
     }
 
 
-    fun switchLists(passedList: MutableList<ProductIncluded>) {
-        this.listOfProductsIncluded = passedList
-        cloneOfListOfProductsIncluded = passedList
-        notifyDataSetChanged()
-    }
-
-    //repeating myself cause this function is called from dishes fragment which doesnt have acces to this list of halfproducts
-    // thats why i cant make one function for both of those calls
-    fun switchSecondList(passedList: MutableList<HalfProductIncludedInDish>) {
-        this.listOfHalfProducts = passedList
-        cloneOfListOfHalfProducts = passedList
-        notifyDataSetChanged()
-    }
-
 
     override fun getItemCount(): Int {
-        return listOfProductsIncluded.size + listOfHalfProducts.size
+        return grandDish.halfProducts.size + grandDish.productsIncluded.size
     }
 
 
@@ -88,18 +71,17 @@ class EditDishAdapter(
             if (weight <= 1) holder.unitTextView.text = result
             else holder.unitTextView.text = result + 's'
         }
-
-        if (position < listOfProductsIncluded.size) {
+        if (position < grandDish.productsIncluded.size) {
             holder.nameTextView.text =
-                listOfProductsIncluded[position].productIncluded.name // name of product not changeable
-            holder.editTextView.setText(listOfProductsIncluded[position].weight.toString()) // To set EditText with current data
+                grandDish.productsIncluded[position].productIncluded.name // name of product not changeable
+            holder.editTextView.setText(grandDish.productsIncluded[position].weight.toString()) // To set EditText with current data
             setUnit(
-                listOfProductsIncluded[position].weightUnit,
-                listOfProductsIncluded[position].weight
+                grandDish.productsIncluded[position].weightUnit,
+                grandDish.productsIncluded[position].weight
             )
             /**Holder for each delete product button */
             holder.deleteProductBtn.setOnClickListener {
-                viewModel.setProductIncluded(listOfProductsIncluded[position])
+                viewModel.setProductIncluded(grandDish.productsIncluded[position])
                 AreYouSure().show(this.fragmentManager, "EditDishAdapter")
             }
 
@@ -107,63 +89,67 @@ class EditDishAdapter(
              *  When weight is changed the same position in cloneOfList gets changed.
              *  */
 
-                holder.editTextView.addTextChangedListener((object : TextWatcher {
-                    override fun afterTextChanged(s: Editable) {}
-                    override fun beforeTextChanged(
-                        s: CharSequence, start: Int,
-                        count: Int, after: Int
-                    ) {
-                    }
+            holder.editTextView.addTextChangedListener((object : TextWatcher {
+                override fun afterTextChanged(s: Editable) {}
+                override fun beforeTextChanged(
+                    s: CharSequence, start: Int,
+                    count: Int, after: Int
+                ) {
+                }
 
-                    override fun onTextChanged(
-                        s: CharSequence, start: Int,
-                        before: Int, count: Int
-                    ) {
-                        if (s.isNotEmpty()) {
-                           if(position < cloneOfListOfProductsIncluded.size) cloneOfListOfProductsIncluded[position].weight = s.toString().toDouble()
+                override fun onTextChanged(
+                    s: CharSequence, start: Int,
+                    before: Int, count: Int
+                ) {
+                    if (s.isNotEmpty()) {
+                        if (position < cloneOfListOfProductsIncluded.size) cloneOfListOfProductsIncluded[position].weight =
+                            s.toString().toDouble()
+                    }
+                }
+            }
+                    ))
+
+        }
+        else if (position >= grandDish.productsIncluded.size) {
+            val thisPosition =
+                position - grandDish.productsIncluded.size // to start counting position from new list
+            holder.nameTextView.text =
+                grandDish.halfProducts[thisPosition].halfProduct.name // name of product not changeable
+            holder.editTextView.setText(grandDish.halfProducts[thisPosition].weight.toString()) // To set EditText with current data
+            Log.i("from edit dish adapter", position.toString() + " " + grandDish.productsIncluded.size.toString())
+            setUnit(
+                grandDish.halfProducts[thisPosition].unit,
+                grandDish.halfProducts[thisPosition].weight
+            )
+
+            /**Holder for each delete half product button */
+            holder.deleteProductBtn.setOnClickListener {
+                viewModel.setHalfProductIncluded(grandDish.halfProducts[thisPosition])
+                AreYouSure().show(this.fragmentManager, "EditDishAdapterDeleteHalfProduct")
+            }
+            holder.editTextView.addTextChangedListener((object : TextWatcher {
+                override fun afterTextChanged(s: Editable) {}
+                override fun beforeTextChanged(
+                    s: CharSequence, start: Int,
+                    count: Int, after: Int
+                ) {
+                }
+
+                override fun onTextChanged(
+                    s: CharSequence, start: Int,
+                    before: Int, count: Int
+                ) {
+                    if (s.isNotEmpty()) {
+                        if (thisPosition < cloneOfListOfHalfProducts.size) {
+                            cloneOfListOfHalfProducts[thisPosition].weight =
+                                s.toString().toDouble()
                         }
                     }
                 }
-                        ))
-
-            }
-         else if (position >= this.listOfProductsIncluded.size) {
-            var thisPosition = position - listOfProductsIncluded.size // to start counting position from new list
-                holder.nameTextView.text =
-                    listOfHalfProducts[thisPosition].halfProduct.name // name of product not changeable
-                holder.editTextView.setText(listOfHalfProducts[thisPosition].weight.toString()) // To set EditText with current data
-                setUnit(
-                    listOfHalfProducts[thisPosition].unit,
-                    listOfHalfProducts[thisPosition].weight
-                )
-
-                /**Holder for each delete half product button */
-                holder.deleteProductBtn.setOnClickListener {
-                    viewModel.setHalfProductIncluded(listOfHalfProducts[thisPosition])
-                    AreYouSure().show(this.fragmentManager, "EditDishAdapterDeleteHalfProduct")
-                }
-                holder.editTextView.addTextChangedListener((object : TextWatcher {
-                     override fun afterTextChanged(s: Editable) {}
-                    override fun beforeTextChanged(
-                        s: CharSequence, start: Int,
-                        count: Int, after: Int
-                    ) {
-                    }
-
-                    override fun onTextChanged(
-                        s: CharSequence, start: Int,
-                        before: Int, count: Int
-                    ) {
-                        if (s.isNotEmpty()) {
-                            if (thisPosition < cloneOfListOfHalfProducts.size) {
-                                cloneOfListOfHalfProducts[thisPosition].weight =
-                                    s.toString().toDouble()
-                            } }
-                    }
-                }))
-            }
+            }))
         }
     }
+}
 
 
 

@@ -38,15 +38,13 @@ class EditDish : DialogFragment() {
         val taxEditText = view.findViewById<EditText>(R.id.edit_dish_tax)
 
 
-        /**Recycler view adapter made of list of pairs product+weight included in this dish */
-        /** 28-01-21  at this point I came to realize that its better if data about weight of product
-         * in the dish stays in dish as a collection of weights
-         * every index of product included has its own index in weight collection
-         * lets see wheres that gonna bring me
+        /**Recycler adapter gets populated with GrandDish which
+         * has two lists, list of products included and
+         * HalfProductsIncludedInDish.
          * */
         val actualRecyclerView =
             view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
-        val recyclerAdapter = EditDishAdapter(viewModel, hpViewModel, childFragmentManager)
+        val recyclerAdapter = EditDishAdapter(viewModel, hpViewModel, childFragmentManager, dishPassedFromAdapter)
         actualRecyclerView.adapter = recyclerAdapter
         val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
         val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)
@@ -67,20 +65,7 @@ class EditDish : DialogFragment() {
             marginEditText.setText(dishPassedFromAdapter.dish.marginPercent.toString())
             taxEditText.setText(dishPassedFromAdapter.dish.dishTax.toString())
         })
-        viewModel.getIngredientsFromDish(dishPassedFromAdapter.dish.dishId)
-            .observe(viewLifecycleOwner, Observer { Products ->
-                val listOfProducts = mutableListOf<ProductIncluded>()
-                listOfProducts.addAll(Products)
-                recyclerAdapter.switchLists(listOfProducts)
-            })
-        hpViewModel.getHalfProductsFromDish(dishPassedFromAdapter.dish.dishId)
-            .observe(viewLifecycleOwner,
-                Observer { halfProducts ->
-                    val listOfHalfProducts = mutableListOf<HalfProductIncludedInDish>()
-                    listOfHalfProducts.addAll(halfProducts)
-                    recyclerAdapter.switchSecondList(listOfHalfProducts)
-                })
-        //}
+
 
 
         /** BUTTON LOGIC*/
