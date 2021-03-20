@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc
 
 import android.os.Bundle
+import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
@@ -34,6 +35,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var menuNavigationClickListener: BottomNavigationView.OnNavigationItemSelectedListener
 
 
+    private lateinit var sideNavigation : NavigationView
+    private val productsFragment = Products.newInstance()
+    private val dishesFragment = Dishes.newInstance()
+    private val addFragment = Add.newInstance()
+    private val settingsFragment = Settings.newInstance()
+    private val halfProductsFragment = HalfProducts.newInstance()
+    private lateinit var drawerLayout: DrawerLayout
     /**Uncheck all items in menu*/
     fun BottomNavigationView.uncheckAllItems() {
         menu.setGroupCheckable(0, true, false)
@@ -59,6 +67,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+        if(sideNavigation.isVisible){ // if side navigation is open close it
+            drawerLayout.closeDrawer(Gravity.LEFT)
+            return
+        }
         if (searchTextField.isVisible && searchTextField.text.isNotEmpty()) {
             backBtn.performClick()
         } else if (supportFragmentManager.backStackEntryCount == 1) {
@@ -115,12 +127,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private val productsFragment = Products.newInstance()
-    private val dishesFragment = Dishes.newInstance()
-    private val addFragment = Add.newInstance()
-    private val settingsFragment = Settings.newInstance()
-    private val halfProductsFragment = HalfProducts.newInstance()
-    private lateinit var drawerLayout: DrawerLayout
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -220,7 +227,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.setOnNavigationItemSelectedListener(menuNavigationClickListener)
 
 
-        val sideNavigation: NavigationView = findViewById(R.id.nav_view)
+        sideNavigation = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
     }
 
