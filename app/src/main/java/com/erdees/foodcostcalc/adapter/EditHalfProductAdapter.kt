@@ -17,9 +17,9 @@ import com.erdees.foodcostcalc.fragments.dialogs.AreYouSure
 import com.erdees.foodcostcalc.model.*
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
-class EditHalfProductAdapter(private val viewModel: HalfProductsViewModel,
-                             private val basicViewModel: AddViewModel,
+class EditHalfProductAdapter(private val viewModel: EditHalfProductAdapterViewModel,
                              private val fragmentManager: FragmentManager):
 RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
 
@@ -34,15 +34,11 @@ RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
      * and afterwards override original list with this one(with save btn)*/
     var cloneOfList: MutableList<ProductIncludedInHalfProduct> = mutableListOf()
 
-
-
-
     fun switchLists(passedList: MutableList<ProductIncludedInHalfProduct>) {
         this.list = passedList
         cloneOfList = passedList
         notifyDataSetChanged()
     }
-
 
 
     fun save(halfProduct: HalfProduct, viewLifecycleOwner: LifecycleOwner) {
@@ -51,7 +47,7 @@ RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
         cloneOfList.forEach { viewModel.editProductIncludedInHalfProduct(it) }
 
         /**So every Half product in dish is also edited.*/
-    viewModel.getHalfProductsFromDishByHalfProduct(halfProduct.halfProductId).observe(viewLifecycleOwner,
+    viewModel.getHalfProductsIncludedInDishFromDishByHalfProduct(halfProduct.halfProductId).observe(viewLifecycleOwner,
         Observer { halfProductList ->
          halfProductList.forEach { viewModel.editHalfProductIncludedInDish(
              HalfProductIncludedInDish(
@@ -98,8 +94,7 @@ RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
 
             /**Holder for each delete product button */
             holder.deleteProductBtn.setOnClickListener {
-
-                basicViewModel.setProductIncludedInHalfProduct(list[position])
+                viewModel.setProductIncludedInHalfProduct(list[position])
                 AreYouSure().show(this.fragmentManager, "EditHalfProductAdapter")
             }
 

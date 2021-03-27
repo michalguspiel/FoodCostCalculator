@@ -19,7 +19,9 @@ import com.erdees.foodcostcalc.model.HalfProduct
 import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
+import com.erdees.foodcostcalc.viewmodel.EditHalfProductViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
 class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
@@ -36,8 +38,7 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         val view = inflater.inflate(R.layout.fragment_edit_half_product, container, false)
 
         /** initialize ui with viewmodel*/
-        val addViewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-        val halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(EditHalfProductViewModel::class.java)
 
         /**Binders*/
         val name = view.findViewById<EditText>(R.id.edit_half_product_name)
@@ -47,12 +48,12 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         val recycleView =
             view.findViewById<RecyclerView>(R.id.recycler_view_products_in_half_product)
         val recyclerViewAdapter =
-            EditHalfProductAdapter(halfProductViewModel, addViewModel, childFragmentManager)
+            EditHalfProductAdapter(ViewModelProvider(this).get(EditHalfProductAdapterViewModel::class.java), childFragmentManager)
         recycleView.adapter = recyclerViewAdapter
         val sharedPreferences = SharedPreferences(requireContext())
 
         unitList = getUnits(resources, sharedPreferences)
-        unitList = when (EditHalfProduct.halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
+        unitList = when (halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
             "per piece" -> mutableListOf("per piece")
             "per kilogram" -> unitList.filterWeight()
             "per liter" -> unitList.filterVol()
@@ -76,19 +77,19 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /**Send data about which dish is being edited
          * so .setPosition(index of this dish in main list)*/
-        halfProductViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
-            addViewModel.setPosition(halfProduct.indexOf(halfProductPassedFromAdapter.halfProduct))
+        viewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+            viewModel.setPosition(halfProduct.indexOf(halfProductPassedFromAdapter.halfProduct))
         })
 
         /** Observe data from viewmodel */
-        halfProductViewModel.getHalfProductWithProductIncluded()
+        viewModel.getHalfProductWithProductIncluded()
             .observe(viewLifecycleOwner, Observer {
-                if (addViewModel.getFlag().value == false) {
+                if (viewModel.getFlag().value == false) {
                     this.dismiss()
-                    addViewModel.setFlag(true)
+                    viewModel.setFlag(true)
                 } else {
                     name.setText(halfProductPassedFromAdapter.halfProduct.name)
-                    halfProductViewModel
+                    viewModel
                         .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapter.halfProduct.halfProductId)
                         .observe(viewLifecycleOwner, Observer { eachProduct ->
                             val testData = mutableListOf<ProductIncludedInHalfProduct>()

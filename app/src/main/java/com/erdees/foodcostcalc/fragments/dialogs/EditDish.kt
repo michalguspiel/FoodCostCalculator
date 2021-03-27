@@ -17,7 +17,9 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.EditDishAdapter
 import com.erdees.foodcostcalc.model.*
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
+import com.erdees.foodcostcalc.viewmodel.EditDishViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewModel
 
 class EditDish : DialogFragment() {
 
@@ -30,8 +32,7 @@ class EditDish : DialogFragment() {
         val view: View = inflater.inflate(R.layout.fragment_edit_dish, container, false)
 
         /** initialize ui with viewmodel*/
-        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-        val hpViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(EditDishViewModel::class.java)
 
         val name = view.findViewById<EditText>(R.id.edit_dish_name)
         val marginEditText = view.findViewById<EditText>(R.id.edit_margin)
@@ -44,7 +45,7 @@ class EditDish : DialogFragment() {
          * */
         val actualRecyclerView =
             view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
-        val recyclerAdapter = EditDishAdapter(viewModel, hpViewModel, childFragmentManager, dishPassedFromAdapter)
+        val recyclerAdapter = EditDishAdapter(ViewModelProvider(this).get(EditDishAdapterViewModel::class.java), childFragmentManager, dishPassedFromAdapter)
         actualRecyclerView.adapter = recyclerAdapter
         val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
         val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)

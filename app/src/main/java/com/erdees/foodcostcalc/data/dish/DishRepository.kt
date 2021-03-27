@@ -12,8 +12,6 @@ class DishRepository(private val dishDao: DishDao) {
         dishDao.addDish(dish)
     }
 
-    fun getGrandDishes() = dishDao.getGrandDishes()
-
     fun getDishes() = dishDao.getDishes()
 
     suspend fun deleteDish(dish: Dish){
@@ -24,28 +22,8 @@ class DishRepository(private val dishDao: DishDao) {
         dishDao.editDish(dish)
     }
 
-    suspend fun addProductToDish(product: ProductIncluded) = dishDao.addProductToDish(product)
-
-
-    suspend fun editProductsIncluded(productIncluded: ProductIncluded){
-        dishDao.editProductsIncluded(productIncluded)
-    }
-
-    suspend fun deleteProductIncluded(productIncluded: ProductIncluded){
-        dishDao.deleteProductIncluded(productIncluded)
-    }
-
-    fun getDishesWithProductsIncluded() = dishDao.getDishesWithProductsIncluded()
-
-
-    fun getIngredientsFromDish(dishId: Long) = dishDao.getIngredientsFromDish(dishId)
-
-    fun getCertainProductIncluded(id: Long) = dishDao.getCertainProductsIncluded(id)
-
-    fun getProductIncludedByDishID(id: Long) = dishDao.getProductIncludedFromDishId(id)
 
     companion object {
-        // Singleton instantiation you already know and love
         @Volatile
         private var instance: DishRepository? = null
 

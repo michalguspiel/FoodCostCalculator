@@ -17,6 +17,7 @@ import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.model.ProductIncluded
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
+import com.erdees.foodcostcalc.viewmodel.EditProductViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
 
@@ -25,8 +26,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
     private var unitPosition: Int? = null
     private var productId: Long? = null
     private var unitList: MutableList<String> = mutableListOf()
-    private lateinit var viewModel: AddViewModel
-    private lateinit var halfProductViewModel: HalfProductsViewModel
+    private lateinit var viewModel: EditProductViewModel
     @SuppressLint("ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -36,9 +36,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         val view: View = inflater.inflate(R.layout.fragment_edit_product, container, false)
 
         /** initialize ui with viewmodel*/
-        viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-        halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
-
+        viewModel = ViewModelProvider(this).get(EditProductViewModel::class.java)
 
         val sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources, sharedPreferences)
@@ -121,7 +119,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                     Observer { listOfProducts ->
                         productIncludedList = listOfProducts
                     })
-                halfProductViewModel.getCertainProductsIncluded(productId!!).observe(viewLifecycleOwner,
+                viewModel.getCertainProductsIncludedInHalfProduct(productId!!).observe(viewLifecycleOwner,
                 Observer { listOfProducts ->
                     productIncludedInHalfProductList = listOfProducts
                 })
@@ -155,7 +153,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                 )
             }
             productIncludedInHalfProductList.forEach {
-                halfProductViewModel.editProductIncludedInHalfProduct(
+                viewModel.editProductIncludedInHalfProduct(
                     ProductIncludedInHalfProduct(
                         it.productIncludedInHalfProductId,
                         productToChange,

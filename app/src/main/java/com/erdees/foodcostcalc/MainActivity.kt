@@ -21,6 +21,7 @@ import com.erdees.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
 import com.erdees.foodcostcalc.fragments.dialogs.CreateDish
 import com.erdees.foodcostcalc.fragments.dialogs.CreateHalfProduct
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
+import com.erdees.foodcostcalc.viewmodel.MainActivityViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 
@@ -134,7 +135,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
 
 
         bottomNavigation = findViewById(R.id.navigationView)

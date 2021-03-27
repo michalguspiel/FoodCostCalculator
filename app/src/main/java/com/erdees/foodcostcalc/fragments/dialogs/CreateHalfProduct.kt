@@ -16,6 +16,8 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.getUnits
 import com.erdees.foodcostcalc.model.HalfProduct
+import com.erdees.foodcostcalc.viewmodel.CreateDishViewModel
+import com.erdees.foodcostcalc.viewmodel.CreateHalfProductViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
 
@@ -33,7 +35,7 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemSelectedListener {
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.fragment_create_half_product,container,false)
-        val halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(CreateHalfProductViewModel::class.java)
 
         /** binders*/
         val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
@@ -62,7 +64,7 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemSelectedListener {
 
             if (dishName.text.isNotEmpty()) {
                 val halfProduct = HalfProduct(0, dishName.text.toString(),chosenUnit)
-                halfProductViewModel.addHalfProducts(halfProduct)
+                viewModel.addHalfProduct(halfProduct)
                 this.dismiss()
 
             } else Toast.makeText(activity, "Can't make nameless half product!", Toast.LENGTH_SHORT).show()
