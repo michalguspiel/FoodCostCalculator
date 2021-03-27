@@ -48,7 +48,7 @@ RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
 
         /**So every Half product in dish is also edited.*/
     viewModel.getHalfProductsIncludedInDishFromDishByHalfProduct(halfProduct.halfProductId).observe(viewLifecycleOwner,
-        Observer { halfProductList ->
+         { halfProductList ->
          halfProductList.forEach { viewModel.editHalfProductIncludedInDish(
              HalfProductIncludedInDish(
              it.halfProductIncludedInDishId,it.dish,it.dishOwnerId,halfProduct,halfProduct.halfProductId,it.weight,it.unit

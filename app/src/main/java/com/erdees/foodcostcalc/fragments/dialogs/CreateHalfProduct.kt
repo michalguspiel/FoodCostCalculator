@@ -23,11 +23,25 @@ import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
 
 
-class CreateHalfProduct : DialogFragment(),AdapterView.OnItemSelectedListener {
+class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
 
     private var chosenUnit = ""
     private var unitList: MutableList<String> = mutableListOf()
-
+    lateinit var sharedPreferences: SharedPreferences
+    lateinit var unitSpinner : AutoCompleteTextView
+    val spinnerId = 2
+    override fun onResume() {
+        unitList = getUnits(resources,sharedPreferences)
+        val unitSpinnerAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, unitList)
+        /**Adapter for unitSpinner*/
+        with(unitSpinner){
+            setAdapter(unitSpinnerAdapter)
+            onItemClickListener = this@CreateHalfProduct
+            gravity = Gravity.CENTER
+            id = spinnerId
+        }
+        super.onResume()
+    }
     @SuppressLint("ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,23 +54,14 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemSelectedListener {
         /** binders*/
         val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
         val dishName = view.findViewById<TextView>(R.id.new_half_product_edittext)
-        val unitSpinner = view.findViewById<Spinner>(R.id.unit_spinner_create_half_product)
-        val sharedPreferences = SharedPreferences(requireContext())
+        unitSpinner = view.findViewById<AutoCompleteTextView>(R.id.unit_spinner_create_half_product)
+        sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources,sharedPreferences)
 
 
-        /**Adapter for unitSpinner*/
-        val unitSpinnerAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, unitList)
-        with(unitSpinner){
-            adapter = unitSpinnerAdapter
-            setSelection(0,false)
-            onItemSelectedListener = this@CreateHalfProduct
-            gravity = Gravity.CENTER
-            this.prompt = "Choose unit"
-            id = 1
-        }
 
-        chosenUnit = unitList.first() //Without this line while dialog opened nothing is selected, no idea why setSelection above is not working... ill fix it later
+
+        chosenUnit = unitList.first() // TODO Without this line while dialog opened nothing is selected, no idea why setSelection above is not working... ill fix it later
 
 
         /** BUTTON LOGIC*/
@@ -81,20 +86,19 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemSelectedListener {
         const val TAG = "CreateHalfProduct"
     }
 
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             1 -> {
                 chosenUnit = unitList[position]
-                Log.i("test", chosenUnit)
+                Log.i("test", chosenUnit + " + " + parent?.id )
 
             }
             else -> {
+                chosenUnit = unitList[position]
+                Log.i("test", chosenUnit + " + " + parent?.id )
             }
         }
 
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        Toast.makeText(requireContext(), "nothing selected", Toast.LENGTH_SHORT).show()
     }
 }

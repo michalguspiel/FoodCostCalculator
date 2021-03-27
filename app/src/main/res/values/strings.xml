@@ -3,7 +3,7 @@
     <string name="add_stuff">Add product to your list</string>
     <string name="name">Product name</string>
     <string name="price">Price</string>
-    <string name="tax">Tax</string>
+    <string name="tax">Tax %</string>
     <string name="waste">Waste %</string>
     <string name="compose">Add product to your dish</string>
     <string name ="cancel">Cancel</string>
@@ -59,4 +59,5 @@
     <string name="quantity">Quantity</string>
     <string name="half_products">Half products</string>
     <string name="got_it">Got it!</string>
+    <string name="half_product">Half product</string>
 </resources>

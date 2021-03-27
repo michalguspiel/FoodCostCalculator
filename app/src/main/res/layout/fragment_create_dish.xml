@@ -1,32 +1,49 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     style="@style/Theme.AppCompat.DayNight.Dialog"
     android:layout_gravity="center"
-    android:background="@drawable/border"
-    >
-    <EditText
-        android:id="@+id/new_dish_edittext"
-        android:inputType="text"
-        android:layout_width="match_parent"
-        android:textColor="@color/black"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:layout_marginLeft="4dp"
-        android:layout_marginRight="4dp"
-        android:layout_marginBottom="4dp"
-        android:hint="@string/name_of_new_dish"
-        android:autofillHints="" />
+    android:background="@drawable/border">
 
-    <Button
-        android:id="@+id/add_button_dialog"
-        android:layout_width="match_parent"
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/product_tax_field"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="300dp"
         android:layout_height="wrap_content"
-        android:background="@drawable/button_gradient"
-        android:padding="8dp"
-        android:layout_margin="4dp"
-        android:textColor="@color/white"
-        android:text="@string/add" />
+        android:hint="@string/name_of_new_dish"
+        android:paddingHorizontal="10dp"
+        android:paddingTop="20dp"
+        android:paddingBottom="20dp"
+        app:boxStrokeColor="@color/orange_500"
+        app:hintTextColor="@color/black">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/new_dish_edittext"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="4dp"
+            android:layout_marginBottom="4dp"
+            android:autofillHints=""
+            android:inputType="text"
+            android:textColor="@color/black" />
+
+        <Button
+            android:id="@+id/add_button_dialog"
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="4dp"
+            android:layout_gravity="center_horizontal"
+            style="@style/TextAppearance.AppCompat.Button"
+            android:padding="0dp"
+            android:text="@string/add"
+            android:textColor="@color/white" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
 </LinearLayout>

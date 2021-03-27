@@ -1,49 +1,110 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center"
+            android:layout_marginTop="8dp"
+            >
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/product_name_field"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+                android:hint="@string/name"
+                app:hintTextColor="@color/black"
+                app:boxStrokeColor="@color/orange_500"
+                android:gravity="center_horizontal"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                >
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/product_name"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:autofillHints="@string/name"
+                    android:inputType="text"  />
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </LinearLayout>
+
     <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_margin="8dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:layout_marginTop="8dp"
         android:layout_gravity="center">
 
-        <EditText
-            android:id="@+id/product_name"
-            android:layout_width="180dp"
-            android:layout_height="match_parent"
-            android:autofillHints="@string/name"
-            android:hint="@string/name"
-            android:inputType="text" />
 
-        <EditText
-            android:id="@+id/product_price"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:autofillHints="@string/price"
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/product_price_field"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
             android:hint="@string/price"
-            android:inputType="numberDecimal" />
+            app:hintTextColor="@color/black"
+            app:boxStrokeColor="@color/orange_500"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
 
-        <EditText
-            android:id="@+id/product_tax"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:autofillHints="tax%"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_price"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:autofillHints="@string/price"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/product_tax_field"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
             android:hint="@string/tax"
-            android:inputType="numberDecimal" />
+            app:hintTextColor="@color/black"
+            app:boxStrokeColor="@color/orange_500"
 
-        <EditText
-            android:id="@+id/product_waste"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:autofillHints="waste percent"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_tax"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/product_waste_field"
+            android:layout_width="90dp"
+            android:layout_height="wrap_content"
             android:hint="@string/waste"
-            android:inputType="numberDecimal" />
+            app:hintTextColor="@color/black"
+            app:boxStrokeColor="@color/orange_500"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/product_waste"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:autofillHints="waste percent"
+                android:inputType="numberDecimal"  />
+        </com.google.android.material.textfield.TextInputLayout>
+
     </LinearLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -53,41 +114,46 @@
         android:orientation="horizontal"
         android:layout_gravity="center">
 
-        <TextView
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/choose_unit"
+            android:hint="@string/choose_unit"
+            app:boxStrokeColor="@color/orange_500"
+            android:textColorHint="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <Spinner
-            android:id="@+id/units_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:spinnerMode="dropdown"
-            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/textView3"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <AutoCompleteTextView
+                android:id="@+id/units_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:inputType="none" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+
 
 
    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <Button
-        android:id="@+id/addProduct"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center"
-        android:layout_height="wrap_content"
-        android:background="@drawable/button_gradient"
-        android:padding="8dp"
-        android:textColor="@color/white"
-        android:layout_margin="8dp"
-        android:text="@string/add_stuff" />
+        <Button
+            android:id="@+id/addProduct"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button_gradient"
+            android:padding="8dp"
+            android:text="@string/add_stuff"
+            android:textColor="@color/white" />
 
 
     <Space
@@ -108,37 +174,63 @@
         android:orientation="horizontal"
         android:layout_gravity="center">
 
-        <EditText
-            android:id="@+id/waste_calc_product_weight"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:hint="@string/product_weight"
-            android:inputType="numberDecimal"
-            android:autofillHints="" />
-        <EditText
-            android:id="@+id/waste_calc_product_waste"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:hint="@string/product_waste"
-            android:inputType="numberDecimal"
-            android:autofillHints="" />
-
-        <Button
-            android:id="@+id/count_waste_percent_btn"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/waste_calc_field"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="170dp"
             android:layout_height="wrap_content"
-            android:background="@drawable/button_gradient"
-            android:padding="8dp"
-            android:textColor="@color/white"
-            android:layout_margin="8dp"
-            android:text="@string/calculate" />
+            app:hintTextColor="@color/black"
+            app:boxStrokeColor="@color/orange_500"
+            android:hint="@string/product_weight">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/waste_calc_product_weight"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:autofillHints=""
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/waste_calc_waste_field"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            app:hintTextColor="@color/black"
+            app:boxStrokeColor="@color/orange_500"
+
+            android:hint="@string/product_waste">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/waste_calc_product_waste"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:autofillHints=""
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
 
 
     </LinearLayout>
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="20dp"/>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp"/>
+        <Button
+            android:id="@+id/count_waste_percent_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button_gradient"
+            android:padding="8dp"
+            android:text="@string/calculate"
+            android:textColor="@color/white" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="40dp" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -154,34 +246,58 @@
         android:orientation="horizontal"
         android:layout_gravity="center">
 
-        <EditText
-            android:id="@+id/calc_price_per_box"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
             android:hint="@string/box_price"
-            android:inputType="numberDecimal"
-            android:autofillHints="" />
+            app:hintTextColor="@color/black"
+            app:boxStrokeColor="@color/orange_500"
 
-        <EditText
-            android:id="@+id/calc_quantity_box"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/calc_price_per_box"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:autofillHints=""
+                android:inputType="numberDecimal" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
             android:hint="@string/quantity"
-            android:inputType="numberDecimal"
-            android:autofillHints="" />
+            app:hintTextColor="@color/black"
+            app:boxStrokeColor="@color/orange_500"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/calc_quantity_box"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inputType="numberDecimal"
+                android:autofillHints=""  />
+        </com.google.android.material.textfield.TextInputLayout>
 
 
+    </LinearLayout>
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="8dp"/>
         <Button
             android:id="@+id/count_price_per_piece_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
             android:background="@drawable/button_gradient"
             android:padding="8dp"
-            android:textColor="@color/white"
-            android:layout_margin="8dp"
-            android:text="@string/calculate" />
+            android:text="@string/calculate"
+            android:textColor="@color/white" />
 
     </LinearLayout>
-
-
-    </LinearLayout>
+    </ScrollView>
