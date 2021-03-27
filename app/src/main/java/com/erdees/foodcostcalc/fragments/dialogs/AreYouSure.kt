@@ -13,16 +13,15 @@ import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.model.*
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
+import com.erdees.foodcostcalc.viewmodel.AreYouSureViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
 class AreYouSure : DialogFragment() {
 
-    private lateinit var halfProductViewModel: HalfProductsViewModel
-    private lateinit var viewModel: AddViewModel
+    private lateinit var viewModel: AreYouSureViewModel
     private lateinit var dishToDelete: Dish
     private lateinit var productToDelete: Product
     private lateinit var halfProductToDelete : HalfProduct
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -32,8 +31,7 @@ class AreYouSure : DialogFragment() {
         val view: View = inflater.inflate(R.layout.fragment_dialog_are_you_sure, container, false)
 
         /** initialize ui with viewmodel*/
-        viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-        halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(AreYouSureViewModel::class.java)
 
         /** Binders*/
         val confirmBtn = view.findViewById<Button>(R.id.button_yes)
@@ -57,14 +55,11 @@ class AreYouSure : DialogFragment() {
         })
 
 
-
-
-
         /** Get dish to delete only if this was called from EditDish.
          * Populates 'listOfProductsIncludedToErase' with list of ProductsIncluded in
          * Dish that is saved as 'dishToDelete' so they will be erased from database.
          * */
-        viewModel.getDishes().observe(viewLifecycleOwner, Observer { dish ->
+        viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { dish ->
             if (this.tag == EditDish.TAG) {
                 dishToDelete = dish[pos!!]
                 viewModel.getProductIncludedByDishId(dishToDelete.dishId)
@@ -80,27 +75,27 @@ class AreYouSure : DialogFragment() {
          *  Get list of every halfProduct Included in dish in order to erase them from database
          * when certain HalfProduct gets erased.
          * */
-        halfProductViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+        viewModel.readAllHalfProductData.observe(viewLifecycleOwner, Observer { halfProduct ->
             if(this.tag == EditHalfProduct.TAG){
                 halfProductToDelete = halfProduct[pos!!]
-                halfProductViewModel.getProductsIncludedFromHalfProduct(halfProductToDelete.halfProductId)
+                viewModel.getProductsIncludedFromHalfProduct(halfProductToDelete.halfProductId)
                     .observe(viewLifecycleOwner, Observer { listOfProductsIncludedInHalfProduct ->
                         listOfProductsIncludedInHalfProductToErase = listOfProductsIncludedInHalfProduct
                     })
-                halfProductViewModel.getHalfProductsFromDishByHalfProduct(halfProductToDelete.halfProductId)
-                    .observe(viewLifecycleOwner,Observer{
+                viewModel.getHalfProductsIncludedInDishFromDishByHalfProduct(halfProductToDelete.halfProductId)
+                    .observe(viewLifecycleOwner,{
                         listOfHalfProductsIncludedInDish = it
                     })
             }
         })
 
         /**Get product to delete only if this was called from EditProduct.*/
-        viewModel.getProducts().observe(viewLifecycleOwner, Observer { product ->
+        viewModel.readAllProductData.observe(viewLifecycleOwner,  { product ->
             if (this.tag == EditProduct.TAG) productToDelete = product[pos!!]
         })
 
         /**Get Half product to delete only if this was called from EditHalfProduct*/
-        halfProductViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+        viewModel.readAllHalfProductData.observe(viewLifecycleOwner,  { halfProduct ->
             if(this.tag == EditHalfProduct.TAG)  halfProductToDelete = halfProduct[pos!!]
         })
 
@@ -141,10 +136,10 @@ class AreYouSure : DialogFragment() {
                 }
                 EditHalfProduct.TAG ->{
                     viewModel.setFlag(false)
-                    listOfProductsIncludedInHalfProductToErase.forEach { halfProductViewModel.deleteProductIncludedInHalfProduct(it)}
-                    halfProductViewModel.deleteHalfProducts(halfProductToDelete)
+                    listOfProductsIncludedInHalfProductToErase.forEach { viewModel.deleteProductIncludedInHalfProduct(it)}
+                    viewModel.deleteHalfProducts(halfProductToDelete)
                     // Delete every halfProductIncludedInDish
-                    listOfHalfProductsIncludedInDish.forEach { halfProductViewModel.deleteHalfProductIncludedInDish(it) }
+                    listOfHalfProductsIncludedInDish.forEach { viewModel.deleteHalfProductIncludedInDish(it) }
                 }
 
                 "EditDishAdapter" -> {
@@ -154,11 +149,11 @@ class AreYouSure : DialogFragment() {
                             Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })
                 }
                 "EditHalfProductAdapter" -> {
-                    halfProductViewModel.getHalfProductWithProductIncluded()
+                    viewModel.getHalfProductWithProductIncluded()
                         .observe(
                             viewLifecycleOwner,
                             Observer {
-                                halfProductViewModel.deleteProductIncludedInHalfProduct(
+                                viewModel.deleteProductIncludedInHalfProduct(
                                     viewModel.getProductIncludedInHalfProduct().value!!
                                 )
                             }
@@ -167,7 +162,7 @@ class AreYouSure : DialogFragment() {
                 "EditDishAdapterDeleteHalfProduct" -> {
                     viewModel.getHalfProductIncluded().observe(viewLifecycleOwner,
                         Observer { halfProductIncluded ->
-                            halfProductViewModel.deleteHalfProductIncludedInDish(halfProductIncluded)
+                            viewModel.deleteHalfProductIncludedInDish(halfProductIncluded)
                         })
                 }
                 else -> this.dismiss()

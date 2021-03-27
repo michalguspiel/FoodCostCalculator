@@ -17,10 +17,10 @@ import com.erdees.foodcostcalc.fragments.dialogs.AreYouSure
 import com.erdees.foodcostcalc.model.*
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewModel
 
 class EditDishAdapter(
-    private val viewModel: AddViewModel,
-    private val hpViewModel: HalfProductsViewModel,
+    private val viewModel: EditDishAdapterViewModel,
     private val fragmentManager: FragmentManager,
     private val grandDish: GrandDish
 ) : RecyclerView.Adapter<EditDishAdapter.EditDishViewHolder>() {
@@ -61,7 +61,7 @@ class EditDishAdapter(
         viewModel.editDish(dish)
         notifyDataSetChanged()
         cloneOfListOfProductsIncluded.forEach { viewModel.editProductsIncluded(it) }
-        cloneOfListOfHalfProducts.forEach { hpViewModel.editHalfProductIncludedInDish(it) }
+        cloneOfListOfHalfProducts.forEach { viewModel.editHalfProductIncludedInDish(it) }
     }
 
 

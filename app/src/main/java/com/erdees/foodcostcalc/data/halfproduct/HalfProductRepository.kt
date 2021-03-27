@@ -7,20 +7,6 @@ import com.erdees.foodcostcalc.model.HalfProductIncludedInDish
 class HalfProductRepository(private val halfProductDao: HalfProductDao) {
     val readAllData : LiveData<List<HalfProduct>> = halfProductDao.getHalfProducts()
 
-    suspend fun addHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish)
-    = halfProductDao.addHalfProductIncludedInDish(halfProductIncludedInDish)
-
-    fun getHalfProductsFromDish(dishId: Long) = halfProductDao.getHalfProductsFromDish(dishId)
-
-    fun getHalfProductsFromDishByHalfProduct(productId: Long) = halfProductDao.getHalfProductsFromDishByHalfProduct(productId)
-
-    suspend fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish)
-    = halfProductDao.editHalfProductIncludedInDish(halfProductIncludedInDish)
-
-    suspend fun deleteHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish)
-    =halfProductDao.deleteHalfProductIncludedInDish(halfProductIncludedInDish)
-
-
     suspend fun addHalfProduct(halfProduct: HalfProduct) = halfProductDao.addHalfProduct(halfProduct)
 
     suspend fun editHalfProduct(halfProduct: HalfProduct) = halfProductDao.editHalfProduct(halfProduct)

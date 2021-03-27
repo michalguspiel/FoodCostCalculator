@@ -15,7 +15,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.model.Dish
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
-
+import com.erdees.foodcostcalc.viewmodel.CreateDishViewModel
 
 
 class CreateDish : DialogFragment() {
@@ -28,7 +28,7 @@ class CreateDish : DialogFragment() {
         val view: View = inflater.inflate(R.layout.fragment_create_dish, container, false)
 
         /** initialize ui with viewmodel*/
-        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(CreateDishViewModel::class.java)
 
         /** binders*/
         val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
@@ -47,7 +47,7 @@ class CreateDish : DialogFragment() {
 
             if (dishName.text.isNotEmpty()) {
                 val dish = Dish(0, dishName.text.toString(),margin,tax)
-                viewModel.addDishes(dish)
+                viewModel.addDish(dish)
                 this.dismiss()
 
             } else Toast.makeText(activity, "Can't make nameless dish!", Toast.LENGTH_SHORT).show()

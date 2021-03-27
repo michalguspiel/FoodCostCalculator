@@ -13,11 +13,12 @@ import com.erdees.foodcostcalc.formatPrice
 import com.erdees.foodcostcalc.model.GrandDish
 import com.erdees.foodcostcalc.unitAbbreviation
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 
 class DishListViewAdapter(private val context: Activity,
                           private val grandDish: GrandDish,
-                          private val halfProductsViewModel: HalfProductsViewModel,
-                            private val viewLifecycleOwner: LifecycleOwner)
+                          private val viewModel: DishListViewAdapterViewModel,
+                          private val viewLifecycleOwner: LifecycleOwner)
     : ArrayAdapter<Any>(context, R.layout.listview_dish_row,
     grandDish.productsIncluded
         + grandDish.halfProducts) {
@@ -50,7 +51,7 @@ class DishListViewAdapter(private val context: Activity,
             productWeightText.text = grandDish.halfProducts[thisPosition].weight.toString()
 
 
-            halfProductsViewModel
+            viewModel
                 .getCertainHalfProductWithProductsIncluded(grandDish.halfProducts[thisPosition].halfProductOwnerId)
                 .observe(viewLifecycleOwner,
                     { productPriceText.text =

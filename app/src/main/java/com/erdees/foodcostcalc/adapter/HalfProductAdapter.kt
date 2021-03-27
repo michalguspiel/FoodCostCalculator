@@ -17,13 +17,13 @@ import com.erdees.foodcostcalc.fragments.dialogs.EditHalfProduct
 import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 
 class HalfProductAdapter(
     private val viewLifeCycleOwner: LifecycleOwner,
     private val list: ArrayList<HalfProductWithProductsIncluded>,
     private val fragmentManager: FragmentManager,
-    val viewModel: AddViewModel,
-    val halfProductViewModel: HalfProductsViewModel,
+    val viewModel : HalfProductAdapterViewModel,
     val activity: Activity
 ) : RecyclerView.Adapter<HalfProductAdapter.RecyclerViewHolder>() {
 
@@ -65,7 +65,7 @@ class HalfProductAdapter(
         }
         holder.halfProductName.text = list[position].halfProduct.name
         holder.unitOfHalfProduct.text = list[position].halfProduct.halfProductUnit
-             halfProductViewModel
+             viewModel
             .getCertainHalfProductWithProductsIncluded(list[position].halfProduct.halfProductId).observe(viewLifeCycleOwner,
                 Observer { if(it != null) holder.finalPriceOfHalfProductPerUnit.text = it.formattedPricePerUnit
                 })

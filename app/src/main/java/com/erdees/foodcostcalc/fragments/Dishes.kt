@@ -10,9 +10,13 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.DishAdapter
+import com.erdees.foodcostcalc.adapter.DishListViewAdapter
 import com.erdees.foodcostcalc.model.GrandDish
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
+import com.erdees.foodcostcalc.viewmodel.DishesViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 import java.util.*
 
 class Dishes : Fragment() {
@@ -28,8 +32,7 @@ class Dishes : Fragment() {
         val view: View = inflater.inflate(R.layout.fragment_dishes, container, false)
 
 
-        val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-        val halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
+        val viewModel = ViewModelProvider(this).get(DishesViewModel::class.java)
 
         /**Implementing adapter for recycler view. */
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_dishes)
@@ -43,7 +46,9 @@ class Dishes : Fragment() {
                 dish.forEach { data.add(it)}
                 recyclerView.adapter = DishAdapter(TAG,
                         data.filter{it.dish.name.toLowerCase().contains(word.toLowerCase())} as ArrayList<GrandDish>,
-                        childFragmentManager,viewModel,halfProductViewModel,viewLifecycleOwner,requireActivity())
+                        childFragmentManager,ViewModelProvider(this).get(DishAdapterViewModel::class.java),
+                    ViewModelProvider(this).get(DishListViewAdapterViewModel::class.java),
+                    viewLifecycleOwner,requireActivity())
             })
         })
 

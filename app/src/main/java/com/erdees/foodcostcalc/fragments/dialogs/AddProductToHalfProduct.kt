@@ -15,6 +15,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.viewmodel.AddProductToHalfProductViewModel
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
@@ -39,8 +40,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
     private var usaAsBoolean = true
 
     /** Initialized here so it can be called outside of 'onCreateView' */
-    lateinit var viewModel: ViewModel
-    lateinit var halfProductViewModel: ViewModel
+    lateinit var viewModel: AddProductToHalfProductViewModel
     private lateinit var unitAdapter: ArrayAdapter<*>
     private lateinit var unitSpinner: Spinner
     lateinit var weightPerPieceEditText: EditText
@@ -54,9 +54,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         savedInstanceState: Bundle?
     ): View {
         val view = inflater.inflate(R.layout.add_product_to_half_product, container, false)
-        halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-        val hpViewModel = halfProductViewModel as HalfProductsViewModel
+        viewModel = ViewModelProvider(this).get(AddProductToHalfProductViewModel::class.java)
 
 
         /**Binders*/
@@ -82,7 +80,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
 
         /**Spinner Adapters!*/
         val halfProductsList = mutableListOf<String>()
-        (halfProductViewModel as HalfProductsViewModel).readAllHalfProductData.observe(
+        viewModel.readAllHalfProductData.observe(
             viewLifecycleOwner,
             Observer { it.forEach { halfProduct -> halfProductsList.add(halfProduct.name) } })
         val halfProductAdapter =
@@ -98,7 +96,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         halfProductAdapter.notifyDataSetChanged()
 
         val productList = mutableListOf<String>()
-        (viewModel as AddViewModel).readAllProductData.observe(
+        viewModel.readAllProductData.observe(
             viewLifecycleOwner,
             Observer { it.forEach { product -> productList.add(product.name) } })
         val productAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, productList)
@@ -130,7 +128,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
          *  WHICH OBSERVES 'LIVEDATA' IN REPOSITORY
          *  WHICH OBSERVES 'LIVEDATA' FROM DAO*/
 
-        (viewModel as AddViewModel).readAllProductData.observe(
+        viewModel.readAllProductData.observe(
             viewLifecycleOwner,
             Observer { products ->
                 productAdapter.clear()
@@ -140,7 +138,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 }
             })
 
-        (halfProductViewModel as HalfProductsViewModel).readAllHalfProductData.observe(
+        viewModel.readAllHalfProductData.observe(
             viewLifecycleOwner,
             Observer { halfProducts ->
                 halfProductAdapter.clear()
@@ -163,11 +161,11 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 ).show()
             } else {
                 val chosenHalfProduct =
-                    hpViewModel.readAllHalfProductData.value?.get(
+                    viewModel.readAllHalfProductData.value?.get(
                         halfProductPosition!!
                     )
                 val chosenProduct =
-                    (viewModel as AddViewModel).readAllProductData.value?.get(productPosition!!)
+                    viewModel.readAllProductData.value?.get(productPosition!!)
                 val weight = weightEditTextField.text.toString().toDouble()
                 if (!isHalfProductPiece && isProductPiece && weightPerPieceEditText.text.isEmpty()) {
                     Toast.makeText(
@@ -176,7 +174,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                         Toast.LENGTH_LONG
                     ).show()
                 } else {
-                    hpViewModel.addProductIncludedInHalfProduct(
+                    viewModel.addProductIncludedInHalfProduct(
                         ProductIncludedInHalfProduct(
                             0,
                             chosenProduct!!,
@@ -192,7 +190,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                     weightEditTextField.text.clear()
                     Toast.makeText(
                         requireContext(),
-                        "${(viewModel as AddViewModel).readAllProductData.value?.get(productPosition!!)?.name} added.",
+                        "${viewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -226,7 +224,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
             1 -> {
                 productPosition = position
                 val chosenProduct =
-                    (viewModel as AddViewModel).readAllProductData.value?.get(position)
+                    viewModel.readAllProductData.value?.get(position)
                 unitType = setAdapterList(
                     chosenProduct?.unit
                 )
@@ -236,13 +234,13 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 unitSpinner.setSelection(0, false)
                 chosenUnit = unitList.first()
                 unitSpinner.setSelection(0) // when the product is chosen first units got chosen immediately
-                isProductPiece = (viewModel as AddViewModel)
+                isProductPiece = viewModel
                     .readAllProductData.value!![productPosition!!].unit == "per piece"
                 setTextField()
             }
             2 -> {
                 halfProductPosition = position
-                val thisHalfProduct = (halfProductViewModel as HalfProductsViewModel)
+                val thisHalfProduct = viewModel
                     .readAllHalfProductData.value!![halfProductPosition!!]
                 halfProductUnit = thisHalfProduct.halfProductUnit
                 isHalfProductPiece = thisHalfProduct.halfProductUnit == "per piece"

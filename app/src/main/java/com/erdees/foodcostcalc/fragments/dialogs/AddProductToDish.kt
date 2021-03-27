@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.model.*
+import com.erdees.foodcostcalc.viewmodel.AddProductToDishViewModel
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
@@ -36,8 +37,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
 
     /** Initialized here so it can be called outside of 'onCreateView' */
-    lateinit var viewModel: ViewModel
-    lateinit var halfProductViewModel: ViewModel
+    lateinit var viewModel: AddProductToDishViewModel
     private lateinit var unitAdapter: ArrayAdapter<*>
     private lateinit var unitSpinner: Spinner
 
@@ -69,10 +69,10 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             1 -> {
                 productPosition = position
                 if (!switch.isChecked) unitType = setAdapterList(
-                        (viewModel as AddViewModel).readAllProductData.value?.get(position)?.unit
+                        viewModel.readAllProductData.value?.get(position)?.unit
                 )
                 if (switch.isChecked) unitType = setAdapterList(
-                        (halfProductViewModel as HalfProductsViewModel)
+                        viewModel
                             .readAllHalfProductData.value?.get(position)?.halfProductUnit
                     )
                 unitList.changeUnitList(unitType, metricAsBoolean, usaAsBoolean)
@@ -100,10 +100,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         val view: View = inflater.inflate(R.layout.add_products_to_dish, container, false)
 
         /** initialize ui with viewmodel*/
-        viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
-        val thisViewModel = viewModel as AddViewModel
-        halfProductViewModel = ViewModelProvider(this).get(HalfProductsViewModel::class.java)
-        val hpViewModel = halfProductViewModel as HalfProductsViewModel
+        viewModel = ViewModelProvider(this).get(AddProductToDishViewModel::class.java)
 
 
         /** Get the data about unit settings from shared preferences.
@@ -126,18 +123,18 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** ADAPTERs FOR SPINNERs */
         val halfProductList = mutableListOf<String>()
-        (halfProductViewModel as HalfProductsViewModel).getHalfProducts()
+        viewModel.getHalfProducts()
             .observe(viewLifecycleOwner,
-                Observer { halfProducts ->
+                { halfProducts ->
                     halfProducts.forEach { halfProductList.add(it.name) }
                 })
         val halfProductAdapter =
             ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProductList)
 
         val productList = mutableListOf<String>()
-        thisViewModel.readAllProductData.observe(
+        viewModel.readAllProductData.observe(
             viewLifecycleOwner,
-            Observer { it.forEach { product -> productList.add(product.name) } })
+            { it.forEach { product -> productList.add(product.name) } })
         val productAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, productList)
         with(productSpinner)
         {
@@ -151,7 +148,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         productAdapter.notifyDataSetChanged()
 
         val dishList = mutableListOf<String>()
-        (viewModel as AddViewModel).readAllDishData.observe(
+        viewModel.readAllDishData.observe(
             viewLifecycleOwner,
             Observer { it.forEach { dish -> dishList.add(dish.name) } })
         val dishesAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, dishList)
@@ -193,7 +190,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
          *  WHICH OBSERVES 'LIVEDATA' IN REPOSITORY
          *  WHICH OBSERVES 'LIVEDATA' FROM DAO*/
 
-        thisViewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
+        viewModel.readAllProductData.observe(viewLifecycleOwner, Observer { products ->
             productAdapter.clear()
             products.forEach { product ->
                 productAdapter.add(product.name)
@@ -201,7 +198,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             }
         })
 
-        thisViewModel.readAllDishData.observe(viewLifecycleOwner, Observer { dishes ->
+        viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { dishes ->
             dishesAdapter.clear()
             dishes.forEach { dish ->
                 dishesAdapter.add(dish.name)
@@ -215,11 +212,11 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
             if (weightOfAddedProduct.text.isNullOrEmpty()) {
                 showToast(message = "You can't add product without weight.")
             } else if (!switch.isChecked) {
-                val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
+                val chosenDish = viewModel.readAllDishData.value?.get(dishPosition!!)
                 val weight = weightOfAddedProduct.text.toString().toDouble()
 
-                val chosenProduct = thisViewModel.readAllProductData.value?.get(productPosition!!)
-                thisViewModel.addProductToDish(
+                val chosenProduct = viewModel.readAllProductData.value?.get(productPosition!!)
+                viewModel.addProductToDish(
                     ProductIncluded(
                         0,
                         chosenProduct!!,
@@ -234,17 +231,17 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                 weightOfAddedProduct.text.clear()
                 Toast.makeText(
                     requireContext(),
-                    "${thisViewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
+                    "${viewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                val chosenDish = thisViewModel.readAllDishData.value?.get(dishPosition!!)
+                val chosenDish = viewModel.readAllDishData.value?.get(dishPosition!!)
                 val weight = weightOfAddedProduct.text.toString().toDouble()
-                hpViewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+                viewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
                     halfProductToAdd = halfProduct[productPosition!!]
                 })
 
-                hpViewModel.addHalfProductIncludedInDish(
+                viewModel.addHalfProductIncludedInDish(
                     HalfProductIncludedInDish(
                         0,
                         chosenDish!!,

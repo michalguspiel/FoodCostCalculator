@@ -15,11 +15,10 @@ import com.erdees.foodcostcalc.fragments.dialogs.EditDish
 import com.erdees.foodcostcalc.fragments.dialogs.EditProduct
 import com.erdees.foodcostcalc.model.GrandDish
 import com.erdees.foodcostcalc.model.Product
-import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import java.util.*
 
 
-class RecyclerViewAdapter(val tag: String?, private val list: ArrayList<*>, private val fragmentManager: FragmentManager,val viewModel : AddViewModel)
+class RecyclerViewAdapter(val tag: String?, private val list: ArrayList<*>, private val fragmentManager: FragmentManager)
     : RecyclerView.Adapter<RecyclerViewAdapter.RecyclerViewHolder>() {
 
     class RecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {

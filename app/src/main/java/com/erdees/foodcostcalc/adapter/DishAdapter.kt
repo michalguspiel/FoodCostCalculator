@@ -17,6 +17,8 @@ import com.erdees.foodcostcalc.fragments.dialogs.EditDish
 import com.erdees.foodcostcalc.model.GrandDish
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 import java.util.ArrayList
 
 
@@ -24,8 +26,8 @@ class DishAdapter(
     val tag: String?,
     private val list: ArrayList<GrandDish>,
     private val fragmentManager: FragmentManager,
-    val viewModel: AddViewModel,
-    val halfProductsViewModel: HalfProductsViewModel,
+    val viewModel: DishAdapterViewModel,
+    val dishListViewAdapterViewModel : DishListViewAdapterViewModel,
     val viewLifecycleOwner: LifecycleOwner,
     val activity: Activity
 ) : RecyclerView.Adapter<DishAdapter.RecyclerViewHolder>() {
@@ -87,7 +89,7 @@ class DishAdapter(
         holder.finalPriceWithMarginAndTax.text = formatPrice(countPriceAfterMarginAndTax(holder.totalPrice))
 
         list[position].halfProducts.forEach {
-            halfProductsViewModel
+            viewModel
                 .getCertainHalfProductWithProductsIncluded(it.halfProductOwnerId)
                 .observe(viewLifecycleOwner, Observer { halfProductWithProductsIncluded ->
                     holder.totalPrice = (holder.totalPrice +
@@ -115,7 +117,7 @@ class DishAdapter(
                 holder.listView.adapter = DishListViewAdapter(
                     activity,
                     list[position],
-                    halfProductsViewModel,
+                    dishListViewAdapterViewModel,
                     viewLifecycleOwner
                 )
                 holder.listView.layoutParams =
