@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.DialogFragment
@@ -15,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.EditDishAdapter
+import com.erdees.foodcostcalc.adapter.RecyclerViewAdapter
 import com.erdees.foodcostcalc.model.*
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.EditDishViewModel
@@ -23,6 +25,7 @@ import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewMo
 
 class EditDish : DialogFragment() {
 
+    lateinit var recyclerAdapter : EditDishAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -45,26 +48,31 @@ class EditDish : DialogFragment() {
          * */
         val actualRecyclerView =
             view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
-        val recyclerAdapter = EditDishAdapter(ViewModelProvider(this).get(EditDishAdapterViewModel::class.java), childFragmentManager, dishPassedFromAdapter)
-        actualRecyclerView.adapter = recyclerAdapter
         val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
         val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)
 
         /**Send data about which dish is being edited
          * so .setPosition(index of this dish in main list)*/
-        viewModel.getDishes().observe(viewLifecycleOwner, Observer { dish ->
+        viewModel.getDishes().observe(viewLifecycleOwner,  { dish ->
             viewModel.setPosition(dish.indexOf(dishPassedFromAdapter.dish))
         })
 
-        /** Observe data from viewmodel */
-        viewModel.getGrandDishes().observe(viewLifecycleOwner, Observer {
+
+        /**Observing grandDish based on dishId that was passed with [dishPassedFromAdapter]
+         * if viewModel flag is false change it to true and close dialog, otherwise set all text fields properly and set recyclerview
+         * based on data in this [GrandDish].*/
+        viewModel.getGrandDishById(dishPassedFromAdapter.dish.dishId).observe(viewLifecycleOwner, Observer { grandDish ->
             if (viewModel.getFlag().value == false) {
                 viewModel.setFlag(true)
                 this.dismiss()
             }
+            else {
             name.setText(dishPassedFromAdapter.dish.name)
             marginEditText.setText(dishPassedFromAdapter.dish.marginPercent.toString())
             taxEditText.setText(dishPassedFromAdapter.dish.dishTax.toString())
+            recyclerAdapter = EditDishAdapter(ViewModelProvider(this).get(EditDishAdapterViewModel::class.java), childFragmentManager, grandDish)
+            actualRecyclerView.adapter = recyclerAdapter
+            }
         })
 
 
@@ -101,6 +109,5 @@ class EditDish : DialogFragment() {
 
         const val TAG = "EditDish"
         lateinit var dishPassedFromAdapter: GrandDish
-        //  lateinit var grandDishPassedFromAdapter: GrandDish
     }
 }

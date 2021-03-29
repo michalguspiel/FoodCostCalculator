@@ -12,6 +12,7 @@ import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
+import com.erdees.foodcostcalc.fragments.dialogs.InformationDialog
 import com.erdees.foodcostcalc.getUnits
 import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
@@ -28,6 +29,7 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
     private lateinit var unitSpinner: AutoCompleteTextView
     private lateinit var sharedPreferences: SharedPreferences
     private val spinnerId = 1
+    private val informationDialog = InformationDialog()
 
     private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
         Toast.makeText(context, message, duration).show()
@@ -69,7 +71,7 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
         val calcPricePerPieceBtn = view.findViewById<Button>(R.id.count_price_per_piece_btn)
         val calcQuantityBox      = view.findViewById<EditText>(R.id.calc_quantity_box)
         val calcPricePerBox      = view.findViewById<EditText>(R.id.calc_price_per_box)
-
+        val informationButton       = view.findViewById<ImageButton>(R.id.info_button)
 
         sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources,sharedPreferences)
@@ -154,6 +156,10 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
             }
         }
 
+
+        informationButton.setOnClickListener{
+            informationDialog.show(parentFragmentManager,TAG)
+        }
 
         return view
     }

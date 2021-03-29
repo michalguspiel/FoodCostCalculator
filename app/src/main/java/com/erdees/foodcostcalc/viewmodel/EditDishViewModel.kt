@@ -27,7 +27,8 @@ class EditDishViewModel(application: Application) : AndroidViewModel(application
 
     fun getDishes() = dishRepository.getDishes()
 
-    fun getGrandDishes() = grandDishRepository.getGrandDishes()
+
+    fun getGrandDishById(dishId: Long) = grandDishRepository.getGrandDishById(dishId)
 
     /**Basic repository methods*/
     fun setFlag(boolean: Boolean) {

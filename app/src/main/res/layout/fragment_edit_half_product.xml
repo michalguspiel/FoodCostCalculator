@@ -17,29 +17,54 @@
         android:layout_marginStart="4dp"
         android:layout_marginEnd="4dp">
 
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="Half product name: " />
 
-        <EditText
-            android:id="@+id/edit_half_product_name"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/edit_half_product_field"
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:hint="@string/half_product_name"
+            app:hintTextColor="@color/black"
             android:layout_gravity="center_horizontal"
-            tools:text="half product name"
-            android:inputType="text"
-            android:autofillHints=""
-            tools:ignore="LabelFor" />
+            app:boxStrokeColor="@color/orange_500"
+            android:gravity="center_horizontal"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_half_product_name"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_height="match_parent"
+                android:inputType="text"
+                android:autofillHints="" />
+        </com.google.android.material.textfield.TextInputLayout>
+
     </LinearLayout>
 
-    <Spinner
-        android:id="@+id/edit_half_product_spinner"
+
+    <com.google.android.material.textfield.TextInputLayout
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_width="150dp"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
+        android:hint="@string/choose_unit"
+        android:textColorHint="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:boxStrokeColor="@color/orange_500"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+    <AutoCompleteTextView
+        android:id="@+id/edit_half_product_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:spinnerMode="dropdown"
+        android:layout_weight="1"
+        android:inputType="none"
         android:layout_gravity="center"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
 
     <FrameLayout android:layout_height="300dp"

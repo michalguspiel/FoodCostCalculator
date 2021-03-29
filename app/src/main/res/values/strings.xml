@@ -60,4 +60,5 @@
     <string name="half_products">Half products</string>
     <string name="got_it">Got it!</string>
     <string name="half_product">Half product</string>
+    <string name="half_product_name">Half product name</string>
 </resources>

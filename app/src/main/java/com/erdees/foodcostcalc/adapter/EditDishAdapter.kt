@@ -1,6 +1,8 @@
 package com.erdees.foodcostcalc.adapter
 
 
+import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -9,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
@@ -66,6 +69,7 @@ class EditDishAdapter(
 
 
     override fun onBindViewHolder(holder: EditDishViewHolder, position: Int) {
+        @SuppressLint("SetTextI18n")
         fun setUnit(result: String, weight: Double) {
             if (weight <= 1) holder.unitTextView.text = result
             else holder.unitTextView.text = result + 's'
@@ -82,6 +86,7 @@ class EditDishAdapter(
             holder.deleteProductBtn.setOnClickListener {
                 viewModel.setProductIncluded(grandDish.productsIncluded[position])
                 AreYouSure().show(this.fragmentManager, "EditDishAdapter")
+
             }
 
             /** Edit text product weight.

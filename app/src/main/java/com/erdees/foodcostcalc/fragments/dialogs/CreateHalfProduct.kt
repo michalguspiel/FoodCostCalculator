@@ -32,7 +32,7 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
     val spinnerId = 2
     override fun onResume() {
         unitList = getUnits(resources,sharedPreferences)
-        val unitSpinnerAdapter = ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, unitList)
+        val unitSpinnerAdapter = ArrayAdapter(requireActivity(), R.layout.dropdown_item, unitList)
         /**Adapter for unitSpinner*/
         with(unitSpinner){
             setAdapter(unitSpinnerAdapter)

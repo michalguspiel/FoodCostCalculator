@@ -17,9 +17,9 @@ import kotlinx.coroutines.launch
 
 class EditDishAdapterViewModel(application: Application):AndroidViewModel(application) {
 
-    val dishRepository: DishRepository
-    val productIncludedRepository: ProductIncludedRepository
-    val halfProductIncludedInDishRepository: HalfProductIncludedInDishRepository
+    private val dishRepository: DishRepository
+    private val productIncludedRepository: ProductIncludedRepository
+    private val halfProductIncludedInDishRepository: HalfProductIncludedInDishRepository
     val basicRepository: BasicRepository
 
     init {
