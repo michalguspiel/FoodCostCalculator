@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -34,13 +35,24 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemClickListener {
 
 
     override fun onResume() {
+        unitList = getUnits(resources, sharedPreferences)
+        Log.i(TAG,unitList.joinToString { it })
+        unitList = when (halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
+            "per piece" -> mutableListOf("per piece")
+            "per kilogram" -> unitList.filterWeight()
+            "per liter" -> unitList.filterVol()
+            "per pound" -> unitList.filterWeight()
+            "per gallon" ->  unitList.filterVol()
+            else -> mutableListOf("error!")
+        }
+
+        Log.i(TAG,unitList.joinToString { it })
         /**Spinner adapter*/
         val unitSpinnerAdapter =
-            ArrayAdapter(requireContext(), R.layout.support_simple_spinner_dropdown_item, unitList)
+            ArrayAdapter(requireContext(), R.layout.dropdown_item, unitList)
         with(spinner) {
             setAdapter(unitSpinnerAdapter)
-            setText(halfProductPassedFromAdapter.halfProduct.halfProductUnit)
-           // setSelection(unitList.indexOf(halfProductPassedFromAdapter.halfProduct.halfProductUnit))
+            setText(halfProductPassedFromAdapter.halfProduct.halfProductUnit,false)
             onItemClickListener = this@EditHalfProduct
             id = spinnerId
             gravity = Gravity.CENTER
@@ -72,16 +84,7 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemClickListener {
         recycleView.adapter = recyclerViewAdapter
         sharedPreferences = SharedPreferences(requireContext())
 
-        unitList = getUnits(resources, sharedPreferences)
-        unitList = when (halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
-            "per piece" -> mutableListOf("per piece")
-            "per kilogram" -> unitList.filterWeight()
-            "per liter" -> unitList.filterVol()
-            "per pound" -> unitList.filterWeight()
-            "per gallon" ->  unitList.filterVol()
-            else -> mutableListOf("error!")
 
-        }
 
 
         /**Send data about which dish is being edited
@@ -111,6 +114,7 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemClickListener {
         /**Button logic*/
 
         saveBtn.setOnClickListener {
+            if(chosenUnit == "") { chosenUnit = halfProductPassedFromAdapter.halfProduct.halfProductUnit}
             recyclerViewAdapter.save(
                 HalfProduct(
                     halfProductPassedFromAdapter.halfProduct.halfProductId,

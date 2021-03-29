@@ -16,11 +16,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.EditDishAdapter
-import com.erdees.foodcostcalc.adapter.RecyclerViewAdapter
 import com.erdees.foodcostcalc.model.*
-import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.EditDishViewModel
-import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewModel
 
 class EditDish : DialogFragment() {

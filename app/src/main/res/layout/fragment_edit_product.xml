@@ -14,21 +14,31 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="100dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/product_name" />
-
-        <EditText
-            android:id="@+id/edit_product_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:hint="@string/product_name"
+            app:hintTextColor="@color/black"
+            app:counterTextColor="@color/black"
+            android:textColorHint="@color/black"
             android:layout_gravity="center_horizontal"
-            tools:text="dish name"
-            android:inputType="text"
-            android:autofillHints=""
-            tools:ignore="LabelFor" />
+            app:boxStrokeColor="@color/orange_500"
+            android:gravity="center_horizontal"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_product_name"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_height="match_parent"
+                tools:text="dish name"
+                android:inputType="text"
+                android:layout_gravity="center_horizontal"
+                android:autofillHints="" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
     </LinearLayout>
 
     <LinearLayout
@@ -37,18 +47,33 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/unit" />
 
-       <Spinner
-           android:id="@+id/spinner_edit_product"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:spinnerMode="dropdown"
-           />
+        <com.google.android.material.textfield.TextInputLayout
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+            android:layout_width="250dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/unit_spinner"
+            android:textColorHint="@color/black"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            app:boxStrokeColor="@color/orange_500"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <AutoCompleteTextView
+                android:id="@+id/spinner_edit_product"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:inputType="none"
+                android:spinnerMode="dropdown" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
 
 
     </LinearLayout>
@@ -60,21 +85,32 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/product_price" />
 
-        <EditText
-            android:id="@+id/edit_product_price"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:hint="@string/price"
+            app:hintTextColor="@color/black"
+            app:counterTextColor="@color/black"
+            android:textColorHint="@color/black"
             android:layout_gravity="center_horizontal"
-            tools:text="dish price"
-            android:inputType="numberDecimal"
-            android:autofillHints=""
-            tools:ignore="LabelFor" />
+            app:boxStrokeColor="@color/orange_500"
+            android:gravity="center_horizontal"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_product_price"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_height="match_parent"
+                tools:text="dish name"
+                android:inputType="numberDecimal"
+                android:layout_gravity="center_horizontal"
+                android:autofillHints="" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
     </LinearLayout>
 
 
@@ -85,21 +121,31 @@
         android:layout_margin="4dp"
         >
 
-        <TextView
-            android:layout_width="100dp"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/product_tax" />
-
-        <EditText
-            android:id="@+id/edit_product_tax"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:hint="@string/tax"
+            app:hintTextColor="@color/black"
+            app:counterTextColor="@color/black"
+            android:textColorHint="@color/black"
             android:layout_gravity="center_horizontal"
-            tools:text="dish tax"
-            android:inputType="numberDecimal"
-            android:autofillHints=""
-            tools:ignore="LabelFor" />
+            app:boxStrokeColor="@color/orange_500"
+            android:gravity="center_horizontal"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_product_tax"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_height="match_parent"
+                tools:text="dish tax"
+                android:inputType="numberDecimal"
+                android:layout_gravity="center_horizontal"
+                android:autofillHints="" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
     </LinearLayout>
 
 
@@ -111,21 +157,32 @@
 
         >
 
-        <TextView
-            android:layout_width="100dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/waste_percent_product" />
 
-        <EditText
-            android:id="@+id/edit_product_waste"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="250dp"
             android:layout_height="wrap_content"
+            android:hint="@string/waste"
+            app:hintTextColor="@color/black"
+            app:counterTextColor="@color/black"
+            android:textColorHint="@color/black"
             android:layout_gravity="center_horizontal"
-            tools:text="dish waste"
-            android:inputType="numberDecimal"
-            android:autofillHints=""
-            tools:ignore="LabelFor" />
+            app:boxStrokeColor="@color/orange_500"
+            android:gravity="center_horizontal"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+            >
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/edit_product_waste"
+                android:layout_width="match_parent"
+                android:gravity="center_horizontal"
+                android:layout_height="match_parent"
+                tools:text="dish waste"
+                android:inputType="numberDecimal"
+                android:layout_gravity="center_horizontal"
+                android:autofillHints="" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
     </LinearLayout>
 
 

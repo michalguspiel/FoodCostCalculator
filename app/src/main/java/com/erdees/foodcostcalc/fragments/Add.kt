@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.fragments
 
 import android.annotation.SuppressLint
+import android.graphics.Path
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -28,6 +29,7 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
     private var unitList: MutableList<String> = mutableListOf()
     private lateinit var unitSpinner: AutoCompleteTextView
     private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var scrollView : ScrollView
     private val spinnerId = 1
     private val informationDialog = InformationDialog()
 
@@ -72,6 +74,7 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
         val calcQuantityBox      = view.findViewById<EditText>(R.id.calc_quantity_box)
         val calcPricePerBox      = view.findViewById<EditText>(R.id.calc_price_per_box)
         val informationButton       = view.findViewById<ImageButton>(R.id.info_button)
+        scrollView = view.findViewById<ScrollView>(R.id.add_scroll_view)
 
         sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources,sharedPreferences)
@@ -145,7 +148,9 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
             if (calcProductWeight.text.isNotEmpty() && calcWasteWeight.text.isNotEmpty()){
                 calculateWaste(calcProductWeight.text.toString().toDouble(),
                                 calcWasteWeight.text.toString().toDouble())
+                scrollUp()
             }
+
         }
 
 
@@ -153,6 +158,7 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
             if(calcPricePerBox.text.isNotEmpty()  && calcQuantityBox.text.isNotEmpty()){
                 calculatePricePerPiece(calcPricePerBox.text.toString().toDouble(),
                     calcQuantityBox.text.toString().toDouble())
+            scrollUp()
             }
         }
 
@@ -168,6 +174,11 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
         fun newInstance(): Add = Add()
         const val TAG = "Add"
     }
+
+    fun scrollUp(){
+        scrollView.fullScroll(ScrollView.FOCUS_UP)
+    }
+
 
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

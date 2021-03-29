@@ -22,7 +22,7 @@
     <string name="product_waste">Waste weight</string>
     <string name="amount">amount</string>
     <string name="add_product_to_dish">add product to dish</string>
-    <string name="dish_margin">margin</string>
+    <string name="dish_margin">Margin %</string>
     <string name="percent">%</string>
     <string name="choose_unit">Choose unit</string>
     <string name="calculate_waste">Calculate waste %</string>
@@ -61,4 +61,6 @@
     <string name="got_it">Got it!</string>
     <string name="half_product">Half product</string>
     <string name="half_product_name">Half product name</string>
+    <string name="unit_spinner">Unit</string>
+    <string name="name_edit_half_prod">Name</string>
 </resources>
