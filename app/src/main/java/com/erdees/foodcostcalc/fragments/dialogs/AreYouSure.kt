@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.fragments.dialogs
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -181,6 +182,8 @@ class AreYouSure : DialogFragment() {
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return view
     }
+
+
 
     companion object {
         fun newInstance(): AreYouSure =

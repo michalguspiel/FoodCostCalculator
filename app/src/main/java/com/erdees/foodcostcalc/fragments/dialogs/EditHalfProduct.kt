@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -23,11 +24,42 @@ import com.erdees.foodcostcalc.viewmodel.EditHalfProductViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
-class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
+class EditHalfProduct : DialogFragment(), AdapterView.OnItemClickListener {
 
     private var chosenUnit = ""
     private var unitList: MutableList<String> = mutableListOf()
 
+    private lateinit var spinner: AutoCompleteTextView
+    private lateinit var sharedPreferences: SharedPreferences
+    private val spinnerId = 1
+
+
+    override fun onResume() {
+        unitList = getUnits(resources, sharedPreferences)
+        Log.i(TAG,unitList.joinToString { it })
+        unitList = when (halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
+            "per piece" -> mutableListOf("per piece")
+            "per kilogram" -> unitList.filterWeight()
+            "per liter" -> unitList.filterVol()
+            "per pound" -> unitList.filterWeight()
+            "per gallon" ->  unitList.filterVol()
+            else -> mutableListOf("error!")
+        }
+
+        Log.i(TAG,unitList.joinToString { it })
+        /**Spinner adapter*/
+        val unitSpinnerAdapter =
+            ArrayAdapter(requireContext(), R.layout.dropdown_item, unitList)
+        with(spinner) {
+            setAdapter(unitSpinnerAdapter)
+            setText(halfProductPassedFromAdapter.halfProduct.halfProductUnit,false)
+            onItemClickListener = this@EditHalfProduct
+            id = spinnerId
+            gravity = Gravity.CENTER
+        }
+
+        super.onResume()
+    }
 
     @SuppressLint("ResourceType")
     override fun onCreateView(
@@ -44,36 +76,16 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         val name = view.findViewById<EditText>(R.id.edit_half_product_name)
         val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
         val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)
-        val spinner = view.findViewById<Spinner>(R.id.edit_half_product_spinner)
+        spinner = view.findViewById(R.id.edit_half_product_spinner)
         val recycleView =
             view.findViewById<RecyclerView>(R.id.recycler_view_products_in_half_product)
         val recyclerViewAdapter =
             EditHalfProductAdapter(ViewModelProvider(this).get(EditHalfProductAdapterViewModel::class.java), childFragmentManager)
         recycleView.adapter = recyclerViewAdapter
-        val sharedPreferences = SharedPreferences(requireContext())
+        sharedPreferences = SharedPreferences(requireContext())
 
-        unitList = getUnits(resources, sharedPreferences)
-        unitList = when (halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
-            "per piece" -> mutableListOf("per piece")
-            "per kilogram" -> unitList.filterWeight()
-            "per liter" -> unitList.filterVol()
-            "per pound" -> unitList.filterWeight()
-            "per gallon" ->  unitList.filterVol()
-            else -> mutableListOf("error!")
 
-        }
 
-        /**Spinner adapter*/
-        val unitSpinnerAdapter =
-            ArrayAdapter(requireContext(), R.layout.support_simple_spinner_dropdown_item, unitList)
-        with(spinner) {
-            adapter = unitSpinnerAdapter
-            setSelection(unitList.indexOf(halfProductPassedFromAdapter.halfProduct.halfProductUnit))
-            onItemSelectedListener = this@EditHalfProduct
-            id = 1
-            gravity = Gravity.CENTER
-            prompt = "Unit"
-        }
 
         /**Send data about which dish is being edited
          * so .setPosition(index of this dish in main list)*/
@@ -102,6 +114,7 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         /**Button logic*/
 
         saveBtn.setOnClickListener {
+            if(chosenUnit == "") { chosenUnit = halfProductPassedFromAdapter.halfProduct.halfProductUnit}
             recyclerViewAdapter.save(
                 HalfProduct(
                     halfProductPassedFromAdapter.halfProduct.halfProductId,
@@ -117,10 +130,6 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         }
 
 
-
-
-
-
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
         return view
@@ -134,13 +143,11 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         lateinit var halfProductPassedFromAdapter: HalfProductWithProductsIncluded
     }
 
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             1 -> chosenUnit = unitList[position]
+            else -> chosenUnit = unitList[position]
         }
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        Toast.makeText(requireContext(), "nothing selected", Toast.LENGTH_LONG).show()
     }
 }

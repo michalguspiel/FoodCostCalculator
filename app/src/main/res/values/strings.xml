@@ -3,7 +3,7 @@
     <string name="add_stuff">Add product to your list</string>
     <string name="name">Product name</string>
     <string name="price">Price</string>
-    <string name="tax">Tax</string>
+    <string name="tax">Tax %</string>
     <string name="waste">Waste %</string>
     <string name="compose">Add product to your dish</string>
     <string name ="cancel">Cancel</string>
@@ -22,7 +22,7 @@
     <string name="product_waste">Waste weight</string>
     <string name="amount">amount</string>
     <string name="add_product_to_dish">add product to dish</string>
-    <string name="dish_margin">margin</string>
+    <string name="dish_margin">Margin %</string>
     <string name="percent">%</string>
     <string name="choose_unit">Choose unit</string>
     <string name="calculate_waste">Calculate waste %</string>
@@ -59,4 +59,8 @@
     <string name="quantity">Quantity</string>
     <string name="half_products">Half products</string>
     <string name="got_it">Got it!</string>
+    <string name="half_product">Half product</string>
+    <string name="half_product_name">Half product name</string>
+    <string name="unit_spinner">Unit</string>
+    <string name="name_edit_half_prod">Name</string>
 </resources>

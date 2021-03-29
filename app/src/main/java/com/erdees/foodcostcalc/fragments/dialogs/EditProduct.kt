@@ -21,12 +21,42 @@ import com.erdees.foodcostcalc.viewmodel.EditProductViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
 
-class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
+class EditProduct : DialogFragment(), AdapterView.OnItemClickListener {
 
     private var unitPosition: Int? = null
     private var productId: Long? = null
     private var unitList: MutableList<String> = mutableListOf()
+    private lateinit var unitSpinner : AutoCompleteTextView
+    private val spinnerId = 1
     private lateinit var viewModel: EditProductViewModel
+    private lateinit var sharedPreferences : SharedPreferences
+
+    override fun onResume() {
+        unitList = getUnits(resources, sharedPreferences)
+        unitList = when (productPassedFromAdapter.unit) {
+            "per piece" -> mutableListOf("per piece")
+            "per kilogram" -> unitList.filterWeight()
+            "per liter" -> unitList.filterVol()
+            "per pound" -> unitList.filterWeight()
+            "per gallon" ->  unitList.filterVol()
+            else -> mutableListOf("error!")
+        }
+
+        val unitsAdapter = ArrayAdapter(
+            requireActivity(),
+            R.layout.dropdown_item,
+            unitList
+        )
+        with(unitSpinner) {
+            setAdapter(unitsAdapter)
+            onItemClickListener = this@EditProduct
+            gravity = Gravity.CENTER
+            id = spinnerId
+        }
+
+        super.onResume()
+    }
+
     @SuppressLint("ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,33 +68,13 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         /** initialize ui with viewmodel*/
         viewModel = ViewModelProvider(this).get(EditProductViewModel::class.java)
 
-        val sharedPreferences = SharedPreferences(requireContext())
-        unitList = getUnits(resources, sharedPreferences)
-        unitList = when (productPassedFromAdapter.unit) {
-            "per piece" -> mutableListOf("per piece")
-            "per kilogram" -> unitList.filterWeight()
-            "per liter" -> unitList.filterVol()
-            "per pound" -> unitList.filterWeight()
-            "per gallon" ->  unitList.filterVol()
-            else -> mutableListOf("error!")
+        sharedPreferences = SharedPreferences(requireContext())
 
-        }
 
 
         /** Spinner */
-        val unitSpinner = view.findViewById<Spinner>(R.id.spinner_edit_product)
-        val unitsAdapter = ArrayAdapter(
-            requireActivity(),
-            R.layout.support_simple_spinner_dropdown_item,
-            unitList
-        )
-        with(unitSpinner) {
-            adapter = unitsAdapter
-            onItemSelectedListener = this@EditProduct
-            gravity = Gravity.CENTER
-            this.prompt = "Choose unit"
-            id = 1
-        }
+        unitSpinner = view.findViewById(R.id.spinner_edit_product)
+
 
         /** Binders*/
         val name = view.findViewById<EditText>(R.id.edit_product_name)
@@ -109,7 +119,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
                 price.setText(productPassedFromAdapter.pricePerUnit.toString())
                 tax.setText(productPassedFromAdapter.tax.toString())
                 waste.setText(productPassedFromAdapter.waste.toString())
-                unitSpinner.setSelection(unitList.indexOf(productPassedFromAdapter.unit))
+                unitSpinner.setText(productPassedFromAdapter.unit,false)
                 /**GET LIST OF PRODUCTS INCLUDED
                  * WITH THE SAME ID AS productID
                  * AND SAVE IT IN 'productIncludedList
@@ -129,6 +139,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** BUTTON LOGIC*/
         saveButton.setOnClickListener {
+            if(unitPosition == null) unitPosition = unitList.indexOf(productPassedFromAdapter.unit)
             val productToChange = Product(
                 productId!!,
                 name.text.toString(),
@@ -193,18 +204,17 @@ class EditProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
         lateinit var productPassedFromAdapter: Product
     }
 
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+
+    override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
             1 -> {
                 unitPosition = position
             }
             else -> {
+                unitPosition = position
+
             }
         }
 
-    }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        this.dismiss()
     }
 }

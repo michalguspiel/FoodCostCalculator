@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.fragments.dialogs
 
+import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.fragments.Add
 
 class InformationDialog : DialogFragment() {
 
@@ -27,6 +29,8 @@ class InformationDialog : DialogFragment() {
 
         when(this.tag) {
             AddProductToHalfProduct.TAG -> text.text = resources.getString(R.string.information_add_product_to_half_product)
+            Add.TAG -> text.text = "Provide all of the necessary data in order to add product to your list, when adding product with per piece unit provide price per each piece" +
+                    " in case You don't know waste percentage or price per piece of product use tools on to bottom."
             else -> text.text = "test"
         }
 

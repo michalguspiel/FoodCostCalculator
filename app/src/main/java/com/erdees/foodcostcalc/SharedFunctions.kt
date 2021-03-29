@@ -161,7 +161,7 @@ fun computeWeightToSameUnit(
             "liter" -> weight
             "ounce" -> (weight / 1000) * 28.3495
             "pound" -> (weight / 1000) * 453.59237
-            "fluid ounce" -> (weight / 1000) * 29.5735295
+            "fluid ounce" -> (weight / 1000) * 3785.41178 / 160
             "gallon" -> (weight / 1000) * 3785.41178
             else -> 900000.9
         }
@@ -172,28 +172,28 @@ fun computeWeightToSameUnit(
             "liter" -> weight
             "ounce" -> (weight / 1000) * 28.3495
             "pound" -> (weight / 1000) * 453.59237
-            "fluid ounce" -> (weight / 1000) * 29.5735295
+            "fluid ounce" -> (weight / 1000) * 3785.41178 / 160
             "gallon" -> (weight / 1000) * 3785.41178
             else -> 900000.9
         }
         "per pound" -> when (thisWeightUnit) {
-            "gram" -> weight / 0.45359237
-            "kilogram" -> weight / 453.59237
-            "milliliter" -> weight / 0.45359237
-            "liter" -> weight / 453.59237
+            "gram" -> weight / 453.59237
+           "kilogram" -> weight * 2.20462262
+            "milliliter" -> weight / 453.59237
+            "liter" -> weight * 2.20462262
             "ounce" -> weight / 16
             "pound" -> weight
-            "fluid ounce" -> weight / 453.59237 / 4.546092 / 160
-            "gallon" -> weight / 453.59237 / 4.546092
+            "fluid ounce" -> weight * 8.345404436202464 / 160
+            "gallon" -> weight * 8.345404436202464
             else -> 900000.9
         }
         else -> when (thisWeightUnit) {
-            "gram" -> weight * 4546.092
-            "kilogram" -> weight * 4.546092
-            "milliliter" -> weight * 4546.092
-            "liter" -> weight * 4.546092
-            "ounce" -> weight * 4.546092 * 2.20462262 * 16
-            "pound" -> weight * 4.546092 * 2.20462262
+            "gram" -> weight * 0.264172052 / 1000
+            "kilogram" -> weight * 0.264172052
+            "milliliter" -> weight * 0.264172052 / 1000
+            "liter" -> weight * 0.264172052
+            "ounce" -> weight * 0.119826427 / 16
+            "pound" -> weight * 0.119826427
             "fluid ounce" -> weight / 160
             "gallon" -> weight
             else -> 900000.9
