@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="56dp"
-    xmlns:tools="http://schemas.android.com/tools"
     android:background="@color/gray_700"
     android:orientation="vertical"
     app:popupTheme="@style/MyAppTheme"
@@ -21,22 +21,22 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:background="@null"
+            android:contentDescription="@string/search_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@android:drawable/ic_menu_search"
-            android:contentDescription="@string/search_button" />
+            app:srcCompat="@android:drawable/ic_menu_search" />
 
         <ImageButton
             android:id="@+id/side_menu_button"
             android:layout_width="36dp"
             android:layout_height="36dp"
-            app:srcCompat="@drawable/ic_menu_1_"
+            android:background="@null"
+            android:contentDescription="@string/open_side_menu_button"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:background="@null"
             app:layout_constraintTop_toTopOf="parent"
-            android:contentDescription="@string/open_side_menu_button" />
+            app:srcCompat="@drawable/ic_menu_1_" />
 
         <EditText
             android:id="@+id/toolbar_text_field"
@@ -46,27 +46,27 @@
             android:layout_marginEnd="8dp"
             android:autofillHints=""
             android:hint="@string/search_by_name"
-            android:textColorHint="#fff"
+            android:inputType="text"
             android:textColor="#fff"
+            android:textColorHint="#DDAAAAAA"
             android:textSize="18sp"
-            android:textStyle="bold"
+            android:textStyle="normal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/search_button"
-            app:layout_constraintTop_toTopOf="parent"
-            android:inputType="text" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <ImageButton
             android:id="@+id/search_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@null"
+            android:contentDescription="@string/cancel_search"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@android:drawable/ic_menu_revert"
-            tools:ignore="MissingConstraints"
-            android:contentDescription="@string/cancel_search" />
+            tools:ignore="MissingConstraints" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.appcompat.widget.Toolbar>

@@ -94,10 +94,12 @@ class EditDishAdapter(
              *  */
 
             holder.editTextView.addTextChangedListener((object : TextWatcher {
-                override fun afterTextChanged(s: Editable) {}
+                override fun afterTextChanged(s: Editable) {
+
+                }
                 override fun beforeTextChanged(
                     s: CharSequence, start: Int,
-                    count: Int, after: Int
+                    count: Int, after: Int // TODO FIX
                 ) {
                 }
 
@@ -105,10 +107,11 @@ class EditDishAdapter(
                     s: CharSequence, start: Int,
                     before: Int, count: Int
                 ) {
-                    if (s.isNotEmpty()) {
+                    if (!s.isNullOrBlank() && s.toString() != "." ) {
                         if (position < cloneOfListOfProductsIncluded.size) cloneOfListOfProductsIncluded[position].weight =
                             s.toString().toDouble()
-                    }
+                        }
+
                 }
             }
                     ))
@@ -119,7 +122,7 @@ class EditDishAdapter(
                 position - grandDish.productsIncluded.size // to start counting position from new list
             holder.nameTextView.text =
                 grandDish.halfProducts[thisPosition].halfProduct.name // name of product not changeable
-            holder.editTextView.setText(grandDish.halfProducts[thisPosition].weight.toString()) // To set EditText with current data
+            holder.editTextView.setText(grandDish.halfProducts[thisPosition].weight.toString()) //To set EditText with current data
             Log.i("from edit dish adapter", position.toString() + " " + grandDish.productsIncluded.size.toString())
             setUnit(
                 grandDish.halfProducts[thisPosition].unit,
@@ -143,13 +146,14 @@ class EditDishAdapter(
                     s: CharSequence, start: Int,
                     before: Int, count: Int
                 ) {
-                    if (s.isNotEmpty()) {
+                    if (!s.isNullOrBlank() && s.toString() != ".") {
                         if (thisPosition < cloneOfListOfHalfProducts.size) {
                             cloneOfListOfHalfProducts[thisPosition].weight =
                                 s.toString().toDouble()
                         }
                     }
                 }
+
             }))
         }
     }

@@ -11,13 +11,10 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.viewmodel.AddProductToHalfProductViewModel
-import com.erdees.foodcostcalc.viewmodel.AddViewModel
-import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
 class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val PRODUCT_SPINNER_ID = 1
@@ -215,7 +212,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
     fun setTextField() {
         if (isProductPiece && !isHalfProductPiece) {
             weightPerPieceEditText.visibility = View.VISIBLE
-            weightPerPieceEditText.hint = "$chosenProductName ${perUnitToAbbreviation(halfProductUnit)}."
+            weightPerPieceEditText.hint = "$chosenProductName ${transformPerUnitToDescription(halfProductUnit)}."
         } else weightPerPieceEditText.visibility = View.GONE
     }
 

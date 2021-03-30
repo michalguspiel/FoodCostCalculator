@@ -17,6 +17,10 @@ import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.AreYouSureViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 
+
+/**
+ *
+ * */
 class AreYouSure : DialogFragment() {
 
     private lateinit var viewModel: AreYouSureViewModel
