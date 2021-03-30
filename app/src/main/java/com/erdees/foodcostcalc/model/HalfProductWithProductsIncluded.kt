@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.model
 
 import androidx.room.*
-import com.erdees.foodcostcalc.computeWeightToSameUnit
+import com.erdees.foodcostcalc.computeWeightAndVolumeToSameUnit
 import java.text.NumberFormat
 
 data class HalfProductWithProductsIncluded(
@@ -16,9 +16,9 @@ data class HalfProductWithProductsIncluded(
         return if (halfProduct.halfProductUnit == "per piece") 1.0
         else halfProductsList.map {
             if(it.weightUnit != "piece")
-                computeWeightToSameUnit(halfProduct.halfProductUnit,it.weightUnit,it.weight)
+                computeWeightAndVolumeToSameUnit(halfProduct.halfProductUnit,it.weightUnit,it.weight)
             else {
-                computeWeightToSameUnit(halfProduct.halfProductUnit,(halfProduct.halfProductUnit.drop(4)), it.weightOfPiece * it.weight)
+                computeWeightAndVolumeToSameUnit(halfProduct.halfProductUnit,(halfProduct.halfProductUnit.drop(4)), it.weightOfPiece * it.weight)
             }
         }.sum()
     }

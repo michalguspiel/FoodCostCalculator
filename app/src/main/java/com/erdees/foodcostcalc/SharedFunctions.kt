@@ -24,7 +24,7 @@ fun MutableList<String>.filterVol(): MutableList<String> {
 }
 
 
-fun unitAbbreviation(unit: String): String = when (unit) {
+fun abbreviateUnit(unit: String): String = when (unit) {
     "piece" -> "pce"
     "kilogram" -> "kg"
     "gram" -> "g"
@@ -36,7 +36,7 @@ fun unitAbbreviation(unit: String): String = when (unit) {
     else -> "fl oz"
 }
 
-fun perUnitToAbbreviation(unit:String): String = when (unit){
+fun transformPerUnitToDescription(unit:String): String = when (unit){
     "per kilogram" -> "weight as kilogram"
     "per gram" -> "weight as gram"
     "per pound" -> "weight as pound"
@@ -44,7 +44,7 @@ fun perUnitToAbbreviation(unit:String): String = when (unit){
     "per liter" -> "volume as liter"
     "per milliliter" -> "volume as ml"
     "per gallon" -> "volume as gallon"
-    else -> "fluid ounce"
+    else -> "volume as fl ounce"
 }
 
 
@@ -107,104 +107,86 @@ fun ArrayList<String>.changeUnitList(
 
 }
 
-
+/**Calculate product price inside dish or half product*/
 fun calculatePrice(
     pricePerUnit: Double,
-    weight: Double,
+    amount: Double,
     productUnit: String,
     chosenUnit: String
 ): Double {
-    return pricePerUnit *
-            when (productUnit) {
-                "per piece" -> weight
-                "per kilogram" -> when (chosenUnit) {
-                    "kilogram" -> weight
-                    "gram" -> weight / 1000
-                    "pound" -> (weight / 1000) * 453.59237
-                    else -> (weight / 1000) * 28.3495
-                }
-                "per pound" -> when (chosenUnit) {
-                    "kilogram" -> weight / 0.45359237
-                    "gram" -> weight / 453.59237
-                    "pound" -> weight
-                    else -> weight / 16
-                }
-                "per gallon" -> when (chosenUnit) {
-                    "liter" -> weight / 4.546092
-                    "milliliter" -> weight / 4546.092
-                    "gallon" -> weight
-                    else -> weight / 128
-                }
-                "per liter" -> when (chosenUnit) {
-                    "liter" -> weight
-                    "milliliter" -> weight / 1000
-                    "gallon" -> weight * 4.546092
-                    else -> weight * 33.8140227
-                }
-                else -> weight
-            }
+    return pricePerUnit * computeWeightAndVolumeToSameUnit(productUnit,chosenUnit,amount)
 }
 
-/** Computes weight/ volume to the same unit
+/** Computes weight / volume to the same unit
  * approximate result for pure water of 4 degrees celsius.
  * */
-fun computeWeightToSameUnit(
-    finalWeightUnit: String,
-    thisWeightUnit: String,
-    weight: Double
+fun computeWeightAndVolumeToSameUnit(
+    finalUnit: String,
+    anotherUnit: String,
+    amount: Double
 ): Double {
-    return when (finalWeightUnit) {
-        "per kilogram" -> when (thisWeightUnit) {
-            "gram" -> weight / 1000
-            "kilogram" -> weight
-            "milliliter" -> weight / 1000
-            "liter" -> weight
-            "ounce" -> (weight / 1000) * 28.3495
-            "pound" -> (weight / 1000) * 453.59237
-            "fluid ounce" -> (weight / 1000) * 3785.41178 / 160
-            "gallon" -> (weight / 1000) * 3785.41178
-            else -> 900000.9
-        }
-        "per liter" -> when (thisWeightUnit) {
-            "gram" -> weight / 1000
-            "kilogram" -> weight
-            "milliliter" -> weight / 1000
-            "liter" -> weight
-            "ounce" -> (weight / 1000) * 28.3495
-            "pound" -> (weight / 1000) * 453.59237
-            "fluid ounce" -> (weight / 1000) * 3785.41178 / 160
-            "gallon" -> (weight / 1000) * 3785.41178
-            else -> 900000.9
-        }
-        "per pound" -> when (thisWeightUnit) {
-            "gram" -> weight / 453.59237
-           "kilogram" -> weight * 2.20462262
-            "milliliter" -> weight / 453.59237
-            "liter" -> weight * 2.20462262
-            "ounce" -> weight / 16
-            "pound" -> weight
-            "fluid ounce" -> weight * 8.345404436202464 / 160
-            "gallon" -> weight * 8.345404436202464
-            else -> 900000.9
-        }
-        else -> when (thisWeightUnit) {
-            "gram" -> weight * 0.264172052 / 1000
-            "kilogram" -> weight * 0.264172052
-            "milliliter" -> weight * 0.264172052 / 1000
-            "liter" -> weight * 0.264172052
-            "ounce" -> weight * 0.119826427 / 16
-            "pound" -> weight * 0.119826427
-            "fluid ounce" -> weight / 160
-            "gallon" -> weight
-            else -> 900000.9
-        }
-
-
+    return when (finalUnit) {
+        "per kilogram" -> computeUnitToKilogram(anotherUnit,amount)
+        "per liter" -> computeUnitToLiter(anotherUnit,amount)
+        "per pound" -> computeUnitToPound(anotherUnit,amount)
+        else -> computeUnitToGallon(anotherUnit,amount)
     }
-
-
 }
 
+fun computeUnitToKilogram(anotherUnit: String,amount: Double) : Double {
+    return when (anotherUnit) {
+        "gram" -> amount / 1000
+        "kilogram" -> amount
+        "milliliter" -> amount / 1000
+        "liter" -> amount
+        "ounce" -> (amount / 1000) * 28.3495
+        "pound" -> (amount / 1000) * 453.59237
+        "fluid ounce" -> (amount / 1000) * 3785.41178 / 128
+        "gallon" -> (amount / 1000) * 3785.41178
+        else -> 900000.9
+    }
+}
 
+fun computeUnitToLiter(anotherUnit: String,amount: Double) : Double{
+    return when (anotherUnit) {
+        "gram" -> amount / 1000
+        "kilogram" -> amount
+        "milliliter" -> amount / 1000
+        "liter" -> amount
+        "ounce" -> (amount / 1000) * 28.3495
+        "pound" -> (amount / 1000) * 453.59237
+        "fluid ounce" -> (amount / 1000) * 3785.41178 / 128
+        "gallon" -> (amount / 1000) * 3785.41178
+        else -> 900000.9
+    }
+}
+
+fun computeUnitToGallon(anotherUnit: String, amount: Double) : Double{
+    return when (anotherUnit) {
+        "gram" -> amount * 0.264172052 / 1000
+        "kilogram" -> amount * 0.264172052
+        "milliliter" -> amount * 0.264172052 / 1000
+        "liter" -> amount * 0.264172052
+        "ounce" -> amount * 0.119826427 / 16
+        "pound" -> amount * 0.119826427
+        "fluid ounce" -> amount / 128
+        "gallon" -> amount
+        else -> 900000.9
+    }
+}
+
+fun computeUnitToPound(anotherUnit: String, amount: Double): Double {
+    return when (anotherUnit) {
+        "gram" -> amount / 453.59237
+        "kilogram" -> amount * 2.20462262
+        "milliliter" -> amount / 453.59237
+        "liter" -> amount * 2.20462262
+        "ounce" -> amount / 16
+        "pound" -> amount
+        "fluid ounce" -> amount * 8.345404436202464 / 128
+        "gallon" -> amount * 8.345404436202464
+        else -> 900000.9
+    }
+}
 
 

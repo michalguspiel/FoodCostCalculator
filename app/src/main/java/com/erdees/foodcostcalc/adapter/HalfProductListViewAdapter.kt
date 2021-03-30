@@ -9,7 +9,7 @@ import android.widget.TextView
 import android.widget.Toast
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.unitAbbreviation
+import com.erdees.foodcostcalc.abbreviateUnit
 
 class HalfProductListViewAdapter(private val context: Activity, private val productIncludedInHalfProductList: List<ProductIncludedInHalfProduct>)
     : ArrayAdapter<ProductIncludedInHalfProduct>(context, R.layout.listview_dish_row, productIncludedInHalfProductList) {
@@ -33,14 +33,14 @@ class HalfProductListViewAdapter(private val context: Activity, private val prod
          return productIncludedInHalfProductList[position].productIncluded.name +
                  unitType +
                  productIncludedInHalfProductList[position].totalWeightForPiece.toString() + " " +
-                         unitAbbreviation(productIncludedInHalfProductList[position].halfProduct.halfProductUnit.drop(4)) +"."
+                         abbreviateUnit(productIncludedInHalfProductList[position].halfProduct.halfProductUnit.drop(4)) +"."
         }
 
 
         productNameText.text = productIncludedInHalfProductList[position].productIncluded.name
         productWeightText.text = productIncludedInHalfProductList[position].formattedWeight
         productPriceText.text = productIncludedInHalfProductList[position].finalFormatPriceOfProduct
-        productUnit.text = unitAbbreviation(productIncludedInHalfProductList[position].weightUnit)
+        productUnit.text = abbreviateUnit(productIncludedInHalfProductList[position].weightUnit)
 
 
 

@@ -11,8 +11,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.calculatePrice
 import com.erdees.foodcostcalc.formatPrice
 import com.erdees.foodcostcalc.model.GrandDish
-import com.erdees.foodcostcalc.unitAbbreviation
-import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
+import com.erdees.foodcostcalc.abbreviateUnit
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 
 class DishListViewAdapter(private val context: Activity,
@@ -41,7 +40,7 @@ class DishListViewAdapter(private val context: Activity,
             productNameText.text = grandDish.productsIncluded[position].productIncluded.name
             productWeightText.text = grandDish.productsIncluded[position].formattedWeight
             productPriceText.text = grandDish.productsIncluded[position].finalFormatPriceOfProduct
-            productUnit.text = unitAbbreviation(grandDish.productsIncluded[position].weightUnit)
+            productUnit.text = abbreviateUnit(grandDish.productsIncluded[position].weightUnit)
         }
 
         /**To populate rest with halfProducts*/
@@ -61,7 +60,7 @@ class DishListViewAdapter(private val context: Activity,
                             )
                     })
 
-            productUnit.text = unitAbbreviation(grandDish.halfProducts[thisPosition].unit)
+            productUnit.text = abbreviateUnit(grandDish.halfProducts[thisPosition].unit)
         }
         return rowView
 
