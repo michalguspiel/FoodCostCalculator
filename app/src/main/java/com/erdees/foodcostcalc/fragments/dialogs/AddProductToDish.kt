@@ -99,6 +99,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
     ): View {
         val view: View = inflater.inflate(R.layout.add_products_to_dish, container, false)
 
+        Log.i("TEST", "Opened from ${this.tag}")
         /** initialize ui with viewmodel*/
         viewModel = ViewModelProvider(this).get(AddProductToDishViewModel::class.java)
 
@@ -147,20 +148,30 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         }
         productAdapter.notifyDataSetChanged()
 
+
+
+
         val dishList = mutableListOf<String>()
         viewModel.readAllDishData.observe(
             viewLifecycleOwner,
-            Observer { it.forEach { dish -> dishList.add(dish.name) } })
+             {
+                it.forEach { dish -> dishList.add(dish.name) }
+                if(this.isOpenedFromDishAdapter()){
+                    val dishToSelect =  viewModel.getDishToDialog().value
+                    val positionToSelect = dishList.indexOf(dishToSelect!!.name)
+                    dishSpinner.setSelection(positionToSelect)
+                }
+            })
         val dishesAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, dishList)
         with(dishSpinner) {
             adapter = dishesAdapter
-            setSelection(0, false)
             onItemSelectedListener = this@AddProductToDish
             prompt = "Select dish"
             gravity = Gravity.CENTER
             id = DISH_SPINNER_ID
         }
         dishesAdapter.notifyDataSetChanged()
+
 
         unitAdapter =
             ArrayAdapter(requireActivity(), R.layout.support_simple_spinner_dropdown_item, unitList)
@@ -178,9 +189,11 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         switch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
             if (isChecked) {
                 chooseProductTextView.text = resources.getString(R.string.choose_half_product)
+                switch.text = "Switch to products"
                 productSpinner.adapter = halfProductAdapter
             } else {
                 chooseProductTextView.text = resources.getString(R.string.choose_product)
+                switch.text = "Switch to half products"
                 productSpinner.adapter = productAdapter
 
             }
@@ -276,6 +289,9 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         const val TAG = "AddProductToDish"
     }
 
+    fun isOpenedFromDishAdapter():Boolean{
+      return this.tag == "DishAdapter"
+    }
 
 }
 

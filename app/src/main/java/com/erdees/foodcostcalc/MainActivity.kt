@@ -1,6 +1,10 @@
 package com.erdees.foodcostcalc
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.MenuItem
 import android.view.View
@@ -24,6 +28,9 @@ import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.MainActivityViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.android.play.core.review.ReviewManagerFactory
+import com.google.android.play.core.review.model.ReviewErrorCode
+import com.google.android.play.core.review.testing.FakeReviewManager
 
 
 class MainActivity : AppCompatActivity() {
@@ -34,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     lateinit var backBtn: ImageButton
     lateinit var bottomNavigation: BottomNavigationView
     lateinit var menuNavigationClickListener: BottomNavigationView.OnNavigationItemSelectedListener
-
 
     private lateinit var sideNavigation : NavigationView
     private val productsFragment = Products.newInstance()
@@ -191,12 +197,16 @@ class MainActivity : AppCompatActivity() {
                         bottomNavigation.uncheckAllItems()
                         hideSearchToolbar()
                     }
-                    R.id.nav_create_half_product ->{
+                    R.id.nav_create_half_product -> {
                         openDialog(CreateHalfProduct())
                     }
-                    R.id.nav_add_product_to_half_product ->
+                    R.id.nav_add_product_to_half_product -> {
                         openDialog(AddProductToHalfProduct())
                     }
+
+
+
+                }
 
                 drawerLayout.closeDrawer(GravityCompat.START)
                 return@OnNavigationItemSelectedListener true
@@ -231,6 +241,8 @@ class MainActivity : AppCompatActivity() {
         sideNavigation = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
     }
+
+
 
 
 }

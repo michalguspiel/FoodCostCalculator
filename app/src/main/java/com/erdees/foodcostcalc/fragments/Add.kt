@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.fragments
 
 import android.annotation.SuppressLint
-import android.graphics.Path
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -74,6 +73,8 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
         val calcQuantityBox      = view.findViewById<EditText>(R.id.calc_quantity_box)
         val calcPricePerBox      = view.findViewById<EditText>(R.id.calc_price_per_box)
         val informationButton       = view.findViewById<ImageButton>(R.id.info_button)
+        val calculateWasteInfoButton = view.findViewById<ImageButton>(R.id.calculate_waste_info_button)
+        val calculatePiecePriceInfoButton = view.findViewById<ImageButton>(R.id.calculate_price_per_piece_info_button)
         scrollView = view.findViewById<ScrollView>(R.id.add_scroll_view)
 
         sharedPreferences = SharedPreferences(requireContext())
@@ -165,6 +166,16 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
 
         informationButton.setOnClickListener{
             informationDialog.show(parentFragmentManager,TAG)
+        }
+
+        calculateWasteInfoButton.setOnClickListener {
+            informationDialog.show(parentFragmentManager,"WasteCalculatorInfo")
+        }
+
+        calculatePiecePriceInfoButton.setOnClickListener {
+            informationDialog.show(parentFragmentManager,"BoxPriceCalculatorInfo")
+
+
         }
 
         return view

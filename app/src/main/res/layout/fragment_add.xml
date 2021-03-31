@@ -175,6 +175,16 @@
             android:background="@drawable/add_layouts"
             >
 
+            <ImageButton
+                android:id="@+id/calculate_waste_info_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:background="@null"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/smaller_info_button" />
+
     <TextView
         android:id="@+id/calculate_waste_tv"
         android:layout_width="wrap_content"
@@ -267,6 +277,16 @@
             android:layout_marginBottom="10dp"
             android:background="@drawable/add_layouts"
             android:padding="5dp">
+
+            <ImageButton
+                android:id="@+id/calculate_price_per_piece_info_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:background="@null"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/smaller_info_button" />
 
             <TextView
                 android:id="@+id/calculate_price_per_piece_tv"

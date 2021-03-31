@@ -59,7 +59,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         val weightEditTextField = view.findViewById<EditText>(R.id.product_weight_in_half_product)
         val halfProductSpinner = view.findViewById<Spinner>(R.id.half_product_spinner)
         val productSpinner = view.findViewById<Spinner>(R.id.product_spinner)
-        val infoButton = view.findViewById<ImageButton>(R.id.info_button)
+        val infoButton = view.findViewById<ImageButton>(R.id.calculate_waste_info_button)
         weightPerPieceEditText = view.findViewById(R.id.weight_for_piece)
         weightPerPieceEditText.visibility = View.GONE // Initially off
 
@@ -79,13 +79,19 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         val halfProductsList = mutableListOf<String>()
         viewModel.readAllHalfProductData.observe(
             viewLifecycleOwner,
-            Observer { it.forEach { halfProduct -> halfProductsList.add(halfProduct.name) } })
+            Observer { it.forEach { halfProduct -> halfProductsList.add(halfProduct.name) }
+            if(this.isOpenFromHalfProductAdapter()) {
+                val halfProductToSelect = viewModel.getHalfProductToDialog().value
+                val positionToSelect = halfProductsList.indexOf(halfProductToSelect!!.name)
+                Log.i("TEST", positionToSelect.toString())
+                halfProductSpinner.setSelection(positionToSelect)
+            }
+            })
         val halfProductAdapter =
             ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProductsList)
         with(halfProductSpinner) {
             adapter = halfProductAdapter
             id = HALFPRODUCT_SPINNER_ID
-            setSelection(0, false)
             onItemSelectedListener = this@AddProductToHalfProduct
             prompt = "choose half product"
             gravity = Gravity.CENTER
@@ -253,5 +259,9 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         this.dismiss()
+    }
+
+    fun isOpenFromHalfProductAdapter(): Boolean {
+        return this.tag == "HalfProductAdapter"
     }
 }

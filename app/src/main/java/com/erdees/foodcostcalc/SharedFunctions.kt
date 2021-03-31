@@ -114,7 +114,8 @@ fun calculatePrice(
     productUnit: String,
     chosenUnit: String
 ): Double {
-    return pricePerUnit * computeWeightAndVolumeToSameUnit(productUnit,chosenUnit,amount)
+    return if (productUnit == "per piece") pricePerUnit * amount
+    else pricePerUnit * computeWeightAndVolumeToSameUnit(productUnit,chosenUnit,amount)
 }
 
 /** Computes weight / volume to the same unit
