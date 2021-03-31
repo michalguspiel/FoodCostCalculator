@@ -29,6 +29,19 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
 
+        <ImageButton
+            android:id="@+id/add_product_to_halfproduct_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginEnd="12dp"
+            android:layout_weight="1"
+            android:background="@null"
+            android:contentDescription="@string/edit_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/edit_button_in_dish_adapter"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/add_quick_button" />
 
         <ImageButton
             android:id="@+id/edit_button_in_dish_adapter"

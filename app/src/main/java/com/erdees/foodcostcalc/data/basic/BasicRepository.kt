@@ -1,10 +1,16 @@
 package com.erdees.foodcostcalc.data.basic
 
-import com.erdees.foodcostcalc.model.HalfProductIncludedInDish
-import com.erdees.foodcostcalc.model.ProductIncluded
-import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.model.*
 
 class BasicRepository(private val basicDao: BasicDao) {
+
+    fun passDishToDialog(dish: Dish) = basicDao.passDishToDialog(dish)
+
+    fun passHalfProductToDialog(halfProduct: HalfProduct) = basicDao.passHalfProductToDialog(halfProduct)
+
+    fun getDishToDialog() = basicDao.getDishToDialog()
+
+    fun getHalfProductToDialog() = basicDao.getHalfProductToDialog()
 
     fun getProductIncludedInHalfProduct() = basicDao.getProductIncludedInHalfProduct()
 

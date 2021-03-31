@@ -175,7 +175,7 @@
         app:constraint_referenced_ids="weight_for_piece" />
 
     <ImageButton
-        android:id="@+id/info_button"
+        android:id="@+id/calculate_waste_info_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"

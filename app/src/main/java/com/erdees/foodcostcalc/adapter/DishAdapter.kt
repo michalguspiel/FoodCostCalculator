@@ -2,10 +2,12 @@ package com.erdees.foodcostcalc.adapter
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
+import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
@@ -13,12 +15,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.calculatePrice
 import com.erdees.foodcostcalc.formatPrice
+import com.erdees.foodcostcalc.fragments.dialogs.AddProductToDish
 import com.erdees.foodcostcalc.fragments.dialogs.EditDish
 import com.erdees.foodcostcalc.model.GrandDish
-import com.erdees.foodcostcalc.viewmodel.AddViewModel
-import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
+import com.google.android.play.core.review.ReviewManagerFactory
 import java.util.ArrayList
 
 
@@ -38,10 +40,12 @@ class DishAdapter(
         val dishMarginTextView: TextView = view.findViewById(R.id.dish_margin_in_adapter)
         val dishTaxTextView: TextView = view.findViewById(R.id.dish_tax_in_adapter)
         val editButton: ImageButton = view.findViewById(R.id.edit_button_in_dish_adapter)
+        val addProductsButton : ImageButton = view.findViewById(R.id.add_product_to_dish_button)
         val listView: ListView = view.findViewById(R.id.list_view)
         val totalPriceOfDish: TextView = view.findViewById(R.id.total_price_dish_card_view)
         val finalPriceWithMarginAndTax: TextView =
             view.findViewById(R.id.total_price_with_margin_dish_card_view)
+
 
         var totalPrice: Double = 0.0
     }
@@ -60,6 +64,11 @@ class DishAdapter(
 
     @SuppressLint("WrongConstant", "ShowToast", "SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
+        if(position == 5){
+            Log.i("Main Activity", "Tried to open feedback form")
+            openFeedBackForm()
+        }
+
         /**Computes height of listView based on each row height, includes dividers.
          * I'm using this approach so listView size is set and doesn't need to be scrollable. */
         fun getListSize(): Int {
@@ -111,15 +120,15 @@ class DishAdapter(
             EditDish.dishPassedFromAdapter = list[position]
         }
 
+        holder.addProductsButton.setOnClickListener{
+            viewModel.passDishToDialog(list[position].dish)
+             openDialog(AddProductToDish())
+        }
+
         /**Opening/closing list after click*/
         holder.eachLinearLayout.setOnClickListener {
             if (holder.listView.adapter == null) {
-                holder.listView.adapter = DishListViewAdapter(
-                    activity,
-                    list[position],
-                    dishListViewAdapterViewModel,
-                    viewLifecycleOwner
-                )
+                holder.listView.adapter = makeAdapterForList(position)
                 holder.listView.layoutParams =
                     LinearLayout.LayoutParams(holder.listView.layoutParams.width, getListSize())
             } else {
@@ -129,5 +138,46 @@ class DishAdapter(
             }
         }
 
+    }
+
+
+    private fun openDialog(dialog: DialogFragment) {
+        val transaction = fragmentManager.beginTransaction()
+        transaction.addToBackStack(dialog.tag)
+        dialog.show(transaction, TAG)
+    }
+
+    private fun  makeAdapterForList( position: Int): ListAdapter{
+      return DishListViewAdapter(
+            activity,
+            list[position],
+            dishListViewAdapterViewModel,
+            viewLifecycleOwner
+        )
+    }
+
+
+    private fun openFeedBackForm(){
+        Log.i("Main Activity", "review triggered!")
+        val manager = ReviewManagerFactory.create(activity)
+        val request = manager.requestReviewFlow()
+        request.addOnCompleteListener { request ->
+            if (request.isSuccessful) {
+                val reviewInfo = request.result
+                val flow = manager.launchReviewFlow(activity, reviewInfo)
+                flow.addOnCompleteListener { _ ->
+                    //Continue your application process
+                    Log.i("Main Activity", "review success!")
+                }
+            } else {
+                //Handle the error here
+                Log.i("Main Activity", "review fail!")
+
+            }
+        }
+    }
+
+    companion object {
+        const val TAG = "DishAdapter"
     }
 }

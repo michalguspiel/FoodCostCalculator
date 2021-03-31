@@ -1,10 +1,9 @@
 package com.erdees.foodcostcalc.data.basic
 
+import android.util.Half
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.erdees.foodcostcalc.model.HalfProductIncludedInDish
-import com.erdees.foodcostcalc.model.ProductIncluded
-import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.model.*
 
 class BasicDao{
     /** Data access object to basic database  */
@@ -30,6 +29,11 @@ class BasicDao{
     private var halfProductIncluded : HalfProductIncludedInDish? = null
     private val halfProductIncludedLive = MutableLiveData<HalfProductIncludedInDish>()
 
+    private var dishPassedToDialog : Dish? = null
+    private val dishPassedToDialogLive = MutableLiveData<Dish>()
+
+    private var halfProductPassedToDialog : HalfProduct? = null
+    private val halfProductPassedToDialogLive = MutableLiveData<HalfProduct>()
 
     init {
         position.value = mutablePosition
@@ -39,7 +43,23 @@ class BasicDao{
         searchWordLive.value = searchWord
         productIncludedInHalfProductLive.value = productIncludedInHalfProduct
         halfProductIncludedLive.value = halfProductIncluded
+
+        dishPassedToDialogLive.value = dishPassedToDialog
+        halfProductPassedToDialogLive.value = halfProductPassedToDialog
     }
+
+    fun passDishToDialog(dish: Dish) {
+        dishPassedToDialog = dish
+        dishPassedToDialogLive.value = dishPassedToDialog
+    }
+    fun getDishToDialog() = dishPassedToDialogLive as LiveData<Dish>
+
+    fun passHalfProductToDialog(halfProduct: HalfProduct) {
+        halfProductPassedToDialog = halfProduct
+        halfProductPassedToDialogLive.value = halfProductPassedToDialog
+    }
+    fun getHalfProductToDialog() = halfProductPassedToDialogLive as LiveData<HalfProduct>
+
 
     fun setProductIncludedInHalfProduct(product: ProductIncludedInHalfProduct){
         productIncludedInHalfProduct = product

@@ -13,6 +13,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
 import com.erdees.foodcostcalc.fragments.dialogs.EditHalfProduct
 import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
@@ -33,6 +34,7 @@ class HalfProductAdapter(
 
         val halfProductName: TextView = view.findViewById(R.id.half_product_name_in_adapter)
         val editButton: ImageButton = view.findViewById(R.id.edit_button_in_dish_adapter)
+        val addProductButton : ImageButton = view.findViewById(R.id.add_product_to_halfproduct_button)
         val listView: ListView = view.findViewById(R.id.list_view)
         val unitOfHalfProduct: TextView =
             view.findViewById(R.id.unit_to_populate_half_product_card_view)
@@ -76,6 +78,12 @@ class HalfProductAdapter(
             EditHalfProduct.halfProductPassedFromAdapter = list[position]
         }
 
+        holder.addProductButton.setOnClickListener {
+            AddProductToHalfProduct().show(fragmentManager,TAG)
+            viewModel.passHalfProductToDialog(list[position].halfProduct)
+
+        }
+
         holder.eachLinearLayout.setOnClickListener {
             if (holder.listView.adapter == null) {
                 holder.listView.adapter =
@@ -96,5 +104,8 @@ class HalfProductAdapter(
         return list.size
     }
 
+    companion object{
+        const val TAG = "HalfProductAdapter"
+    }
 
 }
