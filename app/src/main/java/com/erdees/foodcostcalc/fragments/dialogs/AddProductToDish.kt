@@ -224,7 +224,16 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
             if (weightOfAddedProduct.text.isNullOrEmpty()) {
                 showToast(message = "You can't add product without weight.")
-            } else if (!switch.isChecked) {
+            }
+            if(viewModel.readAllDishData.value.isNullOrEmpty()){
+                showToast(message = "You must pick a dish.")
+            }
+
+            else if (!switch.isChecked) {
+                if(viewModel.readAllProductData.value.isNullOrEmpty()){
+                    showToast(message = "You must pick a product.")
+                    return@setOnClickListener
+                }
                 val chosenDish = viewModel.readAllDishData.value?.get(dishPosition!!)
                 val weight = weightOfAddedProduct.text.toString().toDouble()
 
@@ -248,9 +257,13 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
+                if(viewModel.getHalfProducts().value.isNullOrEmpty()){
+                    showToast(message = "You must pick a product.")
+                    return@setOnClickListener
+                }
                 val chosenDish = viewModel.readAllDishData.value?.get(dishPosition!!)
                 val weight = weightOfAddedProduct.text.toString().toDouble()
-                viewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
+                viewModel.getHalfProducts().observe(viewLifecycleOwner,  { halfProduct ->
                     halfProductToAdd = halfProduct[productPosition!!]
                 })
 
@@ -289,7 +302,7 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         const val TAG = "AddProductToDish"
     }
 
-    fun isOpenedFromDishAdapter():Boolean{
+    private fun isOpenedFromDishAdapter():Boolean{
       return this.tag == "DishAdapter"
     }
 

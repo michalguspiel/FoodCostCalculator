@@ -8,7 +8,9 @@ import java.text.NumberFormat
 
 /**Grand dish represents biggest data model in this app,
  * its made of DishWithProductsIncluded which includes: Dish,ProductsIncluded,Products
- * and DishWithHalfProduct which includes: Dish,HalfProduct,ProductsIncludedInHalfProduct,Products,ProductsIncluded*/
+ * and DishWithHalfProduct which includes: Dish,HalfProduct,ProductsIncludedInHalfProduct,Products,ProductsIncluded
+ *
+ * So You can basically think of it as Dish which has products but also half products*/
 data class GrandDish (
     @Embedded val dish : Dish,
     @Relation(parentColumn = "dishId",
@@ -20,15 +22,5 @@ data class GrandDish (
 ){
     @Ignore
     val totalPrice:Double = productsIncluded.map { it.totalPriceOfThisProduct }.sum()
-    @Ignore
-    val formattedTotalPrice = NumberFormat.getCurrencyInstance().format(totalPrice)
-    @Ignore
-    val priceWithMargin = totalPrice * this.dish.marginPercent / 100
-    @Ignore
-    val formattedPriceWithMargin = formatPriceOrWeight(priceWithMargin)
-    @Ignore
-    val priceWithMarginAndTax = priceWithMargin + (priceWithMargin * this.dish.dishTax / 100)
-    @Ignore
-    val formattedPriceWithMarginAndTax = NumberFormat.getCurrencyInstance().format(priceWithMarginAndTax)
 
 }

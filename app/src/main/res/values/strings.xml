@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FoodCostCalc</string>
+    <string name="app_name">Food Cost Calculator</string>
     <string name="add_stuff">Add product to your list</string>
     <string name="name">Product name</string>
     <string name="price">Price</string>

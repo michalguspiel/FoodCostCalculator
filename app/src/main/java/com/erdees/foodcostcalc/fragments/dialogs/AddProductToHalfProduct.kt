@@ -10,6 +10,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
@@ -22,21 +23,18 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
     private val UNIT_SPINNER_ID = 3
     private var productPosition: Int? = null
     private var halfProductPosition: Int? = null
-    private val unitList = arrayListOf<String>() // list for units, to populate spinner
+    private val unitList = arrayListOf<String>()
     private var chosenUnit: String = ""
 
-    private var halfProductUnit     = ""
-    private var chosenProductName   = ""
+    private var halfProductUnit = ""
+    private var chosenProductName = ""
     private var halfProductUnitType = ""
 
-    /**Holder for type of units*/
     private var unitType = ""
 
-    /**Holder for booleans*/
     private var metricAsBoolean = true
     private var usaAsBoolean = true
 
-    /** Initialized here so it can be called outside of 'onCreateView' */
     lateinit var viewModel: AddProductToHalfProductViewModel
     private lateinit var unitAdapter: ArrayAdapter<*>
     private lateinit var unitSpinner: Spinner
@@ -66,7 +64,6 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         unitSpinner = view.findViewById(R.id.unit_spinner)
 
 
-
         /** Get the data about unit settings from shared preferences.
          * true means that user uses certain units.
          * metricAsBoolean is set as true because something needs to be chosen in order for app to work.*/
@@ -79,13 +76,14 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         val halfProductsList = mutableListOf<String>()
         viewModel.readAllHalfProductData.observe(
             viewLifecycleOwner,
-            Observer { it.forEach { halfProduct -> halfProductsList.add(halfProduct.name) }
-            if(this.isOpenFromHalfProductAdapter()) {
-                val halfProductToSelect = viewModel.getHalfProductToDialog().value
-                val positionToSelect = halfProductsList.indexOf(halfProductToSelect!!.name)
-                Log.i("TEST", positionToSelect.toString())
-                halfProductSpinner.setSelection(positionToSelect)
-            }
+             {
+                it.forEach { halfProduct -> halfProductsList.add(halfProduct.name) }
+                if (this.isOpenFromHalfProductAdapter()) {
+                    val halfProductToSelect = viewModel.getHalfProductToDialog().value
+                    val positionToSelect = halfProductsList.indexOf(halfProductToSelect!!.name)
+                    Log.i("TEST", positionToSelect.toString())
+                    halfProductSpinner.setSelection(positionToSelect)
+                }
             })
         val halfProductAdapter =
             ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProductsList)
@@ -101,7 +99,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         val productList = mutableListOf<String>()
         viewModel.readAllProductData.observe(
             viewLifecycleOwner,
-            Observer { it.forEach { product -> productList.add(product.name) } })
+             { it.forEach { product -> productList.add(product.name) } })
         val productAdapter = ArrayAdapter(requireActivity(), R.layout.spinner_layout, productList)
         with(productSpinner)
         {
@@ -133,7 +131,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
 
         viewModel.readAllProductData.observe(
             viewLifecycleOwner,
-            Observer { products ->
+             { products ->
                 productAdapter.clear()
                 products.forEach { product ->
                     productAdapter.add(product.name)
@@ -143,7 +141,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
 
         viewModel.readAllHalfProductData.observe(
             viewLifecycleOwner,
-            Observer { halfProducts ->
+             { halfProducts ->
                 halfProductAdapter.clear()
                 halfProducts.forEach { halfProduct ->
                     halfProductAdapter.add(halfProduct.name)
@@ -156,13 +154,16 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
 
 
         addProductButton.setOnClickListener {
+
+            if (eitherOfSpinnersIsEmpty()) {
+                showToast(message = "You must pick half product and product.")
+                return@setOnClickListener
+            }
             if (weightEditTextField.text.isNullOrEmpty()) {
-                Toast.makeText(
-                    requireContext(),
-                    "You can't add product without weight.",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
+                showToast(message = "You can't add product without weight.")
+                return@setOnClickListener
+            }
+            else {
                 val chosenHalfProduct =
                     viewModel.readAllHalfProductData.value?.get(
                         halfProductPosition!!
@@ -171,12 +172,9 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                     viewModel.readAllProductData.value?.get(productPosition!!)
                 val weight = weightEditTextField.text.toString().toDouble()
                 if (!isHalfProductPiece && isProductPiece && weightPerPieceEditText.text.isEmpty()) {
-                    Toast.makeText(
-                        requireContext(),
-                        "You need to provide $halfProductUnitType of this product!",
-                        Toast.LENGTH_LONG
-                    ).show()
-                } else {
+                    showToast(message = "You need to provide $halfProductUnitType of this product!")
+                }
+                else {
                     viewModel.addProductIncludedInHalfProduct(
                         ProductIncludedInHalfProduct(
                             0,
@@ -185,17 +183,12 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                             chosenHalfProduct.halfProductId,
                             weight,
                             chosenUnit,
-                            if (!isHalfProductPiece && isProductPiece) weightPerPieceEditText.text.toString().toDouble() else 1.0
+                            if (!isHalfProductPiece && isProductPiece) weightPerPieceEditText.text.toString()
+                                .toDouble() else 1.0
                         )
                     )
-
-
                     weightEditTextField.text.clear()
-                    Toast.makeText(
-                        requireContext(),
-                        "${viewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showToast(message = "${viewModel.readAllProductData.value?.get(productPosition!!)?.name} added.")
                 }
             }
 
@@ -215,10 +208,24 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
     }
 
 
-    fun setTextField() {
+    private fun eitherOfSpinnersIsEmpty(): Boolean {
+        return (viewModel.readAllProductData.value.isNullOrEmpty() || viewModel.readAllHalfProductData.value.isNullOrEmpty())
+
+    }
+
+    private fun showToast(
+        context: FragmentActivity? = activity,
+        message: String,
+        duration: Int = Toast.LENGTH_LONG
+    ) {
+        Toast.makeText(context, message, duration).show()
+    }
+
+    private fun setTextField() {
         if (isProductPiece && !isHalfProductPiece) {
             weightPerPieceEditText.visibility = View.VISIBLE
-            weightPerPieceEditText.hint = "$chosenProductName ${transformPerUnitToDescription(halfProductUnit)}."
+            weightPerPieceEditText.hint =
+                "$chosenProductName ${transformPerUnitToDescription(halfProductUnit)}."
         } else weightPerPieceEditText.visibility = View.GONE
     }
 
@@ -261,7 +268,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         this.dismiss()
     }
 
-    fun isOpenFromHalfProductAdapter(): Boolean {
+    private fun isOpenFromHalfProductAdapter(): Boolean {
         return this.tag == "HalfProductAdapter"
     }
 }

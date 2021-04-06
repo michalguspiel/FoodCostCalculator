@@ -61,7 +61,7 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
 
 
 
-        chosenUnit = unitList.first() // TODO Without this line while dialog opened nothing is selected, no idea why setSelection above is not working... ill fix it later
+        chosenUnit = unitList.first()
 
 
         /** BUTTON LOGIC*/

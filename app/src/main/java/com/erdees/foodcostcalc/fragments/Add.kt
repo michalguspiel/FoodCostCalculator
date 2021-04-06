@@ -32,10 +32,20 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
     private val spinnerId = 1
     private val informationDialog = InformationDialog()
 
+
+    private lateinit var calcPricePerBox : EditText
+    private lateinit var price : TextInputEditText
+    private lateinit var waste : TextInputEditText
+    private lateinit var calculateWasteBtn : Button
+    private lateinit var calcPricePerPieceBtn : Button
+    private lateinit var calcProductWeight : EditText
+    private lateinit var calcQuantityBox : EditText
+    private lateinit var calcWasteWeight : EditText
+
+
     private fun showToast(context: FragmentActivity? = activity, message: String, duration: Int = Toast.LENGTH_LONG) {
         Toast.makeText(context, message, duration).show()
     }
-
 
     override fun onResume() {
         /**Spinner adapter*/
@@ -62,62 +72,25 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
 
         /** BINDERS FOR BUTTONS AND FIELDS */
         val name = view.findViewById<TextInputEditText>(R.id.product_name)
-        val price = view.findViewById<TextInputEditText>(R.id.product_price)
+         price = view.findViewById(R.id.product_price)
         val tax = view.findViewById<TextInputEditText>(R.id.product_tax)
-        val waste = view.findViewById<TextInputEditText>(R.id.product_waste)
+         waste = view.findViewById(R.id.product_waste)
         val addButton = view.findViewById<Button>(R.id.addProduct)
-        val calculateWasteBtn = view.findViewById<Button>(R.id.count_waste_percent_btn)
-        val calcWasteWeight = view.findViewById<EditText>(R.id.waste_calc_product_waste)
-        val calcProductWeight = view.findViewById<EditText>(R.id.waste_calc_product_weight)
-        val calcPricePerPieceBtn = view.findViewById<Button>(R.id.count_price_per_piece_btn)
-        val calcQuantityBox      = view.findViewById<EditText>(R.id.calc_quantity_box)
-        val calcPricePerBox      = view.findViewById<EditText>(R.id.calc_price_per_box)
+         calculateWasteBtn = view.findViewById(R.id.count_waste_percent_btn)
+         calcWasteWeight = view.findViewById(R.id.waste_calc_product_waste)
+         calcProductWeight = view.findViewById(R.id.waste_calc_product_weight)
+         calcPricePerPieceBtn = view.findViewById(R.id.count_price_per_piece_btn)
+         calcQuantityBox      = view.findViewById(R.id.calc_quantity_box)
+         calcPricePerBox      = view.findViewById(R.id.calc_price_per_box)
         val informationButton       = view.findViewById<ImageButton>(R.id.info_button)
         val calculateWasteInfoButton = view.findViewById<ImageButton>(R.id.calculate_waste_info_button)
         val calculatePiecePriceInfoButton = view.findViewById<ImageButton>(R.id.calculate_price_per_piece_info_button)
-        scrollView = view.findViewById<ScrollView>(R.id.add_scroll_view)
+        scrollView = view.findViewById(R.id.add_scroll_view)
 
         sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources,sharedPreferences)
         unitSpinner = view.findViewById(R.id.units_spinner)
 
-
-
-
-
-        /**Functions*/
-
-
-        fun  formatResultAndCheckCommas(number: Double):String {
-            val df = DecimalFormat("#.##")
-            df.roundingMode = RoundingMode.CEILING
-            val formattedResult = df.format(number)
-            var formattedResultCheck = ""
-            for (eachChar in formattedResult) {
-                formattedResultCheck += if (eachChar == ',') '.'
-                else eachChar
-            }
-            return formattedResultCheck
-        }
-
-        /** Calculates waste % from given product weight and waste weight,
-         * formattedResultCheck works as safety for devices that formats number to
-         * for example 21,21 */
-        fun calculateWaste(calcWeight: Double, calcWaste: Double): String {
-                val result = (100 * calcWaste) / calcWeight
-                waste.setText(formatResultAndCheckCommas(result))
-                calcProductWeight.text.clear()
-                calcWasteWeight.text.clear()
-                return formatResultAndCheckCommas(result) // returns this only in order to test it
-            }
-
-
-        fun calculatePricePerPiece(pricePerBox: Double,quantityInBox: Double){
-          val result = pricePerBox/quantityInBox
-          price.setText(formatResultAndCheckCommas(result))
-          calcPricePerBox.text.clear()
-          calcQuantityBox.text.clear()
-        }
 
 
         /** BUTTONS FUNCTIONALITY */
@@ -186,10 +159,37 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
         const val TAG = "Add"
     }
 
-    fun scrollUp(){
-        scrollView.fullScroll(ScrollView.FOCUS_UP)
+
+    /**Because some devices format number with commas which causes errors.*/
+    private fun  formatResultAndCheckCommas(number: Double):String {
+        val df = DecimalFormat("#.##")
+        df.roundingMode = RoundingMode.CEILING
+        val formattedResult = df.format(number)
+        var formattedResultCheck = ""
+        for (eachChar in formattedResult) {
+            formattedResultCheck += if (eachChar == ',') '.'
+            else eachChar
+        }
+        return formattedResultCheck
     }
 
+    private fun calculateWaste(calcWeight: Double, calcWaste: Double) {
+        val result = (100 * calcWaste) / calcWeight
+        waste.setText(formatResultAndCheckCommas(result))
+        calcProductWeight.text.clear()
+        calcWasteWeight.text.clear()
+    }
+
+    private fun calculatePricePerPiece(pricePerBox: Double, quantityInBox: Double){
+        val result = pricePerBox/quantityInBox
+        price.setText(formatResultAndCheckCommas(result))
+        calcPricePerBox.text.clear()
+        calcQuantityBox.text.clear()
+    }
+
+    private fun scrollUp(){
+        scrollView.fullScroll(ScrollView.FOCUS_UP)
+    }
 
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -197,17 +197,12 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
             spinnerId -> {
                 Log.i(TAG,"ITEM SELECTED DOES IT WORK??")
                 chosenUnit = unitList[position]
-
             }
             else -> {
                 Log.i(TAG,"ANNOTHER CLICKED BUT WHY? + " + parent?.id + id)
                 chosenUnit = unitList[position]
             }
         }
-
     }
-
-
-
 }
 

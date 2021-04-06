@@ -54,9 +54,6 @@ class Settings : Fragment() {
             Toast.makeText(requireContext(),"Settings saved!",Toast.LENGTH_SHORT).show()
         }
 
-
-
-
         return view
 
     }

@@ -35,6 +35,16 @@ class BasicDao{
     private var halfProductPassedToDialog : HalfProduct? = null
     private val halfProductPassedToDialogLive = MutableLiveData<HalfProduct>()
 
+    private var openAddFlag: Boolean = false
+    private val openAddFlagLive = MutableLiveData<Boolean>()
+
+    private var openCreateDishFlag: Boolean = false
+    private val openCreateDishFlagLive = MutableLiveData<Boolean>()
+
+    private var openCreateHalfProductFlag: Boolean = false
+    private val openCreateHalfProductFlagLive = MutableLiveData<Boolean>()
+
+
     init {
         position.value = mutablePosition
         secondPosition.value = secondMutablePosition
@@ -43,10 +53,36 @@ class BasicDao{
         searchWordLive.value = searchWord
         productIncludedInHalfProductLive.value = productIncludedInHalfProduct
         halfProductIncludedLive.value = halfProductIncluded
+        openAddFlagLive.value = openAddFlag
+        openCreateDishFlagLive.value = openCreateDishFlag
+        openCreateHalfProductFlagLive.value = openCreateHalfProductFlag
 
         dishPassedToDialogLive.value = dishPassedToDialog
         halfProductPassedToDialogLive.value = halfProductPassedToDialog
     }
+
+
+
+    fun setOpenAddFlag(boolean: Boolean){
+        openAddFlag = boolean
+        openAddFlagLive.value = openAddFlag
+    }
+
+    fun observeOpenAddFlag() = openAddFlagLive as LiveData<Boolean>
+
+    fun setOpenCreateDishFlag(boolean: Boolean){
+        openCreateDishFlag = boolean
+        openCreateDishFlagLive.value = openCreateDishFlag
+    }
+    fun observeOpenCreateDishFlag() = openCreateDishFlagLive as LiveData<Boolean>
+
+    fun setOpenCreateHalfProductFlag(boolean: Boolean){
+        openCreateHalfProductFlag = boolean
+        openCreateHalfProductFlagLive.value = openCreateHalfProductFlag
+    }
+
+    fun observeOpenCreateHalfProductFlag() = openCreateHalfProductFlagLive as LiveData<Boolean>
+
 
     fun passDishToDialog(dish: Dish) {
         dishPassedToDialog = dish

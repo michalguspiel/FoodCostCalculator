@@ -4,6 +4,15 @@ import com.erdees.foodcostcalc.model.*
 
 class BasicRepository(private val basicDao: BasicDao) {
 
+    fun setOpenAddFlag(boolean: Boolean) = basicDao.setOpenAddFlag(boolean)
+    fun observeOpenAddFlag() = basicDao.observeOpenAddFlag()
+
+    fun setOpenCreateDishFlag(boolean: Boolean) = basicDao.setOpenCreateDishFlag(boolean)
+    fun observeOpenCreateDishFlag() = basicDao.observeOpenCreateDishFlag()
+
+    fun setOpenCreateHalfProductFlag(boolean: Boolean) = basicDao.setOpenCreateHalfProductFlag(boolean)
+    fun observeOpenCreateHalfProductFlag() = basicDao.observeOpenCreateHalfProductFlag()
+
     fun passDishToDialog(dish: Dish) = basicDao.passDishToDialog(dish)
 
     fun passHalfProductToDialog(halfProduct: HalfProduct) = basicDao.passHalfProductToDialog(halfProduct)

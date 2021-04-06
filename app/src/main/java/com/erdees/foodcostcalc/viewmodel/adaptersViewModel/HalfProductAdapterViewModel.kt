@@ -20,6 +20,8 @@ class HalfProductAdapterViewModel(application: Application):AndroidViewModel(app
         basicRepository = BasicRepository(basicDao)
     }
 
+    fun setOpenCreateHalfProductFlag(boolean: Boolean) = basicRepository.setOpenCreateHalfProductFlag(boolean)
+
     fun passHalfProductToDialog(halfProduct: HalfProduct) = basicRepository.passHalfProductToDialog(halfProduct)
 
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long)
