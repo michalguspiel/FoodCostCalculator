@@ -99,7 +99,7 @@ class EditDishAdapter(
                 }
                 override fun beforeTextChanged(
                     s: CharSequence, start: Int,
-                    count: Int, after: Int // TODO FIX
+                    count: Int, after: Int
                 ) {
                 }
 

@@ -11,6 +11,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.RecyclerViewAdapter
 import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.viewmodel.ProductsViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
 import java.util.ArrayList
 
 
@@ -22,29 +23,22 @@ class Products : Fragment() {
             savedInstanceState: Bundle?
     ): View {
         val view: View = inflater.inflate(R.layout.fragment_products, container, false)
-
-        /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(ProductsViewModel::class.java)
-
-        /**Implementing adapter for recycler view. */
+        val viewModelPassedToRecycler = ViewModelProvider(this).get(RecyclerViewAdapterViewModel::class.java)
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_products)
         recyclerView.setHasFixedSize(true)
-        viewModel.getWhatToSearchFor().observe(viewLifecycleOwner,{word ->
 
+        viewModel.getWhatToSearchFor().observe(viewLifecycleOwner,{searchWord ->
             viewModel.readAllProductData.observe(viewLifecycleOwner,  { products ->
-            val data = mutableListOf<Product>()
-            products.forEach { data.add(it) }
+            val listOfProducts = mutableListOf<Product>()
+            products.forEach { listOfProducts.add(it) }
             recyclerView.adapter = RecyclerViewAdapter(TAG,
-                    data.filter { it.name.toLowerCase().contains(word.toLowerCase()) } as ArrayList<Product>
-                    , childFragmentManager)
-
+                    listOfProducts.filter { it.name.toLowerCase().contains(searchWord.toLowerCase()) } as ArrayList<Product>
+                    , childFragmentManager,viewModelPassedToRecycler)
         })
-
         })
-
         return view
     }
-
     companion object {
         fun newInstance(): Products = Products()
         const val TAG = "Products"

@@ -18,6 +18,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.fragments.*
 import com.erdees.foodcostcalc.fragments.dialogs.AddProductToDish
@@ -35,22 +36,23 @@ import com.google.android.play.core.review.testing.FakeReviewManager
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var searchBtn: ImageButton
-    lateinit var menuBtn: ImageButton
-    lateinit var searchTextField: EditText
-    lateinit var backBtn: ImageButton
-    lateinit var bottomNavigation: BottomNavigationView
-    lateinit var menuNavigationClickListener: BottomNavigationView.OnNavigationItemSelectedListener
-
+    /**Button binders*/
+    private lateinit var searchBtn: ImageButton
+    private lateinit var menuBtn: ImageButton
+    private lateinit var searchTextField: EditText
+    private lateinit var backBtn: ImageButton
+    private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var menuNavigationClickListener: BottomNavigationView.OnNavigationItemSelectedListener
     private lateinit var sideNavigation : NavigationView
+    private lateinit var drawerLayout: DrawerLayout
+    /**Fragments instances*/
     private val productsFragment = Products.newInstance()
     private val dishesFragment = Dishes.newInstance()
     private val addFragment = Add.newInstance()
     private val settingsFragment = Settings.newInstance()
     private val halfProductsFragment = HalfProducts.newInstance()
-    private lateinit var drawerLayout: DrawerLayout
-    /**Uncheck all items in menu*/
-    fun BottomNavigationView.uncheckAllItems() {
+
+    private fun BottomNavigationView.uncheckAllItems() {
         menu.setGroupCheckable(0, true, false)
         for (i in 0 until menu.size()) {
             menu.getItem(i).isChecked = false
@@ -73,44 +75,61 @@ class MainActivity : AppCompatActivity() {
         searchTextField.hint = "Search by name"
     }
 
+    private fun openAdd(){
+        replaceFragment(addFragment,Add.TAG)
+        bottomNavigation.uncheckAllItems()
+        hideSearchToolbar()
+    }
+
+
+    private fun checkIfSearchToolIsUsed():Boolean{
+        return searchTextField.isVisible && searchTextField.text.isNotEmpty()
+    }
+
     override fun onBackPressed() {
-        if(sideNavigation.isVisible){ // if side navigation is open close it
-            drawerLayout.closeDrawer(Gravity.LEFT)
-            return
-        }
-        if (searchTextField.isVisible && searchTextField.text.isNotEmpty()) {
-            backBtn.performClick()
-        } else if (supportFragmentManager.backStackEntryCount == 1) {
-            finish()
-        } else {
-            super.onBackPressed()
-            backBtn.performClick() //clear search bar
-            when (supportFragmentManager.fragments.last()) { // to setup correct toolbar
-                addFragment -> {
-                    hideSearchToolbar()
-                    bottomNavigation.uncheckAllItems()
-                }
-                settingsFragment -> {
-                    hideSearchToolbar()
-                    bottomNavigation.uncheckAllItems()
-                }
-                dishesFragment -> {
-                    setSearchToolbar()
-                    bottomNavigation.selectedItemId = R.id.navigation_dishes
-                }
-                halfProductsFragment -> {
-                    setSearchToolbar()
-                    bottomNavigation.selectedItemId = R.id.navigation_half_products
-                }
-                productsFragment -> {
-                    setSearchToolbar()
-                    bottomNavigation.selectedItemId = R.id.navigation_products
+        when {
+            sideNavigation.isVisible -> {
+                drawerLayout.closeDrawer(Gravity.LEFT)
+                return
+            }
+            checkIfSearchToolIsUsed() -> {
+                backBtn.performClick()
+                return
+            }
+            supportFragmentManager.backStackEntryCount == 1 -> {
+                finish()
+            }
+            else -> {
+                super.onBackPressed()
+                backBtn.performClick() // to clear search bar
+                when (supportFragmentManager.fragments.last()) { // to setup correct toolbar
+                    addFragment -> {
+                        hideSearchToolbar()
+                        bottomNavigation.uncheckAllItems()
+                    }
+                    settingsFragment -> {
+                        hideSearchToolbar()
+                        bottomNavigation.uncheckAllItems()
+                    }
+                    dishesFragment -> {
+                        setSearchToolbar()
+                        bottomNavigation.selectedItemId = R.id.navigation_dishes
+                    }
+                    halfProductsFragment -> {
+                        setSearchToolbar()
+                        bottomNavigation.selectedItemId = R.id.navigation_half_products
+                    }
+                    productsFragment -> {
+                        setSearchToolbar()
+                        bottomNavigation.selectedItemId = R.id.navigation_products
+                    }
                 }
             }
         }
     }
 
-    private fun replaceFragment(fragment: Fragment, fragmentTag: String) {
+
+     private fun replaceFragment(fragment: Fragment, fragmentTag: String) {
         val backStateName = fragment.javaClass.name
         val manager: FragmentManager = supportFragmentManager
         val fragmentPopped = manager.popBackStackImmediate(backStateName, 0)
@@ -133,18 +152,13 @@ class MainActivity : AppCompatActivity() {
         dialog.show(transaction, dialog.tag)
     }
 
-
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
-
-
         bottomNavigation = findViewById(R.id.navigationView)
+
         /** Toolbar  */
         menuBtn = findViewById(R.id.side_menu_button)
         searchBtn = findViewById(R.id.search_button)
@@ -169,11 +183,29 @@ class MainActivity : AppCompatActivity() {
         }
 
 
+
+
+        /**Listen to viewmodel signals to open fragments or dialog fragments.*/
+        viewModel.observeOpenAddFlag().observe(this, { shouldAddBeOpened ->
+            if(shouldAddBeOpened){
+               openAdd()
+            }
+        })
+        viewModel.observeOpenCreateDishFlag().observe(this,{shouldCreateDishBeOpened ->
+            if(shouldCreateDishBeOpened){
+                openDialog(CreateDish())
+            }
+        })
+        viewModel.observeOpenCreateHalfProductFlag().observe(this,{shouldCreateHalfProductBeOpened ->
+            if(shouldCreateHalfProductBeOpened){
+                openDialog(CreateHalfProduct())
+            }
+        })
+
+
         /**Side drawer menu */
         drawerLayout = findViewById(R.id.drawer_layout)
-
         val toggle = ActionBarDrawerToggle(this, drawerLayout, 0, 0)
-
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
 
@@ -181,10 +213,7 @@ class MainActivity : AppCompatActivity() {
             NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
                 when (item.itemId) {
                     R.id.nav_add_product -> {
-                        replaceFragment(addFragment, Add.TAG)
-                        bottomNavigation.uncheckAllItems()
-                        hideSearchToolbar()
-
+                       openAdd()
                     }
                     R.id.nav_create_new_dish -> {
                         openDialog(CreateDish())
@@ -203,11 +232,7 @@ class MainActivity : AppCompatActivity() {
                     R.id.nav_add_product_to_half_product -> {
                         openDialog(AddProductToHalfProduct())
                     }
-
-
-
                 }
-
                 drawerLayout.closeDrawer(GravityCompat.START)
                 return@OnNavigationItemSelectedListener true
             }
@@ -236,13 +261,7 @@ class MainActivity : AppCompatActivity() {
             }
         replaceFragment(productsFragment, Products.TAG)
         bottomNavigation.setOnNavigationItemSelectedListener(menuNavigationClickListener)
-
-
         sideNavigation = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
     }
-
-
-
-
 }

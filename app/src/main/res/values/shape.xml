@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<style name="ShapeAppearance.Sunflower.Card" parent="ShapeAppearance.MaterialComponents">
+    <item name="cornerFamily">rounded</item>
+
+    <item name="cornerSizeTopLeft">16dp</item>
+    <item name="cornerSizeTopRight">4dp</item>
+    <item name="cornerSizeBottomRight">16dp</item>
+    <item name="cornerSizeBottomLeft">4dp</item>
+</style>
+</resources>

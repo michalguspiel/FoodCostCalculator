@@ -19,6 +19,7 @@ class DishAdapterViewModel(application: Application):AndroidViewModel(applicatio
         basicRepository = BasicRepository(basicDao)
     }
 
+    fun setOpenCreateDishFlag(boolean: Boolean) = basicRepository.setOpenCreateDishFlag(boolean)
 
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long)
             = halfProductWithProductsIncludedRepository.getCertainHalfProductWithProductsIncluded(halfProductId)
