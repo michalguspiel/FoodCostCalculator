@@ -111,7 +111,7 @@ RecyclerView.Adapter<EditHalfProductAdapter.EditHalfProductHolder>(){
 
                 override fun onTextChanged(s: CharSequence, start: Int,
                                            before: Int, count: Int) {
-                    if (s.isNotEmpty()) {
+                    if (s.isNotEmpty() && s.toString() != ".") {
                         cloneOfList[position].weight = s.toString().toDouble()
                     }
                 }

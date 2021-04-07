@@ -159,7 +159,7 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
                 showToast(message = "You must pick half product and product.")
                 return@setOnClickListener
             }
-            if (weightEditTextField.text.isNullOrEmpty()) {
+            else if (weightEditTextField.text.isNullOrEmpty() || weightEditTextField.text.toString() == "." ) {
                 showToast(message = "You can't add product without weight.")
                 return@setOnClickListener
             }
