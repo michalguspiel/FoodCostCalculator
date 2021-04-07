@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -23,6 +24,9 @@ import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewMo
 class EditDish : DialogFragment() {
 
     lateinit var recyclerAdapter : EditDishAdapter
+    lateinit var name : EditText
+    lateinit var marginEditText: EditText
+    lateinit var taxEditText: EditText
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -34,9 +38,9 @@ class EditDish : DialogFragment() {
         /** initialize ui with viewmodel*/
         val viewModel = ViewModelProvider(this).get(EditDishViewModel::class.java)
 
-        val name = view.findViewById<EditText>(R.id.edit_dish_name)
-        val marginEditText = view.findViewById<EditText>(R.id.edit_margin)
-        val taxEditText = view.findViewById<EditText>(R.id.edit_dish_tax)
+        name = view.findViewById(R.id.edit_dish_name)
+        marginEditText = view.findViewById(R.id.edit_margin)
+        taxEditText = view.findViewById(R.id.edit_dish_tax)
 
 
         /**Recycler adapter gets populated with GrandDish which
@@ -76,17 +80,21 @@ class EditDish : DialogFragment() {
 
         /** BUTTON LOGIC*/
 
+
         saveBtn.setOnClickListener {
-            recyclerAdapter.save(
-                Dish(
-                    dishPassedFromAdapter.dish.dishId,
-                    name.text.toString(),
-                    marginEditText.text.toString().toDouble(),
-                    taxEditText.text.toString().toDouble()
+            if(allFieldsAreLegit()) {
+                recyclerAdapter.save(
+                    Dish(
+                        dishPassedFromAdapter.dish.dishId,
+                        name.text.toString(),
+                        marginEditText.text.toString().toDouble(),
+                        taxEditText.text.toString().toDouble()
+                    )
                 )
-            )
-            this.dismiss()
-        }
+                this.dismiss()
+            }
+            else Toast.makeText(requireContext(),"Can't leave empty fields", Toast.LENGTH_SHORT).show()
+            }
 
         deleteBtn.setOnClickListener {
             Log.i("test", viewModel.getPosition().value.toString())
@@ -103,8 +111,13 @@ class EditDish : DialogFragment() {
     companion object {
         fun newInstance(): EditDish =
             EditDish()
-
         const val TAG = "EditDish"
         lateinit var dishPassedFromAdapter: GrandDish
+    }
+
+    private fun allFieldsAreLegit():Boolean{
+        return (!name.text.isNullOrBlank() &&
+                !marginEditText.text.isNullOrBlank() && marginEditText.text.toString() != "." &&
+                !taxEditText.text.isNullOrBlank() && taxEditText.text.toString() != ".")
     }
 }

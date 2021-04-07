@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
@@ -47,15 +48,6 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     /**Holder for type of units*/
     private var unitType = ""
-
-
-    private fun showToast(
-        context: FragmentActivity? = activity,
-        message: String,
-        duration: Int = Toast.LENGTH_LONG
-    ) {
-        Toast.makeText(context, message, duration).show()
-    }
 
 
     /**Spinner implementation */
@@ -222,13 +214,12 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
         /** BUTTON LOGIC*/
         addProductToDishBtn.setOnClickListener {
 
-            if (weightOfAddedProduct.text.isNullOrEmpty()) {
+            if (weightOfAddedProduct.text.isNullOrEmpty() || weightOfAddedProduct.text.toString() == ".") {
                 showToast(message = "You can't add product without weight.")
             }
-            if(viewModel.readAllDishData.value.isNullOrEmpty()){
+            else if(viewModel.readAllDishData.value.isNullOrEmpty()){
                 showToast(message = "You must pick a dish.")
             }
-
             else if (!switch.isChecked) {
                 if(viewModel.readAllProductData.value.isNullOrEmpty()){
                     showToast(message = "You must pick a product.")
@@ -236,7 +227,6 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                 }
                 val chosenDish = viewModel.readAllDishData.value?.get(dishPosition!!)
                 val weight = weightOfAddedProduct.text.toString().toDouble()
-
                 val chosenProduct = viewModel.readAllProductData.value?.get(productPosition!!)
                 viewModel.addProductToDish(
                     ProductIncluded(
@@ -249,13 +239,8 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                         chosenUnit
                     )
                 )
-
                 weightOfAddedProduct.text.clear()
-                Toast.makeText(
-                    requireContext(),
-                    "${viewModel.readAllProductData.value?.get(productPosition!!)?.name} added.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showToast(message = "${viewModel.readAllProductData.value?.get(productPosition!!)?.name} added.")
             } else {
                 if(viewModel.getHalfProducts().value.isNullOrEmpty()){
                     showToast(message = "You must pick a product.")
@@ -279,27 +264,26 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
                     )
                 )
                 weightOfAddedProduct.text.clear()
-                Toast.makeText(
-                    requireContext(),
-                    "${halfProductToAdd.name} added.",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showToast(message = "${halfProductToAdd.name} added." )
             }
         }
 
-
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         return view
-
-
     }
 
     companion object {
         fun newInstance(): AddProductToDish =
             AddProductToDish()
-
         const val TAG = "AddProductToDish"
+    }
+
+    private fun showToast(
+        context: FragmentActivity? = activity,
+        message: String,
+        duration: Int = Toast.LENGTH_SHORT
+    ) {
+        Toast.makeText(context, message, duration).show()
     }
 
     private fun isOpenedFromDishAdapter():Boolean{
