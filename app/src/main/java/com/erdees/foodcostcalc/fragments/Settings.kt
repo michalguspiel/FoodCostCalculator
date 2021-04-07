@@ -14,6 +14,9 @@ import com.erdees.foodcostcalc.SharedPreferences
 
 class Settings : Fragment() {
 
+    private lateinit var editMarginEditText : EditText
+    private lateinit var editTaxEditText : EditText
+
     override fun onCreateView(inflater: LayoutInflater,
                               container: ViewGroup?,
                               savedInstanceState: Bundle?
@@ -22,11 +25,10 @@ class Settings : Fragment() {
 
         /**Binders*/
         val saveBtn             = view.findViewById<Button>(R.id.save_settings_button)
-        val editMarginEditText  = view.findViewById<EditText>(R.id.default_margin_edittext)
-        val editTaxEditText     = view.findViewById<EditText>(R.id.default_dish_tax_edit_text)
+        editMarginEditText  = view.findViewById(R.id.default_margin_edittext)
+        editTaxEditText     = view.findViewById(R.id.default_dish_tax_edit_text)
         val metricCheckBox      = view.findViewById<CheckBox>(R.id.checkBoxMetric)
         val usaCheckBox         = view.findViewById<CheckBox>(R.id.checkBoxUS)
-
 
         val sharedPreference = SharedPreferences(requireContext())
 
@@ -42,16 +44,19 @@ class Settings : Fragment() {
         usaCheckBox.isChecked = isUsaChecked
 
         saveBtn.setOnClickListener{
+        if(marginAndTaxAreValid()) {
             val margin = editMarginEditText.text.toString()
             val tax = editTaxEditText.text.toString()
-            sharedPreference.save("margin",margin)
-            sharedPreference.save("tax",tax)
-            if(metricCheckBox.isChecked) sharedPreference.save("metric",true)
-            else sharedPreference.save("metric",false)
-            if(usaCheckBox.isChecked) sharedPreference.save("usa",true)
-            else sharedPreference.save("usa",false)
+            sharedPreference.save("margin", margin)
+            sharedPreference.save("tax", tax)
+            if (metricCheckBox.isChecked) sharedPreference.save("metric", true)
+            else sharedPreference.save("metric", false)
+            if (usaCheckBox.isChecked) sharedPreference.save("usa", true)
+            else sharedPreference.save("usa", false)
 
-            Toast.makeText(requireContext(),"Settings saved!",Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Settings saved!", Toast.LENGTH_SHORT).show()
+        }
+            else Toast.makeText(requireContext(),"Enter values to default tax and margin.",Toast.LENGTH_SHORT).show()
         }
 
         return view
@@ -62,4 +67,10 @@ class Settings : Fragment() {
         fun newInstance(): Settings = Settings()
         const val TAG = "Settings"
     }
+
+    private fun marginAndTaxAreValid() : Boolean {
+        return (!editMarginEditText.text.isNullOrBlank() && editMarginEditText.text.toString() != "." &&
+                !editTaxEditText.text.isNullOrBlank() && editTaxEditText.text.toString() != ".")
+    }
+
 }
