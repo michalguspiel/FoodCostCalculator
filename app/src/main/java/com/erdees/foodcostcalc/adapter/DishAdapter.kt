@@ -191,7 +191,7 @@ class DishAdapter(
                 val params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
                 )
-                params.setMargins(400, 0, 400, 0)
+                params.setMargins(25, 0, 25, 0)
                 editText.setText(amountOfServingsToPresent.toString())
                 linearLayout.addView(textInputLayout, params)
                 val alertDialog = AlertDialog.Builder(activity)
