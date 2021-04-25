@@ -32,8 +32,7 @@ import java.util.ArrayList
 import java.util.zip.Inflater
 
 
-/**TODO FIX MESS
- * */
+
 
 class DishAdapter(
     val tag: String?,
