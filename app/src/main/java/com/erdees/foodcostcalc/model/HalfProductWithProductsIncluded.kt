@@ -35,6 +35,7 @@ data class HalfProductWithProductsIncluded(
 
     }
     @Ignore
-    val formattedPricePerUnit = NumberFormat.getCurrencyInstance().format(pricePerUnit())
+    val formattedPricePerUnit: String = NumberFormat.getCurrencyInstance().format(pricePerUnit())
 
 }
+

@@ -18,7 +18,7 @@ data class Product(@PrimaryKey(autoGenerate = true) val productId: Long,
                    val unit: String) {
     @Ignore val priceAfterWasteAndTax = pricePerUnit + pricePerUnit * (waste / 100) + pricePerUnit * (tax / 100)
     @Ignore val df = DecimalFormat("#.##")
-    @Ignore val formatedBruttoPrice = df.format(priceAfterWasteAndTax)
+    @Ignore val formatedBruttoPrice: String = df.format(priceAfterWasteAndTax)
 
     override fun toString(): String {
         return "$name, price $unit netto: $pricePerUnit.\nPrice $unit with foodcost: $formatedBruttoPrice."

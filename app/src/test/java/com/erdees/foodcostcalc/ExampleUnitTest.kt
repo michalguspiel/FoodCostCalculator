@@ -100,7 +100,6 @@ class ExampleUnitTest {
         assertEquals(10.0/1000, calculatePrice(10.0,3.78541178,"per gallon","milliliter"),0.01)
         assertEquals(10.0, calculatePrice(10.0,1.0,"per gallon","gallon"),0.01)
         assertEquals(10.0/128, calculatePrice(10.0,1.0,"per gallon","fluid ounce"),0.01)
-
-
     }
+
 }

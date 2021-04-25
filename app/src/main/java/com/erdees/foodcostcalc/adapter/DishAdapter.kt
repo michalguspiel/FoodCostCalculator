@@ -2,17 +2,20 @@ package com.erdees.foodcostcalc.adapter
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.text.InputType
 import android.util.Log
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.calculatePrice
@@ -24,15 +27,20 @@ import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 import com.erdees.foodcostcalc.views.MaskedItemView
 import com.google.android.play.core.review.ReviewManagerFactory
+import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
+import java.util.zip.Inflater
 
+
+/**TODO FIX MESS
+ * */
 
 class DishAdapter(
     val tag: String?,
     private val list: ArrayList<GrandDish>,
     private val fragmentManager: FragmentManager,
     val viewModel: DishAdapterViewModel,
-    private val dishListViewAdapterViewModel : DishListViewAdapterViewModel,
+    private val dishListViewAdapterViewModel: DishListViewAdapterViewModel,
     val viewLifecycleOwner: LifecycleOwner,
     private val activity: Activity
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -47,98 +55,174 @@ class DishAdapter(
         private val dishMarginTextView: TextView = view.findViewById(R.id.dish_margin_in_adapter)
         private val dishTaxTextView: TextView = view.findViewById(R.id.dish_tax_in_adapter)
         private val editButton: ImageButton = view.findViewById(R.id.edit_button_in_dish_adapter)
-        private val addProductsButton : ImageButton = view.findViewById(R.id.add_product_to_dish_button)
+        private val addProductsButton: ImageButton =
+            view.findViewById(R.id.add_product_to_dish_button)
         private val listView: ListView = view.findViewById(R.id.list_view)
-        private val totalPriceOfDish: TextView = view.findViewById(R.id.total_price_dish_card_view)
-        private val finalPriceWithMarginAndTax: TextView =
+          private val totalPriceOfDish: TextView = view.findViewById(R.id.total_price_dish_card_view)
+          private val finalPriceWithMarginAndTax: TextView =
             view.findViewById(R.id.total_price_with_margin_dish_card_view)
-        var totalPrice: Double = 0.0
+        private val howManyServingsTV =
+            view.findViewById<TextView>(R.id.how_many_servings_text_view)
+        private var totalPrice: Double = 0.0
+        private var dishMargin : Double = 0.0
+        private var dishTax : Double = 0.0
+        private var amountOfServingsToPresent = 1
+        private val amountOfServingsSubject = PublishSubject.create<Int>()
 
-        fun bind(position: Int){
-            if(position == 5){
-                Log.i("Main Activity", "Tried to open feedback form")
-                openFeedBackForm()
+        private fun setPriceData(amountOfServings : Int){
+            totalPriceOfDish.text = formatPrice(totalPrice * amountOfServings)
+            finalPriceWithMarginAndTax.text = formatPrice(
+                countPriceAfterMarginAndTax(
+                    totalPrice,
+                    dishMargin,
+                    dishTax,
+                    amountOfServings
+                )
+            )
+        }
+        /**Computes height of listView based on each row height, includes dividers.
+         * I'm using this approach so listView size is set and doesn't need to be scrollable.
+         *I know that I could have also used linear layout and just add programmatically each row view. But I have chosen this solutions as it works well.*/
+        private fun getListSize(position: Int): Int {
+            var result = 0
+            val rangesOfBothLists =  list[position].productsIncluded.indices + list[position].halfProducts.indices
+            for (eachProduct in rangesOfBothLists) {
+                val listItem = listView.adapter.getView(eachProduct, null, listView)
+                listItem.measure(0, View.MeasureSpec.UNSPECIFIED)
+                result += listItem.measuredHeight
             }
+            return result + (listView.dividerHeight * (listView.adapter.count - 1))
+        }
 
-            /**Computes height of listView based on each row height, includes dividers.
-             * I'm using this approach so listView size is set and doesn't need to be scrollable. */
-            fun getListSize(): Int {
-                var result = 0
-                for (eachProduct in list[position].productsIncluded.indices + // first products included
-                        list[position].halfProducts.indices) { // plus halfProducts
-                    val listItem = listView.adapter.getView(eachProduct, null, listView)
-                    listItem.measure(0, View.MeasureSpec.UNSPECIFIED)
-                    result += listItem.measuredHeight
-                }
-                return result + (listView.dividerHeight * (listView.adapter.count - 1))
-            }
-
-
-            fun countPriceAfterMarginAndTax(number: Double): Double {
-                val priceWithMargin = number * list[position].dish.marginPercent / 100
-                val amountOfTax = priceWithMargin * list[position].dish.dishTax / 100
-                return priceWithMargin + amountOfTax
-            }
-
-            /**Summing up total price of products included and then one by one adding price of each half product,
-             * after each call formats total price and sets totalPriceOfDish and finalPriceWithMarginAndTax*/
-
-            /**To set correct price when there's no halfproducts.*/
-            totalPrice = list[position].totalPrice
-            totalPriceOfDish.text = formatPrice(totalPrice)
-            finalPriceWithMarginAndTax.text = formatPrice(countPriceAfterMarginAndTax(totalPrice))
-
+        private fun setHowManyServingsTV(amountOfServings: Int) {
+            if(amountOfServings == 1 ) howManyServingsTV.text = "Data per serving."
+            else howManyServingsTV.text = "Data for $amountOfServings servings."
+        }
+        /**Summing up total price of products included and then one by one adding price of each half product.*/
+        private fun sumPriceAndSetPriceData(position: Int){
             list[position].halfProducts.forEach {
                 viewModel
                     .getCertainHalfProductWithProductsIncluded(it.halfProductOwnerId)
-                    .observe(viewLifecycleOwner, Observer { halfProductWithProductsIncluded ->
-                        totalPrice = (totalPrice +
-                                calculatePrice(halfProductWithProductsIncluded.pricePerUnit(),it.weight,
-                                    halfProductWithProductsIncluded.halfProduct.halfProductUnit,it.unit))
-                        if(list[position].halfProducts.indexOf(it) == list[position].halfProducts.size - 1)//Text fields are changed only when price of last half product is added to total price.
-                        {
-                            totalPriceOfDish.text =  formatPrice(totalPrice)
-                           finalPriceWithMarginAndTax.text = formatPrice(countPriceAfterMarginAndTax(totalPrice))
-                        }
+                    .observe(viewLifecycleOwner, { halfProductWithProductsIncluded ->
+                        val totalPriceOfThisHalfProduct = calculatePrice(
+                            halfProductWithProductsIncluded.pricePerUnit(),
+                            it.weight,
+                            halfProductWithProductsIncluded.halfProduct.halfProductUnit,
+                            it.unit)
+                        totalPrice += totalPriceOfThisHalfProduct
+                        if(isThisLastItemOfTheList(list[position].halfProducts.indexOf(it),list[position].halfProducts.size)) setPriceData(amountOfServingsToPresent)
                     })
-
             }
-           dishNameTextView.text = list[position].dish.name
+        }
+
+        private fun setNameTaxAndMarginAccordingly(position: Int){
+            dishNameTextView.text = list[position].dish.name
             dishMarginTextView.text = "Margin: ${list[position].dish.marginPercent}%"
             dishTaxTextView.text = "Tax: ${list[position].dish.dishTax}%"
+        }
+
+        private fun setEditDishButton(position: Int){
             editButton.setOnClickListener {
                 EditDish().show(fragmentManager, EditDish.TAG)
                 EditDish.dishPassedFromAdapter = list[position]
             }
+        }
 
-            addProductsButton.setOnClickListener{
+        private fun setAddProductsButton(position: Int){
+            addProductsButton.setOnClickListener {
                 viewModel.passDishToDialog(list[position].dish)
                 openDialog(AddProductToDish())
             }
+        }
 
-            /**Opening/closing list after click*/
+        private fun setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position: Int){
             eachLinearLayout.setOnClickListener {
                 if (listView.adapter == null) {
-                    listView.adapter = makeAdapterForList(position)
+                    howManyServingsTV.visibility = View.VISIBLE
+                    listView.adapter = makeAdapterForList(position, amountOfServingsToPresent)
                     listView.layoutParams =
-                        LinearLayout.LayoutParams(listView.layoutParams.width, getListSize())
+                        LinearLayout.LayoutParams(listView.layoutParams.width, getListSize(position))
                 } else {
+                    howManyServingsTV.visibility = View.GONE
                     listView.adapter = null
                     listView.layoutParams =
                         LinearLayout.LayoutParams(listView.layoutParams.width, 0)
                 }
             }
         }
+
+        private fun setPositiveButtonFunctionality(button: Button, editText: EditText, alertDialog: AlertDialog){
+            button.setOnClickListener {
+                if(editText.text.isNullOrBlank() || !editText.text.isDigitsOnly()){
+                    Toast.makeText(activity,"Wrong input!",Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                amountOfServingsSubject.onNext(editText.text.toString().toInt())
+                listView.adapter =
+                    makeAdapterForList(position, amountOfServingsToPresent) // TO REFRESH LIST
+                alertDialog.dismiss()
+            }
+        }
+
+        @SuppressLint("CheckResult")
+        fun bind(position: Int) {
+            if (position == 5) openFeedBackForm()
+
+            totalPrice = list[position].totalPrice
+            dishMargin = list[position].dish.marginPercent
+            dishTax = list[position].dish.dishTax
+
+            amountOfServingsSubject.subscribe { i ->
+                amountOfServingsToPresent = i
+                setHowManyServingsTV(i)
+                setPriceData(amountOfServingsToPresent)
+                Log.i("TEST", "update from RXKOTLIN new value : $i")
+            }
+            amountOfServingsSubject.onNext(1)
+            sumPriceAndSetPriceData(position)
+            setNameTaxAndMarginAccordingly(position)
+            setEditDishButton(position)
+            setAddProductsButton(position)
+            setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position)
+
+            howManyServingsTV.setOnClickListener {
+                val textInputLayout = activity.layoutInflater.inflate(R.layout.text_input_layout,null)
+                val editText = textInputLayout.findViewById<EditText>(R.id.text_input_layout_quantity)
+                val linearLayout = LinearLayout(activity)
+                val params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(400, 0, 400, 0)
+                editText.setText(amountOfServingsToPresent.toString())
+                linearLayout.addView(textInputLayout, params)
+                val alertDialog = AlertDialog.Builder(activity)
+                    .setMessage("Serving amount")
+                    .setView(linearLayout)
+                    .setPositiveButton("Submit", null)
+                    .setNegativeButton("Back", null)
+                    .show()
+                alertDialog.window?.setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        activity,
+                        R.drawable.background_for_dialogs
+                    )
+                )
+                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                setPositiveButtonFunctionality(positiveButton,editText,alertDialog)
+            }
+        }
     }
 
-    inner class LastItemViewHolder(view:View) : RecyclerView.ViewHolder(view){
-        private val layoutAsButton: MaskedItemView = view.findViewById(R.id.products_last_item_layout)
-        private val text : TextView = view.findViewById(R.id.last_item_text)
 
-        fun bind(){
+    inner class LastItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        private val layoutAsButton: MaskedItemView =
+            view.findViewById(R.id.products_last_item_layout)
+        private val text: TextView = view.findViewById(R.id.last_item_text)
+
+        fun bind() {
             text.text = "Create Dish"
             layoutAsButton.setOnClickListener {
-                Log.i("TEST","WORKS")
+                Log.i("TEST", "WORKS")
                 viewModel.setOpenCreateDishFlag(true)
                 viewModel.setOpenCreateDishFlag(false)
             }
@@ -163,7 +247,6 @@ class DishAdapter(
         }
 
 
-
     }
 
     override fun getItemCount(): Int {
@@ -179,7 +262,9 @@ class DishAdapter(
 
     @SuppressLint("WrongConstant", "ShowToast", "SetTextI18n")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if(holder.itemViewType == DISH_ITEM_TYPE) (holder as DishRecyclerViewHolder).bind(position)
+        if (holder.itemViewType == DISH_ITEM_TYPE) (holder as DishAdapter.DishRecyclerViewHolder).bind(
+            position
+        )
         else (holder as LastItemViewHolder).bind()
     }
 
@@ -190,17 +275,18 @@ class DishAdapter(
         dialog.show(transaction, TAG)
     }
 
-    private fun  makeAdapterForList( position: Int): ListAdapter{
-      return DishListViewAdapter(
+    private fun makeAdapterForList(position: Int, servings: Int): ListAdapter {
+        return DishListViewAdapter(
             activity,
             list[position],
+            servings,
             dishListViewAdapterViewModel,
             viewLifecycleOwner
         )
     }
 
 
-    private fun openFeedBackForm(){
+    private fun openFeedBackForm() {
         Log.i("Main Activity", "review triggered!")
         val manager = ReviewManagerFactory.create(activity)
         val request = manager.requestReviewFlow()
@@ -223,4 +309,22 @@ class DishAdapter(
     companion object {
         const val TAG = "DishAdapter"
     }
+
+
+
+    private fun isThisLastItemOfTheList(indexOfHalfProduct : Int , listSize : Int):Boolean{
+        return (indexOfHalfProduct == listSize -1)
+    }
+
+     fun countPriceAfterMarginAndTax(
+        totalPrice: Double,
+        margin: Double,
+        tax: Double,
+        amountOfServings: Int
+    ): Double {
+        val priceWithMargin = totalPrice * margin / 100
+        val amountOfTax = priceWithMargin * tax / 100
+        return (priceWithMargin + amountOfTax) * amountOfServings
+    }
+
 }

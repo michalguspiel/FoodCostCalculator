@@ -20,10 +20,6 @@ data class ProductIncluded(@PrimaryKey(autoGenerate = true) val productIncludedI
     @Ignore
     val totalPriceOfThisProduct: Double
     = calculatePrice(this.productIncluded.priceAfterWasteAndTax,this.weight,this.productIncluded.unit,this.weightUnit)
-    @Ignore
-    val finalFormatPriceOfProduct: String = NumberFormat.getCurrencyInstance().format(totalPriceOfThisProduct)
-    @Ignore
-    val formattedWeight = formatPriceOrWeight(weight)
 
 }
 

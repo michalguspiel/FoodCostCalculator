@@ -1,0 +1,21 @@
+<com.google.android.material.textfield.TextInputLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/text_input_layout"
+    android:layout_width="100dp"
+    android:layout_height="wrap_content"
+    android:hint="@string/quantity"
+    app:hintTextColor="@color/black"
+    app:boxStrokeColor="@color/orange_500"
+    android:gravity="center_horizontal"
+    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+    >
+
+    <com.google.android.material.textfield.TextInputEditText
+        android:id="@+id/text_input_layout_quantity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:maxLength="5"
+        android:inputType="number"  />
+</com.google.android.material.textfield.TextInputLayout>

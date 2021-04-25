@@ -1,5 +1,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/linear_layout_dish_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -35,7 +36,6 @@
             android:layout_gravity="center"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/add_product_to_halfproduct_button"
             app:layout_constraintStart_toEndOf="@+id/dish_name_in_adapter"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -87,6 +87,18 @@
             app:layout_constraintBottom_toBottomOf="parent"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/how_many_servings_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Data per 1 serving."
+            tools:text="Data per 1 serving."
+            tools:visibility="visible"/>
+
 
 
 

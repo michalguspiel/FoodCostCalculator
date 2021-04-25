@@ -7,15 +7,14 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
-import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.calculatePrice
-import com.erdees.foodcostcalc.formatPrice
+import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.model.GrandDish
-import com.erdees.foodcostcalc.abbreviateUnit
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
+import java.text.NumberFormat
 
 class DishListViewAdapter(private val context: Activity,
                           private val grandDish: GrandDish,
+                          private val servings : Int,
                           private val viewModel: DishListViewAdapterViewModel,
                           private val viewLifecycleOwner: LifecycleOwner)
     : ArrayAdapter<Any>(context, R.layout.listview_dish_row,
@@ -38,8 +37,8 @@ class DishListViewAdapter(private val context: Activity,
         /**To populate rows with dishWithProduct products included */
         if (position < grandDish.productsIncluded.size ) {
             productNameText.text = grandDish.productsIncluded[position].productIncluded.name
-            productWeightText.text = grandDish.productsIncluded[position].formattedWeight
-            productPriceText.text = grandDish.productsIncluded[position].finalFormatPriceOfProduct
+            productWeightText.text = formatPriceOrWeight(grandDish.productsIncluded[position].weight * servings)
+            productPriceText.text = NumberFormat.getCurrencyInstance().format(grandDish.productsIncluded[position].totalPriceOfThisProduct * servings)
             productUnit.text = abbreviateUnit(grandDish.productsIncluded[position].weightUnit)
         }
 
@@ -47,7 +46,7 @@ class DishListViewAdapter(private val context: Activity,
         else if (position >= grandDish.productsIncluded.size)  {
             var thisPosition = position - grandDish.productsIncluded.size // to start counting position from new list
             productNameText.text = grandDish.halfProducts[thisPosition].halfProduct.name
-            productWeightText.text = grandDish.halfProducts[thisPosition].weight.toString()
+            productWeightText.text = (grandDish.halfProducts[thisPosition].weight * servings).toString()
 
 
             viewModel
@@ -56,7 +55,7 @@ class DishListViewAdapter(private val context: Activity,
                     { productPriceText.text =
                         formatPrice(
                             calculatePrice(it.pricePerUnit(),grandDish.halfProducts[thisPosition].weight,
-                                it.halfProduct.halfProductUnit, grandDish.halfProducts[thisPosition].unit)
+                                it.halfProduct.halfProductUnit, grandDish.halfProducts[thisPosition].unit) * servings
                             )
                     })
 

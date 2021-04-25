@@ -13,7 +13,7 @@ Please send suggestions / opinions.
 
 
 ## Information 
-It is my first android project as well as programming project in general. In total I'd estimate that I have spent around 300 hours on it, I learned a lot and I'm going to keep improving my knowledge with diffrent projects. I am aware that this project has plenty of things to refactor, like organization of database and I'm going to fix it when I'll have time.
+It is my first android project as well as programming project in general. In total I'd estimate that I have spent around 300 hours on it, I learned a lot and I'm going to keep improving my knowledge with different projects.
 
 ### Technologies used
 - MVVM architecture 

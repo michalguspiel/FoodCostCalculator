@@ -19,7 +19,7 @@ import java.text.NumberFormat
         @Ignore
         val totalPrice:Double = productIncluded.map { it.totalPriceOfThisProduct }.sum()
         @Ignore
-        val formattedTotalPrice = NumberFormat.getCurrencyInstance().format(totalPrice)
+        val formattedTotalPrice: String = NumberFormat.getCurrencyInstance().format(totalPrice)
         @Ignore
         val priceWithMargin = totalPrice * this.dish.marginPercent / 100
         @Ignore
@@ -27,7 +27,7 @@ import java.text.NumberFormat
         @Ignore
         val priceWithMarginAndTax = priceWithMargin + (priceWithMargin * this.dish.dishTax / 100)
         @Ignore
-        val formattedPriceWithMarginAndTax = NumberFormat.getCurrencyInstance().format(priceWithMarginAndTax)
+        val formattedPriceWithMarginAndTax: String = NumberFormat.getCurrencyInstance().format(priceWithMarginAndTax)
 
         override fun toString(): String {
             return if (productIncluded.isEmpty()) "${dish.name} without any ingredients."
