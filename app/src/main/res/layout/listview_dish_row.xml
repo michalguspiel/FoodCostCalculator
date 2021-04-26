@@ -38,15 +38,15 @@
         android:layout_width="5dp"
         android:layout_height="match_parent" />
 
-    <TextView
-        android:id="@+id/product_weight_in_dish_row"
-        android:layout_width="50dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
-        android:gravity="end"
-        android:textColor="#000000"
-        android:textSize="14sp"
-        android:textStyle="normal" />
+        <TextView
+            android:id="@+id/product_weight_in_dish_row"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:gravity="end"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textStyle="normal" />
 
 
     <TextView

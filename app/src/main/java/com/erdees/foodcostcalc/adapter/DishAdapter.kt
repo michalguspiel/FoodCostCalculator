@@ -3,9 +3,7 @@ package com.erdees.foodcostcalc.adapter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.text.InputType
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,11 +13,11 @@ import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
-
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.calculatePrice
-import com.erdees.foodcostcalc.formatPrice
+import com.erdees.foodcostcalc.SharedFunctions.calculatePrice
+import com.erdees.foodcostcalc.SharedFunctions.formatPrice
+import com.erdees.foodcostcalc.SharedFunctions.getListSize
 import com.erdees.foodcostcalc.fragments.dialogs.AddProductToDish
 import com.erdees.foodcostcalc.fragments.dialogs.EditDish
 import com.erdees.foodcostcalc.model.GrandDish
@@ -29,9 +27,6 @@ import com.erdees.foodcostcalc.views.MaskedItemView
 import com.google.android.play.core.review.ReviewManagerFactory
 import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
-import java.util.zip.Inflater
-
-
 
 
 class DishAdapter(
@@ -78,19 +73,6 @@ class DishAdapter(
                     amountOfServings
                 )
             )
-        }
-        /**Computes height of listView based on each row height, includes dividers.
-         * I'm using this approach so listView size is set and doesn't need to be scrollable.
-         *I know that I could have also used linear layout and just add programmatically each row view. But I have chosen this solutions as it works well.*/
-        private fun getListSize(position: Int): Int {
-            var result = 0
-            val rangesOfBothLists =  list[position].productsIncluded.indices + list[position].halfProducts.indices
-            for (eachProduct in rangesOfBothLists) {
-                val listItem = listView.adapter.getView(eachProduct, null, listView)
-                listItem.measure(0, View.MeasureSpec.UNSPECIFIED)
-                result += listItem.measuredHeight
-            }
-            return result + (listView.dividerHeight * (listView.adapter.count - 1))
         }
 
         private fun setHowManyServingsTV(amountOfServings: Int) {
@@ -139,8 +121,9 @@ class DishAdapter(
                 if (listView.adapter == null) {
                     howManyServingsTV.visibility = View.VISIBLE
                     listView.adapter = makeAdapterForList(position, amountOfServingsToPresent)
+                    val indicesOfBothLists = list[position].productsIncluded.indices + list[position].halfProducts.indices
                     listView.layoutParams =
-                        LinearLayout.LayoutParams(listView.layoutParams.width, getListSize(position))
+                        LinearLayout.LayoutParams(listView.layoutParams.width, getListSize(indicesOfBothLists,listView))
                 } else {
                     howManyServingsTV.visibility = View.GONE
                     listView.adapter = null
@@ -150,7 +133,7 @@ class DishAdapter(
             }
         }
 
-        private fun setPositiveButtonFunctionality(button: Button, editText: EditText, alertDialog: AlertDialog){
+        private fun setPositiveButtonFunctionality(button: Button, editText: EditText, alertDialog: AlertDialog, position: Int){
             button.setOnClickListener {
                 if(editText.text.isNullOrBlank() || !editText.text.isDigitsOnly()){
                     Toast.makeText(activity,"Wrong input!",Toast.LENGTH_SHORT).show()
@@ -159,18 +142,50 @@ class DishAdapter(
                 amountOfServingsSubject.onNext(editText.text.toString().toInt())
                 listView.adapter =
                     makeAdapterForList(position, amountOfServingsToPresent) // TO REFRESH LIST
+                val indicesOfBothLists = list[position].productsIncluded.indices + list[position].halfProducts.indices
+                listView.layoutParams =
+                    LinearLayout.LayoutParams(listView.layoutParams.width, getListSize(indicesOfBothLists,listView)) // TO CHANGE SIZE TOO
                 alertDialog.dismiss()
             }
+        }
+
+        private fun setHowManyServingsTvAsButton(textView: TextView,position: Int){
+            textView.setOnClickListener {
+            val textInputLayout = activity.layoutInflater.inflate(R.layout.text_input_layout,null)
+            val editText = textInputLayout.findViewById<EditText>(R.id.text_input_layout_quantity)
+            val linearLayout = LinearLayout(activity)
+            val params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            params.setMargins(25, 0, 25, 0)
+            editText.setText(amountOfServingsToPresent.toString())
+            linearLayout.addView(textInputLayout, params)
+            val alertDialog = AlertDialog.Builder(activity)
+                .setMessage("Serving amount")
+                .setView(linearLayout)
+                .setPositiveButton("Submit", null)
+                .setNegativeButton("Back", null)
+                .show()
+            alertDialog.window?.setBackgroundDrawable(
+                ContextCompat.getDrawable(
+                    activity,
+                    R.drawable.background_for_dialogs
+                )
+            )
+            val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+            setPositiveButtonFunctionality(positiveButton,editText,alertDialog,position)
+        }}
+
+        private fun setDishData(position: Int){
+            totalPrice = list[position].totalPrice
+            dishMargin = list[position].dish.marginPercent
+            dishTax = list[position].dish.dishTax
         }
 
         @SuppressLint("CheckResult")
         fun bind(position: Int) {
             if (position == 5) openFeedBackForm()
-
-            totalPrice = list[position].totalPrice
-            dishMargin = list[position].dish.marginPercent
-            dishTax = list[position].dish.dishTax
-
+            setDishData(position)
             amountOfServingsSubject.subscribe { i ->
                 amountOfServingsToPresent = i
                 setHowManyServingsTV(i)
@@ -183,32 +198,7 @@ class DishAdapter(
             setEditDishButton(position)
             setAddProductsButton(position)
             setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position)
-
-            howManyServingsTV.setOnClickListener {
-                val textInputLayout = activity.layoutInflater.inflate(R.layout.text_input_layout,null)
-                val editText = textInputLayout.findViewById<EditText>(R.id.text_input_layout_quantity)
-                val linearLayout = LinearLayout(activity)
-                val params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-                )
-                params.setMargins(400, 0, 400, 0)
-                editText.setText(amountOfServingsToPresent.toString())
-                linearLayout.addView(textInputLayout, params)
-                val alertDialog = AlertDialog.Builder(activity)
-                    .setMessage("Serving amount")
-                    .setView(linearLayout)
-                    .setPositiveButton("Submit", null)
-                    .setNegativeButton("Back", null)
-                    .show()
-                alertDialog.window?.setBackgroundDrawable(
-                    ContextCompat.getDrawable(
-                        activity,
-                        R.drawable.background_for_dialogs
-                    )
-                )
-                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                setPositiveButtonFunctionality(positiveButton,editText,alertDialog)
-            }
+            setHowManyServingsTvAsButton(howManyServingsTV,position)
         }
     }
 

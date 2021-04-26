@@ -19,6 +19,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
+import com.erdees.foodcostcalc.SharedFunctions.changeUnitList
+import com.erdees.foodcostcalc.SharedFunctions.setAdapterList
 import com.erdees.foodcostcalc.model.*
 import com.erdees.foodcostcalc.viewmodel.AddProductToDishViewModel
 import com.erdees.foodcostcalc.viewmodel.AddViewModel

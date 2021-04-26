@@ -15,6 +15,9 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.*
+import com.erdees.foodcostcalc.SharedFunctions.filterVol
+import com.erdees.foodcostcalc.SharedFunctions.filterWeight
+import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.adapter.EditHalfProductAdapter
 import com.erdees.foodcostcalc.model.HalfProduct
 import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded

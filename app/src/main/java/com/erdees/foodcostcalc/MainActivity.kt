@@ -43,8 +43,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var backBtn: ImageButton
     private lateinit var bottomNavigation: BottomNavigationView
     private lateinit var menuNavigationClickListener: BottomNavigationView.OnNavigationItemSelectedListener
-    private lateinit var sideNavigation : NavigationView
+    private lateinit var sideNavigation: NavigationView
     private lateinit var drawerLayout: DrawerLayout
+
     /**Fragments instances*/
     private val productsFragment = Products.newInstance()
     private val dishesFragment = Dishes.newInstance()
@@ -75,14 +76,14 @@ class MainActivity : AppCompatActivity() {
         searchTextField.hint = "Search by name"
     }
 
-    private fun openAdd(){
-        replaceFragment(addFragment,Add.TAG)
+    private fun openAdd() {
+        replaceFragment(addFragment, Add.TAG)
         bottomNavigation.uncheckAllItems()
         hideSearchToolbar()
     }
 
 
-    private fun checkIfSearchToolIsUsed():Boolean{
+    private fun checkIfSearchToolIsUsed(): Boolean {
         return searchTextField.isVisible && searchTextField.text.isNotEmpty()
     }
 
@@ -129,7 +130,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-     private fun replaceFragment(fragment: Fragment, fragmentTag: String) {
+    private fun replaceFragment(fragment: Fragment, fragmentTag: String) {
         val backStateName = fragment.javaClass.name
         val manager: FragmentManager = supportFragmentManager
         val fragmentPopped = manager.popBackStackImmediate(backStateName, 0)
@@ -183,24 +184,23 @@ class MainActivity : AppCompatActivity() {
         }
 
 
-
-
         /**Listen to viewmodel signals to open fragments or dialog fragments.*/
         viewModel.observeOpenAddFlag().observe(this, { shouldAddBeOpened ->
-            if(shouldAddBeOpened){
-               openAdd()
+            if (shouldAddBeOpened) {
+                openAdd()
             }
         })
-        viewModel.observeOpenCreateDishFlag().observe(this,{shouldCreateDishBeOpened ->
-            if(shouldCreateDishBeOpened){
+        viewModel.observeOpenCreateDishFlag().observe(this, { shouldCreateDishBeOpened ->
+            if (shouldCreateDishBeOpened) {
                 openDialog(CreateDish())
             }
         })
-        viewModel.observeOpenCreateHalfProductFlag().observe(this,{shouldCreateHalfProductBeOpened ->
-            if(shouldCreateHalfProductBeOpened){
-                openDialog(CreateHalfProduct())
-            }
-        })
+        viewModel.observeOpenCreateHalfProductFlag()
+            .observe(this, { shouldCreateHalfProductBeOpened ->
+                if (shouldCreateHalfProductBeOpened) {
+                    openDialog(CreateHalfProduct())
+                }
+            })
 
 
         /**Side drawer menu */
@@ -213,7 +213,7 @@ class MainActivity : AppCompatActivity() {
             NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
                 when (item.itemId) {
                     R.id.nav_add_product -> {
-                       openAdd()
+                        openAdd()
                     }
                     R.id.nav_create_new_dish -> {
                         openDialog(CreateDish())
@@ -264,4 +264,5 @@ class MainActivity : AppCompatActivity() {
         sideNavigation = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
     }
+
 }

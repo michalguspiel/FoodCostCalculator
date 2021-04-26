@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
-import com.erdees.foodcostcalc.getUnits
+import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.model.HalfProduct
 import com.erdees.foodcostcalc.viewmodel.CreateDishViewModel
 import com.erdees.foodcostcalc.viewmodel.CreateHalfProductViewModel
@@ -101,4 +101,6 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
         }
 
     }
+
+
 }
