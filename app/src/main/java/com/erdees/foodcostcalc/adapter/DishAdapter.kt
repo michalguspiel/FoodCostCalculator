@@ -13,7 +13,6 @@ import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
-
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.calculatePrice
@@ -177,12 +176,16 @@ class DishAdapter(
             setPositiveButtonFunctionality(positiveButton,editText,alertDialog,position)
         }}
 
-        @SuppressLint("CheckResult")
-        fun bind(position: Int) {
-            if (position == 5) openFeedBackForm()
+        private fun setDishData(position: Int){
             totalPrice = list[position].totalPrice
             dishMargin = list[position].dish.marginPercent
             dishTax = list[position].dish.dishTax
+        }
+
+        @SuppressLint("CheckResult")
+        fun bind(position: Int) {
+            if (position == 5) openFeedBackForm()
+            setDishData(position)
             amountOfServingsSubject.subscribe { i ->
                 amountOfServingsToPresent = i
                 setHowManyServingsTV(i)

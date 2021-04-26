@@ -3,20 +3,16 @@ package com.erdees.foodcostcalc.adapter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
-import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.SharedFunctions
-import com.erdees.foodcostcalc.SharedFunctions.abbreviateUnit
 import com.erdees.foodcostcalc.SharedFunctions.abbreviateUnitWithPer
 import com.erdees.foodcostcalc.SharedFunctions.formatPrice
 import com.erdees.foodcostcalc.SharedFunctions.getBasicRecipeAsPercentageOfTargetRecipe
@@ -28,7 +24,7 @@ import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import com.erdees.foodcostcalc.views.MaskedItemView
 import io.reactivex.subjects.PublishSubject
-import java.lang.NumberFormatException
+
 
 class HalfProductAdapter(
     private val viewLifeCycleOwner: LifecycleOwner,
@@ -55,7 +51,6 @@ class HalfProductAdapter(
         private val quantityOfDataTV = view.findViewById<TextView>(R.id.quantity_of_data_tv)
         private val priceOfHalfProductPerRecipeTV = view.findViewById<TextView>(R.id.price_of_half_product_per_recipe)
         private val quantitySubject = PublishSubject.create<Double>()
-        private var halfProductUnit = ""
         private var quantity = 0.0
         private var totalWeightOfMainRecipe = 0.0
 

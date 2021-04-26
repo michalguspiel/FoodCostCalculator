@@ -26,7 +26,7 @@ class HalfProductAdapterTests {
     @Test
     fun `Given i pass same amount of target quantity as entry i should recive 100 percent and then same ingredient quantity as given`(){
         assertEquals(100.0,getBasicRecipeAsPercentageOfTargetRecipe(2500.0,2500.0),0.01)
-        assertEquals(50.0,getIngredientForHundredPercentOfRecipe(50.0,100.0))
+        assertEquals(50.0,getIngredientForHundredPercentOfRecipe(50.0,100.0),0.01)
     }
 
 
