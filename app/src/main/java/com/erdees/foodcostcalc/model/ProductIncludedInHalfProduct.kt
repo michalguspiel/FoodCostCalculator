@@ -4,8 +4,8 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.erdees.foodcostcalc.calculatePrice
-import com.erdees.foodcostcalc.formatPriceOrWeight
+import com.erdees.foodcostcalc.SharedFunctions.calculatePrice
+import com.erdees.foodcostcalc.SharedFunctions.formatPriceOrWeight
 import java.text.NumberFormat
 
 @Entity

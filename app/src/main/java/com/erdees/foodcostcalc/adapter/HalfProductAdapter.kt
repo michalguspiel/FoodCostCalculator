@@ -1,27 +1,34 @@
 package com.erdees.foodcostcalc.adapter
 
+import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
+import android.text.InputType
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.ListView
-import android.widget.TextView
-import androidx.constraintlayout.widget.ConstraintLayout
+import android.widget.*
+import androidx.core.content.ContextCompat
+import androidx.core.text.isDigitsOnly
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.SharedFunctions
+import com.erdees.foodcostcalc.SharedFunctions.abbreviateUnit
+import com.erdees.foodcostcalc.SharedFunctions.abbreviateUnitWithPer
+import com.erdees.foodcostcalc.SharedFunctions.formatPrice
+import com.erdees.foodcostcalc.SharedFunctions.getBasicRecipeAsPercentageOfTargetRecipe
 import com.erdees.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
 import com.erdees.foodcostcalc.fragments.dialogs.EditHalfProduct
+import com.erdees.foodcostcalc.SharedFunctions.getListSize
+import com.erdees.foodcostcalc.SharedFunctions.getPriceForHundredPercentOfRecipe
 import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded
-import com.erdees.foodcostcalc.viewmodel.AddViewModel
-import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import com.erdees.foodcostcalc.views.MaskedItemView
+import io.reactivex.subjects.PublishSubject
+import java.lang.NumberFormatException
 
 class HalfProductAdapter(
     private val viewLifeCycleOwner: LifecycleOwner,
@@ -45,54 +52,159 @@ class HalfProductAdapter(
             view.findViewById(R.id.unit_to_populate_half_product_card_view)
         private val finalPriceOfHalfProductPerUnit: TextView =
             view.findViewById(R.id.price_of_half_product_per_unit)
-
-        fun bind(position: Int) {
-            /**Computes height of listView based on each row height, includes dividers.
-             * I'm using this approach so listView size is set and doesn't need to be scrollable. */
-            fun getListSize(): Int {
-                var result = 0
-                for (eachProduct in list[position].halfProductsList.indices) {
-                    val listItem = listView.adapter.getView(eachProduct, null, listView)
-                    listItem.measure(0, View.MeasureSpec.UNSPECIFIED)
-                    result += listItem.measuredHeight
-                }
-                return result + (listView.dividerHeight * (listView.adapter.count - 1))
-            }
-            halfProductName.text = list[position].halfProduct.name
-            unitOfHalfProduct.text = list[position].halfProduct.halfProductUnit
-            viewModel
-                .getCertainHalfProductWithProductsIncluded(list[position].halfProduct.halfProductId)
-                .observe(viewLifeCycleOwner,
-                    Observer {
-                        if (it != null) finalPriceOfHalfProductPerUnit.text =
-                            it.formattedPricePerUnit
-                    })
+        private val quantityOfDataTV = view.findViewById<TextView>(R.id.quantity_of_data_tv)
+        private val priceOfHalfProductPerRecipeTV = view.findViewById<TextView>(R.id.price_of_half_product_per_recipe)
+        private val quantitySubject = PublishSubject.create<Double>()
+        private var halfProductUnit = ""
+        private var quantity = 0.0
+        private var totalWeightOfMainRecipe = 0.0
 
 
+
+        private fun setEditButton(position: Int) {
             editButton.setOnClickListener {
                 EditHalfProduct().show(fragmentManager, EditHalfProduct.TAG)
                 EditHalfProduct.halfProductPassedFromAdapter = list[position]
             }
+        }
 
+        private fun setAddButton(position: Int) {
             addProductButton.setOnClickListener {
                 AddProductToHalfProduct().show(fragmentManager, TAG)
                 viewModel.passHalfProductToDialog(list[position].halfProduct)
 
             }
+        }
 
+        private fun setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position: Int) {
             eachLinearLayout.setOnClickListener {
                 if (listView.adapter == null) {
+                    quantityOfDataTV.visibility = View.VISIBLE
                     listView.adapter =
-                        HalfProductListViewAdapter(activity, list[position].halfProductsList)
+                        HalfProductListViewAdapter(activity, list[position].halfProductsList,quantity,totalWeightOfMainRecipe)
                     listView.layoutParams =
-                        LinearLayout.LayoutParams(listView.layoutParams.width, getListSize())
+                        LinearLayout.LayoutParams(
+                            listView.layoutParams.width,
+                            getListSize(list[position].halfProductsList.indices.toList(), listView)
+                        )
                 } else {
+                    quantityOfDataTV.visibility = View.GONE
                     listView.adapter = null
                     listView.layoutParams =
                         LinearLayout.LayoutParams(listView.layoutParams.width, 0)
                 }
             }
+        }
 
+        private fun setNameAndUnitAccordingly(position: Int) {
+            halfProductName.text = list[position].halfProduct.name
+            unitOfHalfProduct.text = list[position].halfProduct.halfProductUnit + ":"
+        }
+
+        private fun setHalfProductFinalPrice(position: Int) {
+            viewModel
+                .getCertainHalfProductWithProductsIncluded(list[position].halfProduct.halfProductId)
+                .observe(viewLifeCycleOwner,
+                    {
+                        if (it != null){
+                            finalPriceOfHalfProductPerUnit.text =
+                                it.formattedPricePerUnit
+                            priceOfHalfProductPerRecipeTV.text = it.formattedPricePerRecipe
+                        }
+                    })
+        }
+
+
+        private fun setQuantityOfDataTextView(position: Int){
+            val halfProduct = list[position]
+            val totalWeight = halfProduct.totalWeight()
+            totalWeightOfMainRecipe = totalWeight
+            val unit = halfProduct.halfProduct.halfProductUnit
+            quantity = totalWeight
+            quantityOfDataTV.text = "Recipe per $totalWeight ${abbreviateUnitWithPer(unit)} of product."
+        }
+
+        private fun updateQuantityTV(position: Int){
+            val halfProduct = list[position]
+            val unit = halfProduct.halfProduct.halfProductUnit
+            quantityOfDataTV.text = "Recipe per $quantity ${abbreviateUnitWithPer(unit)} of product."
+        }
+
+        private fun makeAdapterForList(position: Int, quantity: Double):ListAdapter {
+            return HalfProductListViewAdapter(activity, list[position].halfProductsList,quantity,totalWeightOfMainRecipe)
+
+        }
+
+        private fun setPositiveButtonFunctionality(button: Button, editText: EditText, alertDialog: AlertDialog,position: Int){
+            button.setOnClickListener {
+                if(editText.text.isNullOrBlank() || editText.text.toString() == "."){
+                    Toast.makeText(activity,"Wrong input!",Toast.LENGTH_SHORT).show()
+                    return@setOnClickListener
+                }
+                quantitySubject.onNext(editText.text.toString().toDouble())
+                listView.adapter =
+                    makeAdapterForList(position, quantity) // TO REFRESH LIST
+                listView.layoutParams =
+                    LinearLayout.LayoutParams(
+                        listView.layoutParams.width,
+                        getListSize(list[position].halfProductsList.indices.toList(), listView)
+                    )
+                alertDialog.dismiss()
+            }
+        }
+
+        private fun setQuantityOfDataTextViewAsButton(position: Int){
+            quantityOfDataTV.setOnClickListener {
+                val textInputLayout = activity.layoutInflater.inflate(R.layout.text_input_layout_decimal,null)
+                val editText = textInputLayout.findViewById<EditText>(R.id.text_input_layout_quantity)
+                val linearLayout = LinearLayout(activity)
+                val params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
+                )
+                params.setMargins(25, 0, 25, 0)
+                editText.setText(quantity.toString())
+                linearLayout.addView(textInputLayout, params)
+                val alertDialog = AlertDialog.Builder(activity)
+                    .setMessage("Product weight")
+                    .setView(linearLayout)
+                    .setPositiveButton("Submit", null)
+                    .setNegativeButton("Back", null)
+                    .show()
+                alertDialog.window?.setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        activity,
+                        R.drawable.background_for_dialogs
+                    )
+                )
+                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                setPositiveButtonFunctionality(positiveButton,editText,alertDialog,position)
+            }
+        }
+
+        private fun updatePriceOfHalfProductPerRecipe(position: Int){
+            val quantityPercent = getBasicRecipeAsPercentageOfTargetRecipe(quantity,totalWeightOfMainRecipe)
+            val pricePerMainRecipe = list[position].pricePerRecipe()
+            val pricePerRecipeForGivenQuantity = getPriceForHundredPercentOfRecipe(pricePerMainRecipe,quantityPercent)
+            priceOfHalfProductPerRecipeTV.text = formatPrice(pricePerRecipeForGivenQuantity)
+
+        }
+
+        @SuppressLint("CheckResult")
+        fun bind(position: Int) {
+            setNameAndUnitAccordingly(position)
+            setHalfProductFinalPrice(position)
+            setQuantityOfDataTextView(position)
+            setEditButton(position)
+            setAddButton(position)
+            setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position)
+            setQuantityOfDataTextViewAsButton(position)
+            quantitySubject.subscribe { i ->
+                quantity = i
+                updateQuantityTV(position)
+                updatePriceOfHalfProductPerRecipe(position)
+                updatePriceOfHalfProductPerRecipe(position)
+                Log.i("TEST", "update from RXKOTLIN new value : $i")
+            }
         }
 
     }
@@ -129,7 +241,9 @@ class HalfProductAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if(holder.itemViewType == HALF_PRODUCT_ITEM_TYPE) (holder as HalfProductAdapter.HalfProductsRecyclerViewHolder).bind(position)
+        if (holder.itemViewType == HALF_PRODUCT_ITEM_TYPE) (holder as HalfProductAdapter.HalfProductsRecyclerViewHolder).bind(
+            position
+        )
         else (holder as HalfProductAdapter.LastItemViewHolder).bind()
 
     }

@@ -1,9 +1,8 @@
 package com.erdees.foodcostcalc.model
 
 import androidx.room.*
-import com.erdees.foodcostcalc.calculatePrice
-import com.erdees.foodcostcalc.formatPriceOrWeight
-import java.text.NumberFormat
+import com.erdees.foodcostcalc.SharedFunctions.calculatePrice
+
 
 /**  Its a product but with dishOwnerId reference and weight */
 @Entity

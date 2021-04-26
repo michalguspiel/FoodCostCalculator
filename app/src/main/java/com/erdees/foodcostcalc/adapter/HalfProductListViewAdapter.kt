@@ -2,16 +2,25 @@ package com.erdees.foodcostcalc.adapter
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.SharedFunctions.abbreviateUnit
+import com.erdees.foodcostcalc.SharedFunctions.formatPriceOrWeight
+import com.erdees.foodcostcalc.SharedFunctions.getBasicRecipeAsPercentageOfTargetRecipe
+import com.erdees.foodcostcalc.SharedFunctions.getIngredientForHundredPercentOfRecipe
+import com.erdees.foodcostcalc.SharedFunctions.getPriceForHundredPercentOfRecipe
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.abbreviateUnit
+import java.text.NumberFormat
 
-class HalfProductListViewAdapter(private val context: Activity, private val productIncludedInHalfProductList: List<ProductIncludedInHalfProduct>)
+class HalfProductListViewAdapter(private val context: Activity,
+                                 private val productIncludedInHalfProductList: List<ProductIncludedInHalfProduct>,
+                                 private val quantity : Double,
+                                 private val totalWeightOfMainRecipe : Double)
     : ArrayAdapter<ProductIncludedInHalfProduct>(context, R.layout.listview_dish_row, productIncludedInHalfProductList) {
 
     @SuppressLint("ViewHolder")
@@ -36,10 +45,18 @@ class HalfProductListViewAdapter(private val context: Activity, private val prod
                          abbreviateUnit(productIncludedInHalfProductList[position].halfProduct.halfProductUnit.drop(4)) +"."
         }
 
+        val quantityPercent = getBasicRecipeAsPercentageOfTargetRecipe(quantity,totalWeightOfMainRecipe)
+        Log.i("TEST",quantityPercent.toString())
+        val weightIncludedQuantity = getIngredientForHundredPercentOfRecipe(productIncludedInHalfProductList[position].weight,quantityPercent)
+        val formattedWeight = formatPriceOrWeight(weightIncludedQuantity)
+        val priceIncludedQuantity = getPriceForHundredPercentOfRecipe(productIncludedInHalfProductList[position].totalPriceOfThisProduct,quantityPercent)
+        val formatedPrice = NumberFormat.getCurrencyInstance().format(
+            priceIncludedQuantity
+        )
 
         productNameText.text = productIncludedInHalfProductList[position].productIncluded.name
-        productWeightText.text = productIncludedInHalfProductList[position].formattedWeight
-        productPriceText.text = productIncludedInHalfProductList[position].finalFormatPriceOfProduct
+        productWeightText.text = formattedWeight
+        productPriceText.text = formatedPrice
         productUnit.text = abbreviateUnit(productIncludedInHalfProductList[position].weightUnit)
 
 

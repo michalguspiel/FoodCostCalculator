@@ -1,5 +1,7 @@
 package com.erdees.foodcostcalc
 
+import com.erdees.foodcostcalc.SharedFunctions.calculatePrice
+import com.erdees.foodcostcalc.SharedFunctions.computeWeightAndVolumeToSameUnit
 import org.junit.Test
 
 import org.junit.Assert.*
@@ -101,5 +103,7 @@ class ExampleUnitTest {
         assertEquals(10.0, calculatePrice(10.0,1.0,"per gallon","gallon"),0.01)
         assertEquals(10.0/128, calculatePrice(10.0,1.0,"per gallon","fluid ounce"),0.01)
     }
+
+
 
 }

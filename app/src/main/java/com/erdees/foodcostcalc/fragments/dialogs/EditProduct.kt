@@ -13,6 +13,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
+import com.erdees.foodcostcalc.SharedFunctions.filterVol
+import com.erdees.foodcostcalc.SharedFunctions.filterWeight
+import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.model.ProductIncluded
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct

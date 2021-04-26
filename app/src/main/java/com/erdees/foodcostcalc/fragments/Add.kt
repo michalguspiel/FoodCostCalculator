@@ -11,10 +11,9 @@ import android.widget.*
 import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.SharedPreferences
-import com.erdees.foodcostcalc.fragments.dialogs.EditHalfProduct
 import com.erdees.foodcostcalc.fragments.dialogs.InformationDialog
-import com.erdees.foodcostcalc.getUnits
 import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.google.android.material.textfield.TextInputEditText

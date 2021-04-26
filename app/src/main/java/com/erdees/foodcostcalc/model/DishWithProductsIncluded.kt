@@ -3,7 +3,7 @@ package com.erdees.foodcostcalc.model
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
-import com.erdees.foodcostcalc.formatPriceOrWeight
+import com.erdees.foodcostcalc.SharedFunctions.formatPriceOrWeight
 import java.text.NumberFormat
 
     data class DishWithProductsIncluded(

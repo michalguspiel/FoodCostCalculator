@@ -3,8 +3,6 @@ package com.erdees.foodcostcalc.model
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
-import com.erdees.foodcostcalc.formatPriceOrWeight
-import java.text.NumberFormat
 
 /**Grand dish represents biggest data model in this app,
  * its made of DishWithProductsIncluded which includes: Dish,ProductsIncluded,Products

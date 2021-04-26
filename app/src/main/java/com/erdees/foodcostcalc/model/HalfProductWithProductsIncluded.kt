@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.model
 
 import androidx.room.*
-import com.erdees.foodcostcalc.computeWeightAndVolumeToSameUnit
+import com.erdees.foodcostcalc.SharedFunctions.computeWeightAndVolumeToSameUnit
 import java.text.NumberFormat
 
 data class HalfProductWithProductsIncluded(
@@ -12,7 +12,7 @@ data class HalfProductWithProductsIncluded(
     )
     val halfProductsList: List<ProductIncludedInHalfProduct>
 ) {
-    fun totalWeight(): Double {
+     fun totalWeight(): Double {
         return if (halfProduct.halfProductUnit == "per piece") 1.0
         else halfProductsList.map {
             if(it.weightUnit != "piece")
@@ -22,6 +22,11 @@ data class HalfProductWithProductsIncluded(
             }
         }.sum()
     }
+
+    fun pricePerRecipe(): Double {
+       return halfProductsList.map { it.totalPriceOfThisProduct }.sum()
+    }
+
     fun pricePerUnit(): Double {
         val totalPrice =  halfProductsList.map { it.totalPriceOfThisProduct }.sum()
         return when(halfProduct.halfProductUnit){
@@ -37,5 +42,7 @@ data class HalfProductWithProductsIncluded(
     @Ignore
     val formattedPricePerUnit: String = NumberFormat.getCurrencyInstance().format(pricePerUnit())
 
+    @Ignore
+    val formattedPricePerRecipe : String = NumberFormat.getCurrencyInstance().format(pricePerRecipe())
 }
 
