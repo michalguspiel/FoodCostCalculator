@@ -21,6 +21,7 @@
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:listDivider">@color/gray_500</item>
 
     </style>
 

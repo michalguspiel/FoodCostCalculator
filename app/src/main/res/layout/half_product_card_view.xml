@@ -81,6 +81,8 @@
             android:id="@+id/list_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:divider="@color/gray_200"
+            android:dividerHeight="1dp"
             android:animateLayoutChanges="true"
             android:layoutAnimation="@anim/layout_animation"
             android:layout_margin="4dp" />

@@ -64,4 +64,6 @@
     <string name="unit_spinner">Unit</string>
     <string name="name_edit_half_prod">Name</string>
     <string name="send_feedback">Send feedback</string>
+    <string name="add_product_to_half_product">Add product to half product</string>
+    <string name="create_half_product">Create half product</string>
 </resources>
