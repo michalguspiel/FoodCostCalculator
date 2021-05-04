@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.data
 
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -15,6 +16,8 @@ import com.erdees.foodcostcalc.data.product.ProductDao
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedDao
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductDao
 import com.erdees.foodcostcalc.model.*
+import com.erdees.foodcostcalc.viewmodel.DishesViewModel
+import java.io.File
 
 @Database(
     entities = [Product::class, Dish::class,
@@ -22,7 +25,7 @@ import com.erdees.foodcostcalc.model.*
         HalfProduct::class,
         ProductIncludedInHalfProduct::class,
         HalfProductIncludedInDish::class,]
-    , version = 1, exportSchema = false
+    , version = 1, exportSchema = true
 )
 abstract class AppRoomDataBase : RoomDatabase() {
 
@@ -43,18 +46,33 @@ abstract class AppRoomDataBase : RoomDatabase() {
         fun getDatabase(context: Context): AppRoomDataBase {
             val tempInstance = INSTANCE
             if (tempInstance != null) {
+                Log.i("TEST", "old instance returned")
                 return tempInstance
             }
             synchronized(this) {
+                Log.i("TEST", "new instance created")
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppRoomDataBase::class.java,
                     "product_database"
-                ).build()
+                ).allowMainThreadQueries()
+                    .build()
                 INSTANCE = instance
                 return instance
             }
         }
+        fun recreateDatabaseFromFile(context: Context, file : File){
+            INSTANCE?.close()
+            INSTANCE = null
+            synchronized(this){
+            val instance = Room.databaseBuilder(context.applicationContext,AppRoomDataBase::class.java,"product_database")
+                .createFromFile(file)
+                .build()
+            INSTANCE = instance
+            Log.i("TEST","Swapping DATABASE!")
+        }
+        }
+
     }
 
 }

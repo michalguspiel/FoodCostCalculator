@@ -29,7 +29,7 @@ class Products : Fragment() {
         recyclerView.setHasFixedSize(true)
 
         viewModel.getWhatToSearchFor().observe(viewLifecycleOwner,{searchWord ->
-            viewModel.readAllProductData.observe(viewLifecycleOwner,  { products ->
+            viewModel.getProducts().observe(viewLifecycleOwner,  { products ->
             val listOfProducts = mutableListOf<Product>()
             products.forEach { listOfProducts.add(it) }
             recyclerView.adapter = RecyclerViewAdapter(TAG,

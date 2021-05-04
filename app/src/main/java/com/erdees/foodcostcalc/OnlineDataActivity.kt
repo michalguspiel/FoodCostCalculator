@@ -5,10 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.room.Room
+import androidx.core.view.marginTop
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.drive.DriveServiceHelper
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -25,7 +26,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.json.gson.GsonFactory
 import com.google.api.services.drive.Drive
 import com.google.gson.Gson
-import java.io.File
+import java.io.*
 import java.util.*
 
 
@@ -90,8 +91,8 @@ class OnlineDataActivity : AppCompatActivity() {
             testEmail.text = account.email
             signInButton.visibility = View.GONE
             signOutButton.visibility = View.VISIBLE
-            saveDatabaseButton.visibility = View.VISIBLE
-            loadButton.visibility = View.VISIBLE
+            saveDatabaseButton.isEnabled = true
+            loadButton.isEnabled = true
         }
     }
 
@@ -104,9 +105,9 @@ class OnlineDataActivity : AppCompatActivity() {
         mGoogleSignInClient.signOut().addOnCompleteListener {
             signOutButton.visibility = View.GONE
             signInButton.visibility = View.VISIBLE
-            testEmail.text = ""
-            loadButton.visibility = View.GONE
-            saveDatabaseButton.visibility = View.GONE
+            testEmail.text = "Sign in with google account to save and download your database."
+            saveDatabaseButton.isEnabled = false
+            loadButton.isEnabled = false
         }
     }
 
@@ -160,21 +161,23 @@ class OnlineDataActivity : AppCompatActivity() {
         val file = File(getExternalFilesDir(null), "product_database")
         mDriveServiceHelper.queryFiles().addOnSuccessListener { fileList ->
            val database = fileList.files.first()
-            mDriveServiceHelper.downloadFile(file,database.id)?.addOnSuccessListener {
-                    prepopulateRoomDatabaseWithFile(file)
-                Log.i(TAG, "Downloaded the file")
-                val fileSize = file.length() / 1024
-                Log.i(TAG, "file Size : $fileSize")
-                Log.i(TAG, "file Path :" + file.absolutePath)
+            mDriveServiceHelper.downloadFile(file, database.id)?.addOnSuccessListener {
+                    swapDatabaseFiles(file)
             }
         }
     }
 
-    private fun prepopulateRoomDatabaseWithFile(file : File){
-        Room.databaseBuilder(application,AppRoomDataBase::class.java,"product_database")
-            .createFromFile(file)
-            .build()
+    private fun swapDatabaseFiles(file: File){
+        AppRoomDataBase.getDatabase(applicationContext).close()
+        databaseFile.delete()
+        copyFile(file.absolutePath, databaseFile.name, databaseFile.absolutePath)
+        AppRoomDataBase.recreateDatabaseFromFile(applicationContext, file) // TO OPEN DATABASE
+        val mainActivity = Intent(applicationContext, MainActivity::class.java)  // NOW RESTARTING ACTIVITY SO DATABASE IS REFRESHED
+        mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) //so by pressing back btn user doesn't come back to this activity
+        startActivity(mainActivity)
     }
+
+
 
     private fun saveOrUpdateDatabaseInDrive() {
         mDriveServiceHelper.queryFiles().addOnSuccessListener { fileList ->
@@ -185,7 +188,7 @@ class OnlineDataActivity : AppCompatActivity() {
 
     private fun updateDatabaseInDrive(file: com.google.api.services.drive.model.File){
         mDriveServiceHelper.deleteFolderFile(file.id)?.addOnSuccessListener {
-            Log.i(TAG,"File deleted!")
+            Log.i(TAG, "File deleted!")
             saveDataBaseInDrive()
         }
     }
@@ -201,19 +204,12 @@ class OnlineDataActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        when (requestCode) {
-            RC_SIGN_IN -> {
-                // The Task returned from this call is always completed, no need to attach
-                // a listener.
+        if(requestCode == RC_SIGN_IN) {
                 val task: Task<GoogleSignInAccount> =
                     GoogleSignIn.getSignedInAccountFromIntent(data)
                 handleSignInResult(task)
             }
-            else -> { // TODO REFACTOR BY ERASING ELSE BRANCH AND TURNING IT INTO SIMPLE CALL OR ADD FUNCTIONALLITY OF HANDLING DATABASE FILE BY PREPOPULATING CURRENT DATABASE
-            }
-        }
     }
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
@@ -247,5 +243,30 @@ class OnlineDataActivity : AppCompatActivity() {
     companion object {
         const val TAG = "OnlineDataActivity"
     }
+
+
+    private fun copyFile(inputPath: String, inputFileName: String, outputPath: String) {
+        var inputStream: InputStream?
+        var out: OutputStream?
+        try {
+            inputStream = FileInputStream(inputPath)
+            out = FileOutputStream(outputPath + inputFileName)
+            val buffer = ByteArray(1024)
+            var read: Int
+            while (inputStream.read(buffer).also { read = it } != -1) {
+                out.write(buffer, 0, read)
+            }
+            inputStream.close()
+            // write the output file (You have now copied the file)
+            out.flush()
+            out.close()
+        } catch (fnfe1: FileNotFoundException) {
+            fnfe1.message?.let { Log.e("tag fnfe1", it)
+            }
+        } catch (e: Exception) {
+            Log.e("tag exception", e.message!!)
+        }
+    }
+
 
 }
