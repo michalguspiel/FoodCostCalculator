@@ -11,6 +11,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
+import com.erdees.foodcostcalc.SharedFunctions.makeGone
+import com.erdees.foodcostcalc.SharedFunctions.makeVisible
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.drive.DriveServiceHelper
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -34,11 +36,13 @@ import java.util.*
 class OnlineDataActivity : AppCompatActivity() {
 
     private lateinit var signInButton: SignInButton
-    private lateinit var emailAndSigningInfoTV: TextView
+    private lateinit var emailTV: TextView
+    private lateinit var welcomeTV : TextView
     private lateinit var signOutButton: Button
     private lateinit var alertDialog: AlertDialog
     private lateinit var resultAlertDialog: AlertDialog
     private lateinit var saveDatabaseButton: Button
+    private lateinit var constraintLayoutStateSignOut : ConstraintLayout
     private lateinit var loadButton: Button
     private lateinit var profilePic: ImageView
     private lateinit var profilePicLayout : FrameLayout
@@ -69,7 +73,7 @@ class OnlineDataActivity : AppCompatActivity() {
 
         getDatabaseFileAndSaveItInVariable()
         bindView()
-        setSigningInfoTV()
+
 
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
@@ -94,26 +98,43 @@ class OnlineDataActivity : AppCompatActivity() {
 
     }
 
+    private fun bindView() {
+        signInButton = findViewById(R.id.sign_in_button)
+        saveDatabaseButton = findViewById(R.id.save_database_button)
+        loadButton = findViewById(R.id.load_database_button)
+        signOutButton = findViewById(R.id.sign_out_button)
+        emailTV = findViewById(R.id.email_tv)
+        profilePic = findViewById(R.id.profile_picture)
+        profilePicLayout = findViewById(R.id.profile_picture_layout)
+        signingLayout = findViewById(R.id.signing_layout)
+        constraintLayoutStateSignOut = findViewById(R.id.constraintLayout2_state_signout)
+        welcomeTV = findViewById(R.id.welcome_tv)
+    }
 
     private fun updateUI(account: GoogleSignInAccount?) {
         if (account != null) {
-            emailAndSigningInfoTV.text = account.email
-            signInButton.visibility = View.GONE
-            signOutButton.visibility = View.VISIBLE
-            signingLayout.visibility = View.VISIBLE
+            emailTV.text = account.email
+            emailTV.makeVisible()
+            signOutButton.makeVisible()
+            signingLayout.makeVisible()
+            welcomeTV.makeVisible()
+            profilePicLayout.makeVisible()
+            constraintLayoutStateSignOut.makeGone()
+            signInButton.makeGone()
             saveDatabaseButton.isEnabled = true
             loadButton.isEnabled = true
-            profilePicLayout.visibility = View.VISIBLE
             if (account.photoUrl != null) setPicture(account.photoUrl!!, profilePic)
         }
     }
 
     private fun signOut() {
         mGoogleSignInClient.signOut().addOnCompleteListener {
-            signOutButton.visibility = View.GONE
-            signInButton.visibility = View.VISIBLE
-            setSigningInfoTV()
-            signingLayout.visibility = View.GONE
+            signOutButton.makeGone()
+            signingLayout.makeGone()
+            welcomeTV.makeGone()
+            signInButton.makeVisible()
+            constraintLayoutStateSignOut.makeVisible()
+            emailTV.text = ""
             saveDatabaseButton.isEnabled = false
             loadButton.isEnabled = false
             Glide.with(this).clear(profilePic)
@@ -125,12 +146,6 @@ class OnlineDataActivity : AppCompatActivity() {
         val signInIntent: Intent = mGoogleSignInClient.signInIntent
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
-
-    private fun setSigningInfoTV() {
-        emailAndSigningInfoTV.text = getString(R.string.singing_info)
-    }
-
-
 
 
     private fun checkForGooglePermissions() {
@@ -293,16 +308,7 @@ class OnlineDataActivity : AppCompatActivity() {
         }
     }
 
-    private fun bindView() {
-        signInButton = findViewById(R.id.sign_in_button)
-        saveDatabaseButton = findViewById(R.id.save_database_button)
-        loadButton = findViewById(R.id.load_database_button)
-        signOutButton = findViewById(R.id.sign_out_button)
-        emailAndSigningInfoTV = findViewById(R.id.email_and_signing_info_tv)
-        profilePic = findViewById(R.id.profile_picture)
-        profilePicLayout = findViewById(R.id.profile_picture_layout)
-        signingLayout = findViewById(R.id.signing_layout)
-    }
+
 
     private fun getDatabaseFileAndSaveItInVariable() {
         databaseFile = getDatabasePath("product_database").absoluteFile
