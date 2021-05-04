@@ -1,15 +1,16 @@
 package com.erdees.foodcostcalc
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.marginTop
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import com.bumptech.glide.Glide
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.drive.DriveServiceHelper
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -33,11 +34,15 @@ import java.util.*
 class OnlineDataActivity : AppCompatActivity() {
 
     private lateinit var signInButton: SignInButton
-    private lateinit var testEmail: TextView
+    private lateinit var emailAndSigningInfoTV: TextView
     private lateinit var signOutButton: Button
+    private lateinit var alertDialog: AlertDialog
+    private lateinit var resultAlertDialog: AlertDialog
     private lateinit var saveDatabaseButton: Button
     private lateinit var loadButton: Button
-
+    private lateinit var profilePic: ImageView
+    private lateinit var profilePicLayout : FrameLayout
+    private lateinit var signingLayout: ConstraintLayout
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var googleDriveService: Drive
     private lateinit var mDriveServiceHelper: DriveServiceHelper
@@ -63,12 +68,16 @@ class OnlineDataActivity : AppCompatActivity() {
         setContentView(R.layout.online_data_activity)
 
         getDatabaseFileAndSaveItInVariable()
-        setButtons()
+        bindView()
+        setSigningInfoTV()
 
         val googleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .build()
-        mGoogleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions) // Check for existing Google Sign In account, if the user is already signed in the GoogleSignInAccount will be non-null.
+        mGoogleSignInClient = GoogleSignIn.getClient(
+            this,
+            googleSignInOptions
+        ) // Check for existing Google Sign In account, if the user is already signed in the GoogleSignInAccount will be non-null.
 
         signInButton.setOnClickListener {
             signIn()
@@ -88,11 +97,27 @@ class OnlineDataActivity : AppCompatActivity() {
 
     private fun updateUI(account: GoogleSignInAccount?) {
         if (account != null) {
-            testEmail.text = account.email
+            emailAndSigningInfoTV.text = account.email
             signInButton.visibility = View.GONE
             signOutButton.visibility = View.VISIBLE
+            signingLayout.visibility = View.VISIBLE
             saveDatabaseButton.isEnabled = true
             loadButton.isEnabled = true
+            profilePicLayout.visibility = View.VISIBLE
+            if (account.photoUrl != null) setPicture(account.photoUrl!!, profilePic)
+        }
+    }
+
+    private fun signOut() {
+        mGoogleSignInClient.signOut().addOnCompleteListener {
+            signOutButton.visibility = View.GONE
+            signInButton.visibility = View.VISIBLE
+            setSigningInfoTV()
+            signingLayout.visibility = View.GONE
+            saveDatabaseButton.isEnabled = false
+            loadButton.isEnabled = false
+            Glide.with(this).clear(profilePic)
+            profilePicLayout.visibility = View.INVISIBLE
         }
     }
 
@@ -101,14 +126,8 @@ class OnlineDataActivity : AppCompatActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
-    private fun signOut() {
-        mGoogleSignInClient.signOut().addOnCompleteListener {
-            signOutButton.visibility = View.GONE
-            signInButton.visibility = View.VISIBLE
-            testEmail.text = "Sign in with google account to save and download your database."
-            saveDatabaseButton.isEnabled = false
-            loadButton.isEnabled = false
-        }
+    private fun setSigningInfoTV() {
+        emailAndSigningInfoTV.text = getString(R.string.singing_info)
     }
 
 
@@ -130,11 +149,7 @@ class OnlineDataActivity : AppCompatActivity() {
                 SCOPE_EMAIL
             )
         } else {
-            Toast.makeText(
-                this,
-                "Permission to access Drive and Email has been granted",
-                Toast.LENGTH_SHORT
-            ).show()
+            Log.i(TAG, "Permission to access Drive And email has been granted.")
             driveSetUp()
         }
     }
@@ -158,58 +173,108 @@ class OnlineDataActivity : AppCompatActivity() {
 
 
     private fun loadFileFromDrive() {
+        showLoadingDialog()
         val file = File(getExternalFilesDir(null), "product_database")
         mDriveServiceHelper.queryFiles().addOnSuccessListener { fileList ->
-           val database = fileList.files.first()
-            mDriveServiceHelper.downloadFile(file, database.id)?.addOnSuccessListener {
-                    swapDatabaseFiles(file)
+            if(fileList.files.isEmpty()){
+                alertDialog.dismiss()
+                showResultDialog(false,"Can't find useful database in your google drive.")
+                return@addOnSuccessListener
             }
+            val database = fileList.files.first()
+            mDriveServiceHelper.downloadFile(file, database.id)?.addOnSuccessListener {
+                swapDatabaseFiles(file)
+            }
+                ?.addOnFailureListener {
+                    alertDialog.dismiss()
+                    showResultDialog(false,"Can't find useful database in your google drive.")
+                }
         }
     }
 
-    private fun swapDatabaseFiles(file: File){
+    private fun swapDatabaseFiles(file: File) {
         AppRoomDataBase.getDatabase(applicationContext).close()
         databaseFile.delete()
         copyFile(file.absolutePath, databaseFile.name, databaseFile.absolutePath)
         AppRoomDataBase.recreateDatabaseFromFile(applicationContext, file) // TO OPEN DATABASE
-        val mainActivity = Intent(applicationContext, MainActivity::class.java)  // NOW RESTARTING ACTIVITY SO DATABASE IS REFRESHED
+        val mainActivity = Intent(
+            applicationContext,
+            MainActivity::class.java
+        )  // NOW RESTARTING ACTIVITY SO DATABASE IS REFRESHED
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) //so by pressing back btn user doesn't come back to this activity
+        alertDialog.dismiss()
         startActivity(mainActivity)
     }
 
+    private fun showLoadingDialog() {
+        val progressBar = this.layoutInflater.inflate(R.layout.loading_bar, null)
+        alertDialog = AlertDialog.Builder(this)
+            .setView(progressBar)
+            .show()
+        alertDialog.window?.setBackgroundDrawable(
+            ContextCompat.getDrawable(
+                this,
+                R.drawable.background_for_dialogs
+            )
+        )
+    }
+
+    private fun showResultDialog(wasSuccessful: Boolean, error : String?) {
+        var message = ""
+        message = if(wasSuccessful) "Your database was successfully saved in google drive."
+        else "Something went wrong, your database wasn't saved."
+        if(error != null) message = error
+       resultAlertDialog =  AlertDialog.Builder(this)
+           .setMessage(message)
+           .setNegativeButton("Back",null)
+           .create()
+        resultAlertDialog.window?.setBackgroundDrawable(
+            ContextCompat.getDrawable(this,R.drawable.background_for_dialogs)
+        )
+        resultAlertDialog.show()
+    }
 
 
     private fun saveOrUpdateDatabaseInDrive() {
+        showLoadingDialog()
         mDriveServiceHelper.queryFiles().addOnSuccessListener { fileList ->
-        if(fileList.files.isEmpty())saveDataBaseInDrive()
-        else { updateDatabaseInDrive(fileList.files.first()) }
+            if (fileList.files.isEmpty()) saveDataBaseInDrive()
+            else {
+                updateDatabaseInDrive(fileList.files.first())
+            }
         }
     }
 
-    private fun updateDatabaseInDrive(file: com.google.api.services.drive.model.File){
+    private fun updateDatabaseInDrive(file: com.google.api.services.drive.model.File) {
         mDriveServiceHelper.deleteFolderFile(file.id)?.addOnSuccessListener {
             Log.i(TAG, "File deleted!")
             saveDataBaseInDrive()
         }
     }
 
-    private fun saveDataBaseInDrive(){
+    private fun saveDataBaseInDrive() {
         mDriveServiceHelper.uploadFile(databaseFile, null, null)
             ?.addOnSuccessListener {
                 val gson = Gson()
                 Log.i(TAG, "onSuccess of save database " + gson.toJson(it))
+                alertDialog.dismiss()
+                showResultDialog(true,null)
             }
-            ?.addOnFailureListener { Log.i(TAG, "onFailure of saving database " + it.message) }
+            ?.addOnFailureListener {
+                Log.i(TAG, "onFailure of saving database " + it.message)
+                alertDialog.dismiss()
+            showResultDialog(wasSuccessful = false,null)
+            }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
-        if(requestCode == RC_SIGN_IN) {
-                val task: Task<GoogleSignInAccount> =
-                    GoogleSignIn.getSignedInAccountFromIntent(data)
-                handleSignInResult(task)
-            }
+        if (requestCode == RC_SIGN_IN) {
+            val task: Task<GoogleSignInAccount> =
+                GoogleSignIn.getSignedInAccountFromIntent(data)
+            handleSignInResult(task)
+        }
     }
 
     private fun handleSignInResult(completedTask: Task<GoogleSignInAccount>) {
@@ -228,16 +293,26 @@ class OnlineDataActivity : AppCompatActivity() {
         }
     }
 
-    private fun setButtons(){
+    private fun bindView() {
         signInButton = findViewById(R.id.sign_in_button)
         saveDatabaseButton = findViewById(R.id.save_database_button)
         loadButton = findViewById(R.id.load_database_button)
         signOutButton = findViewById(R.id.sign_out_button)
-        testEmail = findViewById(R.id.test_sign_in) // TODO TO ERASE
+        emailAndSigningInfoTV = findViewById(R.id.email_and_signing_info_tv)
+        profilePic = findViewById(R.id.profile_picture)
+        profilePicLayout = findViewById(R.id.profile_picture_layout)
+        signingLayout = findViewById(R.id.signing_layout)
     }
 
     private fun getDatabaseFileAndSaveItInVariable() {
         databaseFile = getDatabasePath("product_database").absoluteFile
+    }
+
+    private fun setPicture(imageUrl: Uri, image: ImageView) {
+        Glide.with(this)
+            .load(imageUrl)
+            .circleCrop()
+            .into(image)
     }
 
     companion object {
@@ -261,7 +336,8 @@ class OnlineDataActivity : AppCompatActivity() {
             out.flush()
             out.close()
         } catch (fnfe1: FileNotFoundException) {
-            fnfe1.message?.let { Log.e("tag fnfe1", it)
+            fnfe1.message?.let {
+                Log.e("tag fnfe1", it)
             }
         } catch (e: Exception) {
             Log.e("tag exception", e.message!!)

@@ -17,10 +17,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <LinearLayout
-            android:id="@+id/linearLayout3"
+        <FrameLayout
+            android:id="@+id/profile_picture_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:visibility="invisible"
             android:layout_marginLeft="5dp"
             android:layout_marginTop="5dp"
             android:background="@drawable/ic_ellipse_1"
@@ -29,36 +30,38 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
+                android:layout_gravity="center"
                 android:id="@+id/profile_picture"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_width="95dp"
+                android:layout_height="95dp" />
 
-        </LinearLayout>
+        </FrameLayout>
 
         <TextView
             android:id="@+id/welcome_tv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="13dp"
+            android:layout_marginStart="5dp"
             android:layout_marginTop="5dp"
             android:text="Welcome!"
             android:textColor="@color/gray_500"
             android:textSize="52sp"
             app:layout_constraintHorizontal_bias="0.25"
-            app:layout_constraintStart_toEndOf="@+id/linearLayout3"
+            app:layout_constraintStart_toEndOf="@+id/profile_picture_layout"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/test_sign_in"
+            android:id="@+id/email_and_signing_info_tv"
             android:layout_width="270dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="13dp"
-            android:layout_marginEnd="0dp"
+            android:layout_marginStart="15dp"
             android:textColor="@color/gray_700"
             android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@+id/linearLayout3"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/profile_picture_layout"
             app:layout_constraintTop_toBottomOf="@+id/welcome_tv"
-            tools:text="Sign in with google account to save and download database from drive." />
+            tools:text="Sign in with google account to save and download your database from google drive." />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -79,6 +82,7 @@
             android:id="@+id/save_database_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:enabled="false"
             android:background="@drawable/button_online_data"
             android:text="Save data"
             android:textSize="28sp"
@@ -91,23 +95,16 @@
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/signing_layout"
         android:layout_width="201dp"
         android:layout_height="73dp"
+        android:visibility="gone"
         android:layout_marginBottom="48dp"
         android:background="@drawable/ic_small_rectangle_5"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
-        <com.google.android.gms.common.SignInButton
-            android:id="@+id/sign_in_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-             />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/sign_out_button"
@@ -122,6 +119,17 @@
             app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <com.google.android.gms.common.SignInButton
+        android:id="@+id/sign_in_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="58dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        />
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/load_database_layout"
@@ -139,6 +147,7 @@
             android:id="@+id/load_database_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:enabled="false"
             android:text="Load database"
             android:visibility="visible"
             android:textSize="28sp"

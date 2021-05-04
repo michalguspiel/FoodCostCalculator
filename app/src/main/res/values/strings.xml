@@ -66,4 +66,5 @@
     <string name="send_feedback">Send feedback</string>
     <string name="add_product_to_half_product">Add product to half product</string>
     <string name="create_half_product">Create half product</string>
+    <string name="singing_info">Sign in with google account to save and download your database from google drive.</string>
 </resources>
