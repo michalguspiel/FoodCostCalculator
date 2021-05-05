@@ -24,6 +24,7 @@ It is my first android project as well as programming project in general. In tot
 - Recycler Views
 - List Views
 - Google Drive API
+- Rx Java / Rx Kotlin
 
 ### Features implemented 
 - Creating dishes
