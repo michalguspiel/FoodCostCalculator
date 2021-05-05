@@ -23,12 +23,18 @@ It is my first android project as well as programming project in general. In tot
 - Dialog fragments
 - Recycler Views
 - List Views
+- Google Drive API
 
 ### Features implemented 
 - Creating dishes
 - Creating half products 
 - Calculating prices 
+- Presenting dish data for multiple dishes
+- Presenting half product data for X of volume 
+- Saving database into user google drive
+- Loading database from user google drive
 - Units: Metric(gram, kilogram, millilter,liter) US(ounce, pound, fluid ounce, gallon)
+
 
 ### TODO 
 - Printing recipe? 
