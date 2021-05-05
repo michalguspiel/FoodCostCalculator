@@ -27,6 +27,7 @@ class ProductsViewModel(application: Application):AndroidViewModel(application) 
 
     }
 
+    fun getProducts() = productRepository.getProducts()
 
     fun getWhatToSearchFor() = basicRepository.getWhatToSearchFor()
 }

@@ -14,38 +14,62 @@ import com.erdees.foodcostcalc.model.GrandDish
 import com.erdees.foodcostcalc.viewmodel.DishesViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
+import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import java.util.*
 
 class Dishes : Fragment() {
 
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var listViewViewModelPassedToRecyclerView: DishListViewAdapterViewModel
+    private lateinit var viewModelPassedToRecyclerView: DishAdapterViewModel
+
+
     override fun onCreateView(
-            inflater: LayoutInflater,
-            container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View {
         inflater.inflate(R.layout.fragment_dishes, container, false)
         val view: View = inflater.inflate(R.layout.fragment_dishes, container, false)
 
         val viewModel = ViewModelProvider(this).get(DishesViewModel::class.java)
-        val viewModelPassedToRecyclerView = ViewModelProvider(this).get(DishAdapterViewModel::class.java)
-        val listViewViewModelPassedToRecyclerView = ViewModelProvider(this).get(DishListViewAdapterViewModel::class.java)
+        viewModelPassedToRecyclerView =
+            ViewModelProvider(this).get(DishAdapterViewModel::class.java)
+        listViewViewModelPassedToRecyclerView =
+            ViewModelProvider(this).get(DishListViewAdapterViewModel::class.java)
 
-        val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_dishes)
+        recyclerView = view.findViewById(R.id.recycler_view_dishes)
         recyclerView.setHasFixedSize(true)
+        setEmptyAdapterToRecyclerView()
 
-        viewModel.getWhatToSearchFor().observe(viewLifecycleOwner,  { searchWord ->
-            viewModel.getGrandDishes().observe(viewLifecycleOwner,  { grandDishes ->
+        viewModel.getWhatToSearchFor().observe(viewLifecycleOwner, { searchWord ->
+            viewModel.getGrandDishes().observe(viewLifecycleOwner, { grandDishes ->
                 val grandDishesList = mutableListOf<GrandDish>()
-                grandDishes.forEach { grandDishesList.add(it)}
+                grandDishes.forEach { grandDishesList.add(it) }
                 recyclerView.adapter = DishAdapter(TAG,
-                        grandDishesList.filter{it.dish.name.toLowerCase().contains(searchWord.toLowerCase())} as ArrayList<GrandDish>,
-                        childFragmentManager,viewModelPassedToRecyclerView,
+                    grandDishesList.filter {
+                        it.dish.name.toLowerCase().contains(searchWord.toLowerCase())
+                    } as ArrayList<GrandDish>,
+                    childFragmentManager, viewModelPassedToRecyclerView,
                     listViewViewModelPassedToRecyclerView,
-                    viewLifecycleOwner,requireActivity())
+                    viewLifecycleOwner, requireActivity())
             })
         })
 
         return view
+    }
+
+    /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No adapter attached; skipping layout" */
+    private fun setEmptyAdapterToRecyclerView() {
+        recyclerView.adapter = DishAdapter(
+            TAG,
+            arrayListOf(),
+            childFragmentManager,
+            viewModelPassedToRecyclerView,
+            listViewViewModelPassedToRecyclerView,
+            viewLifecycleOwner,
+            requireActivity()
+        )
     }
 
     companion object {

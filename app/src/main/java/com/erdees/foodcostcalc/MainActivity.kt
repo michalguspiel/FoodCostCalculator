@@ -5,13 +5,12 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
+import androidx.core.view.MenuCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
@@ -153,6 +152,9 @@ class MainActivity : AppCompatActivity() {
         dialog.show(transaction, dialog.tag)
     }
 
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -232,6 +234,10 @@ class MainActivity : AppCompatActivity() {
                     R.id.nav_add_product_to_half_product -> {
                         openDialog(AddProductToHalfProduct())
                     }
+                    R.id.nav_online_data -> {
+                        val intent = Intent(this,OnlineDataActivity::class.java)
+                        startActivity(intent,savedInstanceState)
+                    }
                 }
                 drawerLayout.closeDrawer(GravityCompat.START)
                 return@OnNavigationItemSelectedListener true
@@ -261,8 +267,11 @@ class MainActivity : AppCompatActivity() {
             }
         replaceFragment(productsFragment, Products.TAG)
         bottomNavigation.setOnNavigationItemSelectedListener(menuNavigationClickListener)
+
         sideNavigation = findViewById(R.id.nav_view)
         sideNavigation.setNavigationItemSelectedListener(sideNavigationClickListener)
     }
+
+
 
 }

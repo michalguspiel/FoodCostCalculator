@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group>
         <item
             android:id="@+id/nav_add_product"
             android:icon="@drawable/ic_add"
@@ -17,16 +16,23 @@
         <item
             android:id="@+id/nav_create_half_product"
             android:icon="@drawable/ic_croissant"
-            android:title="Create half product"/>
+            android:title="@string/create_half_product"/>
         <item
             android:id="@+id/nav_add_product_to_half_product"
             android:icon="@drawable/ic_bread"
-            android:title="Add product to half product"/>
+            android:title="@string/add_product_to_half_product"/>
+
+    <group
+        android:id="@+id/group_0001"
+        android:menuCategory="secondary">
         <item
             android:id="@+id/nav_personalize"
             android:icon="@drawable/ic_settings"
             android:title="@string/personalize"/>
-
+        <item
+            android:id="@+id/nav_online_data"
+            android:icon="@drawable/ic_browser"
+            android:title="Your online data"/>
     </group>
 
 

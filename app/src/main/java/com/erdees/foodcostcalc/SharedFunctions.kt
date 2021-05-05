@@ -8,6 +8,14 @@ import java.text.NumberFormat
 
 object SharedFunctions {
 
+    fun View.makeGone(){
+        this.visibility = View.GONE
+    }
+
+    fun View.makeVisible(){
+        this.visibility = View.VISIBLE
+    }
+
     fun formatPriceOrWeight(number: Double): String {
         val df = DecimalFormat("#.##")
         return df.format(number)
