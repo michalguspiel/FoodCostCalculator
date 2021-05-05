@@ -22,55 +22,15 @@ class DriveServiceHelper(driveService: Drive) {
     private val mExecutor: Executor = Executors.newSingleThreadExecutor()
     private val mDriveService: Drive = driveService
 
-    /**
-     * Creates a text file in the user's My Drive folder and returns its file ID.
-     */
-    fun createFile(): Task<String> {
-        return call(mExecutor) {
-            val metadata: File = File()
-                .setParents(Collections.singletonList("root"))
-                .setMimeType("text/plain")
-                .setName("Untitled file")
-            val googleFile: File = mDriveService.files().create(metadata).execute()
-                ?: throw IOException("Null result when requesting file creation.")
-            googleFile.id
-        }
-    }
-
-    /**
-     * Opens the file identified by `fileId` and returns a [Pair] of its name and
-     * contents.
-     */
-    fun readFile(fileId: String?): Task<Pair<String, String>> {
-        return call(mExecutor) {
-
-            // Retrieve the metadata as a File object.
-            val metadata: File = mDriveService.files().get(fileId).execute()
-            val name: String = metadata.name
-            mDriveService.files().get(fileId).executeMediaAsInputStream().use { `is` ->
-                BufferedReader(InputStreamReader(`is`)).use { reader ->
-                    val stringBuilder = StringBuilder()
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) {
-                        stringBuilder.append(line)
-                    }
-                    val contents = stringBuilder.toString()
-                    return@call Pair(name, contents)
-                }
-            }
-        }
-    }
 
     fun downloadFile(targetFile: java.io.File?, fileId: String?): Task<Void?>? {
         return call(mExecutor) {
-
             // Retrieve the metadata as a File object.
             val outputStream: OutputStream = FileOutputStream(targetFile)
             mDriveService.files()[fileId].executeMediaAndDownloadTo(outputStream)
             null
         }
     }
-
 
     fun deleteFolderFile(fileId: String?): Task<Void?>? {
         return call(mExecutor,
@@ -97,75 +57,7 @@ class DriveServiceHelper(driveService: Drive) {
         return call(mExecutor) { mDriveService.files().list().setSpaces("drive").execute() }
     }
 
-    /**
-     * Returns an [Intent] for opening the Storage Access Framework file picker.
-     */
-    fun createFilePickerIntent(): Intent {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.type = "text/plain"
-        return intent
-    }
 
-    /**
-     * Opens the file at the `uri` returned by a Storage Access Framework [Intent]
-     * created by [.createFilePickerIntent] using the given `contentResolver`.
-     */
-    fun openFileUsingStorageAccessFramework(
-        contentResolver: ContentResolver, uri: Uri?
-    ): Task<Pair<String, String>> {
-        return call(mExecutor) {
-
-            // Retrieve the document's display name from its metadata.
-            var name: String
-            contentResolver.query(uri!!, null, null, null, null).use { cursor ->
-                name = if (cursor != null && cursor.moveToFirst()) {
-                    val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-                    cursor.getString(nameIndex)
-                } else {
-                    throw IOException("Empty cursor returned for file.")
-                }
-            }
-
-            // Read the document's contents as a String.
-            var content: String
-            contentResolver.openInputStream(uri).use { `is` ->
-                BufferedReader(InputStreamReader(`is`)).use { reader ->
-                    val stringBuilder = StringBuilder()
-                    var line: String?
-                    while (reader.readLine().also { line = it } != null) {
-                        stringBuilder.append(line)
-                    }
-                    content = stringBuilder.toString()
-                }
-            }
-            Pair(name, content)
-        }
-    }
-
-
-
-    // TO CREATE A FOLDER
-    fun createFolder(
-        folderName: String?,
-        @Nullable folderId: String?
-    ): Task<GoogleDriveFileHolder>? {
-        return call(mExecutor,
-            {
-                val googleDriveFileHolder = GoogleDriveFileHolder()
-                val root: List<String> = folderId?.let { listOf(it) } ?: listOf("root")
-                val metadata =
-                    File()
-                        .setParents(root)
-                        .setMimeType("application/vnd.google-apps.folder")
-                        .setName(folderName)
-                val googleFile =
-                    mDriveService.files().create(metadata).execute()
-                        ?: throw IOException("Null result when requesting file creation.")
-                googleDriveFileHolder.id = googleFile.id
-                googleDriveFileHolder
-            })
-    }
 
     fun uploadFile(
         localFile: java.io.File,

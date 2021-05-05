@@ -31,7 +31,7 @@
             android:title="@string/personalize"/>
         <item
             android:id="@+id/nav_online_data"
-            android:icon="@drawable/ic_settings"
+            android:icon="@drawable/ic_browser"
             android:title="Your online data"/>
     </group>
 
