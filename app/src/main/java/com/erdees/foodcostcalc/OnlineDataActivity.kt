@@ -87,13 +87,15 @@ class OnlineDataActivity : AppCompatActivity() {
             signIn()
         }
         saveDatabaseButton.setOnClickListener {
-            saveOrUpdateDatabaseInDrive()
+            if(accountDoesNotHaveGooglePermissions())showResultDialog(false,"Error! Can't do that without permissions.")
+            else saveOrUpdateDatabaseInDrive()
         }
         signOutButton.setOnClickListener {
             signOut()
         }
         loadButton.setOnClickListener {
-            loadFileFromDrive()
+            if(accountDoesNotHaveGooglePermissions())showResultDialog(false,"Error! Can't do that without permissions.")
+            else loadFileFromDrive()
         }
 
     }
@@ -147,15 +149,17 @@ class OnlineDataActivity : AppCompatActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
+    private fun accountDoesNotHaveGooglePermissions(): Boolean {
+        return !GoogleSignIn.hasPermissions(
+            GoogleSignIn.getLastSignedInAccount(applicationContext),
+            ACCESS_DRIVE_SCOPE,
+            SCOPE_EMAIL
+        )
+    }
 
     private fun checkForGooglePermissions() {
         Log.w(TAG, "checking for permission")
-        if (!GoogleSignIn.hasPermissions(
-                GoogleSignIn.getLastSignedInAccount(applicationContext),
-                ACCESS_DRIVE_SCOPE,
-                SCOPE_EMAIL
-            )
-        ) {
+        if (accountDoesNotHaveGooglePermissions()) {
             GoogleSignIn.requestPermissions(
                 this@OnlineDataActivity,
                 RC_SIGN_IN,
@@ -298,13 +302,14 @@ class OnlineDataActivity : AppCompatActivity() {
             Log.i(TAG, "signInResult: SUCCESS !")
             // Signed in successfully, show authenticated UI.
             updateUI(account)
+            checkForGooglePermissions()
             driveSetUp()
         } catch (e: ApiException) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.statusCode)
             updateUI(null)
-            checkForGooglePermissions()
+          //  checkForGooglePermissions()
         }
     }
 
