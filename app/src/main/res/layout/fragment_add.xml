@@ -150,7 +150,7 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/addProduct"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -248,7 +248,7 @@
     </LinearLayout>
 
 
-        <Button
+            <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/count_waste_percent_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -348,7 +348,7 @@
 
             </LinearLayout>
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/count_price_per_piece_btn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

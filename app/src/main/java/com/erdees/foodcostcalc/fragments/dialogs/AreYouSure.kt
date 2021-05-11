@@ -55,7 +55,7 @@ class AreYouSure : DialogFragment() {
         var listOfHalfProductsIncludedInDish = listOf<HalfProductIncludedInDish>()
 
         /**Observe data to set positions to provide parameters for delete methods */
-        viewModel.getPosition().observe(viewLifecycleOwner, Observer { position ->
+        viewModel.getPosition().observe(viewLifecycleOwner,  { position ->
             pos = position
         })
 
@@ -64,7 +64,7 @@ class AreYouSure : DialogFragment() {
          * Populates 'listOfProductsIncludedToErase' with list of ProductsIncluded in
          * Dish that is saved as 'dishToDelete' so they will be erased from database.
          * */
-        viewModel.readAllDishData.observe(viewLifecycleOwner, Observer { dish ->
+        viewModel.readAllDishData.observe(viewLifecycleOwner,  { dish ->
             if (this.tag == EditDish.TAG) {
                 dishToDelete = dish[pos!!]
                 viewModel.getProductIncludedByDishId(dishToDelete.dishId)
@@ -80,7 +80,7 @@ class AreYouSure : DialogFragment() {
          *  Get list of every halfProduct Included in dish in order to erase them from database
          * when certain HalfProduct gets erased.
          * */
-        viewModel.readAllHalfProductData.observe(viewLifecycleOwner, Observer { halfProduct ->
+        viewModel.readAllHalfProductData.observe(viewLifecycleOwner,  { halfProduct ->
             if(this.tag == EditHalfProduct.TAG){
                 halfProductToDelete = halfProduct[pos!!]
                 viewModel.getProductsIncludedFromHalfProduct(halfProductToDelete.halfProductId)
@@ -142,8 +142,7 @@ class AreYouSure : DialogFragment() {
                 EditHalfProduct.TAG ->{
                     viewModel.setFlag(false)
                     listOfProductsIncludedInHalfProductToErase.forEach { viewModel.deleteProductIncludedInHalfProduct(it)}
-                    viewModel.deleteHalfProducts(halfProductToDelete)
-                    // Delete every halfProductIncludedInDish
+                    viewModel.deleteHalfProducts(halfProductToDelete) // Delete every halfProductIncludedInDish
                     listOfHalfProductsIncludedInDish.forEach { viewModel.deleteHalfProductIncludedInDish(it) }
                 }
 
@@ -151,13 +150,13 @@ class AreYouSure : DialogFragment() {
                     viewModel.getDishesWithProductsIncluded()
                         .observe(
                             viewLifecycleOwner,
-                            Observer { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })
+                             { viewModel.deleteProductIncluded(viewModel.getProductIncluded().value!!) })
                 }
                 "EditHalfProductAdapter" -> {
                     viewModel.getHalfProductWithProductIncluded()
                         .observe(
                             viewLifecycleOwner,
-                            Observer {
+                             {
                                 viewModel.deleteProductIncludedInHalfProduct(
                                     viewModel.getProductIncludedInHalfProduct().value!!
                                 )
@@ -166,7 +165,7 @@ class AreYouSure : DialogFragment() {
                 }
                 "EditDishAdapterDeleteHalfProduct" -> {
                     viewModel.getHalfProductIncluded().observe(viewLifecycleOwner,
-                        Observer { halfProductIncluded ->
+                         { halfProductIncluded ->
                             viewModel.deleteHalfProductIncludedInDish(halfProductIncluded)
                         })
                 }

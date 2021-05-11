@@ -60,7 +60,7 @@
         tools:ignore="LabelFor" />
 
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/save_settings_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

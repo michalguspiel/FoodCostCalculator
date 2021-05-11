@@ -46,11 +46,9 @@ abstract class AppRoomDataBase : RoomDatabase() {
         fun getDatabase(context: Context): AppRoomDataBase {
             val tempInstance = INSTANCE
             if (tempInstance != null) {
-                Log.i("TEST", "old instance returned")
                 return tempInstance
             }
             synchronized(this) {
-                Log.i("TEST", "new instance created")
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppRoomDataBase::class.java,
@@ -69,7 +67,6 @@ abstract class AppRoomDataBase : RoomDatabase() {
                 .createFromFile(file)
                 .build()
             INSTANCE = instance
-            Log.i("TEST","Swapping DATABASE!")
         }
         }
 
