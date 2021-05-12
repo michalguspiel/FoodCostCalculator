@@ -6,11 +6,11 @@ Food cost calculator is an easy to use application which simplifies counting rea
 
 
 
+<button name="button" onclick="http://www.google.com">Click me</button>
 
 
 
-
-### Support or Contact
+## Support or Contact
 Having question? Send me mail to guspielmichal@gmail.com.
 
 
