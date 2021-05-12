@@ -5,9 +5,9 @@ Food cost calculator is an easy to use application which simplifies counting rea
 ![screenshot1](https://user-images.githubusercontent.com/70368829/117968773-3ccf8580-b32f-11eb-91ef-aacfba84510e.png)
 
 
-
-<button name="button" onclick="http://www.google.com">Click me</button>
-
+<center>
+<button name="button" onclick="http://www.google.com">Download</button>
+</center>
 
 
 ## Support or Contact
