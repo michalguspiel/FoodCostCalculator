@@ -215,14 +215,12 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
 
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        when (parent?.id) {
+        chosenUnit = when (parent?.id) {
             spinnerId -> {
-                Log.i(TAG, "ITEM SELECTED DOES IT WORK??")
-                chosenUnit = unitList[position]
+                unitList[position]
             }
             else -> {
-                Log.i(TAG, "ANNOTHER CLICKED BUT WHY? + " + parent?.id + id)
-                chosenUnit = unitList[position]
+                unitList[position]
             }
         }
     }

@@ -25,8 +25,8 @@ class AreYouSureViewModel(application: Application): AndroidViewModel(applicatio
     val readAllProductData: LiveData<List<Product>>
     val readAllDishData: LiveData<List<Dish>>
     val readAllHalfProductData: LiveData<List<HalfProduct>>
-    val readAllProductIncludedInHalfProductData: LiveData<List<ProductIncludedInHalfProduct>>
-    val readAllProductIncludedInHalfProductDataNotAsc: LiveData<List<ProductIncludedInHalfProduct>>
+    private val readAllProductIncludedInHalfProductData: LiveData<List<ProductIncludedInHalfProduct>>
+    private val readAllProductIncludedInHalfProductDataNotAsc: LiveData<List<ProductIncludedInHalfProduct>>
 
     private val productRepository: ProductRepository
     private val dishRepository: DishRepository

@@ -1,36 +1,27 @@
 package com.erdees.foodcostcalc
 
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
-import androidx.core.view.MenuCompat
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.fragments.*
 import com.erdees.foodcostcalc.fragments.dialogs.AddProductToDish
 import com.erdees.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
 import com.erdees.foodcostcalc.fragments.dialogs.CreateDish
 import com.erdees.foodcostcalc.fragments.dialogs.CreateHalfProduct
-import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.MainActivityViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
-import com.google.android.play.core.review.ReviewManagerFactory
-import com.google.android.play.core.review.model.ReviewErrorCode
-import com.google.android.play.core.review.testing.FakeReviewManager
 
 
 class MainActivity : AppCompatActivity() {

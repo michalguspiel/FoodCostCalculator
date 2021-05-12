@@ -88,7 +88,7 @@
         android:orientation="horizontal"
         android:layout_gravity="center_horizontal">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/save_halfproduct_changes_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -100,7 +100,7 @@
             android:text="@string/save"
             tools:ignore="ButtonStyle" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/delete_halfproduct_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
