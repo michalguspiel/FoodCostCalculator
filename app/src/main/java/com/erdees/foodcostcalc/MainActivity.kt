@@ -166,7 +166,8 @@ class MainActivity : AppCompatActivity() {
         }
         searchBtn.setOnClickListener {
             viewModel.searchFor(searchTextField.text.toString())
-            menuBtn.visibility = View.GONE
+            menuBtn.visibility = View.INVISIBLE
+            menuBtn.isEnabled = false
             backBtn.visibility = View.VISIBLE
         }
         backBtn.setOnClickListener {
@@ -174,6 +175,7 @@ class MainActivity : AppCompatActivity() {
             searchTextField.text.clear()
             backBtn.visibility = View.GONE
             menuBtn.visibility = View.VISIBLE
+            menuBtn.isEnabled = true
         }
 
 

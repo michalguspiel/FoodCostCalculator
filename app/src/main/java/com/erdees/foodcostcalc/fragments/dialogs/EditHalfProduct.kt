@@ -13,6 +13,7 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.SharedFunctions.filterVol
@@ -85,6 +86,7 @@ class EditHalfProduct : DialogFragment(), AdapterView.OnItemClickListener {
         val recyclerViewAdapter =
             EditHalfProductAdapter(ViewModelProvider(this).get(EditHalfProductAdapterViewModel::class.java), childFragmentManager)
         recycleView.adapter = recyclerViewAdapter
+        recycleView.layoutManager =  LinearLayoutManager(requireContext(),LinearLayoutManager.VERTICAL,false)
         sharedPreferences = SharedPreferences(requireContext())
 
 
