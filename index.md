@@ -1,4 +1,4 @@
-# Food Cost Calculator
+# <center>Food Cost Calculator</center>
 
 Food cost calculator is an easy to use application which simplifies counting real food cost of dishes or products with their waste, that You provide for your customers, app saves all entered products, composed half products or dishes in phone memory so You don't need to worry about losing your data. In case of device change Food Cost Calculator provides a feature which allows You to sign in with google account and save data to google drive, then on another device all You need to do is to sign with same google account and load database from google drive back! 
 
