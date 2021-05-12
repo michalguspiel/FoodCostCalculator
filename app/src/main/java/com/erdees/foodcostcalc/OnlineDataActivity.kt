@@ -46,7 +46,6 @@ class OnlineDataActivity : AppCompatActivity() {
     private lateinit var loadButton: Button
     private lateinit var profilePic: ImageView
     private lateinit var profilePicLayout : FrameLayout
-    private lateinit var signingLayout: ConstraintLayout
     private lateinit var mGoogleSignInClient: GoogleSignInClient
     private lateinit var googleDriveService: Drive
     private lateinit var mDriveServiceHelper: DriveServiceHelper
@@ -108,7 +107,6 @@ class OnlineDataActivity : AppCompatActivity() {
         emailTV = findViewById(R.id.email_tv)
         profilePic = findViewById(R.id.profile_picture)
         profilePicLayout = findViewById(R.id.profile_picture_layout)
-        signingLayout = findViewById(R.id.signing_layout)
         constraintLayoutStateSignOut = findViewById(R.id.constraintLayout2_state_signout)
         welcomeTV = findViewById(R.id.welcome_tv)
     }
@@ -118,7 +116,6 @@ class OnlineDataActivity : AppCompatActivity() {
             emailTV.text = account.email
             emailTV.makeVisible()
             signOutButton.makeVisible()
-            signingLayout.makeVisible()
             welcomeTV.makeVisible()
             profilePicLayout.makeVisible()
             constraintLayoutStateSignOut.makeGone()
@@ -132,7 +129,6 @@ class OnlineDataActivity : AppCompatActivity() {
     private fun signOut() {
         mGoogleSignInClient.signOut().addOnCompleteListener {
             signOutButton.makeGone()
-            signingLayout.makeGone()
             welcomeTV.makeGone()
             signInButton.makeVisible()
             constraintLayoutStateSignOut.makeVisible()

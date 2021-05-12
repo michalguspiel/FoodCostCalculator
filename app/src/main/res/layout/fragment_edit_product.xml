@@ -8,17 +8,14 @@
     android:background="@drawable/border"
     android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_margin="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="250dp"
             android:layout_height="wrap_content"
             android:hint="@string/product_name"
             app:hintTextColor="@color/black"
+            android:layout_marginTop="8dp"
+            android:layout_marginHorizontal="8dp"
             app:counterTextColor="@color/black"
             android:textColorHint="@color/black"
             android:layout_gravity="center_horizontal"
@@ -39,13 +36,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_margin="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -56,6 +47,7 @@
             android:textColorHint="@color/black"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:layout_gravity="center_horizontal"
             app:boxStrokeColor="@color/orange_500"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -76,14 +68,7 @@
 
 
 
-    </LinearLayout>
 
-
-    <LinearLayout
-        android:layout_margin="4dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -111,15 +96,9 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-    </LinearLayout>
 
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="4dp"
-        >
+
 
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="250dp"
@@ -146,16 +125,6 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-    </LinearLayout>
-
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="4dp"
-
-        >
 
 
         <com.google.android.material.textfield.TextInputLayout
@@ -183,7 +152,7 @@
         </com.google.android.material.textfield.TextInputLayout>
 
 
-    </LinearLayout>
+
 
 
     <LinearLayout

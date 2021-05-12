@@ -20,12 +20,13 @@
 
         <TextView
             android:id="@+id/dish_name_in_adapter"
-            android:layout_width="155dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:textColor="#000000"
             android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/linearLayout2"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -34,8 +35,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginEnd="0dp"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/linear_layout_image_buttons"
             app:layout_constraintStart_toEndOf="@+id/dish_name_in_adapter"
             app:layout_constraintTop_toTopOf="parent">
 
@@ -44,6 +47,7 @@
                 android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                tools:text="Margin: 233%"
                 android:textColor="#000000"
                 android:textSize="14sp"
                 android:textStyle="normal" />
@@ -51,6 +55,7 @@
             <TextView
                 android:id="@+id/dish_tax_in_adapter"
                 android:layout_width="50dp"
+                tools:text="Tax: 23%"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:textColor="#000000"
@@ -59,6 +64,14 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/linear_layout_image_buttons"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
         <ImageButton
             android:id="@+id/add_product_to_dish_button"
@@ -69,9 +82,6 @@
             android:layout_weight="1"
             android:background="@null"
             android:contentDescription="@string/edit_button"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/edit_button_in_dish_adapter"
-            app:layout_constraintTop_toTopOf="parent"
             app:srcCompat="@drawable/add_quick_button" />
         <ImageButton
             android:id="@+id/edit_button_in_dish_adapter"
@@ -82,10 +92,9 @@
             android:background="@null"
             android:contentDescription="@string/edit_button"
             app:srcCompat="@drawable/ic_edit"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+          />
 
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
