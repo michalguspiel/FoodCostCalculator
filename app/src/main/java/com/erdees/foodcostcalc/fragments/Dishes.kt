@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -31,7 +32,6 @@ class Dishes : Fragment() {
     ): View {
         inflater.inflate(R.layout.fragment_dishes, container, false)
         val view: View = inflater.inflate(R.layout.fragment_dishes, container, false)
-
         val viewModel = ViewModelProvider(this).get(DishesViewModel::class.java)
         viewModelPassedToRecyclerView =
             ViewModelProvider(this).get(DishAdapterViewModel::class.java)
