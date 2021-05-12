@@ -16,4 +16,5 @@ Food cost calculator is an easy to use application which simplifies counting rea
 
 http://github.com - automatic!
 [GitHub](http://github.com)
- <center>[Privacy policy](https://michalguspiel.github.io/)</center>
+[Privacy policy](https://michalguspiel.github.io)
+ <center> [Privacy policy](https://michalguspiel.github.io) </center>
