@@ -11,10 +11,9 @@ Food cost calculator is an easy to use application which simplifies counting rea
 
 
 ### Support or Contact
-<center>Having question? Send me mail at guspielmichal@gmail.com.</center>
+Having question? Send me mail to guspielmichal@gmail.com.
 
 
-http://github.com - automatic!
-[GitHub](http://github.com)
+## Privacy policy: 
 [Privacy policy](https://michalguspiel.github.io)
- <center> [Privacy policy](https://michalguspiel.github.io) </center>
+
