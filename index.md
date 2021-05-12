@@ -7,6 +7,9 @@ Food cost calculator is an easy to use application which simplifies counting rea
 
 <center>
 <button name="button" onclick="http://www.google.com">Download</button>
+  
+  [Download](http://www.google.com){: .btn}
+  
 </center>
 
 
