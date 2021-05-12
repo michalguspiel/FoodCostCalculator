@@ -8,7 +8,6 @@ Food cost calculator is an easy to use application which simplifies counting rea
 <center>
 <button name="button" onclick="https://play.google.com/store/apps/details?id=com.erdees.foodcostcalc">Download</button>
   
-  [Download](https://play.google.com/store/apps/details?id=com.erdees.foodcostcalc){: .btn}
   
 </center>
 
