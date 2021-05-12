@@ -1,35 +1,16 @@
 # Food Cost Calculator
 
+Food cost calculator is an easy to use application which simplifies counting real food cost of dishes or products with their waste, that You provide for your customers, app saves all entered products, composed half products or dishes in phone memory so You don't need to worry about losing your data. In case of device change Food Cost Calculator provides a feature which allows You to sign in with google account and save data to google drive, then on another device all You need to do is to sign with same google account and load database from google drive back! 
 
 
-### Markdown
+![screenshot1](https://user-images.githubusercontent.com/70368829/117968325-bca92000-b32e-11eb-9346-b319556e4c39.jpg)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
 
-```markdown
-Syntax highlighted code block
 
-# Header 1
-## Header 2
-### Header 3
 
-- Bulleted
-- List
 
-1. Numbered
-2. List
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/michalguspiel/FoodCostCalculator/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
 
 ### Support or Contact
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+Having question? Send me mail at guspielmichal@gmail.com.
