@@ -1,4 +1,4 @@
 theme: jekyll-theme-minimal
-show_downloads: true
+show_downloads: false
 title: Food Cost Calculator
 logo:  https://user-images.githubusercontent.com/70368829/118404237-ba222f80-b67a-11eb-90c6-c50035c0cc58.png
