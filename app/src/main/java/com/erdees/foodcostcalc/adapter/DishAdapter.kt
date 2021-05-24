@@ -279,9 +279,9 @@ class DishAdapter(
         Log.i("Main Activity", "review triggered!")
         val manager = ReviewManagerFactory.create(activity)
         val request = manager.requestReviewFlow()
-        request.addOnCompleteListener { request ->
-            if (request.isSuccessful) {
-                val reviewInfo = request.result
+        request.addOnCompleteListener { thisRequest ->
+            if (thisRequest.isSuccessful) {
+                val reviewInfo = thisRequest.result
                 val flow = manager.launchReviewFlow(activity, reviewInfo)
                 flow.addOnCompleteListener { _ ->
                     //Continue your application process

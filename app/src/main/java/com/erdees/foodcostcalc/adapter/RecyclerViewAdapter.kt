@@ -44,7 +44,7 @@ class RecyclerViewAdapter(
                 "Price ${list[position].unit} with foodcost: ${formatPrice(list[position].priceAfterWasteAndTax)}."
             editButton.setOnClickListener {
                 EditProduct().show(fragmentManager, EditProduct.TAG)
-                EditProduct.productPassedFromAdapter = list[position] as Product
+                EditProduct.productPassedFromAdapter = list[position]
             }
         }
     }

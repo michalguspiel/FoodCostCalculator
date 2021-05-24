@@ -91,12 +91,10 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
         when (parent?.id) {
             1 -> {
                 chosenUnit = unitList[position]
-                Log.i("test", chosenUnit + " + " + parent?.id )
 
             }
             else -> {
                 chosenUnit = unitList[position]
-                Log.i("test", chosenUnit + " + " + parent?.id )
             }
         }
 
