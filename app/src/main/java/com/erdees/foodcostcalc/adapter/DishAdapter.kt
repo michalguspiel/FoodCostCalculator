@@ -27,6 +27,8 @@ import com.erdees.foodcostcalc.views.MaskedItemView
 import com.google.android.play.core.review.ReviewManagerFactory
 import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
+import com.erdees.Constants.DISH_ITEM_TYPE
+import com.erdees.Constants.LAST_ITEM_TYPE
 
 
 class DishAdapter(
@@ -39,8 +41,6 @@ class DishAdapter(
     private val activity: Activity
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val LAST_ITEM_TYPE = 0
-    private val DISH_ITEM_TYPE = 1
 
 
     inner class DishRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
@@ -75,6 +75,7 @@ class DishAdapter(
             )
         }
 
+        @SuppressLint("SetTextI18n")
         private fun setHowManyServingsTV(amountOfServings: Int) {
             if(amountOfServings == 1 ) howManyServingsTV.text = "Data per serving."
             else howManyServingsTV.text = "Data for $amountOfServings servings."
@@ -96,6 +97,7 @@ class DishAdapter(
             }
         }
 
+        @SuppressLint("SetTextI18n")
         private fun setNameTaxAndMarginAccordingly(position: Int){
             dishNameTextView.text = list[position].dish.name
             dishMarginTextView.text = "Margin: ${list[position].dish.marginPercent}%"
@@ -184,7 +186,7 @@ class DishAdapter(
 
         @SuppressLint("CheckResult")
         fun bind(position: Int) {
-            if (position == 5) openFeedBackForm()
+            if (position == 3) openFeedBackForm()
             setDishData(position)
             amountOfServingsSubject.subscribe { i ->
                 amountOfServingsToPresent = i
@@ -208,6 +210,7 @@ class DishAdapter(
             view.findViewById(R.id.products_last_item_layout)
         private val text: TextView = view.findViewById(R.id.last_item_text)
 
+        @SuppressLint("SetTextI18n")
         fun bind() {
             text.text = "Create Dish"
             layoutAsButton.setOnClickListener {
@@ -283,7 +286,7 @@ class DishAdapter(
             if (thisRequest.isSuccessful) {
                 val reviewInfo = thisRequest.result
                 val flow = manager.launchReviewFlow(activity, reviewInfo)
-                flow.addOnCompleteListener { _ ->
+                flow.addOnCompleteListener {
                     //Continue your application process
                     Log.i("Main Activity", "review success!")
                 }

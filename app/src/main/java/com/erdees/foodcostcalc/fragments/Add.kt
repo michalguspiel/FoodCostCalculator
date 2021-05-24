@@ -10,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
+import com.erdees.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.SharedPreferences
@@ -17,11 +18,15 @@ import com.erdees.foodcostcalc.fragments.dialogs.InformationDialog
 import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.google.android.material.textfield.TextInputEditText
+import com.google.firebase.analytics.FirebaseAnalytics
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
 
 class Add : Fragment(), AdapterView.OnItemClickListener {
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
 
     private var chosenUnit: String = ""
     private var unitList: MutableList<String> = mutableListOf()
@@ -43,6 +48,11 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
     private lateinit var calcQuantityBox: EditText
     private lateinit var calcWasteWeight: EditText
 
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+    }
 
     override fun onResume() {
         /**Spinner adapter*/
@@ -105,6 +115,7 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
                     chosenUnit
                 )
                 viewModel.addProducts(product)
+                sendDataAboutProduct(product)
                 clearInputFields()
             }
         }
@@ -146,6 +157,17 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
     companion object {
         fun newInstance(): Add = Add()
         const val TAG = "Add"
+    }
+
+    private fun sendDataAboutProduct(product: Product){
+        val bundle = Bundle()
+        bundle.putString(Constants.PRODUCT_NAME,product.name)
+        bundle.putString(Constants.PRODUCT_TAX,product.tax.toString())
+        bundle.putString(Constants.PRODUCT_WASTE,product.waste.toString())
+        bundle.putString(Constants.PRODUCT_UNIT,product.unit)
+        bundle.putString(Constants.PRODUCT_PRICE_PER_UNIT,product.pricePerUnit.toString())
+        firebaseAnalytics.logEvent(Constants.PRODUCT_CREATED,bundle)
+
     }
 
     private fun showToast(

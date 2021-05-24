@@ -11,14 +11,23 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import com.erdees.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.model.Dish
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.CreateDishViewModel
+import com.google.firebase.analytics.FirebaseAnalytics
 
 
 class CreateDish : DialogFragment() {
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+    }
 
     override fun onCreateView(
             inflater: LayoutInflater,
@@ -48,6 +57,7 @@ class CreateDish : DialogFragment() {
             if (dishName.text.isNotEmpty()) {
                 val dish = Dish(0, dishName.text.toString(),margin,tax)
                 viewModel.addDish(dish)
+                sendDataAboutDishCreated(dish)
                 this.dismiss()
 
             } else Toast.makeText(activity, "Can't make nameless dish!", Toast.LENGTH_SHORT).show()
@@ -55,9 +65,13 @@ class CreateDish : DialogFragment() {
 
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         return view
+    }
 
+    private fun sendDataAboutDishCreated(dish: Dish){
+        val thisDishBundle = Bundle()
+        thisDishBundle.putString(FirebaseAnalytics.Param.VALUE,dish.name)
+        firebaseAnalytics.logEvent(Constants.DISH_CREATED,thisDishBundle)
 
     }
 
