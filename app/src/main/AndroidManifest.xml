@@ -19,6 +19,8 @@
         android:theme="@style/Theme.FoodCostCalc"
         android:fullBackupContent="@xml/backup_descriptor">
 
+
+
         <activity android:name="com.erdees.foodcostcalc.MainActivity"
             android:windowSoftInputMode="adjustPan"
             >
@@ -32,6 +34,10 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-5093191239349402~1464603569"/>
+
     </application>
 
 </manifest>
