@@ -20,6 +20,7 @@ import com.erdees.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
 import com.erdees.foodcostcalc.fragments.dialogs.CreateDish
 import com.erdees.foodcostcalc.fragments.dialogs.CreateHalfProduct
 import com.erdees.foodcostcalc.viewmodel.MainActivityViewModel
+import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
 
@@ -149,6 +150,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        MobileAds.initialize(this)
 
         val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         bottomNavigation = findViewById(R.id.navigationView)

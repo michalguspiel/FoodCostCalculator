@@ -70,7 +70,7 @@ class CreateDish : DialogFragment() {
 
     private fun sendDataAboutDishCreated(dish: Dish){
         val thisDishBundle = Bundle()
-        thisDishBundle.putString(FirebaseAnalytics.Param.VALUE,dish.name)
+        thisDishBundle.putString(Constants.DISH_NAME, dish.name)
         firebaseAnalytics.logEvent(Constants.DISH_CREATED,thisDishBundle)
 
     }
