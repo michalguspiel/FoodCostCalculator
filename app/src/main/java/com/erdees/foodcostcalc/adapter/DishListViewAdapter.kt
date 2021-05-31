@@ -25,10 +25,10 @@ class DishListViewAdapter(private val context: Activity,
     grandDish.productsIncluded
         + grandDish.halfProducts) {
 
-    lateinit var productUnit : TextView
-    lateinit var productWeightText : TextView
-    lateinit var productPriceText : TextView
-    lateinit var productNameText : TextView
+    private lateinit var productUnit : TextView
+    private lateinit var productWeightText : TextView
+    private lateinit var productPriceText : TextView
+    private lateinit var productNameText : TextView
 
     @SuppressLint("ViewHolder")
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
@@ -47,7 +47,7 @@ class DishListViewAdapter(private val context: Activity,
 
         /**To populate rest with halfProducts*/
         else if (position >= grandDish.productsIncluded.size)  {
-            var positionOfHalfProduct = position - grandDish.productsIncluded.size // to start counting position from new list
+            val positionOfHalfProduct = position - grandDish.productsIncluded.size // to start counting position from new list
             setRowAsHalfProduct(positionOfHalfProduct)
         }
         return rowView

@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
+import com.erdees.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
@@ -19,11 +20,13 @@ import com.erdees.foodcostcalc.model.HalfProduct
 import com.erdees.foodcostcalc.viewmodel.CreateDishViewModel
 import com.erdees.foodcostcalc.viewmodel.CreateHalfProductViewModel
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
-
-
+import com.google.firebase.analytics.FirebaseAnalytics
 
 
 class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
+
+    private lateinit var firebaseAnalytics: FirebaseAnalytics
+
 
     private var chosenUnit = ""
     private var unitList: MutableList<String> = mutableListOf()
@@ -42,6 +45,12 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
         }
         super.onResume()
     }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
+    }
+
     @SuppressLint("ResourceType")
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -70,6 +79,7 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
             if (dishName.text.isNotEmpty()) {
                 val halfProduct = HalfProduct(0, dishName.text.toString(),chosenUnit)
                 viewModel.addHalfProduct(halfProduct)
+                sendDataAboutHalfProductCreated(halfProduct)
                 this.dismiss()
 
             } else Toast.makeText(activity, "Can't make nameless half product!", Toast.LENGTH_SHORT).show()
@@ -79,6 +89,14 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
 
         return view
     }
+
+    private fun sendDataAboutHalfProductCreated(halfProduct: HalfProduct){
+        val bundle = Bundle()
+        bundle.putString(FirebaseAnalytics.Param.VALUE,halfProduct.name)
+        firebaseAnalytics.logEvent(Constants.HALF_PRODUCT_CREATED,bundle)
+
+    }
+
     companion object {
         fun newInstance(): CreateHalfProduct =
             CreateHalfProduct()
@@ -91,12 +109,10 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
         when (parent?.id) {
             1 -> {
                 chosenUnit = unitList[position]
-                Log.i("test", chosenUnit + " + " + parent?.id )
 
             }
             else -> {
                 chosenUnit = unitList[position]
-                Log.i("test", chosenUnit + " + " + parent?.id )
             }
         }
 

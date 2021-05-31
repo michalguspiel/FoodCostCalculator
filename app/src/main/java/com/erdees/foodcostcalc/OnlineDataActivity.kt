@@ -235,7 +235,7 @@ class OnlineDataActivity : AppCompatActivity() {
     }
 
     private fun showResultDialog(wasSuccessful: Boolean, error : String?) {
-        var message = ""
+        var message: String
         message = if(wasSuccessful) "Your database was successfully saved in google drive."
         else "Something went wrong, your database wasn't saved."
         if(error != null) message = error
@@ -284,6 +284,7 @@ class OnlineDataActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
+        Log.i(TAG, "$resultCode      request : $requestCode")
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
         if (requestCode == RC_SIGN_IN) {
             val task: Task<GoogleSignInAccount> =
