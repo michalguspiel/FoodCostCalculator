@@ -3,25 +3,24 @@ package com.erdees.foodcostcalc.adapter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.graphics.drawable.ColorDrawable
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
-import com.erdees.foodcostcalc.AdHelper
 import com.erdees.foodcostcalc.Constants
+import com.erdees.foodcostcalc.Constants.ADMOB_PRODUCTS_RV_AD_UNIT_ID
+import com.erdees.foodcostcalc.ads.AdHelper
+import com.erdees.foodcostcalc.Constants.ADMOB_TEST_AD_UNIT_ID
 import com.erdees.foodcostcalc.Constants.LAST_ITEM_TYPE
 import com.erdees.foodcostcalc.Constants.PRODUCTS_AD_FREQUENCY
 import com.erdees.foodcostcalc.Constants.PRODUCT_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.Constants.PRODUCT_ITEM_TYPE
+import com.erdees.foodcostcalc.MainActivity
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.formatPrice
-import com.erdees.foodcostcalc.ads.NativeTemplateStyle
-import com.erdees.foodcostcalc.ads.TemplateView
 import com.erdees.foodcostcalc.fragments.dialogs.EditProduct
 import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
@@ -34,7 +33,7 @@ import java.util.*
 
 
 class ProductsRecyclerAdapter(
-    val context: Context,
+    val activity: Activity,
     val tag: String?,
     private val list: ArrayList<Product>,
     private val fragmentManager: FragmentManager,
@@ -47,7 +46,7 @@ class ProductsRecyclerAdapter(
 
     private val positionsOfAds = adCase.positionsOfAds()
 
-
+    private var currentNativeAd: NativeAd? = null
 
     inner class RecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val textView: TextView = view.findViewById(R.id.product_title)
@@ -84,29 +83,36 @@ class ProductsRecyclerAdapter(
         }
     }
 
-    inner class AdItemViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+    inner class AdItemViewHolder(val view: NativeAdView) : RecyclerView.ViewHolder(view) {
         fun bind() {
-            val adLoader:AdLoader = AdLoader.Builder(context, Constants.ADMOB_TEST_AD_UNIT_ID)
-                .forNativeAd { nativeAd ->
-                    Log.i("TESt", "Ad downloaded succesfully ${nativeAd.body} , ${nativeAd.headline}")
-                    val styles: NativeTemplateStyle =
-                        NativeTemplateStyle.Builder().withMainBackgroundColor(
-                            ColorDrawable(
-                                ContextCompat.getColor(
-                                    context,
-                                    R.color.gray_200
-                                )
-                            )
-                        ).build();
-                    val template: TemplateView = view.findViewById(R.id.my_template);
-                    template.setStyles(styles);
-                    template.setNativeAd(nativeAd);
+            val builder = AdLoader.Builder(activity, ADMOB_PRODUCTS_RV_AD_UNIT_ID)
+            builder.forNativeAd { nativeAd ->
+                // OnUnifiedNativeAdLoadedListener implementation.
+                // If this callback occurs after the activity is destroyed, you must call
+                // destroy and return or you may get a memory leak.
+                val activityDestroyed: Boolean = activity.isDestroyed
+                if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
+                    nativeAd.destroy()
+                    Log.i("TESTTT", " THIS RETURN IS CALLED ")
+                    return@forNativeAd
                 }
-                .build();
-            adLoader.loadAd(AdRequest.Builder().build());
+                // You must call destroy on old ads when you are done with them,
+                // otherwise you will have a memory leak.
+                currentNativeAd?.destroy()
+                currentNativeAd = nativeAd
+                adCase.populateNativeAdView(nativeAd, view)
+            }
+            val videoOptions = VideoOptions.Builder()
+                .build()
+            val adOptions = NativeAdOptions.Builder()
+                .setVideoOptions(videoOptions)
+                .build()
+            builder.withNativeAdOptions(adOptions)
+            val adLoader = builder.withAdListener(object : AdListener() {
+            }).build()
+            adLoader.loadAd(AdRequest.Builder().build())
         }
-
-}
+    }
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -119,7 +125,7 @@ class ProductsRecyclerAdapter(
             }
             PRODUCT_AD_ITEM_TYPE -> {
                 val adapterLayout = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.product_ad_layout, parent, false)
+                    .inflate(R.layout.product_ad_custom_layout, parent, false) as NativeAdView
                 AdItemViewHolder(adapterLayout)
             }
             else -> {
@@ -144,11 +150,22 @@ class ProductsRecyclerAdapter(
 
     @SuppressLint("WrongConstant", "ShowToast")
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder.itemViewType == PRODUCT_ITEM_TYPE) (holder as ProductsRecyclerAdapter.RecyclerViewHolder).bind(position)
+        if (holder.itemViewType == PRODUCT_ITEM_TYPE) (holder as ProductsRecyclerAdapter.RecyclerViewHolder).bind(
+            position
+        )
         else if (holder.itemViewType == PRODUCT_AD_ITEM_TYPE) (holder as ProductsRecyclerAdapter.AdItemViewHolder).bind()
         else (holder as LastItemViewHolder).bind()
 
     }
 
+    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
+        currentNativeAd?.destroy()
+        super.onViewRecycled(holder)
+    }
+
+
+    fun destroyAds() {
+        currentNativeAd?.destroy()
+    }
 
 }

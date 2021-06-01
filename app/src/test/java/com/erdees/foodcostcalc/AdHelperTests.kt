@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc
 
-import com.erdees.AdHelper
+import com.erdees.foodcostcalc.ads.AdHelper
 import junit.framework.Assert.assertEquals
 import org.junit.Test
 

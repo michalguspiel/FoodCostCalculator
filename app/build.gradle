@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "30.0.3"
 
     packagingOptions {
@@ -23,7 +23,7 @@ android {
     defaultConfig {
         applicationId "com.erdees.foodcostcalc"
         minSdkVersion 21
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 17
         versionName "2.2"
         multiDexEnabled true

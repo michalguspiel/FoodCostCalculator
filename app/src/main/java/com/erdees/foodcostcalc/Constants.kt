@@ -17,10 +17,22 @@ object Constants {
     const val PRODUCT_PRICE_PER_UNIT = "product_price_per_unit"
 
     const val PRODUCTS_AD_FREQUENCY = 6
-    const val PRODUCT_AD_ITEM_TYPE = 522
+    const val HALF_PRODUCTS_AD_FREQUENCY = 4
+    const val DISHES_AD_FREQUENCY = 5
 
+
+    const val PRODUCT_AD_ITEM_TYPE = 522
+    const val HALF_PRODUCT_AD_ITEM_TYPE = 523
+    const val DISH_AD_ITEM_TYPE = 524
+
+
+    const val HALF_PRODUCT_ITEM_TYPE = 1
 
     const val ADMOB_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110"
+
+    const val ADMOB_PRODUCTS_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/7646868536"
+    const val ADMOB_DISHES_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/9127239654"
+    const val ADMOB_HALF_PRODUCTS_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/9594143514"
 
     const val APP_ID = "ca-app-pub-5093191239349402~1464603569"
 

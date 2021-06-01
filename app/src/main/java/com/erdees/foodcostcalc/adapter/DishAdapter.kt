@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.adapter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
+import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +15,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.erdees.foodcostcalc.Constants
+import com.erdees.foodcostcalc.Constants.DISH_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.calculatePrice
 import com.erdees.foodcostcalc.SharedFunctions.formatPrice
@@ -29,6 +32,15 @@ import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
 import com.erdees.foodcostcalc.Constants.DISH_ITEM_TYPE
 import com.erdees.foodcostcalc.Constants.LAST_ITEM_TYPE
+import com.erdees.foodcostcalc.MainActivity
+import com.erdees.foodcostcalc.ads.AdHelper
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.VideoOptions
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
+import com.google.android.gms.ads.nativead.NativeAdView
 
 
 class DishAdapter(
@@ -41,9 +53,18 @@ class DishAdapter(
     private val activity: Activity
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private val adCase = AdHelper(list.size, Constants.DISHES_AD_FREQUENCY)
+
+    private val itemsSizeWithAds = adCase.newListSizeWithAds + 1 // +1 to include button as footer.
+
+    private val positionsOfAds = adCase.positionsOfAds()
+
+    private var currentNativeAd: NativeAd? = null
 
 
     inner class DishRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+
+
         private val eachLinearLayout: LinearLayout = view.findViewById(R.id.linear_layout_dish_card)
         private val dishNameTextView: TextView = view.findViewById(R.id.dish_name_in_adapter)
         private val dishMarginTextView: TextView = view.findViewById(R.id.dish_margin_in_adapter)
@@ -186,24 +207,56 @@ class DishAdapter(
 
         @SuppressLint("CheckResult")
         fun bind(position: Int) {
+            val positionIncludedAdsBinded = adCase.correctElementFromListToBind(position)
+
             if (position == 3) openFeedBackForm()
-            setDishData(position)
+            setDishData(positionIncludedAdsBinded)
             amountOfServingsSubject.subscribe { i ->
                 amountOfServingsToPresent = i
                 setHowManyServingsTV(i)
                 setPriceData(amountOfServingsToPresent)
-                Log.i("TEST", "update from RXKOTLIN new value : $i")
             }
             amountOfServingsSubject.onNext(1)
-            sumPriceAndSetPriceData(position)
-            setNameTaxAndMarginAccordingly(position)
-            setEditDishButton(position)
-            setAddProductsButton(position)
-            setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position)
-            setHowManyServingsTvAsButton(howManyServingsTV,position)
+            sumPriceAndSetPriceData(positionIncludedAdsBinded)
+            setNameTaxAndMarginAccordingly(positionIncludedAdsBinded)
+            setEditDishButton(positionIncludedAdsBinded)
+            setAddProductsButton(positionIncludedAdsBinded)
+            setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(positionIncludedAdsBinded)
+            setHowManyServingsTvAsButton(howManyServingsTV,positionIncludedAdsBinded)
         }
     }
 
+
+    inner class AdItemViewHolder(val view: NativeAdView) : RecyclerView.ViewHolder(view) {
+        fun bind() {
+            val builder = AdLoader.Builder(activity, Constants.ADMOB_DISHES_RV_AD_UNIT_ID)
+            builder.forNativeAd { nativeAd ->
+                // OnUnifiedNativeAdLoadedListener implementation.
+                // If this callback occurs after the activity is destroyed, you must call
+                // destroy and return or you may get a memory leak.
+                val activityDestroyed: Boolean = activity.isDestroyed
+                if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
+                    nativeAd.destroy()
+                    Log.i("TESTTT", " THIS RETURN IS CALLED ")
+                    return@forNativeAd
+                }
+                // You must call destroy on old ads when you are done with them,
+                // otherwise you will have a memory leak.
+                currentNativeAd?.destroy()
+                currentNativeAd = nativeAd
+                adCase.populateNativeAdView(nativeAd, view)
+            }
+            val videoOptions = VideoOptions.Builder()
+                .build()
+            val adOptions = NativeAdOptions.Builder()
+                .setVideoOptions(videoOptions)
+                .build()
+            builder.withNativeAdOptions(adOptions)
+            val adLoader = builder.withAdListener(object : AdListener() {
+            }).build()
+            adLoader.loadAd(AdRequest.Builder().build())
+        }
+    }
 
     inner class LastItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val layoutAsButton: MaskedItemView =
@@ -230,6 +283,11 @@ class DishAdapter(
                         .inflate(R.layout.dish_card_view, parent, false)
                 DishRecyclerViewHolder(adapterLayout)
             }
+            DISH_AD_ITEM_TYPE -> {
+                val adapterLayout = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.product_ad_custom_layout, parent, false) as NativeAdView
+                AdItemViewHolder(adapterLayout)
+            }
             else -> {
                 val adapterLayout =
                     LayoutInflater.from(parent.context)
@@ -242,14 +300,13 @@ class DishAdapter(
     }
 
     override fun getItemCount(): Int {
-        return list.size + 1
+        return itemsSizeWithAds
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            list.size -> LAST_ITEM_TYPE
-            else -> DISH_ITEM_TYPE
-        }
+        return if (position == itemsSizeWithAds - 1) LAST_ITEM_TYPE
+        else if (positionsOfAds.contains(position)) DISH_AD_ITEM_TYPE
+        else  DISH_ITEM_TYPE
     }
 
     @SuppressLint("WrongConstant", "ShowToast", "SetTextI18n")
@@ -257,6 +314,7 @@ class DishAdapter(
         if (holder.itemViewType == DISH_ITEM_TYPE) (holder as DishAdapter.DishRecyclerViewHolder).bind(
             position
         )
+        else if (holder.itemViewType == DISH_AD_ITEM_TYPE) (holder as AdItemViewHolder).bind()
         else (holder as LastItemViewHolder).bind()
     }
 

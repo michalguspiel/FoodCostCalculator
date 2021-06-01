@@ -12,6 +12,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
+import com.erdees.foodcostcalc.Constants
+import com.erdees.foodcostcalc.Constants.HALF_PRODUCT_AD_ITEM_TYPE
+import com.erdees.foodcostcalc.Constants.HALF_PRODUCT_ITEM_TYPE
+import com.erdees.foodcostcalc.Constants.LAST_ITEM_TYPE
+import com.erdees.foodcostcalc.MainActivity
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.abbreviateUnitWithPer
 import com.erdees.foodcostcalc.SharedFunctions.formatPrice
@@ -20,9 +25,17 @@ import com.erdees.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
 import com.erdees.foodcostcalc.fragments.dialogs.EditHalfProduct
 import com.erdees.foodcostcalc.SharedFunctions.getListSize
 import com.erdees.foodcostcalc.SharedFunctions.getPriceForHundredPercentOfRecipe
+import com.erdees.foodcostcalc.ads.AdHelper
 import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import com.erdees.foodcostcalc.views.MaskedItemView
+import com.google.android.gms.ads.AdListener
+import com.google.android.gms.ads.AdLoader
+import com.google.android.gms.ads.AdRequest
+import com.google.android.gms.ads.VideoOptions
+import com.google.android.gms.ads.nativead.NativeAd
+import com.google.android.gms.ads.nativead.NativeAdOptions
+import com.google.android.gms.ads.nativead.NativeAdView
 import io.reactivex.subjects.PublishSubject
 
 
@@ -34,8 +47,13 @@ class HalfProductAdapter(
     val activity: Activity
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val LAST_ITEM_TYPE = 0
-    val HALF_PRODUCT_ITEM_TYPE = 1
+    private val adCase = AdHelper(list.size, Constants.HALF_PRODUCTS_AD_FREQUENCY)
+
+    private val itemsSizeWithAds = adCase.newListSizeWithAds + 1 // +1 to include button as footer.
+
+    private val positionsOfAds = adCase.positionsOfAds()
+
+    private var currentNativeAd: NativeAd? = null
 
     inner class HalfProductsRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val eachLinearLayout: LinearLayout = view.findViewById(R.id.linear_layout_dish_card)
@@ -186,23 +204,57 @@ class HalfProductAdapter(
 
         @SuppressLint("CheckResult")
         fun bind(position: Int) {
-            setNameAndUnitAccordingly(position)
-            setHalfProductFinalPrice(position)
-            setQuantityOfDataTextView(position)
-            setEditButton(position)
-            setAddButton(position)
-            setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position)
-            setQuantityOfDataTextViewAsButton(position)
+            val positionIncludedAdsBinded = adCase.correctElementFromListToBind(position)
+
+            setNameAndUnitAccordingly(positionIncludedAdsBinded)
+            setHalfProductFinalPrice(positionIncludedAdsBinded)
+            setQuantityOfDataTextView(positionIncludedAdsBinded)
+            setEditButton(positionIncludedAdsBinded)
+            setAddButton(positionIncludedAdsBinded)
+            setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(positionIncludedAdsBinded)
+            setQuantityOfDataTextViewAsButton(positionIncludedAdsBinded)
             quantitySubject.subscribe { i ->
                 quantity = i
-                updateQuantityTV(position)
-                updatePriceOfHalfProductPerRecipe(position)
-                updatePriceOfHalfProductPerRecipe(position)
+                updateQuantityTV(positionIncludedAdsBinded)
+                updatePriceOfHalfProductPerRecipe(positionIncludedAdsBinded)
+                updatePriceOfHalfProductPerRecipe(positionIncludedAdsBinded)
                 Log.i("TEST", "update from RXKOTLIN new value : $i")
             }
         }
 
     }
+
+    inner class AdItemViewHolder(val view: NativeAdView) : RecyclerView.ViewHolder(view) {
+        fun bind() {
+            val builder = AdLoader.Builder(activity, Constants.ADMOB_HALF_PRODUCTS_RV_AD_UNIT_ID)
+            builder.forNativeAd { nativeAd ->
+                // OnUnifiedNativeAdLoadedListener implementation.
+                // If this callback occurs after the activity is destroyed, you must call
+                // destroy and return or you may get a memory leak.
+                val activityDestroyed: Boolean = activity.isDestroyed
+                if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
+                    nativeAd.destroy()
+                    Log.i("TESTTT", " THIS RETURN IS CALLED ")
+                    return@forNativeAd
+                }
+                // You must call destroy on old ads when you are done with them,
+                // otherwise you will have a memory leak.
+                currentNativeAd?.destroy()
+                currentNativeAd = nativeAd
+                adCase.populateNativeAdView(nativeAd, view)
+            }
+            val videoOptions = VideoOptions.Builder()
+                .build()
+            val adOptions = NativeAdOptions.Builder()
+                .setVideoOptions(videoOptions)
+                .build()
+            builder.withNativeAdOptions(adOptions)
+            val adLoader = builder.withAdListener(object : AdListener() {
+            }).build()
+            adLoader.loadAd(AdRequest.Builder().build())
+        }
+    }
+
 
     inner class LastItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val layoutAsButton: MaskedItemView =
@@ -227,6 +279,11 @@ class HalfProductAdapter(
                     .inflate(R.layout.half_product_card_view, parent, false)
                 HalfProductsRecyclerViewHolder(adapterLayout)
             }
+            HALF_PRODUCT_AD_ITEM_TYPE -> {
+                val adapterLayout = LayoutInflater.from(parent.context)
+                    .inflate(R.layout.product_ad_custom_layout, parent, false) as NativeAdView
+                AdItemViewHolder(adapterLayout)
+            }
             else -> {
                 val adapterLayout = LayoutInflater.from(parent.context)
                     .inflate(R.layout.products_recycler_last_item, parent, false)
@@ -239,19 +296,19 @@ class HalfProductAdapter(
         if (holder.itemViewType == HALF_PRODUCT_ITEM_TYPE) (holder as HalfProductAdapter.HalfProductsRecyclerViewHolder).bind(
             position
         )
+        else if (holder.itemViewType == HALF_PRODUCT_AD_ITEM_TYPE) (holder as AdItemViewHolder).bind()
         else (holder as HalfProductAdapter.LastItemViewHolder).bind()
 
     }
 
     override fun getItemViewType(position: Int): Int {
-        return when (position) {
-            list.size -> LAST_ITEM_TYPE
-            else -> HALF_PRODUCT_ITEM_TYPE
-        }
+        return if (position == itemsSizeWithAds - 1) LAST_ITEM_TYPE
+        else if (positionsOfAds.contains(position)) HALF_PRODUCT_AD_ITEM_TYPE
+        else HALF_PRODUCT_ITEM_TYPE
     }
 
     override fun getItemCount(): Int {
-        return list.size + 1
+        return itemsSizeWithAds
     }
 
     companion object {
