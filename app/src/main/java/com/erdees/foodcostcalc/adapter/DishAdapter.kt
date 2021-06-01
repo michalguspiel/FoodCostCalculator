@@ -267,7 +267,6 @@ class DishAdapter(
         fun bind() {
             text.text = "Create Dish"
             layoutAsButton.setOnClickListener {
-                Log.i("TEST", "WORKS")
                 viewModel.setOpenCreateDishFlag(true)
                 viewModel.setOpenCreateDishFlag(false)
             }

@@ -34,6 +34,5 @@ object Constants {
     const val ADMOB_DISHES_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/9127239654"
     const val ADMOB_HALF_PRODUCTS_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/9594143514"
 
-    const val APP_ID = "ca-app-pub-5093191239349402~1464603569"
 
 }
