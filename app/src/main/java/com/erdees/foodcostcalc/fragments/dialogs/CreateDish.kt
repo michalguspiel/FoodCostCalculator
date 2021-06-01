@@ -11,11 +11,10 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.Constants
+import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.model.Dish
-import com.erdees.foodcostcalc.viewmodel.AddViewModel
 import com.erdees.foodcostcalc.viewmodel.CreateDishViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
 

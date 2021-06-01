@@ -1,6 +1,4 @@
-package com.erdees
-
-import android.util.Log
+package com.erdees.foodcostcalc
 
 class AdHelper(val itemsSize: Int, private val adFrequency: Int) {
 

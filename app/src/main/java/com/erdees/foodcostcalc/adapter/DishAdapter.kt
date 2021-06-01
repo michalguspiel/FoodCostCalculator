@@ -27,8 +27,8 @@ import com.erdees.foodcostcalc.views.MaskedItemView
 import com.google.android.play.core.review.ReviewManagerFactory
 import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
-import com.erdees.Constants.DISH_ITEM_TYPE
-import com.erdees.Constants.LAST_ITEM_TYPE
+import com.erdees.foodcostcalc.Constants.DISH_ITEM_TYPE
+import com.erdees.foodcostcalc.Constants.LAST_ITEM_TYPE
 
 
 class DishAdapter(

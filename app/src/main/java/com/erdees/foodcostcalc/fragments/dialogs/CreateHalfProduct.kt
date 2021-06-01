@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,14 +11,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.Constants
+import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.model.HalfProduct
-import com.erdees.foodcostcalc.viewmodel.CreateDishViewModel
 import com.erdees.foodcostcalc.viewmodel.CreateHalfProductViewModel
-import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
 
 

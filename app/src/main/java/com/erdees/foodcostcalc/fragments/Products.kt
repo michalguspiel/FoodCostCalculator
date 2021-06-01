@@ -37,7 +37,7 @@ class Products : Fragment() {
             viewModel.getProducts().observe(viewLifecycleOwner, { products ->
                 val listOfProducts = mutableListOf<Product>()
                 products.forEach { listOfProducts.add(it) }
-                recyclerView.adapter = ProductsRecyclerAdapter(TAG,
+                recyclerView.adapter = ProductsRecyclerAdapter(requireContext(),TAG,
                     listOfProducts.filter {
                         it.name.toLowerCase().contains(searchWord.toLowerCase())
                     } as ArrayList<Product>, childFragmentManager, viewModelPassedToRecycler)
@@ -49,7 +49,7 @@ class Products : Fragment() {
     /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No adapter attached; skipping layout" */
     private fun setEmptyAdapterToRecyclerView() {
         recyclerView.adapter =
-            ProductsRecyclerAdapter(TAG, arrayListOf(), childFragmentManager, viewModelPassedToRecycler)
+            ProductsRecyclerAdapter(requireContext(),TAG, arrayListOf(), childFragmentManager, viewModelPassedToRecycler)
     }
 
     companion object {

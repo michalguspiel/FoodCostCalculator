@@ -1,4 +1,4 @@
-package com.erdees
+package com.erdees.foodcostcalc
 
 object Constants {
     const val LAST_ITEM_TYPE = 0
@@ -16,7 +16,12 @@ object Constants {
     const val PRODUCT_TAX = "product_tax"
     const val PRODUCT_PRICE_PER_UNIT = "product_price_per_unit"
 
-    const val PRODUCTS_AD_FREQUENCY = 7
+    const val PRODUCTS_AD_FREQUENCY = 6
     const val PRODUCT_AD_ITEM_TYPE = 522
+
+
+    const val ADMOB_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110"
+
+    const val APP_ID = "ca-app-pub-5093191239349402~1464603569"
 
 }

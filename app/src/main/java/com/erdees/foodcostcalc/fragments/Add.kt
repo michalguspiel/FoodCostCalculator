@@ -2,7 +2,6 @@ package com.erdees.foodcostcalc.fragments
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -10,7 +9,7 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.Constants
+import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.SharedPreferences
