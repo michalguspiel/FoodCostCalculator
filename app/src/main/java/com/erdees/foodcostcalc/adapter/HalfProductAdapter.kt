@@ -315,4 +315,8 @@ class HalfProductAdapter(
         const val TAG = "HalfProductAdapter"
     }
 
+    fun destroyAds() {
+        currentNativeAd?.destroy()
+    }
+
 }

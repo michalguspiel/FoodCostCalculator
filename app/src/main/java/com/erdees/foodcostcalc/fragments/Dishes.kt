@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.DishAdapter
+import com.erdees.foodcostcalc.adapter.ProductsRecyclerAdapter
 import com.erdees.foodcostcalc.model.GrandDish
 import com.erdees.foodcostcalc.viewmodel.DishesViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
@@ -23,6 +24,7 @@ class Dishes : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var listViewViewModelPassedToRecyclerView: DishListViewAdapterViewModel
     private lateinit var viewModelPassedToRecyclerView: DishAdapterViewModel
+    private lateinit var adapter: DishAdapter
 
 
     override fun onCreateView(
@@ -46,13 +48,15 @@ class Dishes : Fragment() {
             viewModel.getGrandDishes().observe(viewLifecycleOwner, { grandDishes ->
                 val grandDishesList = mutableListOf<GrandDish>()
                 grandDishes.forEach { grandDishesList.add(it) }
-                recyclerView.adapter = DishAdapter(TAG,
+                adapter = DishAdapter(TAG,
                     grandDishesList.filter {
                         it.dish.name.toLowerCase().contains(searchWord.toLowerCase())
                     } as ArrayList<GrandDish>,
                     childFragmentManager, viewModelPassedToRecyclerView,
                     listViewViewModelPassedToRecyclerView,
                     viewLifecycleOwner, requireActivity())
+
+            recyclerView.adapter = adapter
             })
         })
 
@@ -61,7 +65,7 @@ class Dishes : Fragment() {
 
     /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No adapter attached; skipping layout" */
     private fun setEmptyAdapterToRecyclerView() {
-        recyclerView.adapter = DishAdapter(
+        adapter = DishAdapter(
             TAG,
             arrayListOf(),
             childFragmentManager,
@@ -70,10 +74,19 @@ class Dishes : Fragment() {
             viewLifecycleOwner,
             requireActivity()
         )
+        recyclerView.adapter = adapter
     }
 
     companion object {
         fun newInstance(): Dishes = Dishes()
         const val TAG = "Dishes"
     }
+
+    override fun onDestroy() {
+        Log.i(HalfProducts.TAG,"onDestroy casted")
+
+        super.onDestroy()
+        adapter.destroyAds()
+    }
+
 }

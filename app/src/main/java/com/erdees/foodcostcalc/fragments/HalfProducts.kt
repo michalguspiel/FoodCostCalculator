@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.HalfProductAdapter
+import com.erdees.foodcostcalc.adapter.ProductsRecyclerAdapter
 import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
@@ -19,6 +21,8 @@ class HalfProducts : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewModelPassedToRecyclerView: HalfProductAdapterViewModel
+    private lateinit var adapter: HalfProductAdapter
+
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -41,11 +45,12 @@ class HalfProducts : Fragment() {
                 .observe(viewLifecycleOwner, { halfProducts ->
                     val listOfHalfProducts = mutableListOf<HalfProductWithProductsIncluded>()
                     halfProducts.forEach { listOfHalfProducts.add(it) }
-                    recyclerView.adapter = HalfProductAdapter(viewLifecycleOwner,
+                    adapter = HalfProductAdapter(viewLifecycleOwner,
                         listOfHalfProducts.filter {
                             it.halfProduct.name.toLowerCase().contains(searchWord.toLowerCase())
                         } as ArrayList<HalfProductWithProductsIncluded>,
                         childFragmentManager, viewModelPassedToRecyclerView, requireActivity())
+                    recyclerView.adapter = adapter
                 })
         })
 
@@ -54,17 +59,25 @@ class HalfProducts : Fragment() {
 
     /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No adapter attached; skipping layout" */
     private fun setEmptyAdapterToRecyclerView() {
-        recyclerView.adapter = HalfProductAdapter(
+        adapter = HalfProductAdapter(
             viewLifecycleOwner,
             arrayListOf(),
             childFragmentManager,
             viewModelPassedToRecyclerView,
             requireActivity()
         )
+        recyclerView.adapter = adapter
     }
 
     companion object {
         fun newInstance(): HalfProducts = HalfProducts()
         const val TAG = "HalfProducts"
     }
+
+    override fun onDestroy() {
+        Log.i(TAG,"onDestroy casted")
+        super.onDestroy()
+        adapter.destroyAds()
+    }
+
 }

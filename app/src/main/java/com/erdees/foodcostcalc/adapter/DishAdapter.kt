@@ -376,4 +376,8 @@ class DishAdapter(
         return (priceWithMargin + amountOfTax) * amountOfServings
     }
 
+    fun destroyAds() {
+        currentNativeAd?.destroy()
+    }
+
 }

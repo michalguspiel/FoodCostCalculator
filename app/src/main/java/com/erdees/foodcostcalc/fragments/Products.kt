@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.fragments
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -52,8 +53,9 @@ class Products : Fragment() {
 
     /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No adapter attached; skipping layout" */
     private fun setEmptyAdapterToRecyclerView() {
-        recyclerView.adapter =
+        adapter =
             ProductsRecyclerAdapter(requireActivity(),TAG, arrayListOf(), childFragmentManager, viewModelPassedToRecycler)
+    recyclerView.adapter = adapter
     }
 
     companion object {
@@ -62,8 +64,10 @@ class Products : Fragment() {
     }
 
     override fun onDestroy() {
-        adapter.destroyAds()
+        Log.i(HalfProducts.TAG,"onDestroy casted")
+
         super.onDestroy()
+        adapter.destroyAds()
     }
 
 }
