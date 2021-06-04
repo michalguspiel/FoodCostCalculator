@@ -10,18 +10,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.HalfProductAdapter
-import com.erdees.foodcostcalc.adapter.ProductsRecyclerAdapter
 import com.erdees.foodcostcalc.model.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.viewmodel.HalfProductsViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
 import java.util.ArrayList
 
-class HalfProducts : Fragment() {
+class HalfProducts : Fragment()  {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewModelPassedToRecyclerView: HalfProductAdapterViewModel
     private lateinit var adapter: HalfProductAdapter
+
 
 
     override fun onCreateView(
@@ -75,9 +74,9 @@ class HalfProducts : Fragment() {
     }
 
     override fun onDestroy() {
-        Log.i(TAG,"onDestroy casted")
         super.onDestroy()
         adapter.destroyAds()
     }
+
 
 }

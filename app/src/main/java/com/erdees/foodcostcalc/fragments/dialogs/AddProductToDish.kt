@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.SharedFunctions.changeUnitList
+import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
 import com.erdees.foodcostcalc.SharedFunctions.setAdapterList
 import com.erdees.foodcostcalc.model.*
 import com.erdees.foodcostcalc.viewmodel.AddProductToDishViewModel
@@ -107,6 +108,9 @@ class AddProductToDish : DialogFragment(), AdapterView.OnItemSelectedListener {
 
         /** binders*/
         val weightOfAddedProduct = view.findViewById<EditText>(R.id.product_weight_in_half_product)
+        weightOfAddedProduct.setOnFocusChangeListener { _, hasFocus ->
+            if(!hasFocus) view.hideKeyboard()
+        }
         val addProductToDishBtn =
             view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
         val productSpinner = view.findViewById<Spinner>(R.id.mySpinner)

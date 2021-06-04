@@ -1,12 +1,25 @@
 package com.erdees.foodcostcalc
 
+import android.app.Activity
+import android.content.Context
 import android.content.res.Resources
 import android.view.View
+import android.view.inputmethod.InputMethodManager
 import android.widget.ListView
+import androidx.core.content.ContextCompat
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
+
 object SharedFunctions {
+
+
+    fun View.hideKeyboard() {
+        (context.getSystemService(Activity.INPUT_METHOD_SERVICE)as InputMethodManager?)?.hideSoftInputFromWindow(
+            this.windowToken,
+            0
+        )
+    }
 
     fun View.makeGone(){
         this.visibility = View.GONE

@@ -1,13 +1,11 @@
 package com.erdees.foodcostcalc.fragments.dialogs
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
@@ -16,6 +14,7 @@ import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.SharedFunctions.filterVol
 import com.erdees.foodcostcalc.SharedFunctions.filterWeight
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
+import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
 import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.model.ProductIncluded
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
@@ -33,6 +32,7 @@ class EditProduct : DialogFragment(), AdapterView.OnItemClickListener {
     private val spinnerId = 1
     private lateinit var viewModel: EditProductViewModel
     private lateinit var sharedPreferences : SharedPreferences
+
 
     private lateinit var name: EditText
     private lateinit var price: EditText
@@ -82,6 +82,9 @@ class EditProduct : DialogFragment(), AdapterView.OnItemClickListener {
          tax = view.findViewById(R.id.edit_product_tax)
          waste = view.findViewById(R.id.edit_product_waste)
          unitSpinner = view.findViewById(R.id.spinner_edit_product)
+            unitSpinner.setOnFocusChangeListener { _, hasFocus ->
+                if(hasFocus) view.hideKeyboard()
+            }
          val saveButton = view.findViewById<Button>(R.id.save_changes_button)
          val deleteButton = view.findViewById<Button>(R.id.delete_product_button)
 
@@ -158,16 +161,13 @@ class EditProduct : DialogFragment(), AdapterView.OnItemClickListener {
         }
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+        dialog?.window?.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN)
         return view
     }
 
 
     companion object {
-        fun newInstance(): EditProduct =
-            EditProduct()
-
         const val TAG = "EditProduct"
-
         /**Position of Edited product */
         lateinit var productPassedFromAdapter: Product
     }
@@ -233,6 +233,10 @@ class EditProduct : DialogFragment(), AdapterView.OnItemClickListener {
 
             }
         }
+    }
 
+
+    override fun onDismiss(dialog: DialogInterface) {
+        super.onDismiss(dialog)
     }
 }

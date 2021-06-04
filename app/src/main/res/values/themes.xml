@@ -17,7 +17,6 @@
         <item name="boxStrokeColor">@color/orange_500</item>
         <item name="boxStrokeWidth">2dp</item>
 
-        <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>

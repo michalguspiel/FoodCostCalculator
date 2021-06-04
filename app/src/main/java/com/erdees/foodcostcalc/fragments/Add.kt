@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
+import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.fragments.dialogs.InformationDialog
 import com.erdees.foodcostcalc.model.Product
@@ -97,6 +98,9 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
         sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources, sharedPreferences)
         unitSpinner = view.findViewById(R.id.units_spinner)
+        unitSpinner.setOnFocusChangeListener { v, hasFocus ->
+            if(hasFocus) view.hideKeyboard()
+        }
 
 
         /** BUTTONS FUNCTIONALITY */

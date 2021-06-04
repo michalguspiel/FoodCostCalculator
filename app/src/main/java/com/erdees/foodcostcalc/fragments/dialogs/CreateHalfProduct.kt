@@ -15,6 +15,7 @@ import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
+import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
 import com.erdees.foodcostcalc.model.HalfProduct
 import com.erdees.foodcostcalc.viewmodel.CreateHalfProductViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -59,8 +60,11 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
 
         /** binders*/
         val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
-        val dishName = view.findViewById<TextView>(R.id.new_half_product_edittext)
-        unitSpinner = view.findViewById<AutoCompleteTextView>(R.id.unit_spinner_create_half_product)
+        val halfProductName = view.findViewById<TextView>(R.id.new_half_product_edittext)
+        halfProductName.setOnFocusChangeListener { _, hasFocus ->
+            if(!hasFocus) view.hideKeyboard()
+        }
+        unitSpinner = view.findViewById(R.id.unit_spinner_create_half_product)
         sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources,sharedPreferences)
 
@@ -73,8 +77,8 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
         /** BUTTON LOGIC*/
         addDishBtn.setOnClickListener {
 
-            if (dishName.text.isNotEmpty()) {
-                val halfProduct = HalfProduct(0, dishName.text.toString(),chosenUnit)
+            if (halfProductName.text.isNotEmpty()) {
+                val halfProduct = HalfProduct(0, halfProductName.text.toString(),chosenUnit)
                 viewModel.addHalfProduct(halfProduct)
                 sendDataAboutHalfProductCreated(halfProduct)
                 this.dismiss()

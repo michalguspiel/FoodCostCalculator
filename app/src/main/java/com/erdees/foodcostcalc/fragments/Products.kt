@@ -23,6 +23,7 @@ class Products : Fragment() {
     private lateinit var adapter: ProductsRecyclerAdapter
 
 
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -64,10 +65,9 @@ class Products : Fragment() {
     }
 
     override fun onDestroy() {
-        Log.i(HalfProducts.TAG,"onDestroy casted")
-
         super.onDestroy()
         adapter.destroyAds()
     }
+
 
 }

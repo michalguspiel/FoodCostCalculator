@@ -2,8 +2,10 @@ package com.erdees.foodcostcalc
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.*
+import androidx.annotation.ContentView
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -14,6 +16,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
+import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
 import com.erdees.foodcostcalc.fragments.*
 import com.erdees.foodcostcalc.fragments.dialogs.AddProductToDish
 import com.erdees.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
@@ -146,11 +149,10 @@ class MainActivity : AppCompatActivity() {
 
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         MobileAds.initialize(this){}
 
         val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
@@ -160,18 +162,26 @@ class MainActivity : AppCompatActivity() {
         menuBtn = findViewById(R.id.side_menu_button)
         searchBtn = findViewById(R.id.search_button)
         searchTextField = findViewById(R.id.toolbar_text_field)
+
+        searchTextField.setOnFocusChangeListener { _, hasFocus ->
+            if(!hasFocus) drawerLayout.hideKeyboard()
+        }
+
+
         backBtn = findViewById(R.id.search_back)
 
         backBtn.visibility = View.GONE
 
         menuBtn.setOnClickListener {
             drawerLayout.open()
+            drawerLayout.hideKeyboard()
         }
         searchBtn.setOnClickListener {
             viewModel.searchFor(searchTextField.text.toString())
             menuBtn.visibility = View.INVISIBLE
             menuBtn.isEnabled = false
             backBtn.visibility = View.VISIBLE
+            drawerLayout.hideKeyboard()
         }
         backBtn.setOnClickListener {
             viewModel.searchFor("")
@@ -179,6 +189,7 @@ class MainActivity : AppCompatActivity() {
             backBtn.visibility = View.GONE
             menuBtn.visibility = View.VISIBLE
             menuBtn.isEnabled = true
+            drawerLayout.hideKeyboard()
         }
 
 
@@ -202,7 +213,6 @@ class MainActivity : AppCompatActivity() {
 
 
         /**Side drawer menu */
-        drawerLayout = findViewById(R.id.drawer_layout)
         val toggle = ActionBarDrawerToggle(this, drawerLayout, 0, 0)
         drawerLayout.addDrawerListener(toggle)
         toggle.syncState()

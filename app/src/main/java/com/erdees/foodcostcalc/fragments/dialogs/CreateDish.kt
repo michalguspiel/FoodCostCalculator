@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.fragments.dialogs
 
+import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -13,6 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.model.Dish
 import com.erdees.foodcostcalc.viewmodel.CreateDishViewModel
@@ -22,6 +24,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 class CreateDish : DialogFragment() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +44,9 @@ class CreateDish : DialogFragment() {
         /** binders*/
         val addDishBtn = view.findViewById<Button>(R.id.add_button_dialog)
         val dishName = view.findViewById<TextView>(R.id.new_dish_edittext)
+        dishName.setOnFocusChangeListener { _, hasFocus ->
+            if(!hasFocus) view.hideKeyboard()
+        }
 
         val sharedPreferences = SharedPreferences(requireContext())
 
@@ -77,7 +83,6 @@ class CreateDish : DialogFragment() {
     companion object {
         fun newInstance(): CreateDish =
                 CreateDish()
-
         const val TAG = "CreateDish"
     }
 

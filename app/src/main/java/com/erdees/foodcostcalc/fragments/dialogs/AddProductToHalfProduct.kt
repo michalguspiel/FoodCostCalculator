@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.SharedFunctions.changeUnitList
+import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
 import com.erdees.foodcostcalc.SharedFunctions.setAdapterList
 import com.erdees.foodcostcalc.SharedFunctions.transformPerUnitToDescription
 import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
@@ -58,6 +59,9 @@ class AddProductToHalfProduct : DialogFragment(), AdapterView.OnItemSelectedList
         /**Binders*/
         val addProductButton = view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
         val weightEditTextField = view.findViewById<EditText>(R.id.product_weight_in_half_product)
+        weightEditTextField.setOnFocusChangeListener { _, hasFocus ->
+            if(!hasFocus) view.hideKeyboard()
+        }
         val halfProductSpinner = view.findViewById<Spinner>(R.id.half_product_spinner)
         val productSpinner = view.findViewById<Spinner>(R.id.product_spinner)
         val infoButton = view.findViewById<ImageButton>(R.id.calculate_waste_info_button)

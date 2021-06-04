@@ -6,17 +6,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.adapter.DishAdapter
-import com.erdees.foodcostcalc.adapter.ProductsRecyclerAdapter
 import com.erdees.foodcostcalc.model.GrandDish
 import com.erdees.foodcostcalc.viewmodel.DishesViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import java.util.*
 
 class Dishes : Fragment() {
@@ -25,6 +22,7 @@ class Dishes : Fragment() {
     private lateinit var listViewViewModelPassedToRecyclerView: DishListViewAdapterViewModel
     private lateinit var viewModelPassedToRecyclerView: DishAdapterViewModel
     private lateinit var adapter: DishAdapter
+
 
 
     override fun onCreateView(
@@ -83,10 +81,10 @@ class Dishes : Fragment() {
     }
 
     override fun onDestroy() {
-        Log.i(HalfProducts.TAG,"onDestroy casted")
-
         super.onDestroy()
         adapter.destroyAds()
     }
+
+
 
 }
