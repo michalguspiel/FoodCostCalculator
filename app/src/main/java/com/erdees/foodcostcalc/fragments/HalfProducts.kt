@@ -73,10 +73,6 @@ class HalfProducts : Fragment()  {
         const val TAG = "HalfProducts"
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        adapter.destroyAds()
-    }
 
 
 }

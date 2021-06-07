@@ -3,7 +3,6 @@ package com.erdees.foodcostcalc.adapter
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.AlertDialog
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -32,7 +31,6 @@ import io.reactivex.subjects.PublishSubject
 import java.util.ArrayList
 import com.erdees.foodcostcalc.Constants.DISH_ITEM_TYPE
 import com.erdees.foodcostcalc.Constants.LAST_ITEM_TYPE
-import com.erdees.foodcostcalc.MainActivity
 import com.erdees.foodcostcalc.ads.AdHelper
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
@@ -376,8 +374,5 @@ class DishAdapter(
         return (priceWithMargin + amountOfTax) * amountOfServings
     }
 
-    fun destroyAds() {
-        currentNativeAd?.destroy()
-    }
 
 }

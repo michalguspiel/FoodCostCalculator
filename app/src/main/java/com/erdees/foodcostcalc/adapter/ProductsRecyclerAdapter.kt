@@ -158,14 +158,5 @@ class ProductsRecyclerAdapter(
 
     }
 
-    override fun onViewRecycled(holder: RecyclerView.ViewHolder) {
-        currentNativeAd?.destroy()
-        super.onViewRecycled(holder)
-    }
-
-
-    fun destroyAds() {
-        currentNativeAd?.destroy()
-    }
 
 }

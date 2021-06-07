@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         when {
             sideNavigation.isVisible -> {
-                drawerLayout.closeDrawer(Gravity.LEFT)
+                drawerLayout.closeDrawer(GravityCompat.START)
                 return
             }
             checkIfSearchToolIsUsed() -> {
@@ -152,7 +152,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        val drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
+        drawerLayout = findViewById<DrawerLayout>(R.id.drawer_layout)
         MobileAds.initialize(this){}
 
         val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)

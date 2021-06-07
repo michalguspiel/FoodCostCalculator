@@ -80,11 +80,6 @@ class Dishes : Fragment() {
         const val TAG = "Dishes"
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        adapter.destroyAds()
-    }
-
 
 
 }

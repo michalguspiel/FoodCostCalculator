@@ -234,7 +234,6 @@ class HalfProductAdapter(
                 val activityDestroyed: Boolean = activity.isDestroyed
                 if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
                     nativeAd.destroy()
-                    Log.i("TESTTT", " THIS RETURN IS CALLED ")
                     return@forNativeAd
                 }
                 // You must call destroy on old ads when you are done with them,
@@ -315,8 +314,5 @@ class HalfProductAdapter(
         const val TAG = "HalfProductAdapter"
     }
 
-    fun destroyAds() {
-        currentNativeAd?.destroy()
-    }
 
 }

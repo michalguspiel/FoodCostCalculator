@@ -64,10 +64,5 @@ class Products : Fragment() {
         const val TAG = "Products"
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        adapter.destroyAds()
-    }
-
 
 }
