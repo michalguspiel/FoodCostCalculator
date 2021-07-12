@@ -116,6 +116,11 @@ dependencies {
 
     //GOOGLE ADS
     implementation 'com.google.android.gms:play-services-ads:20.1.0'
+    //Facebook Ads for open bidding
+    implementation 'com.google.ads.mediation:facebook:6.5.1.0'
+    //mediation test suite
+    implementation 'com.google.android.ads:mediation-test-suite:2.0.0'
+
     //ERROR HANDLE
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 

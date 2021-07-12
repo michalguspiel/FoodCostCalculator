@@ -23,6 +23,7 @@ import com.erdees.foodcostcalc.fragments.dialogs.AddProductToHalfProduct
 import com.erdees.foodcostcalc.fragments.dialogs.CreateDish
 import com.erdees.foodcostcalc.fragments.dialogs.CreateHalfProduct
 import com.erdees.foodcostcalc.viewmodel.MainActivityViewModel
+import com.google.android.ads.mediationtestsuite.MediationTestSuite
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
@@ -157,6 +158,8 @@ class MainActivity : AppCompatActivity() {
 
         val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         bottomNavigation = findViewById(R.id.navigationView)
+
+
 
         /** Toolbar  */
         menuBtn = findViewById(R.id.side_menu_button)
