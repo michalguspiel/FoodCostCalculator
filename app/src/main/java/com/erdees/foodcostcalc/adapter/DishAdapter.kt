@@ -36,6 +36,9 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.VideoOptions
+import com.google.android.gms.ads.formats.NativeAdOptions.ADCHOICES_BOTTOM_LEFT
+import com.google.android.gms.ads.formats.NativeAdOptions.ADCHOICES_TOP_LEFT
+import com.google.android.gms.ads.nativead.AdChoicesView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView

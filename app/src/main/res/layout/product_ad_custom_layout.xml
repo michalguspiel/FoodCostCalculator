@@ -1,6 +1,7 @@
 <com.google.android.gms.ads.nativead.NativeAdView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginBottom="4dp"
     >
 
     <com.google.android.material.card.MaterialCardView
@@ -12,7 +13,10 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:background="@drawable/recycler_card"
-        android:layout_margin="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
         app:cardCornerRadius="16dp"
         app:cardPreventCornerOverlap="true"
         android:elevation="16dp"
