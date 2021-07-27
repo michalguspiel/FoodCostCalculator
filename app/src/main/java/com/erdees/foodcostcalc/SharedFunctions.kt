@@ -6,13 +6,23 @@ import android.content.res.Resources
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.ListView
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat
+import com.google.android.material.snackbar.Snackbar
 import java.text.DecimalFormat
 import java.text.NumberFormat
 
 
 object SharedFunctions {
 
+
+     fun View.makeSnackBar(name: String , context: Context) {
+        val snackBar =
+            Snackbar.make(this, "$name created successfully!", Snackbar.LENGTH_SHORT)
+        snackBar.setAction("Okay") { snackBar.dismiss() }
+        snackBar.setActionTextColor(ContextCompat.getColor(context, R.color.orange_500))
+            .show()
+    }
 
     fun View.hideKeyboard() {
         (context.getSystemService(Activity.INPUT_METHOD_SERVICE)as InputMethodManager?)?.hideSoftInputFromWindow(

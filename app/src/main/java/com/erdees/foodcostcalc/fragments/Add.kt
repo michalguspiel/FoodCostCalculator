@@ -13,15 +13,16 @@ import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
+import com.erdees.foodcostcalc.SharedFunctions.makeSnackBar
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.fragments.dialogs.InformationDialog
 import com.erdees.foodcostcalc.model.Product
 import com.erdees.foodcostcalc.viewmodel.AddViewModel
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.analytics.FirebaseAnalytics
 import java.math.RoundingMode
 import java.text.DecimalFormat
-
 
 class Add : Fragment(), AdapterView.OnItemClickListener {
 
@@ -35,6 +36,8 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
     private lateinit var scrollView: ScrollView
     private val spinnerId = 1
     private val informationDialog = InformationDialog()
+
+    private lateinit var thisView : View
 
     private lateinit var calcPricePerBox: EditText
 
@@ -74,32 +77,32 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(R.layout.fragment_add, container, false)
+        thisView  = inflater.inflate(R.layout.fragment_add, container, false)
         val viewModel = ViewModelProvider(this).get(AddViewModel::class.java)
 
         /** BINDERS FOR BUTTONS AND FIELDS */
-        name = view.findViewById(R.id.product_name)
-        price = view.findViewById(R.id.product_price)
-        tax = view.findViewById(R.id.product_tax)
-        waste = view.findViewById(R.id.product_waste)
-        val addButton = view.findViewById<Button>(R.id.addProduct)
-        calculateWasteBtn = view.findViewById(R.id.count_waste_percent_btn)
-        calcWasteWeight = view.findViewById(R.id.waste_calc_product_waste)
-        calcProductWeight = view.findViewById(R.id.waste_calc_product_weight)
-        calcPricePerPieceBtn = view.findViewById(R.id.count_price_per_piece_btn)
-        calcQuantityBox = view.findViewById(R.id.calc_quantity_box)
-        calcPricePerBox = view.findViewById(R.id.calc_price_per_box)
-        val informationButton = view.findViewById<ImageButton>(R.id.info_button)
+        name = thisView.findViewById(R.id.product_name)
+        price = thisView.findViewById(R.id.product_price)
+        tax = thisView.findViewById(R.id.product_tax)
+        waste = thisView.findViewById(R.id.product_waste)
+        val addButton = thisView.findViewById<Button>(R.id.addProduct)
+        calculateWasteBtn = thisView.findViewById(R.id.count_waste_percent_btn)
+        calcWasteWeight = thisView.findViewById(R.id.waste_calc_product_waste)
+        calcProductWeight = thisView.findViewById(R.id.waste_calc_product_weight)
+        calcPricePerPieceBtn = thisView.findViewById(R.id.count_price_per_piece_btn)
+        calcQuantityBox = thisView.findViewById(R.id.calc_quantity_box)
+        calcPricePerBox = thisView.findViewById(R.id.calc_price_per_box)
+        val informationButton = thisView.findViewById<ImageButton>(R.id.info_button)
         val calculateWasteInfoButton =
-            view.findViewById<ImageButton>(R.id.calculate_waste_info_button)
+            thisView.findViewById<ImageButton>(R.id.calculate_waste_info_button)
         val calculatePiecePriceInfoButton =
-            view.findViewById<ImageButton>(R.id.calculate_price_per_piece_info_button)
-        scrollView = view.findViewById(R.id.add_scroll_view)
+            thisView.findViewById<ImageButton>(R.id.calculate_price_per_piece_info_button)
+        scrollView = thisView.findViewById(R.id.add_scroll_view)
         sharedPreferences = SharedPreferences(requireContext())
         unitList = getUnits(resources, sharedPreferences)
-        unitSpinner = view.findViewById(R.id.units_spinner)
+        unitSpinner = thisView.findViewById(R.id.units_spinner)
         unitSpinner.setOnFocusChangeListener { v, hasFocus ->
-            if(hasFocus) view.hideKeyboard()
+            if(hasFocus) thisView.hideKeyboard()
         }
 
 
@@ -119,6 +122,7 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
                 )
                 viewModel.addProducts(product)
                 sendDataAboutProduct(product)
+                thisView.makeSnackBar(product.name,requireContext())
                 clearInputFields()
             }
         }
@@ -154,13 +158,15 @@ class Add : Fragment(), AdapterView.OnItemClickListener {
 
         }
 
-        return view
+        return thisView
     }
 
     companion object {
         fun newInstance(): Add = Add()
         const val TAG = "Add"
     }
+
+
 
     private fun sendDataAboutProduct(product: Product){
         val bundle = Bundle()

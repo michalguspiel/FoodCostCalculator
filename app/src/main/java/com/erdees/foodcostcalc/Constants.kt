@@ -16,9 +16,9 @@ object Constants {
     const val PRODUCT_TAX = "product_tax"
     const val PRODUCT_PRICE_PER_UNIT = "product_price_per_unit"
 
-    const val PRODUCTS_AD_FREQUENCY = 6
-    const val HALF_PRODUCTS_AD_FREQUENCY = 4
-    const val DISHES_AD_FREQUENCY = 5
+    const val PRODUCTS_AD_FREQUENCY = 4
+    const val HALF_PRODUCTS_AD_FREQUENCY = 3
+    const val DISHES_AD_FREQUENCY = 3
 
 
     const val PRODUCT_AD_ITEM_TYPE = 522

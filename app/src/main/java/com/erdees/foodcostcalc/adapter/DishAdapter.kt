@@ -36,9 +36,6 @@ import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.VideoOptions
-import com.google.android.gms.ads.formats.NativeAdOptions.ADCHOICES_BOTTOM_LEFT
-import com.google.android.gms.ads.formats.NativeAdOptions.ADCHOICES_TOP_LEFT
-import com.google.android.gms.ads.nativead.AdChoicesView
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
@@ -56,7 +53,7 @@ class DishAdapter(
 
     private val adCase = AdHelper(list.size, Constants.DISHES_AD_FREQUENCY)
 
-    private val itemsSizeWithAds = adCase.newListSizeWithAds + 1 // +1 to include button as footer.
+    private val itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
 
     private val positionsOfAds = adCase.positionsOfAds()
 
@@ -209,6 +206,7 @@ class DishAdapter(
         @SuppressLint("CheckResult")
         fun bind(position: Int) {
             val positionIncludedAdsBinded = adCase.correctElementFromListToBind(position)
+            Log.i("DishesRecycler", "position : $position , positionIncludedWithAdsBinded : $positionIncludedAdsBinded , listSize : ${list.size} , positionOfAds : $positionsOfAds")
 
             if (position == 3) openFeedBackForm()
             setDishData(positionIncludedAdsBinded)

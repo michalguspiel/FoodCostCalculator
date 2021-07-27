@@ -27,6 +27,7 @@ import com.google.android.ads.mediationtestsuite.MediationTestSuite
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity() {
@@ -204,13 +205,13 @@ class MainActivity : AppCompatActivity() {
         })
         viewModel.observeOpenCreateDishFlag().observe(this, { shouldCreateDishBeOpened ->
             if (shouldCreateDishBeOpened) {
-                openDialog(CreateDish())
+                openDialog(CreateDish(drawerLayout))
             }
         })
         viewModel.observeOpenCreateHalfProductFlag()
             .observe(this, { shouldCreateHalfProductBeOpened ->
                 if (shouldCreateHalfProductBeOpened) {
-                    openDialog(CreateHalfProduct())
+                    openDialog(CreateHalfProduct(drawerLayout))
                 }
             })
 
@@ -227,7 +228,7 @@ class MainActivity : AppCompatActivity() {
                         openAdd()
                     }
                     R.id.nav_create_new_dish -> {
-                        openDialog(CreateDish())
+                        openDialog(CreateDish(drawerLayout))
                     }
                     R.id.nav_add_product_to_dish -> {
                         openDialog(AddProductToDish())
@@ -238,7 +239,7 @@ class MainActivity : AppCompatActivity() {
                         hideSearchToolbar()
                     }
                     R.id.nav_create_half_product -> {
-                        openDialog(CreateHalfProduct())
+                        openDialog(CreateHalfProduct(drawerLayout))
                     }
                     R.id.nav_add_product_to_half_product -> {
                         openDialog(AddProductToHalfProduct())

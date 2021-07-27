@@ -16,7 +16,6 @@ import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.Constants.HALF_PRODUCT_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.Constants.HALF_PRODUCT_ITEM_TYPE
 import com.erdees.foodcostcalc.Constants.LAST_ITEM_TYPE
-import com.erdees.foodcostcalc.MainActivity
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.abbreviateUnitWithPer
 import com.erdees.foodcostcalc.SharedFunctions.formatPrice
@@ -49,7 +48,7 @@ class HalfProductAdapter(
 
     private val adCase = AdHelper(list.size, Constants.HALF_PRODUCTS_AD_FREQUENCY)
 
-    private val itemsSizeWithAds = adCase.newListSizeWithAds + 1 // +1 to include button as footer.
+    private val itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
 
     private val positionsOfAds = adCase.positionsOfAds()
 

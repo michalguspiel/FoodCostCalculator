@@ -9,22 +9,29 @@ import com.erdees.foodcostcalc.R
 import com.google.android.gms.ads.VideoController
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
+import java.lang.NullPointerException
 
 class AdHelper(val itemsSize: Int, private val adFrequency: Int) {
 
-    val howManyAds = itemsSize / adFrequency
+    private val initialCountOfAds = itemsSize / adFrequency
 
-    val newListSizeWithAds = itemsSize + itemsSize / adFrequency
+    val initialListSize = itemsSize + initialCountOfAds
+
+    val finalAmountOfAds = initialListSize / adFrequency
+
+    val finalListSize = itemsSize + finalAmountOfAds
+
 
     fun adsBindedSoFar(position: Int): Int {
-        return (position + 1 ) / adFrequency
+        if(position>finalListSize)throw NullPointerException()
+        return (position  ) / adFrequency
     }
 
 
     fun positionsOfAds() : List<Int>{
         val positions = mutableListOf<Int>()
-        var position = adFrequency - 1  // initially first position
-      for (eachAd in 0 until howManyAds) {
+        var position = adFrequency   // initially first position
+      for (eachAd in 0 until finalAmountOfAds) {
           positions += position
           position += adFrequency
       }

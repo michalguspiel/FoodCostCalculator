@@ -16,12 +16,13 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedPreferences
 import com.erdees.foodcostcalc.SharedFunctions.getUnits
 import com.erdees.foodcostcalc.SharedFunctions.hideKeyboard
+import com.erdees.foodcostcalc.SharedFunctions.makeSnackBar
 import com.erdees.foodcostcalc.model.HalfProduct
 import com.erdees.foodcostcalc.viewmodel.CreateHalfProductViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
 
 
-class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
+class CreateHalfProduct(private val parentView : View) : DialogFragment(),AdapterView.OnItemClickListener {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
@@ -81,6 +82,7 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
                 val halfProduct = HalfProduct(0, halfProductName.text.toString(),chosenUnit)
                 viewModel.addHalfProduct(halfProduct)
                 sendDataAboutHalfProductCreated(halfProduct)
+                parentView.makeSnackBar(halfProduct.name,requireContext())
                 this.dismiss()
 
             } else Toast.makeText(activity, "Can't make nameless half product!", Toast.LENGTH_SHORT).show()
@@ -99,9 +101,6 @@ class CreateHalfProduct : DialogFragment(),AdapterView.OnItemClickListener {
     }
 
     companion object {
-        fun newInstance(): CreateHalfProduct =
-            CreateHalfProduct()
-
         const val TAG = "CreateHalfProduct"
     }
 

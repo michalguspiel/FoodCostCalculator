@@ -2,7 +2,6 @@ package com.erdees.foodcostcalc.adapter
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -10,15 +9,12 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
-import com.erdees.foodcostcalc.Constants
 import com.erdees.foodcostcalc.Constants.ADMOB_PRODUCTS_RV_AD_UNIT_ID
 import com.erdees.foodcostcalc.ads.AdHelper
-import com.erdees.foodcostcalc.Constants.ADMOB_TEST_AD_UNIT_ID
 import com.erdees.foodcostcalc.Constants.LAST_ITEM_TYPE
 import com.erdees.foodcostcalc.Constants.PRODUCTS_AD_FREQUENCY
 import com.erdees.foodcostcalc.Constants.PRODUCT_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.Constants.PRODUCT_ITEM_TYPE
-import com.erdees.foodcostcalc.MainActivity
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.SharedFunctions.formatPrice
 import com.erdees.foodcostcalc.fragments.dialogs.EditProduct
@@ -42,7 +38,7 @@ class ProductsRecyclerAdapter(
 
     private val adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
 
-    private val itemsSizeWithAds = adCase.newListSizeWithAds + 1 // +1 to include button as footer.
+    private val itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
 
     private val positionsOfAds = adCase.positionsOfAds()
 
@@ -58,7 +54,7 @@ class ProductsRecyclerAdapter(
         fun bind(position: Int) {
 
             val positionIncludedAdsBinded = adCase.correctElementFromListToBind(position)
-
+            Log.i("ProductsRecycler", "position : $position , positionIncludedWithAdsBinded : $positionIncludedAdsBinded , listSize : ${list.size} , positionOfAds : $positionsOfAds")
             textView.text = list[positionIncludedAdsBinded].name
             nettoTextView.text =
                 "Price ${list[positionIncludedAdsBinded].unit} netto: ${formatPrice(list[positionIncludedAdsBinded].pricePerUnit)}."

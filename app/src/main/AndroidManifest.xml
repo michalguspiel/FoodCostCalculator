@@ -19,7 +19,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.FoodCostCalc"
         android:fullBackupContent="@xml/backup_descriptor"
-        > <!--TODO CHECK IF NETWORKS SECURITY CONFIG DOES NOT CAUSE CRASHES OR BUGS FOR LOWER API DEVICES!-->
+        >
 
 
 
