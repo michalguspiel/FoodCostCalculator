@@ -1,10 +1,9 @@
 package com.erdees.foodcostcalc
 
-import com.erdees.foodcostcalc.SharedFunctions.calculatePrice
-import com.erdees.foodcostcalc.SharedFunctions.computeWeightAndVolumeToSameUnit
+import com.erdees.foodcostcalc.utils.SharedFunctions.calculatePrice
+import com.erdees.foodcostcalc.utils.SharedFunctions.computeWeightAndVolumeToSameUnit
+import org.junit.Assert.assertEquals
 import org.junit.Test
-
-import org.junit.Assert.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).

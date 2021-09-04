@@ -7,11 +7,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
+    tools:context=".ui.activities.mainActivity.MainActivity"
     tools:openDrawer="start">
 
 
 
     <include
+        android:id="@+id/content"
         layout="@layout/content"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

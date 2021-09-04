@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context=".ui.activities.mainActivity.MainActivity"
     android:background="@drawable/background"
     >
 
@@ -20,6 +20,7 @@
         />
 
     <include
+        android:id="@+id/customToolbar"
         layout="@layout/custom_toolbar"
         />
 

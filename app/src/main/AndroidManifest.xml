@@ -23,16 +23,17 @@
 
 
 
-        <activity android:name="com.erdees.foodcostcalc.MainActivity"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
-            >
+        <activity
+            android:name="com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity"
+            android:windowSoftInputMode="adjustResize|stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.erdees.foodcostcalc.OnlineDataActivity"
-            android:theme="@style/Theme.OnlineDataActivity"/>
+        <activity
+            android:name="com.erdees.foodcostcalc.ui.activities.onlineDataActivity.OnlineDataActivity"
+            android:theme="@style/Theme.OnlineDataActivity" />
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />

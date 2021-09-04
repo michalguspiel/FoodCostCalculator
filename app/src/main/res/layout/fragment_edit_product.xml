@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:gravity="center_horizontal"
                 android:layout_height="match_parent"
-                tools:text="dish name"
+                tools:text="dishModel name"
                 android:inputType="text"
                 android:layout_gravity="center_horizontal"
                 android:autofillHints="" />
@@ -89,7 +89,7 @@
                 android:layout_width="match_parent"
                 android:gravity="center_horizontal"
                 android:layout_height="match_parent"
-                tools:text="dish name"
+                tools:text="dishModel name"
                 android:inputType="numberDecimal"
                 android:layout_gravity="center_horizontal"
                 android:autofillHints="" />
@@ -118,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:gravity="center_horizontal"
                 android:layout_height="match_parent"
-                tools:text="dish tax"
+                tools:text="dishModel tax"
                 android:inputType="numberDecimal"
                 android:layout_gravity="center_horizontal"
                 android:autofillHints="" />
@@ -145,7 +145,7 @@
                 android:layout_width="match_parent"
                 android:gravity="center_horizontal"
                 android:layout_height="match_parent"
-                tools:text="dish waste"
+                tools:text="dishModel waste"
                 android:inputType="numberDecimal"
                 android:layout_gravity="center_horizontal"
                 android:autofillHints="" />

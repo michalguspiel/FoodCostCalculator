@@ -1,8 +1,6 @@
 package com.erdees.foodcostcalc.data
 
 import android.content.Context
-import android.util.Log
-import androidx.lifecycle.ViewModelProvider
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -15,17 +13,22 @@ import com.erdees.foodcostcalc.data.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.product.ProductDao
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedDao
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductDao
-import com.erdees.foodcostcalc.model.*
-import com.erdees.foodcostcalc.viewmodel.DishesViewModel
+import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
+import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import java.io.File
 
 @Database(
-    entities = [Product::class, Dish::class,
+    entities = [
+        ProductModel::class, DishModel::class,
         ProductIncluded::class,
-        HalfProduct::class,
-        ProductIncludedInHalfProduct::class,
-        HalfProductIncludedInDish::class,]
-    , version = 1, exportSchema = true
+        HalfProductModel::class,
+        ProductIncludedInHalfProductModel::class,
+        HalfProductIncludedInDishModel::class,
+    ], version = 1, exportSchema = true
 )
 abstract class AppRoomDataBase : RoomDatabase() {
 

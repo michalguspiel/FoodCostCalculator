@@ -9,9 +9,9 @@ import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.dish.DishRepository
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
-import com.erdees.foodcostcalc.model.Dish
-import com.erdees.foodcostcalc.model.HalfProductIncludedInDish
-import com.erdees.foodcostcalc.model.ProductIncluded
+import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -37,16 +37,16 @@ class EditDishAdapterViewModel(application: Application):AndroidViewModel(applic
 
     }
 
-    fun editDish(dish: Dish) {
+    fun editDish(dishModel: DishModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            dishRepository.editDish(dish)
+            dishRepository.editDish(dishModel)
         }
     }
 
-    fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish) {
+    fun editHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductIncludedInDishRepository
-                .editHalfProductIncludedInDish(halfProductIncludedInDish)
+                .editHalfProductIncludedInDish(halfProductIncludedInDishModel)
         }
     }
 
@@ -56,14 +56,15 @@ class EditDishAdapterViewModel(application: Application):AndroidViewModel(applic
             productIncludedRepository.editProductsIncluded(productIncluded)
         }
     }
-        /**Basic repository methods*/
-        fun setProductIncluded(product: ProductIncluded) {
-            basicRepository.setProductIncluded(product)
-        }
 
-        fun setHalfProductIncluded(halfProductIncluded: HalfProductIncludedInDish) {
-            basicRepository.setHalfProductIncluded(halfProductIncluded)
-        }
-
+    /**Basic repository methods*/
+    fun setProductIncluded(product: ProductIncluded) {
+        basicRepository.setProductIncluded(product)
     }
+
+    fun setHalfProductIncluded(halfProductIncludedModel: HalfProductIncludedInDishModel) {
+        basicRepository.setHalfProductIncluded(halfProductIncludedModel)
+    }
+
+}
 

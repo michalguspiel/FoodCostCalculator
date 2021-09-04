@@ -2,32 +2,32 @@ package com.erdees.foodcostcalc.data.productIncludedInHalfProduct
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 
 @Dao
 interface ProductIncludedInHalfProductDao {
 
     @Query("SELECT * FROM PRODUCTINCLUDEDINHALFPRODUCT ORDER BY product_name ASC")
-    fun getAllProductIncludedInHalfProduct(): LiveData<List<ProductIncludedInHalfProduct>>
+    fun getAllProductIncludedInHalfProduct(): LiveData<List<ProductIncludedInHalfProductModel>>
 
     @Query("SELECT * FROM PRODUCTINCLUDEDINHALFPRODUCT")
-    fun getAllProductIncludedInHalfProductNotAsc(): LiveData<List<ProductIncludedInHalfProduct>>
+    fun getAllProductIncludedInHalfProductNotAsc(): LiveData<List<ProductIncludedInHalfProductModel>>
 
     @Query("SELECT * FROM productincludedinhalfproduct WHERE productId = :productId")
-    fun getCertainProductsIncluded(productId: Long): LiveData<List<ProductIncludedInHalfProduct>>
+    fun getCertainProductsIncluded(productId: Long): LiveData<List<ProductIncludedInHalfProductModel>>
 
     @Insert
-    suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
+    suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel)
 
     @Update
-    suspend fun editProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
+    suspend fun editProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel)
 
     @Delete
-    suspend fun deleteProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
+    suspend fun deleteProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel)
 
     @Transaction
-    @Query("SELECT * FROM ProductIncludedInHalfProduct WHERE halfProductId = :halfProductId ORDER BY product_name ASC")
-    fun getProductsFromHalfProduct(halfProductId: Long): LiveData<List<ProductIncludedInHalfProduct>>
+    @Query("SELECT * FROM PRODUCTINCLUDEDINHALFPRODUCT WHERE halfProductId = :halfProductId ORDER BY product_name ASC")
+    fun getProductsFromHalfProduct(halfProductId: Long): LiveData<List<ProductIncludedInHalfProductModel>>
 
 
 }

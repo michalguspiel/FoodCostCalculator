@@ -1,9 +1,12 @@
 package com.erdees.foodcostcalc.data.basic
 
-import android.util.Half
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.erdees.foodcostcalc.model.*
+import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 
 class BasicDao{
     /** Data access object to basic database  */
@@ -13,7 +16,7 @@ class BasicDao{
     private var secondMutablePosition: Int? = null
     private val secondPosition = MutableLiveData<Int>()
 
-    /**Flag provides an information if product/dish was just deleted and if fragment should close itself */
+    /**Flag provides an information if product/dishModel was just deleted and if fragment should close itself */
     private var mutableFlag: Boolean = true
     private val flag = MutableLiveData<Boolean>()
 
@@ -23,17 +26,18 @@ class BasicDao{
     private var searchWord: String = ""
     private val searchWordLive = MutableLiveData<String>()
 
-    private var productIncludedInHalfProduct: ProductIncludedInHalfProduct? = null
-    private val productIncludedInHalfProductLive = MutableLiveData<ProductIncludedInHalfProduct>()
+    private var productIncludedInHalfProductModel: ProductIncludedInHalfProductModel? = null
+    private val productIncludedInHalfProductLive =
+        MutableLiveData<ProductIncludedInHalfProductModel>()
 
-    private var halfProductIncluded : HalfProductIncludedInDish? = null
-    private val halfProductIncludedLive = MutableLiveData<HalfProductIncludedInDish>()
+    private var halfProductIncludedModel: HalfProductIncludedInDishModel? = null
+    private val halfProductIncludedLive = MutableLiveData<HalfProductIncludedInDishModel>()
 
-    private var dishPassedToDialog : Dish? = null
-    private val dishPassedToDialogLive = MutableLiveData<Dish>()
+    private var dishModelPassedToDialog: DishModel? = null
+    private val dishPassedToDialogLive = MutableLiveData<DishModel>()
 
-    private var halfProductPassedToDialog : HalfProduct? = null
-    private val halfProductPassedToDialogLive = MutableLiveData<HalfProduct>()
+    private var halfProductModelPassedToDialog: HalfProductModel? = null
+    private val halfProductPassedToDialogLive = MutableLiveData<HalfProductModel>()
 
     private var openAddFlag: Boolean = false
     private val openAddFlagLive = MutableLiveData<Boolean>()
@@ -51,14 +55,14 @@ class BasicDao{
         flag.value = mutableFlag
         productIncludedLive.value = productIncluded
         searchWordLive.value = searchWord
-        productIncludedInHalfProductLive.value = productIncludedInHalfProduct
-        halfProductIncludedLive.value = halfProductIncluded
+        productIncludedInHalfProductLive.value = productIncludedInHalfProductModel
+        halfProductIncludedLive.value = halfProductIncludedModel
         openAddFlagLive.value = openAddFlag
         openCreateDishFlagLive.value = openCreateDishFlag
         openCreateHalfProductFlagLive.value = openCreateHalfProductFlag
 
-        dishPassedToDialogLive.value = dishPassedToDialog
-        halfProductPassedToDialogLive.value = halfProductPassedToDialog
+        dishPassedToDialogLive.value = dishModelPassedToDialog
+        halfProductPassedToDialogLive.value = halfProductModelPassedToDialog
     }
 
 
@@ -74,9 +78,10 @@ class BasicDao{
         openCreateDishFlag = boolean
         openCreateDishFlagLive.value = openCreateDishFlag
     }
+
     fun observeOpenCreateDishFlag() = openCreateDishFlagLive as LiveData<Boolean>
 
-    fun setOpenCreateHalfProductFlag(boolean: Boolean){
+    fun setOpenCreateHalfProductFlag(boolean: Boolean) {
         openCreateHalfProductFlag = boolean
         openCreateHalfProductFlagLive.value = openCreateHalfProductFlag
     }
@@ -84,35 +89,38 @@ class BasicDao{
     fun observeOpenCreateHalfProductFlag() = openCreateHalfProductFlagLive as LiveData<Boolean>
 
 
-    fun passDishToDialog(dish: Dish) {
-        dishPassedToDialog = dish
-        dishPassedToDialogLive.value = dishPassedToDialog
-    }
-    fun getDishToDialog() = dishPassedToDialogLive as LiveData<Dish>
-
-    fun passHalfProductToDialog(halfProduct: HalfProduct) {
-        halfProductPassedToDialog = halfProduct
-        halfProductPassedToDialogLive.value = halfProductPassedToDialog
-    }
-    fun getHalfProductToDialog() = halfProductPassedToDialogLive as LiveData<HalfProduct>
-
-
-    fun setProductIncludedInHalfProduct(product: ProductIncludedInHalfProduct){
-        productIncludedInHalfProduct = product
-        productIncludedInHalfProductLive.value = productIncludedInHalfProduct
+    fun passDishToDialog(dishModel: DishModel) {
+        dishModelPassedToDialog = dishModel
+        dishPassedToDialogLive.value = dishModelPassedToDialog
     }
 
-    fun getProductIncludedInHalfProduct() = productIncludedInHalfProductLive as LiveData<ProductIncludedInHalfProduct>
+    fun getDishToDialog() = dishPassedToDialogLive as LiveData<DishModel>
+
+    fun passHalfProductToDialog(halfProductModel: HalfProductModel) {
+        halfProductModelPassedToDialog = halfProductModel
+        halfProductPassedToDialogLive.value = halfProductModelPassedToDialog
+    }
+
+    fun getHalfProductToDialog() = halfProductPassedToDialogLive as LiveData<HalfProductModel>
 
 
-    fun searchFor(word: String){
+    fun setProductIncludedInHalfProduct(productModel: ProductIncludedInHalfProductModel) {
+        productIncludedInHalfProductModel = productModel
+        productIncludedInHalfProductLive.value = productIncludedInHalfProductModel
+    }
+
+    fun getProductIncludedInHalfProduct() =
+        productIncludedInHalfProductLive as LiveData<ProductIncludedInHalfProductModel>
+
+
+    fun searchFor(word: String) {
         searchWord = word
         searchWordLive.value = searchWord
     }
 
     fun getWhatToSearchFor() = searchWordLive as LiveData<String>
 
-    fun setProductIncluded(product: ProductIncluded){
+    fun setProductIncluded(product: ProductIncluded) {
         productIncluded = product
         productIncludedLive.value = productIncluded
     }
@@ -120,15 +128,16 @@ class BasicDao{
     fun getProductIncluded() = productIncludedLive as LiveData<ProductIncluded>
 
 
-    fun setHalfProductIncluded(halfProduct : HalfProductIncludedInDish){
-        halfProductIncluded = halfProduct
-        halfProductIncludedLive.value = halfProductIncluded
+    fun setHalfProductIncluded(halfProductModel: HalfProductIncludedInDishModel) {
+        halfProductIncludedModel = halfProductModel
+        halfProductIncludedLive.value = halfProductIncludedModel
     }
 
-    fun getHalfProductIncluded() = halfProductIncludedLive as LiveData<HalfProductIncludedInDish>
+    fun getHalfProductIncluded() =
+        halfProductIncludedLive as LiveData<HalfProductIncludedInDishModel>
 
 
-    fun setPosition(pos: Int){
+    fun setPosition(pos: Int) {
         mutablePosition = pos
         position.value = mutablePosition
     }

@@ -2,24 +2,24 @@ package com.erdees.foodcostcalc.data.product
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.erdees.foodcostcalc.model.Product
+import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 
 /** DATA ACCESS OBJECT */
 @Dao
 interface ProductDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addProduct(product: Product)
+    suspend fun addProduct(productModel: ProductModel)
 
     @Query("SELECT * from products ORDER BY product_name ASC")
-    fun getProducts(): LiveData<List<Product>>
+    fun getProducts(): LiveData<List<ProductModel>>
 
     @Update
-    suspend fun editProduct(newProduct: Product)
+    suspend fun editProduct(newProductModel: ProductModel)
 
     @Delete
-    suspend fun deleteProduct(product: Product)
+    suspend fun deleteProduct(productModel: ProductModel)
 
     @Query("SELECT * FROM products WHERE productId = :id")
-    fun getProduct(id: Long): LiveData<Product>
+    fun getProduct(id: Long): LiveData<ProductModel>
 }

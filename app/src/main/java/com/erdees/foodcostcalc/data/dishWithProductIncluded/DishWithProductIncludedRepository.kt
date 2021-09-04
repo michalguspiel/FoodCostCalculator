@@ -1,8 +1,5 @@
 package com.erdees.foodcostcalc.data.dishWithProductIncluded
 
-import com.erdees.foodcostcalc.data.dish.DishDao
-import com.erdees.foodcostcalc.data.dish.DishRepository
-
 class DishWithProductIncludedRepository(private val dao : DishWithProductIncludedDao) {
 
     fun getDishesWithProductsIncluded() = dao.getDishesWithProductsIncluded()

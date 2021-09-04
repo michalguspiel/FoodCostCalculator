@@ -6,7 +6,7 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.basic.BasicDataBase
 import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
-import com.erdees.foodcostcalc.model.HalfProduct
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
 
 class HalfProductAdapterViewModel(application: Application):AndroidViewModel(application) {
 
@@ -22,7 +22,8 @@ class HalfProductAdapterViewModel(application: Application):AndroidViewModel(app
 
     fun setOpenCreateHalfProductFlag(boolean: Boolean) = basicRepository.setOpenCreateHalfProductFlag(boolean)
 
-    fun passHalfProductToDialog(halfProduct: HalfProduct) = basicRepository.passHalfProductToDialog(halfProduct)
+    fun passHalfProductToDialog(halfProductModel: HalfProductModel) =
+        basicRepository.passHalfProductToDialog(halfProductModel)
 
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long)
             = halfProductWithProductsIncludedRepository.getCertainHalfProductWithProductsIncluded(halfProductId)

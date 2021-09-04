@@ -9,9 +9,9 @@ import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.model.HalfProduct
-import com.erdees.foodcostcalc.model.HalfProductIncludedInDish
-import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -39,20 +39,20 @@ class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel
     }
 
 
-    fun setProductIncludedInHalfProduct(product: ProductIncludedInHalfProduct) {
-        basicRepository.setProductIncludedInHalfProduct(product)
+    fun setProductIncludedInHalfProduct(productModel: ProductIncludedInHalfProductModel) {
+        basicRepository.setProductIncludedInHalfProduct(productModel)
     }
 
-    fun editHalfProducts(halfProduct: HalfProduct) {
+    fun editHalfProducts(halfProductModel: HalfProductModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            halfProductRepository.editHalfProduct(halfProduct)
+            halfProductRepository.editHalfProduct(halfProductModel)
         }
     }
 
-    fun editProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) {
+    fun editProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) {
         viewModelScope.launch(Dispatchers.IO) {
             productIncludedInHalfProductRepository.editProductIncludedInHalfProduct(
-                productIncludedInHalfProduct
+                productIncludedInHalfProductModel
             )
         }
     }
@@ -63,10 +63,10 @@ class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel
         )
 
 
-    fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish) {
+    fun editHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductIncludedInDishRepository
-                .editHalfProductIncludedInDish(halfProductIncludedInDish)
+                .editHalfProductIncludedInDish(halfProductIncludedInDishModel)
         }
 
     }

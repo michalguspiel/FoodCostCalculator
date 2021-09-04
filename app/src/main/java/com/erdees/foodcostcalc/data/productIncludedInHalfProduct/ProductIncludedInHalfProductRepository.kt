@@ -1,32 +1,38 @@
 package com.erdees.foodcostcalc.data.productIncludedInHalfProduct
 
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.model.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 
 class ProductIncludedInHalfProductRepository(private val productIncludedInHalfProductDao: ProductIncludedInHalfProductDao) {
-    val readAllData : LiveData<List<ProductIncludedInHalfProduct>> = productIncludedInHalfProductDao.getAllProductIncludedInHalfProduct()
+    val readAllData: LiveData<List<ProductIncludedInHalfProductModel>> =
+        productIncludedInHalfProductDao.getAllProductIncludedInHalfProduct()
 
-    val readAllDataNotAsc : LiveData<List<ProductIncludedInHalfProduct>> =
+    val readAllDataNotAsc: LiveData<List<ProductIncludedInHalfProductModel>> =
         productIncludedInHalfProductDao.getAllProductIncludedInHalfProductNotAsc()
 
-    fun getCertainProductsIncluded(productId: Long)
-    = productIncludedInHalfProductDao.getCertainProductsIncluded(productId)
+    fun getCertainProductsIncluded(productId: Long) =
+        productIncludedInHalfProductDao.getCertainProductsIncluded(productId)
 
-    suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
-    = productIncludedInHalfProductDao.addProductIncludedInHalfProduct(productIncludedInHalfProduct)
+    suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) =
+        productIncludedInHalfProductDao.addProductIncludedInHalfProduct(
+            productIncludedInHalfProductModel
+        )
 
-    suspend fun editProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
-    = productIncludedInHalfProductDao.editProductIncludedInHalfProduct(productIncludedInHalfProduct)
+    suspend fun editProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) =
+        productIncludedInHalfProductDao.editProductIncludedInHalfProduct(
+            productIncludedInHalfProductModel
+        )
 
-    suspend fun deleteProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct)
-    = productIncludedInHalfProductDao.deleteProductIncludedInHalfProduct(productIncludedInHalfProduct)
+    suspend fun deleteProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) =
+        productIncludedInHalfProductDao.deleteProductIncludedInHalfProduct(
+            productIncludedInHalfProductModel
+        )
 
-    fun getProductsIncludedFromHalfProduct(halfProductId: Long)
-    = productIncludedInHalfProductDao.getProductsFromHalfProduct(halfProductId)
+    fun getProductsIncludedFromHalfProduct(halfProductId: Long) =
+        productIncludedInHalfProductDao.getProductsFromHalfProduct(halfProductId)
 
 
-
-    companion object{
+    companion object {
         @Volatile
         private var instance: ProductIncludedInHalfProductRepository? = null
 

@@ -1,25 +1,24 @@
 package com.erdees.foodcostcalc.data.dish
 
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.model.Dish
-import com.erdees.foodcostcalc.model.ProductIncluded
+import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 
 class DishRepository(private val dishDao: DishDao) {
 
-    val readAllData: LiveData<List<Dish>> = dishDao.getDishes()
+    val readAllData: LiveData<List<DishModel>> = dishDao.getDishes()
 
-    suspend fun addDish(dish: Dish) {
-        dishDao.addDish(dish)
+    suspend fun addDish(dishModel: DishModel) {
+        dishDao.addDish(dishModel)
     }
 
     fun getDishes() = dishDao.getDishes()
 
-    suspend fun deleteDish(dish: Dish){
-        dishDao.deleteDish(dish)
+    suspend fun deleteDish(dishModel: DishModel) {
+        dishDao.deleteDish(dishModel)
     }
 
-    suspend fun editDish(dish: Dish){
-        dishDao.editDish(dish)
+    suspend fun editDish(dishModel: DishModel) {
+        dishDao.editDish(dishModel)
     }
 
 
