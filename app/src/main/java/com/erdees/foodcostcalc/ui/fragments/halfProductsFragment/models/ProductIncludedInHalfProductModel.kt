@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
-import com.erdees.foodcostcalc.utils.SharedFunctions.calculatePrice
+import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 
 @Entity(tableName = "ProductIncludedInHalfProduct")
 data class ProductIncludedInHalfProductModel(

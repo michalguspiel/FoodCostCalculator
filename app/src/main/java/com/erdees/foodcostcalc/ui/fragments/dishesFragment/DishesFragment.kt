@@ -13,6 +13,9 @@ import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 import java.util.*
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class DishesFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
@@ -76,7 +79,6 @@ class DishesFragment : Fragment() {
         fun newInstance(): DishesFragment = DishesFragment()
         const val TAG = "DishesFragment"
     }
-
 
 
 }

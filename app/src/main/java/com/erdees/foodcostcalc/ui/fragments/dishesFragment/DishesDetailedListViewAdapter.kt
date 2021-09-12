@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.ui.fragments.dishesFragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -9,12 +10,14 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
-import com.erdees.foodcostcalc.utils.SharedFunctions.abbreviateUnit
-import com.erdees.foodcostcalc.utils.SharedFunctions.calculatePrice
-import com.erdees.foodcostcalc.utils.SharedFunctions.formatPrice
-import com.erdees.foodcostcalc.utils.SharedFunctions.formatPriceOrWeight
+import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
+import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
+import com.erdees.foodcostcalc.utils.Utils.formatPrice
+import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 import java.text.NumberFormat
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 class DishesDetailedListViewAdapter(
     private val context: Activity,
@@ -37,13 +40,15 @@ class DishesDetailedListViewAdapter(
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
 
         val inflater = context.layoutInflater
-        val rowView = inflater.inflate(R.layout.listview_dish_row,
-            parent, false)
+        val rowView = inflater.inflate(
+            R.layout.listview_dish_row,
+            parent, false
+        )
 
-         productNameText = rowView.findViewById(R.id.product_name_in_dish_row)
-         productWeightText = rowView.findViewById(R.id.product_weight_in_dish_row)
-         productPriceText = rowView.findViewById(R.id.product_price_in_dish_row)
-         productUnit = rowView.findViewById(R.id.product_weight_unit_in_dish_row)
+        productNameText = rowView.findViewById(R.id.product_name_in_dish_row)
+        productWeightText = rowView.findViewById(R.id.product_weight_in_dish_row)
+        productPriceText = rowView.findViewById(R.id.product_price_in_dish_row)
+        productUnit = rowView.findViewById(R.id.product_weight_unit_in_dish_row)
 
         /**To populate rows with dishWithProduct products included */
         if (position < grandDishModel.productsIncluded.size) setRowAsProduct(position)
@@ -57,12 +62,13 @@ class DishesDetailedListViewAdapter(
         return rowView
     }
 
-    private fun setHalfProductRowPrice(positionOfHalfProduct: Int){
+    /**TODO FIGURE OUT WHY THIS SETS ONLY LAST TEXT VIEW AND FIX IT!!*/
+    private fun setHalfProductRowPrice(positionOfHalfProduct: Int) {
         viewModel
             .getCertainHalfProductWithProductsIncluded(grandDishModel.halfProductModels[positionOfHalfProduct].halfProductOwnerId)
             .observe(viewLifecycleOwner,
-                { productPriceText.text =
-                    formatPrice(
+                {
+                    val result = formatPrice(
                         calculatePrice(
                             it.pricePerUnit(),
                             grandDishModel.halfProductModels[positionOfHalfProduct].weight,
@@ -70,6 +76,8 @@ class DishesDetailedListViewAdapter(
                             grandDishModel.halfProductModels[positionOfHalfProduct].unit
                         ) * servings
                     )
+                    Log.i("DishesDetailedList", result)
+                    productPriceText.text = result
                 })
     }
 
@@ -79,7 +87,7 @@ class DishesDetailedListViewAdapter(
         productWeightText.text =
             (grandDishModel.halfProductModels[positionOfHalfProduct].weight * servings).toString()
         productUnit.text =
-            abbreviateUnit(grandDishModel.halfProductModels[positionOfHalfProduct].unit)
+            getUnitAbbreviation(grandDishModel.halfProductModels[positionOfHalfProduct].unit)
         setHalfProductRowPrice(positionOfHalfProduct)
     }
 
@@ -89,8 +97,8 @@ class DishesDetailedListViewAdapter(
             formatPriceOrWeight(grandDishModel.productsIncluded[position].weight * servings)
         productPriceText.text = NumberFormat.getCurrencyInstance()
             .format(grandDishModel.productsIncluded[position].totalPriceOfThisProduct * servings)
-        productUnit.text = abbreviateUnit(grandDishModel.productsIncluded[position].weightUnit)
+        productUnit.text = getUnitAbbreviation(grandDishModel.productsIncluded[position].weightUnit)
     }
 
 
-    }
+}

@@ -20,6 +20,9 @@ import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewModel
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class EditDishFragment : DialogFragment() {
 
     lateinit var recyclerFragmentRecyclerAdapter: EditDishFragmentRecyclerAdapter
@@ -77,8 +80,7 @@ class EditDishFragment : DialogFragment() {
                     )
                     actualRecyclerView.adapter = recyclerFragmentRecyclerAdapter
                 }
-        })
-
+            })
 
 
         /** BUTTON LOGIC*/
@@ -95,9 +97,8 @@ class EditDishFragment : DialogFragment() {
                     )
                 )
                 this.dismiss()
-            }
-            else Toast.makeText(requireContext(),"Can't leave empty fields", Toast.LENGTH_SHORT).show()
-            }
+            } else Toast.makeText(requireContext(),"Can't leave empty fields", Toast.LENGTH_SHORT).show()
+        }
 
         deleteBtn.setOnClickListener {
             Log.i("test", viewModel.getPosition().value.toString())

@@ -7,6 +7,8 @@ import com.erdees.foodcostcalc.data.basic.BasicDataBase
 import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.grandDish.GrandDishRepository
 
+/**TODO IMPLEMENT HILT*/
+
 class DishesFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     val grandDishRepository: GrandDishRepository

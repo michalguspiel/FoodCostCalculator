@@ -21,6 +21,9 @@ import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProd
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewModel
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class EditDishFragmentRecyclerAdapter(
     private val viewModel: EditDishAdapterViewModel,
     private val fragmentManager: FragmentManager,
@@ -96,6 +99,7 @@ class EditDishFragmentRecyclerAdapter(
                 override fun afterTextChanged(s: Editable) {
 
                 }
+
                 override fun beforeTextChanged(
                     s: CharSequence, start: Int,
                     count: Int, after: Int
@@ -122,7 +126,7 @@ class EditDishFragmentRecyclerAdapter(
                 grandDishModel.halfProductModels[thisPosition].halfProductModel.name // name of product not changeable
             holder.editTextView.setText(grandDishModel.halfProductModels[thisPosition].weight.toString()) //To set EditText with current data
             Log.i(
-                "from edit dishModel adapter",
+                "from edit dish adapter",
                 position.toString() + " " + grandDishModel.productsIncluded.size.toString()
             )
             setUnit(

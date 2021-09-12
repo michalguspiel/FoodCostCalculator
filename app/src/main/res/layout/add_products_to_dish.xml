@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     style="@style/Theme.AppCompat.DayNight.Dialog"
     android:layout_width="match_parent"
     android:layout_height="350dp"
@@ -61,7 +60,7 @@
         app:layout_constraintTop_toBottomOf="@id/constraint_1">
 
         <TextView
-            android:id="@+id/choose_product_half_product"
+            android:id="@+id/chooseProductOrHalfProductTv"
             android:layout_width="115dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
@@ -76,13 +75,13 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <pl.utkala.searchablespinner.SearchableSpinner
-            android:id="@+id/mySpinner"
+            android:id="@+id/productSpinner"
             android:layout_width="200dp"
             android:layout_height="35dp"
             android:spinnerMode="dialog"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/choose_product_half_product"
+            app:layout_constraintStart_toEndOf="@+id/chooseProductOrHalfProductTv"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -129,7 +128,7 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <EditText
-            android:id="@+id/product_weight_in_half_product"
+            android:id="@+id/productWeight"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:autofillHints=""
@@ -137,7 +136,7 @@
             android:inputType="numberDecimal" />
 
         <ImageButton
-            android:id="@+id/add_product_to_halfproduct_btn"
+            android:id="@+id/addProductToDishBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"

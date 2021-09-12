@@ -5,6 +5,11 @@ object Constants {
     const val DISH_ITEM_TYPE = 1
     const val PRODUCT_ITEM_TYPE = 1
 
+    const val ADD_FRAGMENT_SPINNER_ID = 1
+
+    const val PRODUCT_SPINNER_ID = 1
+    const val DISH_SPINNER_ID = 2
+    const val UNIT_SPINNER_ID = 3
 
     const val DISH_CREATED = "dish_created"
     const val HALF_PRODUCT_CREATED = "half_product_created"
@@ -28,11 +33,12 @@ object Constants {
 
     const val HALF_PRODUCT_ITEM_TYPE = 1
 
-    const val ADMOB_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110"
-
     const val ADMOB_PRODUCTS_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/7646868536"
     const val ADMOB_DISHES_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/9127239654"
     const val ADMOB_HALF_PRODUCTS_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/9594143514"
+
+    const val METRIC = "metric"
+    const val USA = "usa"
 
 
 }

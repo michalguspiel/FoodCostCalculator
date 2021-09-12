@@ -16,6 +16,9 @@ import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class AddProductToHalfProductFragmentViewModel(application: Application) :
     AndroidViewModel(application) {
 

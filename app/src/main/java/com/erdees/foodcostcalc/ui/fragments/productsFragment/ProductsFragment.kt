@@ -12,6 +12,8 @@ import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
 import java.util.*
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
 
 class ProductsFragment : Fragment() {
 

@@ -8,6 +8,9 @@ import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.dish.DishRepository
 import com.erdees.foodcostcalc.data.grandDish.GrandDishRepository
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class EditDishFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     val dishRepository: DishRepository
@@ -33,6 +36,7 @@ class EditDishFragmentViewModel(application: Application) : AndroidViewModel(app
     fun setFlag(boolean: Boolean) {
         basicRepository.setFlag(boolean)
     }
+
     fun setPosition(pos: Int) {
         basicRepository.setPosition(pos)
     }

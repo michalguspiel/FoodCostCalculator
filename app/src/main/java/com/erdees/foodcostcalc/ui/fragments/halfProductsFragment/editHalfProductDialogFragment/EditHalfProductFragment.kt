@@ -21,10 +21,13 @@ import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProd
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductWithProductsIncludedModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
-import com.erdees.foodcostcalc.utils.SharedFunctions.filterVol
-import com.erdees.foodcostcalc.utils.SharedFunctions.filterWeight
-import com.erdees.foodcostcalc.utils.SharedFunctions.getUnits
+import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
+import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
+import com.erdees.foodcostcalc.utils.Utils.getUnits
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
 
 class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
@@ -38,7 +41,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
 
     override fun onResume() {
         unitList = getUnits(resources, sharedPreferences)
-        Log.i(TAG,unitList.joinToString { it })
+        Log.i(TAG, unitList.joinToString { it })
         unitList = when (halfProductPassedFromAdapterModel.halfProductModel.halfProductUnit) {
             "per piece" -> mutableListOf("per piece")
             "per kilogram" -> unitList.filterWeight()
@@ -48,7 +51,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
             else -> mutableListOf("error!")
         }
 
-        Log.i(TAG,unitList.joinToString { it })
+        Log.i(TAG, unitList.joinToString { it })
         /**Spinner adapter*/
         val unitSpinnerAdapter =
             ArrayAdapter(requireContext(), R.layout.dropdown_item, unitList)

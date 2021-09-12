@@ -12,6 +12,9 @@ import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProd
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import java.util.*
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class HalfProductsFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
@@ -69,7 +72,6 @@ class HalfProductsFragment : Fragment() {
         fun newInstance(): HalfProductsFragment = HalfProductsFragment()
         const val TAG = "HalfProductsFragment"
     }
-
 
 
 }

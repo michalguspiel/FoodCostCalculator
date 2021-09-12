@@ -9,6 +9,9 @@ import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductW
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class EditHalfProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     private val halfProductRepository: HalfProductRepository
@@ -35,8 +38,7 @@ class EditHalfProductFragmentViewModel(application: Application) : AndroidViewMo
 
     fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
 
-    fun getProductsIncludedFromHalfProduct(halfProductId: Long)
-            = productIncludedInHalfProductRepository.getProductsIncludedFromHalfProduct(halfProductId)
+    fun getProductsIncludedFromHalfProduct(halfProductId: Long) = productIncludedInHalfProductRepository.getProductsIncludedFromHalfProduct(halfProductId)
 
     fun setPosition(pos: Int) {
         basicRepository.setPosition(pos)

@@ -20,11 +20,11 @@ import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Constants.HALF_PRODUCT_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.HALF_PRODUCT_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.LAST_ITEM_TYPE
-import com.erdees.foodcostcalc.utils.SharedFunctions.abbreviateUnitWithPer
-import com.erdees.foodcostcalc.utils.SharedFunctions.formatPrice
-import com.erdees.foodcostcalc.utils.SharedFunctions.getBasicRecipeAsPercentageOfTargetRecipe
-import com.erdees.foodcostcalc.utils.SharedFunctions.getListSize
-import com.erdees.foodcostcalc.utils.SharedFunctions.getPriceForHundredPercentOfRecipe
+import com.erdees.foodcostcalc.utils.UnitsUtils.getPerUnitAbbreviation
+import com.erdees.foodcostcalc.utils.Utils.formatPrice
+import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRecipe
+import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
+import com.erdees.foodcostcalc.utils.ViewUtils.getListSize
 import com.erdees.foodcostcalc.utils.ads.AdHelper
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import com.google.android.gms.ads.AdListener
@@ -35,6 +35,8 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import io.reactivex.subjects.PublishSubject
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 
 class HalfProductFragmentRecyclerAdapter(
@@ -141,14 +143,14 @@ class HalfProductFragmentRecyclerAdapter(
             val unit = halfProduct.halfProductModel.halfProductUnit
             quantity = totalWeight
             quantityOfDataTV.text =
-                "Recipe per $totalWeight ${abbreviateUnitWithPer(unit)} of product."
+                "Recipe per $totalWeight ${getPerUnitAbbreviation(unit)} of product."
         }
 
         private fun updateQuantityTV(position: Int) {
             val halfProduct = list[position]
             val unit = halfProduct.halfProductModel.halfProductUnit
             quantityOfDataTV.text =
-                "Recipe per $quantity ${abbreviateUnitWithPer(unit)} of product."
+                "Recipe per $quantity ${getPerUnitAbbreviation(unit)} of product."
         }
 
         private fun makeAdapterForList(position: Int, quantity: Double): ListAdapter {

@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.fragments.addFragment
 
 import android.app.Application
+import android.content.res.Resources
 import android.os.Bundle
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,22 +9,32 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.SharedFunctions.formatResultAndCheckCommas
+import com.erdees.foodcostcalc.utils.Utils
+import com.erdees.foodcostcalc.utils.Utils.formatResultAndCheckCommas
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/** REFACTORED !*/
 class AddFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     private val productRepository: ProductRepository
 
     lateinit var firebaseAnalytics: FirebaseAnalytics
 
+    var chosenUnit: String = ""
+    var unitList: MutableList<String> = mutableListOf()
 
     init {
         val productDao = AppRoomDataBase.getDatabase(application).productDao()
         productRepository = ProductRepository(productDao)
+    }
 
+    fun getUnits(
+        resources: Resources,
+        sharedPreferences: com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
+    ) {
+        unitList = Utils.getUnits(resources, sharedPreferences)
     }
 
     fun addProduct(
@@ -31,7 +42,6 @@ class AddFragmentViewModel(application: Application) : AndroidViewModel(applicat
         productPrice: Double,
         productTax: Double,
         productWaste: Double,
-        chosenUnit: String
     ) {
         val product = ProductModel(
             0,

@@ -15,8 +15,8 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.ui.activities.onlineDataActivity.googleDrive.DriveServiceHelper
-import com.erdees.foodcostcalc.utils.SharedFunctions.makeGone
-import com.erdees.foodcostcalc.utils.SharedFunctions.makeVisible
+import com.erdees.foodcostcalc.utils.ViewUtils.makeGone
+import com.erdees.foodcostcalc.utils.ViewUtils.makeVisible
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -35,11 +35,13 @@ import java.io.*
 import java.util.*
 
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
 class OnlineDataActivity : AppCompatActivity() {
 
     private lateinit var signInButton: SignInButton
     private lateinit var emailTV: TextView
-    private lateinit var welcomeTV : TextView
+    private lateinit var welcomeTV: TextView
     private lateinit var signOutButton: Button
     private lateinit var alertDialog: AlertDialog
     private lateinit var resultAlertDialog: AlertDialog
@@ -241,10 +243,10 @@ class OnlineDataActivity : AppCompatActivity() {
         message = if(wasSuccessful) "Your database was successfully saved in google drive."
         else "Something went wrong, your database wasn't saved."
         if(error != null) message = error
-       resultAlertDialog =  AlertDialog.Builder(this)
-           .setMessage(message)
-           .setNegativeButton("Back",null)
-           .create()
+        resultAlertDialog =  AlertDialog.Builder(this)
+            .setMessage(message)
+            .setNegativeButton("Back",null)
+            .create()
         resultAlertDialog.window?.setBackgroundDrawable(
             ContextCompat.getDrawable(this, R.drawable.background_for_dialogs)
         )
@@ -280,7 +282,7 @@ class OnlineDataActivity : AppCompatActivity() {
             ?.addOnFailureListener {
                 Log.i(TAG, "onFailure of saving database " + it.message)
                 alertDialog.dismiss()
-            showResultDialog(wasSuccessful = false,null)
+                showResultDialog(wasSuccessful = false,null)
             }
     }
 
@@ -308,10 +310,9 @@ class OnlineDataActivity : AppCompatActivity() {
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
             Log.w(TAG, "signInResult:failed code=" + e.statusCode)
             updateUI(null)
-          //  checkForGooglePermissions()
+            //  checkForGooglePermissions()
         }
     }
-
 
 
     private fun getDatabaseFileAndSaveItInVariable() {

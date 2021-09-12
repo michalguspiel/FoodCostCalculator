@@ -107,7 +107,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="4dp"
         android:gravity="start"
-        android:text="Add products to half productModel"
+        android:text="Add products to half product"
         android:textColor="@color/blue_700"
         android:textSize="16sp"
         android:textStyle="bold"

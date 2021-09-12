@@ -18,7 +18,7 @@ import com.erdees.foodcostcalc.utils.Constants.LAST_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.PRODUCTS_AD_FREQUENCY
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_ITEM_TYPE
-import com.erdees.foodcostcalc.utils.SharedFunctions.formatPrice
+import com.erdees.foodcostcalc.utils.Utils.formatPrice
 import com.erdees.foodcostcalc.utils.ads.AdHelper
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
 import com.google.android.gms.ads.*
@@ -26,6 +26,8 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import java.util.*
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 
 class ProductsFragmentRecyclerAdapter(

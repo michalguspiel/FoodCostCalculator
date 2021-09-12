@@ -15,10 +15,12 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.SharedFunctions.getUnits
-import com.erdees.foodcostcalc.utils.SharedFunctions.hideKeyboard
-import com.erdees.foodcostcalc.utils.SharedFunctions.makeSnackBar
+import com.erdees.foodcostcalc.utils.Utils.getUnits
+import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
+import com.erdees.foodcostcalc.utils.ViewUtils.makeSnackBar
 import com.google.firebase.analytics.FirebaseAnalytics
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 
 class CreateHalfProductFragment(private val parentView: View) : DialogFragment(),
@@ -99,6 +101,7 @@ class CreateHalfProductFragment(private val parentView: View) : DialogFragment()
         firebaseAnalytics.logEvent(Constants.HALF_PRODUCT_CREATED, bundle)
 
     }
+
     companion object {
         const val TAG = "CreateHalfProductFragment"
     }

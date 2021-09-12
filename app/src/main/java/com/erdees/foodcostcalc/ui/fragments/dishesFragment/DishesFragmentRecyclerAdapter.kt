@@ -23,9 +23,9 @@ import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Constants.DISH_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.DISH_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.LAST_ITEM_TYPE
-import com.erdees.foodcostcalc.utils.SharedFunctions.calculatePrice
-import com.erdees.foodcostcalc.utils.SharedFunctions.formatPrice
-import com.erdees.foodcostcalc.utils.SharedFunctions.getListSize
+import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
+import com.erdees.foodcostcalc.utils.Utils.formatPrice
+import com.erdees.foodcostcalc.utils.ViewUtils.getListSize
 import com.erdees.foodcostcalc.utils.ads.AdHelper
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
@@ -39,6 +39,8 @@ import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.play.core.review.ReviewManagerFactory
 import io.reactivex.subjects.PublishSubject
 import java.util.*
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 
 class DishesFragmentRecyclerAdapter(
@@ -71,8 +73,8 @@ class DishesFragmentRecyclerAdapter(
         private val addProductsButton: ImageButton =
             view.findViewById(R.id.add_product_to_dish_button)
         private val listView: ListView = view.findViewById(R.id.list_view)
-          private val totalPriceOfDish: TextView = view.findViewById(R.id.total_price_dish_card_view)
-          private val finalPriceWithMarginAndTax: TextView =
+        private val totalPriceOfDish: TextView = view.findViewById(R.id.total_price_dish_card_view)
+        private val finalPriceWithMarginAndTax: TextView =
             view.findViewById(R.id.total_price_with_margin_dish_card_view)
         private val howManyServingsTV =
             view.findViewById<TextView>(R.id.how_many_servings_text_view)
@@ -99,6 +101,7 @@ class DishesFragmentRecyclerAdapter(
             if(amountOfServings == 1 ) howManyServingsTV.text = "Data per serving."
             else howManyServingsTV.text = "Data for $amountOfServings servings."
         }
+
         /**Summing up total price of products included and then one by one adding price of each half product.*/
         private fun sumPriceAndSetPriceData(position: Int){
             list[position].halfProductModels.forEach {
@@ -179,30 +182,30 @@ class DishesFragmentRecyclerAdapter(
 
         private fun setHowManyServingsTvAsButton(textView: TextView,position: Int){
             textView.setOnClickListener {
-            val textInputLayout = activity.layoutInflater.inflate(R.layout.text_input_layout,null)
-            val editText = textInputLayout.findViewById<EditText>(R.id.text_input_layout_quantity)
-            val linearLayout = LinearLayout(activity)
-            val params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
-            )
-            params.setMargins(25, 0, 25, 0)
-            editText.setText(amountOfServingsToPresent.toString())
-            linearLayout.addView(textInputLayout, params)
-            val alertDialog = AlertDialog.Builder(activity)
-                .setMessage("Serving amount")
-                .setView(linearLayout)
-                .setPositiveButton("Submit", null)
-                .setNegativeButton("Back", null)
-                .show()
-            alertDialog.window?.setBackgroundDrawable(
-                ContextCompat.getDrawable(
-                    activity,
-                    R.drawable.background_for_dialogs
+                val textInputLayout = activity.layoutInflater.inflate(R.layout.text_input_layout,null)
+                val editText = textInputLayout.findViewById<EditText>(R.id.text_input_layout_quantity)
+                val linearLayout = LinearLayout(activity)
+                val params: LinearLayout.LayoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT
                 )
-            )
-            val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
-            setPositiveButtonFunctionality(positiveButton,editText,alertDialog,position)
-        }}
+                params.setMargins(25, 0, 25, 0)
+                editText.setText(amountOfServingsToPresent.toString())
+                linearLayout.addView(textInputLayout, params)
+                val alertDialog = AlertDialog.Builder(activity)
+                    .setMessage("Serving amount")
+                    .setView(linearLayout)
+                    .setPositiveButton("Submit", null)
+                    .setNegativeButton("Back", null)
+                    .show()
+                alertDialog.window?.setBackgroundDrawable(
+                    ContextCompat.getDrawable(
+                        activity,
+                        R.drawable.background_for_dialogs
+                    )
+                )
+                val positiveButton = alertDialog.getButton(AlertDialog.BUTTON_POSITIVE)
+                setPositiveButtonFunctionality(positiveButton,editText,alertDialog,position)
+            }}
 
         private fun setDishData(position: Int) {
             totalPrice = list[position].totalPrice
@@ -365,12 +368,11 @@ class DishesFragmentRecyclerAdapter(
     }
 
 
-
     private fun isThisLastItemOfTheList(indexOfHalfProduct : Int , listSize : Int):Boolean{
         return (indexOfHalfProduct == listSize -1)
     }
 
-     fun countPriceAfterMarginAndTax(
+    fun countPriceAfterMarginAndTax(
         totalPrice: Double,
         margin: Double,
         tax: Double,

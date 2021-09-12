@@ -11,6 +11,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.erdees.foodcostcalc.R
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class SettingsFragment : Fragment() {
 
     private lateinit var editMarginEditText: EditText
@@ -44,19 +47,18 @@ class SettingsFragment : Fragment() {
         usaCheckBox.isChecked = isUsaChecked
 
         saveBtn.setOnClickListener{
-        if(marginAndTaxAreValid()) {
-            val margin = editMarginEditText.text.toString()
-            val tax = editTaxEditText.text.toString()
-            sharedPreference.save("margin", margin)
-            sharedPreference.save("tax", tax)
-            if (metricCheckBox.isChecked) sharedPreference.save("metric", true)
-            else sharedPreference.save("metric", false)
-            if (usaCheckBox.isChecked) sharedPreference.save("usa", true)
-            else sharedPreference.save("usa", false)
+            if(marginAndTaxAreValid()) {
+                val margin = editMarginEditText.text.toString()
+                val tax = editTaxEditText.text.toString()
+                sharedPreference.save("margin", margin)
+                sharedPreference.save("tax", tax)
+                if (metricCheckBox.isChecked) sharedPreference.save("metric", true)
+                else sharedPreference.save("metric", false)
+                if (usaCheckBox.isChecked) sharedPreference.save("usa", true)
+                else sharedPreference.save("usa", false)
 
-            Toast.makeText(requireContext(), "SettingsFragment saved!", Toast.LENGTH_SHORT).show()
-        }
-            else Toast.makeText(requireContext(),"Enter values to default tax and margin.",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), "SettingsFragment saved!", Toast.LENGTH_SHORT).show()
+            } else Toast.makeText(requireContext(),"Enter values to default tax and margin.",Toast.LENGTH_SHORT).show()
         }
 
         return view

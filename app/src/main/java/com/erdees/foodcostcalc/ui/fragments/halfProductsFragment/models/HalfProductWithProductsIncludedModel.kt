@@ -3,8 +3,10 @@ package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
-import com.erdees.foodcostcalc.utils.SharedFunctions.computeWeightAndVolumeToSameUnit
+import com.erdees.foodcostcalc.utils.UnitsUtils.computeWeightAndVolumeToSameUnit
 import java.text.NumberFormat
+
+/**TODO REFACTOR*/
 
 data class HalfProductWithProductsIncludedModel(
     @Embedded val halfProductModel: HalfProductModel,
@@ -49,6 +51,7 @@ data class HalfProductWithProductsIncludedModel(
         }
 
     }
+
     @Ignore
     val formattedPricePerUnit: String = NumberFormat.getCurrencyInstance().format(pricePerUnit())
 

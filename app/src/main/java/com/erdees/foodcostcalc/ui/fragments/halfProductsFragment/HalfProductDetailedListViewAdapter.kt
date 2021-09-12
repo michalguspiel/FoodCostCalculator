@@ -9,12 +9,16 @@ import android.widget.TextView
 import android.widget.Toast
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.utils.SharedFunctions.abbreviateUnit
-import com.erdees.foodcostcalc.utils.SharedFunctions.formatPriceOrWeight
-import com.erdees.foodcostcalc.utils.SharedFunctions.getBasicRecipeAsPercentageOfTargetRecipe
-import com.erdees.foodcostcalc.utils.SharedFunctions.getIngredientForHundredPercentOfRecipe
-import com.erdees.foodcostcalc.utils.SharedFunctions.getPriceForHundredPercentOfRecipe
+import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
+import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
+import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRecipe
+import com.erdees.foodcostcalc.utils.Utils.getIngredientForHundredPercentOfRecipe
+import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
+
 import java.text.NumberFormat
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
 
 class HalfProductDetailedListViewAdapter(
     private val context: Activity,
@@ -75,7 +79,7 @@ class HalfProductDetailedListViewAdapter(
         productWeightText.text = formattedWeight
         productPriceText.text = formatedPrice
         productUnit.text =
-            abbreviateUnit(productIncludedInHalfProductModelList[position].weightUnit)
+            getUnitAbbreviation(productIncludedInHalfProductModelList[position].weightUnit)
     }
 
     private fun totalWeightMessage(position: Int):String {
@@ -86,7 +90,7 @@ class HalfProductDetailedListViewAdapter(
         return productIncludedInHalfProductModelList[position].productModelIncluded.name +
                 unitType +
                 productIncludedInHalfProductModelList[position].totalWeightForPiece.toString() + " " +
-                abbreviateUnit(
+                getUnitAbbreviation(
                     productIncludedInHalfProductModelList[position].halfProductModel.halfProductUnit.drop(
                         4
                     )

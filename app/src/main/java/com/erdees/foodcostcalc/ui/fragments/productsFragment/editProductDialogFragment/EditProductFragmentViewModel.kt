@@ -15,6 +15,9 @@ import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class EditProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     private val productRepository: ProductRepository
@@ -54,8 +57,7 @@ class EditProductFragmentViewModel(application: Application) : AndroidViewModel(
     }
 
     /**ProductIncluded in Half ProductModel Repository methods*/
-    fun getCertainProductsIncludedInHalfProduct(productId: Long)
-            = productIncludedInHalfProductRepository.getCertainProductsIncluded(productId)
+    fun getCertainProductsIncludedInHalfProduct(productId: Long) = productIncludedInHalfProductRepository.getCertainProductsIncluded(productId)
 
 
     fun editProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) {

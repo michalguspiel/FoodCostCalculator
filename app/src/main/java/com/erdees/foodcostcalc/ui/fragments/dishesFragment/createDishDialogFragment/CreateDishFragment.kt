@@ -15,9 +15,11 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.SharedFunctions.hideKeyboard
-import com.erdees.foodcostcalc.utils.SharedFunctions.makeSnackBar
+import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
+import com.erdees.foodcostcalc.utils.ViewUtils.makeSnackBar
 import com.google.firebase.analytics.FirebaseAnalytics
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 
 class CreateDishFragment(val parentView: View) : DialogFragment() {

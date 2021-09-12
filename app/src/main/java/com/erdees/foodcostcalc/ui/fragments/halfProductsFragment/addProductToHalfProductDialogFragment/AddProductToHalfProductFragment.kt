@@ -16,10 +16,13 @@ import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
-import com.erdees.foodcostcalc.utils.SharedFunctions.changeUnitList
-import com.erdees.foodcostcalc.utils.SharedFunctions.hideKeyboard
-import com.erdees.foodcostcalc.utils.SharedFunctions.setAdapterList
-import com.erdees.foodcostcalc.utils.SharedFunctions.transformPerUnitToDescription
+import com.erdees.foodcostcalc.utils.UnitsUtils.getPerUnitAsDescription
+import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitType
+import com.erdees.foodcostcalc.utils.Utils.changeUnitList
+import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
 
 class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
     private val PRODUCT_SPINNER_ID = 1
@@ -61,7 +64,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
         val addProductButton = view.findViewById<ImageButton>(R.id.add_product_to_halfproduct_btn)
         val weightEditTextField = view.findViewById<EditText>(R.id.product_weight_in_half_product)
         weightEditTextField.setOnFocusChangeListener { _, hasFocus ->
-            if(!hasFocus) view.hideKeyboard()
+            if (!hasFocus) view.hideKeyboard()
         }
         val halfProductSpinner = view.findViewById<Spinner>(R.id.half_product_spinner)
         val productSpinner = view.findViewById<Spinner>(R.id.product_spinner)
@@ -171,12 +174,10 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
             if (eitherOfSpinnersIsEmpty()) {
                 showToast(message = "You must pick half product and product.")
                 return@setOnClickListener
-            }
-            else if (weightEditTextField.text.isNullOrEmpty() || weightEditTextField.text.toString() == "." ) {
+            } else if (weightEditTextField.text.isNullOrEmpty() || weightEditTextField.text.toString() == ".") {
                 showToast(message = "You can't add product without weight.")
                 return@setOnClickListener
-            }
-            else {
+            } else {
                 val chosenHalfProduct =
                     fragmentViewModel.readAllHalfProductModelData.value?.get(
                         halfProductPosition!!
@@ -186,8 +187,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
                 val weight = weightEditTextField.text.toString().toDouble()
                 if (!isHalfProductPiece && isProductPiece && weightPerPieceEditText.text.isEmpty()) {
                     showToast(message = "You need to provide $halfProductUnitType of this product!")
-                }
-                else {
+                } else {
                     fragmentViewModel.addProductIncludedInHalfProduct(
                         ProductIncludedInHalfProductModel(
                             0,
@@ -244,7 +244,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
         if (isProductPiece && !isHalfProductPiece) {
             weightPerPieceEditText.visibility = View.VISIBLE
             weightPerPieceEditText.hint =
-                "$chosenProductName ${transformPerUnitToDescription(halfProductUnit)}."
+                "$chosenProductName ${getPerUnitAsDescription(halfProductUnit)}."
         } else weightPerPieceEditText.visibility = View.GONE
     }
 
@@ -254,7 +254,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
                 productPosition = position
                 val chosenProduct =
                     fragmentViewModel.readAllProductModelData.value?.get(position)
-                unitType = setAdapterList(
+                unitType = getUnitType(
                     chosenProduct?.unit
                 )
                 chosenProductName = chosenProduct!!.name
@@ -273,7 +273,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
                     .readAllHalfProductModelData.value!![halfProductPosition!!]
                 halfProductUnit = thisHalfProduct.halfProductUnit
                 isHalfProductPiece = thisHalfProduct.halfProductUnit == "per piece"
-                halfProductUnitType = setAdapterList(thisHalfProduct.halfProductUnit)
+                halfProductUnitType = getUnitType(thisHalfProduct.halfProductUnit)
                 setTextField()
             }
             else -> {

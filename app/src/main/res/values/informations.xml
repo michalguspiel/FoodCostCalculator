@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="information_add_product_to_half_product">
-        "Try to use same units inside half productModel for best performance,
-        otherwise all products included are converted to the same unit as half productModel as pure water of temperature  4°C. "
-    </string>
-
-
-</resources>

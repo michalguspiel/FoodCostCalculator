@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
-import com.erdees.foodcostcalc.utils.SharedFunctions.calculatePrice
+import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 
 
 /**  Its a product but with dishOwnerId reference and weight */

@@ -18,6 +18,9 @@ import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProd
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class EditHalfProductFragmentRecyclerAdapter(
     private val viewModel: EditHalfProductAdapterViewModel,
     private val fragmentManager: FragmentManager
@@ -84,7 +87,7 @@ class EditHalfProductFragmentRecyclerAdapter(
     }
 
     override fun getItemCount(): Int {
-    return list.size
+        return list.size
     }
 
 
@@ -103,32 +106,32 @@ class EditHalfProductFragmentRecyclerAdapter(
         setUnit()
 
 
-            /**Holder for each delete product button */
-            holder.deleteProductBtn.setOnClickListener {
-                viewModel.setProductIncludedInHalfProduct(list[position])
-                AreYouSure().show(this.fragmentManager, "EditHalfProductFragmentRecyclerAdapter")
-            }
-
-            /** Edit text product weight.
-             *  When weight is changed the same position in cloneOfList gets changed.
-             *  */
-            holder.editTextView.addTextChangedListener((object : TextWatcher {
-
-                override fun afterTextChanged(s: Editable) {}
-
-                override fun beforeTextChanged(s: CharSequence, start: Int,
-                                               count: Int, after: Int) {
-                }
-
-                override fun onTextChanged(s: CharSequence, start: Int,
-                                           before: Int, count: Int) {
-                    if (s.isNotEmpty() && s.toString() != ".") {
-                        cloneOfList[position].weight = s.toString().toDouble()
-                    }
-                }
-            }
-                    ))
-
-
+        /**Holder for each delete product button */
+        holder.deleteProductBtn.setOnClickListener {
+            viewModel.setProductIncludedInHalfProduct(list[position])
+            AreYouSure().show(this.fragmentManager, "EditHalfProductFragmentRecyclerAdapter")
         }
+
+        /** Edit text product weight.
+         *  When weight is changed the same position in cloneOfList gets changed.
+         *  */
+        holder.editTextView.addTextChangedListener((object : TextWatcher {
+
+            override fun afterTextChanged(s: Editable) {}
+
+            override fun beforeTextChanged(s: CharSequence, start: Int,
+                                           count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int,
+                                       before: Int, count: Int) {
+                if (s.isNotEmpty() && s.toString() != ".") {
+                    cloneOfList[position].weight = s.toString().toDouble()
+                }
+            }
+        }
+                ))
+
+
     }
+}

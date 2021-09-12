@@ -9,6 +9,9 @@ import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class CreateDishFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     private val dishRepository: DishRepository

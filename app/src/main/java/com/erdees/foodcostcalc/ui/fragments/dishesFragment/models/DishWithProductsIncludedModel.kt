@@ -4,8 +4,10 @@ import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
-import com.erdees.foodcostcalc.utils.SharedFunctions.formatPriceOrWeight
+import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
 import java.text.NumberFormat
+
+/** TODO REFACTOR */
 
 data class DishWithProductsIncludedModel(
     @Embedded val dishModel: DishModel,
@@ -36,13 +38,13 @@ data class DishWithProductsIncludedModel(
     val formattedPriceWithMarginAndTax: String =
         NumberFormat.getCurrencyInstance().format(priceWithMarginAndTax)
 
-        override fun toString(): String {
-            return if (productIncluded.isEmpty()) "${dishModel.name} without any ingredients."
-            else " ${dishModel.name} includes: " +
-                    productIncluded.map { it.productModelIncluded.name }.sortedBy { it }
-                        .joinToString { "\n-$it" } +
-                    "\n with total food cost of: $formattedTotalPrice. " +
-                    "\n Price with calculated margin : $formattedPriceWithMargin." +
-                    "\n Price with calculated margin and tax : $formattedPriceWithMarginAndTax."
-        }
+    override fun toString(): String {
+        return if (productIncluded.isEmpty()) "${dishModel.name} without any ingredients."
+        else " ${dishModel.name} includes: " +
+                productIncluded.map { it.productModelIncluded.name }.sortedBy { it }
+                    .joinToString { "\n-$it" } +
+                "\n with total food cost of: $formattedTotalPrice. " +
+                "\n Price with calculated margin : $formattedPriceWithMargin." +
+                "\n Price with calculated margin and tax : $formattedPriceWithMarginAndTax."
     }
+}

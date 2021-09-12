@@ -15,10 +15,12 @@ import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductI
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
-import com.erdees.foodcostcalc.utils.SharedFunctions.filterVol
-import com.erdees.foodcostcalc.utils.SharedFunctions.filterWeight
-import com.erdees.foodcostcalc.utils.SharedFunctions.getUnits
-import com.erdees.foodcostcalc.utils.SharedFunctions.hideKeyboard
+import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
+import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
+import com.erdees.foodcostcalc.utils.Utils.getUnits
+import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
+
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 
 class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {

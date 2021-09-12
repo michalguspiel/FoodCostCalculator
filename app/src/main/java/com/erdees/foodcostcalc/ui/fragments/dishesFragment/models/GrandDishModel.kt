@@ -6,6 +6,8 @@ import androidx.room.Relation
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 
+/**TODO REFACTOR*/
+
 /**Grand dishModel represents biggest data model in this app,
  * its made of DishWithProductsIncludedModel which includes: DishModel,ProductsIncluded,ProductsFragment
  * and DishWithHalfProduct which includes: DishModel,HalfProductModel,ProductsIncludedInHalfProduct,ProductsFragment,ProductsIncluded

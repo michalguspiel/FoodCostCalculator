@@ -67,4 +67,23 @@
     <string name="create_half_product">Create half product</string>
     <string name="signing_info">Sign in with google account to save and download your database from google drive.</string>
     <string name="create_dish">Create Dish</string>
+
+    <string name="fill_all_data">Fill all data!</string>
+
+    <string name="information_add_product_to_half_product">Try to use same units inside half product for best performance, otherwise all products included are converted to the same unit as half productModel as pure water of temperature  4°C.</string>
+    <string name="information_add_fragment_general">Provide all of the necessary data in order to add product to your list, when adding product with per piece unit provide price per each piece, in case You do not know waste percentage or price per piece of product use tools on to bottom of this screen.</string>
+    <string name="information_waste_calculator">To learn the waste percentage of product, weight product before processing it and amount of waste afterwards. Press calculate and waste percentage will appear in waste percent field.</string>
+    <string name="information_price_per_piece_calculator">In Box price pass how much do You pay per box, in quantity pass how many pieces there is in box. Press calculate Price per piece will appear in price field.</string>
+
+    <string name="switch_to_products">Switch to products</string>
+    <string name="switch_to_half_products">Switch to half products</string>
+    <string name="select_unit">Select unit</string>
+    <string name="cant_add_product_without_weight">You cannot add product without weight.</string>
+    <string name="you_must_pick_dish">You must pick a dish.</string>
+    <string name="you_must_pick_product">You must pick a product.</string>
+    <string name="select_product">Select product</string>
+    <string name="select_dish">Select dish</string>
+
+    <string name="product_added">%1$s added!</string>
+
 </resources>

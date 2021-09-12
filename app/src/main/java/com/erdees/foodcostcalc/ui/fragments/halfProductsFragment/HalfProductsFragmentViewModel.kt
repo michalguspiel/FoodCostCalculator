@@ -7,6 +7,9 @@ import com.erdees.foodcostcalc.data.basic.BasicDataBase
 import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
 
+/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+
+
 class HalfProductsFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository

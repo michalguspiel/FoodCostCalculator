@@ -26,11 +26,14 @@ import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHal
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.createHalfProductDialogFragment.CreateHalfProductFragment
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.ProductsFragment
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SettingsFragment
-import com.erdees.foodcostcalc.utils.SharedFunctions.hideKeyboard
-import com.erdees.foodcostcalc.utils.SharedFunctions.uncheckAllItems
+import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
+import com.erdees.foodcostcalc.utils.ViewUtils.uncheckAllItems
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.navigation.NavigationView
+
+/**VIEW BINDING REFACTORING DONE
+ * MVVM IMPROVEMENT DONE*/
 
 class MainActivity : AppCompatActivity() {
 
@@ -55,7 +58,7 @@ class MainActivity : AppCompatActivity() {
     private fun setSearchToolbar() {
         viewBinding.content.customToolbar.searchButton.visibility = View.VISIBLE
         viewBinding.content.customToolbar.searchTextField.visibility = View.VISIBLE
-        viewBinding.content.customToolbar.searchTextField.hint = "Search by name"
+        viewBinding.content.customToolbar.searchTextField.hint = getString(R.string.search_by_name)
     }
 
     private fun openAdd() {
@@ -170,7 +173,8 @@ class MainActivity : AppCompatActivity() {
             viewBinding.drawerLayout.hideKeyboard()
         }
 
-        /**Listen to viewmodel signals to open fragments or dialog fragments.*/
+        /**Listen to viewmodel signals to open fragments or dialog fragments.
+         * TODO REFACTOR SO THESE 3 METHODS ARE NOT NECESSARY*/
         viewModel.observeOpenAddFlag().observe(this, { shouldAddBeOpened ->
             if (shouldAddBeOpened) {
                 openAdd()
