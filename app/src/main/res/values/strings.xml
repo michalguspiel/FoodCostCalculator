@@ -85,5 +85,7 @@
     <string name="select_dish">Select dish</string>
 
     <string name="product_added">%1$s added!</string>
-
+    <string name="okay">Okay</string>
+    <string name="successful_creation_message">%1$s created successfully!</string>
+    <string name="cannot_make_nameless_dish">Cannot make nameless dish!</string>
 </resources>

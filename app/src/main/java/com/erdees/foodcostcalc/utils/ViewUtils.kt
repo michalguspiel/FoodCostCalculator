@@ -40,10 +40,14 @@ object ViewUtils {
         menu.setGroupCheckable(0, true, true)
     }
 
-    fun View.makeSnackBar(name: String, context: Context) {
+    fun View.makeCreationConfirmationSnackBar(name: String, context: Context) {
         val snackBar =
-            Snackbar.make(this, "$name created successfully!", Snackbar.LENGTH_SHORT)
-        snackBar.setAction("Okay") { snackBar.dismiss() }
+            Snackbar.make(
+                this,
+                context.getString(R.string.successful_creation_message, name),
+                Snackbar.LENGTH_SHORT
+            )
+        snackBar.setAction(context.getString(R.string.okay)) { snackBar.dismiss() }
         snackBar.setActionTextColor(ContextCompat.getColor(context, R.color.orange_500))
             .show()
     }
@@ -64,9 +68,7 @@ object ViewUtils {
     }
 
 
-    /**Computes height of listView based on each row height, includes dividers.
-     * I'm using this approach so listView size is set and doesn't need to be scrollable.
-     *I know that I could have also used linear layout and just add programmatically each row view. But I have chosen this solutions as it works well.*/
+    /**Computes height of listView based on each row height, includes dividers.*/
     fun getListSize(indicesOfBothLists: List<Int>, listView: ListView): Int {
         var result = 0
         for (eachProduct in indicesOfBothLists) {

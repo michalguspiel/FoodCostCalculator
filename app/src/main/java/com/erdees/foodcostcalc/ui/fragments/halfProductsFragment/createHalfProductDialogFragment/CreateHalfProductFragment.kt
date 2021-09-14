@@ -17,7 +17,7 @@ import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Utils.getUnits
 import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
-import com.erdees.foodcostcalc.utils.ViewUtils.makeSnackBar
+import com.erdees.foodcostcalc.utils.ViewUtils.makeCreationConfirmationSnackBar
 import com.google.firebase.analytics.FirebaseAnalytics
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
@@ -84,7 +84,7 @@ class CreateHalfProductFragment(private val parentView: View) : DialogFragment()
                 val halfProduct = HalfProductModel(0, halfProductName.text.toString(), chosenUnit)
                 viewModel.addHalfProduct(halfProduct)
                 sendDataAboutHalfProductCreated(halfProduct)
-                parentView.makeSnackBar(halfProduct.name,requireContext())
+                parentView.makeCreationConfirmationSnackBar(halfProduct.name, requireContext())
                 this.dismiss()
 
             } else Toast.makeText(activity, "Can't make nameless half product!", Toast.LENGTH_SHORT).show()

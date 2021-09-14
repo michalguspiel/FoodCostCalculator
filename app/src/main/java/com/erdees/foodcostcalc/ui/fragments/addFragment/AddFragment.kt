@@ -15,12 +15,10 @@ import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants.ADD_FRAGMENT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
 import com.erdees.foodcostcalc.utils.ViewUtils.isNotEmptyNorJustDot
-import com.erdees.foodcostcalc.utils.ViewUtils.makeSnackBar
+import com.erdees.foodcostcalc.utils.ViewUtils.makeCreationConfirmationSnackBar
 import com.erdees.foodcostcalc.utils.ViewUtils.scrollUp
 import com.erdees.foodcostcalc.utils.ViewUtils.showShortToast
 import com.google.firebase.analytics.FirebaseAnalytics
-
-/**REFACTORED*/
 
 class AddFragment : Fragment(), AdapterView.OnItemClickListener {
 
@@ -82,7 +80,7 @@ class AddFragment : Fragment(), AdapterView.OnItemClickListener {
                         binding.productTaxEditText.text.toString().toDouble(),
                         binding.productWasteEditText.text.toString().toDouble(),
                     )
-                    binding.root.makeSnackBar(
+                    binding.root.makeCreationConfirmationSnackBar(
                         binding.productNameEditText.text.toString(),
                         requireContext()
                     )

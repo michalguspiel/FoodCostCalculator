@@ -40,5 +40,10 @@ object Constants {
     const val METRIC = "metric"
     const val USA = "usa"
 
+    const val MARGIN = "margin"
+    const val TAX = "tax"
+
+    const val BASIC_MARGIN = 100
+    const val BASIC_TAX = 23
 
 }

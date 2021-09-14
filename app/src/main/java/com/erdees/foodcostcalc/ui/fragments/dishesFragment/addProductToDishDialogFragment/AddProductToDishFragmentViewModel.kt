@@ -25,11 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
-
 class AddProductToDishFragmentViewModel(application: Application) : AndroidViewModel(application) {
-
 
     val readAllHalfProductModelData: LiveData<List<HalfProductModel>>
     val readAllProductModelData: LiveData<List<ProductModel>>
@@ -53,8 +49,6 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
             AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
         val basicDao = BasicDataBase.getInstance().basicDao
 
-
-
         basicRepository = BasicRepository(basicDao)
         halfProductRepository = HalfProductRepository(halfProductDao)
         productRepository = ProductRepository(productDao)
@@ -66,7 +60,6 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
         readAllHalfProductModelData = halfProductRepository.readAllData
         readAllProductModelData = productRepository.readAllData
         readAllDishModelData = dishRepository.readAllData
-
     }
 
     private var metricCondition = true
@@ -86,19 +79,16 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
     fun chooseUnit(position: Int) {
         chosenUnit = unitList[position]
     }
+    private var unitType = ""
 
     fun updateUnitList() {
         unitList.changeUnitList(
-            getUnitType(),
+            unitType,
             metricCondition,
             usaCondition
         )
         chosenUnit = unitList.first()
     }
-
-    private var unitType = ""
-
-    fun getUnitType(): String = unitType
 
     fun setProductUnitType(position: Int) {
         unitType = UnitsUtils.getUnitType(
@@ -143,7 +133,6 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
         return product
     }
 
-
     private fun addHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductIncludedInDishRepository
@@ -167,6 +156,4 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
 
         return halfProduct
     }
-
-
 }

@@ -17,8 +17,6 @@ import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.UNIT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.ViewUtils.showShortToast
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
 
     private var _binding: AddProductsToDishBinding? = null
@@ -36,7 +34,7 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         when (parent?.id) {
-            1 -> {
+            PRODUCT_SPINNER_ID -> {
                 viewModel.productPosition = position
                 if (!binding.productHalfproductSwitch.isChecked) viewModel.setProductUnitType(
                     position
@@ -44,13 +42,12 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                 else viewModel.setHalfProductUnitType(position)
                 viewModel.updateUnitList()
                 unitAdapter.notifyDataSetChanged()
-                binding.unitSpinner.setSelection(0, false)
                 binding.unitSpinner.setSelection(0) // when the product is chosen first units got chosen immediately
             }
-            2 -> {
+            DISH_SPINNER_ID -> {
                 viewModel.dishPosition = position
             }
-            else -> {
+            UNIT_SPINNER_ID -> {
                 viewModel.chooseUnit(position)
             }
         }
@@ -67,9 +64,8 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
         viewModel =
             ViewModelProvider(this).get(AddProductToDishFragmentViewModel::class.java)
         viewModel.updateUnitsConditions()
-
         setAdapters()
-        setProductsSpinner()
+        setProductsSpinner() //because initially dialog start with products
         setDishesSpinner()
         setUnitsSpinner()
 
@@ -94,7 +90,6 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             halfProductAdapter.notifyDataSetChanged()
         })
 
-        /**TODO REFACTOR THIS BUTTON AND THEN THIS FILE IS DONE*/
         binding.addProductToDishBtn.setOnClickListener {
             if (isProductWeightInvalid()) {
                 showShortToast(
@@ -108,28 +103,13 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
                     showShortToast(requireContext(), getString(R.string.you_must_pick_product))
                     return@setOnClickListener
                 }
-                val productAdded = viewModel.addProductToDish(
-                    binding.productWeight.text.toString().toDouble(),
-                )
-                binding.productWeight.text.clear()
-                showShortToast(
-                    requireContext(), getString(
-                        R.string.product_added, productAdded.name
-                    )
-                )
+                addChosenProductToDish()
             } else {
                 if (viewModel.getHalfProducts().value.isNullOrEmpty()) {
                     showShortToast(requireContext(), getString(R.string.you_must_pick_product))
                     return@setOnClickListener
                 }
-                val halfProductAdded = viewModel.addHalfProductIncludedInDish(
-                    binding.productWeight.text.toString().toDouble()
-                )
-                binding.productWeight.text.clear()
-                showShortToast(
-                    requireContext(),
-                    getString(R.string.product_added, halfProductAdded.name)
-                )
+                addChosenHalfProductToDish()
             }
         }
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -141,6 +121,29 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             AddProductToDishFragment()
 
         const val TAG = "AddProductToDishFragment"
+    }
+
+    private fun addChosenHalfProductToDish() {
+        val halfProductAdded = viewModel.addHalfProductIncludedInDish(
+            binding.productWeight.text.toString().toDouble()
+        )
+        binding.productWeight.text.clear()
+        showShortToast(
+            requireContext(),
+            getString(R.string.product_added, halfProductAdded.name)
+        )
+    }
+
+    private fun addChosenProductToDish() {
+        val productAdded = viewModel.addProductToDish(
+            binding.productWeight.text.toString().toDouble(),
+        )
+        binding.productWeight.text.clear()
+        showShortToast(
+            requireContext(), getString(
+                R.string.product_added, productAdded.name
+            )
+        )
     }
 
     private fun setAdapters() {
@@ -180,7 +183,7 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     }
 
     private fun setProductsSpinner() {
-        with(binding.productSpinner) // cause initially dialog start with products
+        with(binding.productSpinner)
         {
             adapter = productsAdapter
             setSelection(0, false)
