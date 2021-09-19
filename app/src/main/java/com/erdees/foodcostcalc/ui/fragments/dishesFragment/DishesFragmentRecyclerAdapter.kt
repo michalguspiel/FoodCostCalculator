@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.databinding.DishCardViewBinding
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.addProductToDishDialogFragment.AddProductToDishFragment
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.editDishDialogFragment.EditDishFragment
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
@@ -27,8 +28,6 @@ import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 import com.erdees.foodcostcalc.utils.Utils.formatPrice
 import com.erdees.foodcostcalc.utils.ViewUtils.getListSize
 import com.erdees.foodcostcalc.utils.ads.AdHelper
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
@@ -42,51 +41,42 @@ import java.util.*
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
-
 class DishesFragmentRecyclerAdapter(
     val tag: String?,
-    private val list: ArrayList<GrandDishModel>,
     private val fragmentManager: FragmentManager,
-    val viewModel: DishAdapterViewModel,
+    val viewModel: DishRVAdapterViewModel,
     private val dishListViewAdapterViewModel: DishListViewAdapterViewModel,
     val viewLifecycleOwner: LifecycleOwner,
     private val activity: Activity
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val adCase = AdHelper(list.size, Constants.DISHES_AD_FREQUENCY)
-
-    private val itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
-
-    private val positionsOfAds = adCase.positionsOfAds()
+    lateinit var list: List<GrandDishModel>
+    lateinit var adCase: AdHelper
 
     private var currentNativeAd: NativeAd? = null
 
+    @SuppressLint("NotifyDataSetChanged")
+    fun setGrandDishList(listToSet: List<GrandDishModel>) {
+        this.list = listToSet
+        this.notifyDataSetChanged()
+    }
 
-    inner class DishRecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    fun initializeAdHelper() {
+        adCase = AdHelper(list.size, Constants.DISHES_AD_FREQUENCY)
+    }
 
+    inner class DishRecyclerViewHolder(private val viewBinding: DishCardViewBinding) :
+        RecyclerView.ViewHolder(viewBinding.root) {
 
-        private val eachLinearLayout: LinearLayout = view.findViewById(R.id.linear_layout_dish_card)
-        private val dishNameTextView: TextView = view.findViewById(R.id.dish_name_in_adapter)
-        private val dishMarginTextView: TextView = view.findViewById(R.id.dish_margin_in_adapter)
-        private val dishTaxTextView: TextView = view.findViewById(R.id.dish_tax_in_adapter)
-        private val editButton: ImageButton = view.findViewById(R.id.edit_button_in_dish_adapter)
-        private val addProductsButton: ImageButton =
-            view.findViewById(R.id.add_product_to_dish_button)
-        private val listView: ListView = view.findViewById(R.id.list_view)
-        private val totalPriceOfDish: TextView = view.findViewById(R.id.total_price_dish_card_view)
-        private val finalPriceWithMarginAndTax: TextView =
-            view.findViewById(R.id.total_price_with_margin_dish_card_view)
-        private val howManyServingsTV =
-            view.findViewById<TextView>(R.id.how_many_servings_text_view)
         private var totalPrice: Double = 0.0
-        private var dishMargin : Double = 0.0
-        private var dishTax : Double = 0.0
+        private var dishMargin: Double = 0.0
+        private var dishTax: Double = 0.0
         private var amountOfServingsToPresent = 1
         private val amountOfServingsSubject = PublishSubject.create<Int>()
 
-        private fun setPriceData(amountOfServings : Int){
-            totalPriceOfDish.text = formatPrice(totalPrice * amountOfServings)
-            finalPriceWithMarginAndTax.text = formatPrice(
+        private fun setPriceData(amountOfServings: Int) {
+            viewBinding.totalPriceDishCardView.text = formatPrice(totalPrice * amountOfServings)
+            viewBinding.totalPriceWithMarginDishCardView.text = formatPrice(
                 countPriceAfterMarginAndTax(
                     totalPrice,
                     dishMargin,
@@ -96,10 +86,11 @@ class DishesFragmentRecyclerAdapter(
             )
         }
 
-        @SuppressLint("SetTextI18n")
         private fun setHowManyServingsTV(amountOfServings: Int) {
-            if(amountOfServings == 1 ) howManyServingsTV.text = "Data per serving."
-            else howManyServingsTV.text = "Data for $amountOfServings servings."
+            if (amountOfServings == 1) viewBinding.howManyServingsTextView.text =
+                activity.getString(R.string.data_per_serving)
+            else viewBinding.howManyServingsTextView.text =
+                activity.getString(R.string.data_per_x_servings, amountOfServings)
         }
 
         /**Summing up total price of products included and then one by one adding price of each half product.*/
@@ -124,58 +115,72 @@ class DishesFragmentRecyclerAdapter(
             }
         }
 
-        @SuppressLint("SetTextI18n")
         private fun setNameTaxAndMarginAccordingly(position: Int) {
-            dishNameTextView.text = list[position].dishModel.name
-            dishMarginTextView.text = "Margin: ${list[position].dishModel.marginPercent}%"
-            dishTaxTextView.text = "Tax: ${list[position].dishModel.dishTax}%"
+            viewBinding.dishNameInAdapter.text = list[position].dishModel.name
+            viewBinding.dishMarginTvInAdapter.text = (activity.getString(
+                R.string.dish_x_margin, String.format(
+                    list[position].dishModel.marginPercent.toString()
+                )
+            ))
+            viewBinding.dishTaxTvInAdapter.text = activity.getString(
+                R.string.dish_x_tax, String.format(
+                    list[position].dishModel.dishTax.toString()
+                )
+            )
         }
 
         private fun setEditDishButton(position: Int){
-            editButton.setOnClickListener {
+            viewBinding.editButtonInDishAdapter.setOnClickListener {
                 EditDishFragment().show(fragmentManager, EditDishFragment.TAG)
                 EditDishFragment.grandDishModelPassedFromAdapter = list[position]
             }
         }
 
         private fun setAddProductsButton(position: Int){
-            addProductsButton.setOnClickListener {
+            viewBinding.addProductToDishButton.setOnClickListener {
                 viewModel.passDishToDialog(list[position].dishModel)
                 openDialog(AddProductToDishFragment())
             }
         }
 
-        private fun setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position: Int){
-            eachLinearLayout.setOnClickListener {
-                if (listView.adapter == null) {
-                    howManyServingsTV.visibility = View.VISIBLE
-                    listView.adapter = makeAdapterForList(position, amountOfServingsToPresent)
+        private fun setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(position: Int) {
+            viewBinding.linearLayoutDishCard.setOnClickListener {
+                if (viewBinding.listView.adapter == null) {
+                    viewBinding.howManyServingsTextView.visibility = View.VISIBLE
+                    viewBinding.listView.adapter =
+                        makeAdapterForList(position, amountOfServingsToPresent)
                     val indicesOfBothLists =
                         list[position].productsIncluded.indices + list[position].halfProductModels.indices
-                    listView.layoutParams =
-                        LinearLayout.LayoutParams(listView.layoutParams.width, getListSize(indicesOfBothLists,listView))
+                    viewBinding.listView.layoutParams =
+                        LinearLayout.LayoutParams(
+                            viewBinding.listView.layoutParams.width,
+                            getListSize(indicesOfBothLists, viewBinding.listView)
+                        )
                 } else {
-                    howManyServingsTV.visibility = View.GONE
-                    listView.adapter = null
-                    listView.layoutParams =
-                        LinearLayout.LayoutParams(listView.layoutParams.width, 0)
+                    viewBinding.howManyServingsTextView.visibility = View.GONE
+                    viewBinding.listView.adapter = null
+                    viewBinding.listView.layoutParams =
+                        LinearLayout.LayoutParams(viewBinding.listView.layoutParams.width, 0)
                 }
             }
         }
 
         private fun setPositiveButtonFunctionality(button: Button, editText: EditText, alertDialog: AlertDialog, position: Int){
             button.setOnClickListener {
-                if(editText.text.isNullOrBlank() || !editText.text.isDigitsOnly()){
-                    Toast.makeText(activity,"Wrong input!",Toast.LENGTH_SHORT).show()
+                if (editText.text.isNullOrBlank() || !editText.text.isDigitsOnly()) {
+                    Toast.makeText(activity, "Wrong input!", Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
                 amountOfServingsSubject.onNext(editText.text.toString().toInt())
-                listView.adapter =
+                viewBinding.listView.adapter =
                     makeAdapterForList(position, amountOfServingsToPresent) // TO REFRESH LIST
                 val indicesOfBothLists =
                     list[position].productsIncluded.indices + list[position].halfProductModels.indices
-                listView.layoutParams =
-                    LinearLayout.LayoutParams(listView.layoutParams.width, getListSize(indicesOfBothLists,listView)) // TO CHANGE SIZE TOO
+                viewBinding.listView.layoutParams =
+                    LinearLayout.LayoutParams(
+                        viewBinding.listView.layoutParams.width,
+                        getListSize(indicesOfBothLists, viewBinding.listView)
+                    ) // TO CHANGE SIZE TOO
                 alertDialog.dismiss()
             }
         }
@@ -216,8 +221,6 @@ class DishesFragmentRecyclerAdapter(
         @SuppressLint("CheckResult")
         fun bind(position: Int) {
             val positionIncludedAdsBinded = adCase.correctElementFromListToBind(position)
-            Log.i("DishesRecycler", "position : $position , positionIncludedWithAdsBinded : $positionIncludedAdsBinded , listSize : ${list.size} , positionOfAds : $positionsOfAds")
-
             if (position == 3) openFeedBackForm()
             setDishData(positionIncludedAdsBinded)
             amountOfServingsSubject.subscribe { i ->
@@ -231,10 +234,12 @@ class DishesFragmentRecyclerAdapter(
             setEditDishButton(positionIncludedAdsBinded)
             setAddProductsButton(positionIncludedAdsBinded)
             setWholeLayoutAsListenerWhichOpensAndClosesListOfProducts(positionIncludedAdsBinded)
-            setHowManyServingsTvAsButton(howManyServingsTV,positionIncludedAdsBinded)
+            setHowManyServingsTvAsButton(
+                viewBinding.howManyServingsTextView,
+                positionIncludedAdsBinded
+            )
         }
     }
-
 
     inner class AdItemViewHolder(val view: NativeAdView) : RecyclerView.ViewHolder(view) {
         fun bind() {
@@ -246,7 +251,6 @@ class DishesFragmentRecyclerAdapter(
                 val activityDestroyed: Boolean = activity.isDestroyed
                 if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
                     nativeAd.destroy()
-                    Log.i("TESTTT", " THIS RETURN IS CALLED ")
                     return@forNativeAd
                 }
                 // You must call destroy on old ads when you are done with them,
@@ -285,10 +289,13 @@ class DishesFragmentRecyclerAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             DISH_ITEM_TYPE -> {
-                val adapterLayout =
-                    LayoutInflater.from(parent.context)
-                        .inflate(R.layout.dish_card_view, parent, false)
-                DishRecyclerViewHolder(adapterLayout)
+                DishRecyclerViewHolder(
+                    DishCardViewBinding.inflate(
+                        LayoutInflater.from(activity),
+                        parent,
+                        false
+                    )
+                )
             }
             DISH_AD_ITEM_TYPE -> {
                 val adapterLayout = LayoutInflater.from(parent.context)
@@ -302,18 +309,16 @@ class DishesFragmentRecyclerAdapter(
                 LastItemViewHolder(adapterLayout)
             }
         }
-
-
     }
 
     override fun getItemCount(): Int {
-        return itemsSizeWithAds
+        return adCase.itemsSizeWithAds()
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (position == itemsSizeWithAds - 1) LAST_ITEM_TYPE
-        else if (positionsOfAds.contains(position)) DISH_AD_ITEM_TYPE
-        else  DISH_ITEM_TYPE
+        return if (position == adCase.itemsSizeWithAds() - 1) LAST_ITEM_TYPE
+        else if (adCase.positionsOfAds().contains(position)) DISH_AD_ITEM_TYPE
+        else DISH_ITEM_TYPE
     }
 
     @SuppressLint("WrongConstant", "ShowToast", "SetTextI18n")
@@ -324,7 +329,6 @@ class DishesFragmentRecyclerAdapter(
         else if (holder.itemViewType == DISH_AD_ITEM_TYPE) (holder as AdItemViewHolder).bind()
         else (holder as LastItemViewHolder).bind()
     }
-
 
     private fun openDialog(dialog: DialogFragment) {
         val transaction = fragmentManager.beginTransaction()
@@ -341,7 +345,6 @@ class DishesFragmentRecyclerAdapter(
             viewLifecycleOwner
         )
     }
-
 
     private fun openFeedBackForm() {
         Log.i("Main Activity", "review triggered!")
@@ -367,7 +370,6 @@ class DishesFragmentRecyclerAdapter(
         const val TAG = "DishesFragmentRecyclerAdapter"
     }
 
-
     private fun isThisLastItemOfTheList(indexOfHalfProduct : Int , listSize : Int):Boolean{
         return (indexOfHalfProduct == listSize -1)
     }
@@ -382,6 +384,4 @@ class DishesFragmentRecyclerAdapter(
         val amountOfTax = priceWithMargin * tax / 100
         return (priceWithMargin + amountOfTax) * amountOfServings
     }
-
-
 }

@@ -20,17 +20,19 @@ class AdHelper(private val itemsSize: Int, private val adFrequency: Int) {
 
     val finalListSize = itemsSize + finalAmountOfAds
 
-
-    fun adsBindedSoFar(position: Int): Int {
-        if(position>finalListSize)throw NullPointerException()
-        return (position  ) / adFrequency
+    fun itemsSizeWithAds(): Int {
+        return this.finalListSize + 1// +1 to include button as footer.
     }
 
+    fun adsBindedSoFar(position: Int): Int {
+        if (position > finalListSize) throw NullPointerException()
+        return (position) / adFrequency
+    }
 
-    fun positionsOfAds() : List<Int>{
+    fun positionsOfAds(): List<Int> {
         val positions = mutableListOf<Int>()
         var position = adFrequency   // initially first position
-      for (eachAd in 0 until finalAmountOfAds) {
+        for (eachAd in 0 until finalAmountOfAds) {
           positions += position
           position += adFrequency
       }

@@ -6,79 +6,66 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
-import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishAdapterViewModel
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
+import com.erdees.foodcostcalc.databinding.FragmentDishesBinding
 import java.util.*
-
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 
 class DishesFragment : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
     private lateinit var listViewViewModelPassedToRecyclerView: DishListViewAdapterViewModel
-    private lateinit var viewModelPassedToRecyclerView: DishAdapterViewModel
+    private lateinit var viewModelPassedToRecyclerView: DishRVAdapterViewModel
     private lateinit var fragmentRecyclerAdapter: DishesFragmentRecyclerAdapter
 
+    private var _binding: FragmentDishesBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        inflater.inflate(R.layout.fragment_dishes, container, false)
-        val view: View = inflater.inflate(R.layout.fragment_dishes, container, false)
+        _binding = FragmentDishesBinding.inflate(inflater, container, false)
+        val view = binding.root
         val viewModel = ViewModelProvider(this).get(DishesFragmentViewModel::class.java)
         viewModelPassedToRecyclerView =
-            ViewModelProvider(this).get(DishAdapterViewModel::class.java)
+            ViewModelProvider(this).get(DishRVAdapterViewModel::class.java)
         listViewViewModelPassedToRecyclerView =
             ViewModelProvider(this).get(DishListViewAdapterViewModel::class.java)
 
-        recyclerView = view.findViewById(R.id.recycler_view_dishes)
-        recyclerView.setHasFixedSize(true)
-        setEmptyAdapterToRecyclerView()
+        binding.recyclerViewDishes.setHasFixedSize(true)
+        setAdapterToRecyclerView()
 
         viewModel.getWhatToSearchFor().observe(viewLifecycleOwner, { searchWord ->
             viewModel.getGrandDishes().observe(viewLifecycleOwner, { grandDishes ->
-                val grandDishesList = mutableListOf<GrandDishModel>()
-                grandDishes.forEach { grandDishesList.add(it) }
-                fragmentRecyclerAdapter = DishesFragmentRecyclerAdapter(
-                    TAG,
-                    grandDishesList.filter {
-                        it.dishModel.name.toLowerCase().contains(searchWord.toLowerCase())
-                    } as ArrayList<GrandDishModel>,
-                    childFragmentManager, viewModelPassedToRecyclerView,
-                    listViewViewModelPassedToRecyclerView,
-                    viewLifecycleOwner, requireActivity())
-
-                recyclerView.adapter = fragmentRecyclerAdapter
+                fragmentRecyclerAdapter.setGrandDishList(
+                    grandDishes.filter {
+                        it.dishModel.name.toLowerCase(Locale.ROOT).contains(
+                            searchWord.toLowerCase(
+                                Locale.ROOT
+                            )
+                        )
+                    })
+                fragmentRecyclerAdapter.initializeAdHelper()
             })
         })
-
         return view
     }
 
-    /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No fragmentRecyclerAdapter attached; skipping layout" */
-    private fun setEmptyAdapterToRecyclerView() {
+    private fun setAdapterToRecyclerView() {
         fragmentRecyclerAdapter = DishesFragmentRecyclerAdapter(
             TAG,
-            arrayListOf(),
             childFragmentManager,
             viewModelPassedToRecyclerView,
             listViewViewModelPassedToRecyclerView,
             viewLifecycleOwner,
             requireActivity()
         )
-        recyclerView.adapter = fragmentRecyclerAdapter
+        fragmentRecyclerAdapter.setGrandDishList(arrayListOf())
+        fragmentRecyclerAdapter.initializeAdHelper()
+        binding.recyclerViewDishes.adapter = fragmentRecyclerAdapter
     }
 
     companion object {
         fun newInstance(): DishesFragment = DishesFragment()
         const val TAG = "DishesFragment"
     }
-
-
 }

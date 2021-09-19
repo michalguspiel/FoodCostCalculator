@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.viewmodel.adaptersViewModel
+package com.erdees.foodcostcalc.ui.fragments.dishesFragment
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -8,14 +8,17 @@ import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 
-class DishAdapterViewModel(application: Application):AndroidViewModel(application) {
+class DishRVAdapterViewModel(application: Application) : AndroidViewModel(application) {
 
-    val halfProductWithProductsIncludedRepository : HalfProductWithProductsIncludedRepository
-    val basicRepository : BasicRepository
+    val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
+    val basicRepository: BasicRepository
+
     init {
-        val halfProductWithProductsIncludedDao = AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
+        val halfProductWithProductsIncludedDao =
+            AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
         val basicDao = BasicDataBase.getInstance().basicDao
-        halfProductWithProductsIncludedRepository = HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
+        halfProductWithProductsIncludedRepository =
+            HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
         basicRepository = BasicRepository(basicDao)
     }
 

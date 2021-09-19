@@ -1,9 +1,8 @@
-package com.erdees.foodcostcalc.viewmodel.adaptersViewModel
+package com.erdees.foodcostcalc.ui.fragments.dishesFragment
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedDao
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
 
 class DishListViewAdapterViewModel(application: Application):AndroidViewModel(application) {

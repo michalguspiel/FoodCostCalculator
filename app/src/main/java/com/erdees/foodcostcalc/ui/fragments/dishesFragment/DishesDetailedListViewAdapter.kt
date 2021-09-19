@@ -13,7 +13,6 @@ import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
 import com.erdees.foodcostcalc.utils.Utils.formatPrice
 import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.DishListViewAdapterViewModel
 import java.text.NumberFormat
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
