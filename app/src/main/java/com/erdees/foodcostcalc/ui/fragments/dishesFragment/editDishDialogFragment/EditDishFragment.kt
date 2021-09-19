@@ -22,7 +22,6 @@ import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewMo
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
-
 class EditDishFragment : DialogFragment() {
 
     lateinit var recyclerFragmentRecyclerAdapter: EditDishFragmentRecyclerAdapter

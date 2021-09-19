@@ -2,7 +2,6 @@ package com.erdees.foodcostcalc.ui.fragments.dishesFragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -62,11 +61,11 @@ class DishesDetailedListViewAdapter(
         return rowView
     }
 
-    /**TODO FIGURE OUT WHY THIS SETS ONLY LAST TEXT VIEW AND FIX IT!!*/
-    private fun setHalfProductRowPrice(positionOfHalfProduct: Int) {
+    private fun setHalfProductRowPrice(positionOfHalfProduct: Int, productPriceTextView: TextView) {
         viewModel
             .getCertainHalfProductWithProductsIncluded(grandDishModel.halfProductModels[positionOfHalfProduct].halfProductOwnerId)
-            .observe(viewLifecycleOwner,
+            .observe(
+                viewLifecycleOwner,
                 {
                     val result = formatPrice(
                         calculatePrice(
@@ -76,8 +75,7 @@ class DishesDetailedListViewAdapter(
                             grandDishModel.halfProductModels[positionOfHalfProduct].unit
                         ) * servings
                     )
-                    Log.i("DishesDetailedList", result)
-                    productPriceText.text = result
+                    productPriceTextView.text = result
                 })
     }
 
@@ -88,7 +86,7 @@ class DishesDetailedListViewAdapter(
             (grandDishModel.halfProductModels[positionOfHalfProduct].weight * servings).toString()
         productUnit.text =
             getUnitAbbreviation(grandDishModel.halfProductModels[positionOfHalfProduct].unit)
-        setHalfProductRowPrice(positionOfHalfProduct)
+        setHalfProductRowPrice(positionOfHalfProduct, productPriceText)
     }
 
     private fun setRowAsProduct(position: Int) {

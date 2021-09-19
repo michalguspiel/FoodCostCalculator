@@ -87,7 +87,7 @@ object UnitsUtils {
         }
     }
 
-    fun computeUnitToKilogram(anotherUnit: String, amount: Double): Double {
+    private fun computeUnitToKilogram(anotherUnit: String, amount: Double): Double {
         return when (anotherUnit) {
             "gram" -> amount / 1000
             "kilogram" -> amount
@@ -101,7 +101,7 @@ object UnitsUtils {
         }
     }
 
-    fun computeUnitToLiter(anotherUnit: String, amount: Double): Double {
+    private fun computeUnitToLiter(anotherUnit: String, amount: Double): Double {
         return when (anotherUnit) {
             "gram" -> amount / 1000
             "kilogram" -> amount
@@ -115,7 +115,7 @@ object UnitsUtils {
         }
     }
 
-    fun computeUnitToGallon(anotherUnit: String, amount: Double): Double {
+    private fun computeUnitToGallon(anotherUnit: String, amount: Double): Double {
         return when (anotherUnit) {
             "gram" -> amount * 0.264172052 / 1000
             "kilogram" -> amount * 0.264172052
@@ -129,7 +129,7 @@ object UnitsUtils {
         }
     }
 
-    fun computeUnitToPound(anotherUnit: String, amount: Double): Double {
+    private fun computeUnitToPound(anotherUnit: String, amount: Double): Double {
         return when (anotherUnit) {
             "gram" -> amount / 453.59237
             "kilogram" -> amount * 2.20462262
