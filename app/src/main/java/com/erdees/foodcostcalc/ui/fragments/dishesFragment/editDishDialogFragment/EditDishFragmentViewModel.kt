@@ -2,48 +2,65 @@ package com.erdees.foodcostcalc.ui.fragments.dishesFragment.editDishDialogFragme
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.dish.DishRepository
 import com.erdees.foodcostcalc.data.grandDish.GrandDishRepository
-
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
+import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
+import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
+import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class EditDishFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    val dishRepository: DishRepository
-    val grandDishRepository: GrandDishRepository
-    val basicRepository: BasicRepository
+    private val dishRepository: DishRepository
+    private val grandDishRepository: GrandDishRepository
+    private val productIncludedRepository: ProductIncludedRepository
+    private val halfProductIncludedInDishRepository: HalfProductIncludedInDishRepository
 
     init {
         val dishDao = AppRoomDataBase.getDatabase(application).dishDao()
         val grandDishDao = AppRoomDataBase.getDatabase(application).grandDishDao()
-        val basicDao = BasicDataBase.getInstance().basicDao
+        val productIncludedDao = AppRoomDataBase.getDatabase(application).productIncludedDao()
+        val halfProductIncludedInDishDao =
+            AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
 
         dishRepository = DishRepository(dishDao)
         grandDishRepository = GrandDishRepository(grandDishDao)
-        basicRepository = BasicRepository(basicDao)
+        productIncludedRepository = ProductIncludedRepository((productIncludedDao))
+        halfProductIncludedInDishRepository =
+            HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
     }
 
-    fun getDishes() = dishRepository.getDishes()
-
+    fun saveDish(dishId: Long, dishName: String, dishMargin: Double, dishTax: Double) {
+        val dish = DishModel(dishId, dishName, dishMargin, dishTax)
+        viewModelScope.launch(Dispatchers.IO) {
+            dishRepository.editDish(dish)
+        }
+    }
 
     fun getGrandDishById(dishId: Long) = grandDishRepository.getGrandDishById(dishId)
 
-    /**Basic repository methods*/
-    fun setFlag(boolean: Boolean) {
-        basicRepository.setFlag(boolean)
+    fun deleteGrandDish(grandDishModel: GrandDishModel) {
+        deleteDish(grandDishModel.dishModel)
+        deleteAllProductsIncludedInThisDish(grandDishModel.dishModel.dishId)
+        deleteAllHalfProductsIncludedInThisDish(grandDishModel.dishModel.dishId)
     }
 
-    fun setPosition(pos: Int) {
-        basicRepository.setPosition(pos)
+    private fun deleteDish(dishModel: DishModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+            dishRepository.deleteDish(dishModel)
+        }
     }
 
-    fun getFlag() = basicRepository.getFlag()
+    private fun deleteAllProductsIncludedInThisDish(dishId: Long) {
+        productIncludedRepository.deleteAllProductsIncludedInDish(dishId)
+    }
 
-    fun getPosition() = basicRepository.getPosition()
-
+    private fun deleteAllHalfProductsIncludedInThisDish(dishId: Long) {
+        halfProductIncludedInDishRepository.deleteAllHalfProductsIncludedInDish(dishId)
+    }
 
 }

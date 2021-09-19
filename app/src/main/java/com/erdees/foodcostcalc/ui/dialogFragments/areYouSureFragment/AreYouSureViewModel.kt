@@ -15,20 +15,17 @@ import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 
-class AreYouSureViewModel(application: Application): AndroidViewModel(application) {
+class AreYouSureViewModel(application: Application) : AndroidViewModel(application) {
 
     val readAllProductModelData: LiveData<List<ProductModel>>
-    val readAllDishModelData: LiveData<List<DishModel>>
     val readAllHalfProductModelData: LiveData<List<HalfProductModel>>
     private val readAllProductIncludedInHalfProductModelData: LiveData<List<ProductIncludedInHalfProductModel>>
     private val readAllProductIncludedInHalfProductModelDataNotAsc: LiveData<List<ProductIncludedInHalfProductModel>>
@@ -48,14 +45,17 @@ class AreYouSureViewModel(application: Application): AndroidViewModel(applicatio
     init {
         val productDao = AppRoomDataBase.getDatabase(application).productDao()
         val dishDao = AppRoomDataBase.getDatabase(application).dishDao()
-        val dishWithProductIncludedDao = AppRoomDataBase.getDatabase(application).dishWithProductIncludedDao()
+        val dishWithProductIncludedDao =
+            AppRoomDataBase.getDatabase(application).dishWithProductIncludedDao()
         val basicDao = BasicDataBase.getInstance().basicDao
         val productIncludedDao = AppRoomDataBase.getDatabase(application).productIncludedDao()
         val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
         val productIncludedInHalfProductDao =
             AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
-        val halfProductWithProductIncludedDao = AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
-        val halfProductIncludedInDishDao = AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
+        val halfProductWithProductIncludedDao =
+            AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
+        val halfProductIncludedInDishDao =
+            AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
 
         productRepository = ProductRepository(productDao)
         dishRepository = DishRepository(dishDao)
@@ -72,7 +72,6 @@ class AreYouSureViewModel(application: Application): AndroidViewModel(applicatio
             HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
 
         readAllProductModelData = productRepository.readAllData
-        readAllDishModelData = dishRepository.readAllData
         readAllHalfProductModelData = halfProductRepository.readAllData
         readAllProductIncludedInHalfProductModelData =
             productIncludedInHalfProductRepository.readAllData
@@ -81,6 +80,7 @@ class AreYouSureViewModel(application: Application): AndroidViewModel(applicatio
 
 
     }
+
     /**Basic repository methods*/
     fun getPosition() = basicRepository.getPosition()
 
@@ -88,19 +88,7 @@ class AreYouSureViewModel(application: Application): AndroidViewModel(applicatio
         basicRepository.setFlag(boolean)
     }
 
-    fun getProductIncluded() = basicRepository.getProductIncluded()
-
     fun getProductIncludedInHalfProduct() = basicRepository.getProductIncludedInHalfProduct()
-
-    fun getHalfProductIncluded() = basicRepository.getHalfProductIncluded()
-
-    /**DishWithProductIncluded repository methods*/
-
-    fun getDishesWithProductsIncluded() = dishWithProductIncludedRepository.getDishesWithProductsIncluded()
-
-    /**ProductIncluded Repository methods*/
-
-    fun getProductIncludedByDishId(dishId: Long) = productIncludedRepository.getProductIncludedByDishID(dishId)
 
     /**ProductsIncludedInHalfProduct Repository methods*/
 
@@ -123,21 +111,6 @@ class AreYouSureViewModel(application: Application): AndroidViewModel(applicatio
         }
     }
 
-    /**DishModel Repository methods*/
-
-    fun deleteDish(dishModel: DishModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            dishRepository.deleteDish(dishModel)
-        }
-    }
-
-    /**ProductIncluded Repository methods*/
-
-    fun deleteProductIncluded(productIncluded: ProductIncluded) {
-        viewModelScope.launch(Dispatchers.IO) {
-            productIncludedRepository.deleteProductIncluded(productIncluded)
-        }
-    }
 
     /**ProductIncludedInHalfProductModel Repository methods*/
 

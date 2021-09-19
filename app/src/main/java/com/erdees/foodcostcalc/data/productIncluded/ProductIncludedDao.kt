@@ -16,11 +16,14 @@ interface ProductIncludedDao {
 
     @Transaction
     @Query("SELECT * FROM productincluded WHERE productId = :id ")
-    fun getCertainProductsIncluded(id: Long) : LiveData<List<ProductIncluded>>
+    fun getCertainProductsIncluded(id: Long): LiveData<List<ProductIncluded>>
 
     @Transaction
     @Query("SELECT * FROM productincluded WHERE dishOwnerId = :id ")
-    fun  getProductIncludedFromDishId(id: Long) : LiveData<List<ProductIncluded>>
+    fun getProductIncludedFromDishId(id: Long): LiveData<List<ProductIncluded>>
+
+    @Query("DELETE FROM productincluded WHERE dishOwnerId = :id")
+    fun deleteAllProductsIncludedInDish(id: Long)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addProductToDish(productIncluded: ProductIncluded)

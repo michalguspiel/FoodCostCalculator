@@ -66,7 +66,7 @@
             app:hintTextColor="@color/black">
 
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edit_margin"
+                android:id="@+id/edit_dish_margin"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:autofillHints=""
@@ -125,7 +125,7 @@
         android:layout_gravity="center_horizontal">
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/save_halfproduct_changes_button"
+            android:id="@+id/save_dish_changes_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -137,7 +137,7 @@
             tools:ignore="ButtonStyle" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/delete_halfproduct_button"
+            android:id="@+id/delete_dish_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

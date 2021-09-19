@@ -9,6 +9,10 @@ import java.text.NumberFormat
 
 object Utils {
 
+    fun CharSequence.isNotBlankNorJustDot(): Boolean {
+        return this.isNotBlank() && this.toString() != "."
+    }
+
     /**Because some devices format number with commas which causes errors.*/
     fun formatResultAndCheckCommas(number: Double): String {
         val df = DecimalFormat("#.##")

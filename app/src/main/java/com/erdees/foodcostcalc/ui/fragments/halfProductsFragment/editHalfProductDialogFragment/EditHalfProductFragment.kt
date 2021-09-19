@@ -80,7 +80,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
         /**Binders*/
         val name = view.findViewById<EditText>(R.id.edit_half_product_name)
         val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
-        val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)
+        val deleteBtn = view.findViewById<Button>(R.id.delete_dish_button)
         spinner = view.findViewById(R.id.edit_half_product_spinner)
         val recycleView =
             view.findViewById<RecyclerView>(R.id.recycler_view_products_in_half_product)

@@ -16,6 +16,9 @@ interface HalfProductIncludedInDishDao {
     @Query("SELECT * FROM HALFPRODUCTINCLUDEDINDISH WHERE halfProductId =:halfProductId")
     fun getHalfProductsIncludedInDishFromDishByHalfProduct(halfProductId: Long): LiveData<List<HalfProductIncludedInDishModel>>
 
+    @Query("DELETE FROM HALFPRODUCTINCLUDEDINDISH WHERE dishOwnerId =:dishId")
+    fun deleteAllHalfProductsIncludedInDish(dishId: Long)
+
     @Update
     suspend fun editHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel)
 

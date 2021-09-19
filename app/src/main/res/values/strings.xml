@@ -11,6 +11,7 @@
     <string name="delete">Delete</string>
     <string name="are_you_sure">Are You sure?</string>
     <string name="yes">Yes</string>
+    <string name="back">Back</string>
     <string name="dish_name">Dish name</string>
     <string name="product_name">Product name:</string>
     <string name="product_price">price:</string>
@@ -88,4 +89,9 @@
     <string name="okay">Okay</string>
     <string name="successful_creation_message">%1$s created successfully!</string>
     <string name="cannot_make_nameless_dish">Cannot make nameless dish!</string>
+
+    <string name="cannot_leave_empty_fields">Cannot leave empty fields</string>
+
+    <string name="string_plural">%1$ss</string>
+
 </resources>

@@ -32,6 +32,11 @@ object ViewUtils {
         return this.text.isNotEmpty() && this.text.toString() != "."
     }
 
+    fun EditText.isNotBlankNorJustDot(): Boolean {
+        return this.text.isNotBlank() && this.text.toString() != "."
+
+    }
+
     fun BottomNavigationView.uncheckAllItems() {
         menu.setGroupCheckable(0, true, false)
         for (i in 0 until menu.size()) {

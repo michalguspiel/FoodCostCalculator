@@ -4,9 +4,6 @@ import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProd
 
 class HalfProductIncludedInDishRepository(private val halfProductIncludedInDishDao: HalfProductIncludedInDishDao ) {
 
-    fun getHalfProductsIncludedInDishFromDish(dishId: Long) =
-        halfProductIncludedInDishDao.getHalfProductsIncludedInDishFromDish(dishId)
-
     fun getHalfProductsIncludedInDishFromDishByHalfProduct(productId: Long) =
         halfProductIncludedInDishDao.getHalfProductsIncludedInDishFromDishByHalfProduct(productId)
 
@@ -19,17 +16,8 @@ class HalfProductIncludedInDishRepository(private val halfProductIncludedInDishD
     suspend fun deleteHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) =
         halfProductIncludedInDishDao.deleteHalfProductIncludedInDish(halfProductIncludedInDishModel)
 
-
-    companion object {
-        @Volatile
-        private var instance: HalfProductIncludedInDishRepository? = null
-
-        fun getInstance(halfProductIncludedInDishDao: HalfProductIncludedInDishDao) =
-            instance ?: synchronized(this) {
-                instance ?: HalfProductIncludedInDishRepository(halfProductIncludedInDishDao).also {
-                    instance = it
-                }
-            }
+    fun deleteAllHalfProductsIncludedInDish(dishId: Long) {
+        halfProductIncludedInDishDao.deleteAllHalfProductsIncludedInDish(dishId)
     }
 
 }

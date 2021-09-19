@@ -1,114 +1,89 @@
 package com.erdees.foodcostcalc.ui.fragments.dishesFragment.editDishDialogFragment
 
+import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.ui.dialogFragments.areYouSureFragment.AreYouSure
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.databinding.FragmentEditDishBinding
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditDishAdapterViewModel
-
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
+import com.erdees.foodcostcalc.utils.ViewUtils.isNotEmptyNorJustDot
 
 class EditDishFragment : DialogFragment() {
 
-    lateinit var recyclerFragmentRecyclerAdapter: EditDishFragmentRecyclerAdapter
-    lateinit var name: EditText
-    lateinit var marginEditText: EditText
-    lateinit var taxEditText: EditText
+    private var _binding: FragmentEditDishBinding? = null
+    private val binding get() = _binding!!
+    private lateinit var recyclerFragmentRecyclerAdapter: EditDishFragmentRecyclerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(R.layout.fragment_edit_dish, container, false)
-
-        /** initialize ui with viewmodel*/
+        _binding = FragmentEditDishBinding.inflate(inflater, container, false)
+        val view = binding.root
         val viewModel = ViewModelProvider(this).get(EditDishFragmentViewModel::class.java)
 
-        name = view.findViewById(R.id.edit_dish_name)
-        marginEditText = view.findViewById(R.id.edit_margin)
-        taxEditText = view.findViewById(R.id.edit_dish_tax)
-
-
-        /**Recycler adapter gets populated with GrandDishModel which
-         * has two lists, list of products included and
-         * HalfProductsIncludedInDish.
-         * */
-        val actualRecyclerView =
-            view.findViewById<RecyclerView>(R.id.recycler_view_products_in_dish)
-        val saveBtn = view.findViewById<Button>(R.id.save_halfproduct_changes_button)
-        val deleteBtn = view.findViewById<Button>(R.id.delete_halfproduct_button)
-
-        /**Send data about which dishModel is being edited
-         * so .setPosition(index of this dishModel in main list)*/
-        viewModel.getDishes().observe(viewLifecycleOwner, { dish ->
-            viewModel.setPosition(dish.indexOf(dishModelPassedFromAdapter.dishModel))
-        })
-
-
-        /**Observing grandDish based on dishId that was passed with [dishModelPassedFromAdapter]
-         * if fragmentViewModel flag is false change it to true and close dialog, otherwise set all text fields properly and set recyclerview
-         * based on data in this [GrandDishModel].*/
-        viewModel.getGrandDishById(dishModelPassedFromAdapter.dishModel.dishId)
-            .observe(viewLifecycleOwner, Observer { grandDish ->
-                if (viewModel.getFlag().value == false) {
-                    viewModel.setFlag(true)
-                    this.dismiss()
-                } else {
-                    name.setText(dishModelPassedFromAdapter.dishModel.name)
-                    marginEditText.setText(dishModelPassedFromAdapter.dishModel.marginPercent.toString())
-                    taxEditText.setText(dishModelPassedFromAdapter.dishModel.dishTax.toString())
-                    recyclerFragmentRecyclerAdapter = EditDishFragmentRecyclerAdapter(
-                        ViewModelProvider(this).get(EditDishAdapterViewModel::class.java),
-                        childFragmentManager,
-                        grandDish
-                    )
-                    actualRecyclerView.adapter = recyclerFragmentRecyclerAdapter
-                }
+        viewModel.getGrandDishById(grandDishModelPassedFromAdapter.dishModel.dishId)
+            .observe(viewLifecycleOwner, { grandDish ->
+                setFields()
+                recyclerFragmentRecyclerAdapter = EditDishFragmentRecyclerAdapter(
+                    ViewModelProvider(this).get(EditDishAdapterViewModel::class.java),
+                    requireActivity(),
+                    grandDish
+                )
+                binding.recyclerViewProductsInDish.adapter = recyclerFragmentRecyclerAdapter
             })
 
-
-        /** BUTTON LOGIC*/
-
-
-        saveBtn.setOnClickListener {
-            if(allFieldsAreLegit()) {
-                recyclerFragmentRecyclerAdapter.save(
-                    DishModel(
-                        dishModelPassedFromAdapter.dishModel.dishId,
-                        name.text.toString(),
-                        marginEditText.text.toString().toDouble(),
-                        taxEditText.text.toString().toDouble()
-                    )
+        binding.saveDishChangesButton.setOnClickListener {
+            if (allFieldsAreLegit()) {
+                viewModel.saveDish(
+                    grandDishModelPassedFromAdapter.dishModel.dishId,
+                    binding.editDishName.text.toString(),
+                    binding.editDishMargin.text.toString().toDouble(),
+                    binding.editDishTax.text.toString().toDouble()
                 )
+                recyclerFragmentRecyclerAdapter.save()
                 this.dismiss()
-            } else Toast.makeText(requireContext(),"Can't leave empty fields", Toast.LENGTH_SHORT).show()
+            } else Toast.makeText(
+                requireContext(),
+                getString(R.string.cannot_leave_empty_fields),
+                Toast.LENGTH_SHORT
+            ).show()
         }
 
-        deleteBtn.setOnClickListener {
-            Log.i("test", viewModel.getPosition().value.toString())
-            AreYouSure().show(childFragmentManager, TAG)
+        binding.deleteDishButton.setOnClickListener {
+            val alertDialog = AlertDialog.Builder(requireContext()).setTitle(R.string.are_you_sure)
+                .setPositiveButton(getString(R.string.yes), null)
+                .setNegativeButton(getString(R.string.back), null)
+                .show()
+            alertDialog.window?.setBackgroundDrawable(
+                ContextCompat.getDrawable(
+                    requireContext(),
+                    R.drawable.background_for_dialogs
+                )
+            )
+            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                viewModel.deleteGrandDish(grandDishModelPassedFromAdapter)
+                alertDialog.dismiss()
+                this.dismiss()
+            }
         }
-
-
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         return view
+    }
 
+    private fun setFields() {
+        binding.editDishName.setText(grandDishModelPassedFromAdapter.dishModel.name)
+        binding.editDishMargin.setText(grandDishModelPassedFromAdapter.dishModel.marginPercent.toString())
+        binding.editDishTax.setText(grandDishModelPassedFromAdapter.dishModel.dishTax.toString())
     }
 
     companion object {
@@ -116,12 +91,12 @@ class EditDishFragment : DialogFragment() {
             EditDishFragment()
 
         const val TAG = "EditDishFragment"
-        lateinit var dishModelPassedFromAdapter: GrandDishModel
+        lateinit var grandDishModelPassedFromAdapter: GrandDishModel
     }
 
-    private fun allFieldsAreLegit():Boolean{
-        return (!name.text.isNullOrBlank() &&
-                !marginEditText.text.isNullOrBlank() && marginEditText.text.toString() != "." &&
-                !taxEditText.text.isNullOrBlank() && taxEditText.text.toString() != ".")
+    private fun allFieldsAreLegit(): Boolean {
+        return (!binding.editDishName.text.isNullOrBlank() &&
+                binding.editDishMargin.isNotEmptyNorJustDot() &&
+                binding.editDishTax.isNotEmptyNorJustDot())
     }
 }

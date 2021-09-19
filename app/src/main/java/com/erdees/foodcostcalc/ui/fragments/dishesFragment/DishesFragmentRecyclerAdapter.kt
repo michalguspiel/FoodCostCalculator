@@ -134,7 +134,7 @@ class DishesFragmentRecyclerAdapter(
         private fun setEditDishButton(position: Int){
             editButton.setOnClickListener {
                 EditDishFragment().show(fragmentManager, EditDishFragment.TAG)
-                EditDishFragment.dishModelPassedFromAdapter = list[position]
+                EditDishFragment.grandDishModelPassedFromAdapter = list[position]
             }
         }
 

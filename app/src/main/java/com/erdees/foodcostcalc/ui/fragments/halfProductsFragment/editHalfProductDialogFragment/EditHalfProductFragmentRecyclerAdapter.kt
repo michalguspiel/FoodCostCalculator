@@ -73,15 +73,15 @@ class EditHalfProductFragmentRecyclerAdapter(
 
 
     class EditHalfProductHolder(view: View):RecyclerView.ViewHolder(view) {
-        val nameTextView: TextView = view.findViewById(R.id.edit_dish_product_name)
-        val unitTextView: TextView = view.findViewById(R.id.unit)
+        val nameTextView: TextView = view.findViewById(R.id.product_name_text_view)
+        val unitTextView: TextView = view.findViewById(R.id.unit_text_view)
         val editTextView: EditText = view.findViewById(R.id.product_weight_edittext)
         val deleteProductBtn: ImageButton = view.findViewById(R.id.delete_product_in_dish_button)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditHalfProductHolder {
         val adapterLayout = LayoutInflater.from(parent.context)
-            .inflate(R.layout.small_list_of_products_v2, parent, false)
+            .inflate(R.layout.edit_dish_product_row, parent, false)
 
         return EditHalfProductHolder(adapterLayout)
     }
