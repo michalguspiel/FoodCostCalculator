@@ -34,7 +34,7 @@ class EditDishFragmentRecyclerAdapter(
     }
 
     override fun getItemCount(): Int {
-        return grandDishModel.halfProductModels.size + grandDishModel.productsIncluded.size
+        return grandDishModel.halfProducts.size + grandDishModel.productsIncluded.size
     }
 
     fun save() {
@@ -57,9 +57,9 @@ class EditDishFragmentRecyclerAdapter(
             val thisPosition =
                 holder.adapterPosition - grandDishModel.productsIncluded.size // to start counting position from new list
             setFields(
-                grandDishModel.halfProductModels[thisPosition].halfProductModel.name,
-                grandDishModel.halfProductModels[thisPosition].weight,
-                grandDishModel.halfProductModels[thisPosition].unit,
+                grandDishModel.halfProducts[thisPosition].halfProductModel.name,
+                grandDishModel.halfProducts[thisPosition].weight,
+                grandDishModel.halfProducts[thisPosition].unit,
                 holder
             )
             holder.viewBinding.deleteProductInDishButton.setOnClickListener {
@@ -124,7 +124,7 @@ class EditDishFragmentRecyclerAdapter(
             )
         )
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            viewModel.deleteHalfProductIncluded(grandDishModel.halfProductModels[pos])
+            viewModel.deleteHalfProductIncluded(grandDishModel.halfProducts[pos])
             alertDialog.dismiss()
         }
     }

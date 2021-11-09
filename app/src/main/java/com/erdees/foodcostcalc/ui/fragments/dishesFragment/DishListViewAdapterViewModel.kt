@@ -7,13 +7,13 @@ import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductW
 
 class DishListViewAdapterViewModel(application: Application):AndroidViewModel(application) {
 
-    val halfProductWithProductsIncludedRepository : HalfProductWithProductsIncludedRepository
+    private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
 
     init {
         val halfProductWithProductsIncludedDao  = AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
         halfProductWithProductsIncludedRepository = HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
     }
-
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long)
             = halfProductWithProductsIncludedRepository.getCertainHalfProductWithProductsIncluded(halfProductId)
+
 }

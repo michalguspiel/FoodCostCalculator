@@ -79,6 +79,7 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
     fun chooseUnit(position: Int) {
         chosenUnit = unitList[position]
     }
+
     private var unitType = ""
 
     fun updateUnitList() {
@@ -104,8 +105,6 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
 
     var productPosition: Int? = null
     var dishPosition: Int? = null
-
-    fun getDishToDialog() = basicRepository.getDishToDialog()
 
     fun getHalfProducts() = halfProductRepository.readAllData
 

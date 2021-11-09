@@ -20,7 +20,6 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
         basicRepository = BasicRepository(basicDao)
     }
 
-
     fun getGrandDishes() = grandDishRepository.getGrandDishes()
 
     fun getWhatToSearchFor() = basicRepository.getWhatToSearchFor()

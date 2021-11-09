@@ -18,7 +18,7 @@ data class GrandDishModel(
         parentColumn = "dishId",
         entityColumn = "dishOwnerId"
     )
-    val halfProductModels: List<HalfProductIncludedInDishModel>
+    val halfProducts: List<HalfProductIncludedInDishModel>
 ) {
     @Ignore
     val totalPrice: Double = productsIncluded.map { it.totalPriceOfThisProduct }.sum()

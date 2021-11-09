@@ -12,6 +12,7 @@
     <string name="are_you_sure">Are You sure?</string>
     <string name="yes">Yes</string>
     <string name="back">Back</string>
+    <string name="submit">Submit</string>
     <string name="dish_name">Dish name</string>
     <string name="product_name">Product name:</string>
     <string name="product_price">price:</string>
@@ -84,6 +85,7 @@
     <string name="you_must_pick_product">You must pick a product.</string>
     <string name="select_product">Select product</string>
     <string name="select_dish">Select dish</string>
+    <string name="serving_amount">Serving amount</string>
 
     <string name="product_added">%1$s added!</string>
     <string name="okay">Okay</string>

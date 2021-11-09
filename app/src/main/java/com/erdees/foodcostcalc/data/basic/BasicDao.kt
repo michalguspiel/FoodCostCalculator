@@ -2,13 +2,12 @@ package com.erdees.foodcostcalc.data.basic
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 
-class BasicDao{
+class BasicDao {
     /** Data access object to basic database  */
     private var mutablePosition: Int? = null
     private val position = MutableLiveData<Int>()
@@ -33,8 +32,6 @@ class BasicDao{
     private var halfProductIncludedModel: HalfProductIncludedInDishModel? = null
     private val halfProductIncludedLive = MutableLiveData<HalfProductIncludedInDishModel>()
 
-    private var dishModelPassedToDialog: DishModel? = null
-    private val dishPassedToDialogLive = MutableLiveData<DishModel>()
 
     private var halfProductModelPassedToDialog: HalfProductModel? = null
     private val halfProductPassedToDialogLive = MutableLiveData<HalfProductModel>()
@@ -61,20 +58,18 @@ class BasicDao{
         openCreateDishFlagLive.value = openCreateDishFlag
         openCreateHalfProductFlagLive.value = openCreateHalfProductFlag
 
-        dishPassedToDialogLive.value = dishModelPassedToDialog
         halfProductPassedToDialogLive.value = halfProductModelPassedToDialog
     }
 
 
-
-    fun setOpenAddFlag(boolean: Boolean){
+    fun setOpenAddFlag(boolean: Boolean) {
         openAddFlag = boolean
         openAddFlagLive.value = openAddFlag
     }
 
     fun observeOpenAddFlag() = openAddFlagLive as LiveData<Boolean>
 
-    fun setOpenCreateDishFlag(boolean: Boolean){
+    fun setOpenCreateDishFlag(boolean: Boolean) {
         openCreateDishFlag = boolean
         openCreateDishFlagLive.value = openCreateDishFlag
     }
@@ -88,13 +83,6 @@ class BasicDao{
 
     fun observeOpenCreateHalfProductFlag() = openCreateHalfProductFlagLive as LiveData<Boolean>
 
-
-    fun passDishToDialog(dishModel: DishModel) {
-        dishModelPassedToDialog = dishModel
-        dishPassedToDialogLive.value = dishModelPassedToDialog
-    }
-
-    fun getDishToDialog() = dishPassedToDialogLive as LiveData<DishModel>
 
     fun passHalfProductToDialog(halfProductModel: HalfProductModel) {
         halfProductModelPassedToDialog = halfProductModel
@@ -150,8 +138,6 @@ class BasicDao{
     }
 
     fun getFlag() = flag as LiveData<Boolean>
-
-
 
 
 }

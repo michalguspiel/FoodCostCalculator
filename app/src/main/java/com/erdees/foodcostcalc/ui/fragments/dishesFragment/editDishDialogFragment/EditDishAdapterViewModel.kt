@@ -38,7 +38,7 @@ class EditDishAdapterViewModel(application: Application) : AndroidViewModel(appl
 
     fun updateClonesOfLists(grandDishModel: GrandDishModel) {
         cloneOfListOfProductsIncluded = grandDishModel.productsIncluded.toMutableList()
-        cloneOfListOfHalfProductModels = grandDishModel.halfProductModels.toMutableList()
+        cloneOfListOfHalfProductModels = grandDishModel.halfProducts.toMutableList()
     }
 
     fun saveLists() {

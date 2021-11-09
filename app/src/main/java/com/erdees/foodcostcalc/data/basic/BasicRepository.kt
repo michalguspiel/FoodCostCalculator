@@ -1,10 +1,8 @@
 package com.erdees.foodcostcalc.data.basic
 
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 
 class BasicRepository(private val basicDao: BasicDao) {
 
@@ -17,12 +15,10 @@ class BasicRepository(private val basicDao: BasicDao) {
     fun setOpenCreateHalfProductFlag(boolean: Boolean) = basicDao.setOpenCreateHalfProductFlag(boolean)
     fun observeOpenCreateHalfProductFlag() = basicDao.observeOpenCreateHalfProductFlag()
 
-    fun passDishToDialog(dishModel: DishModel) = basicDao.passDishToDialog(dishModel)
 
     fun passHalfProductToDialog(halfProductModel: HalfProductModel) =
         basicDao.passHalfProductToDialog(halfProductModel)
 
-    fun getDishToDialog() = basicDao.getDishToDialog()
 
     fun getHalfProductToDialog() = basicDao.getHalfProductToDialog()
 
@@ -37,11 +33,7 @@ class BasicRepository(private val basicDao: BasicDao) {
 
     fun searchFor(word: String) = basicDao.searchFor(word)
 
-    fun getProductIncluded() = basicDao.getProductIncluded()
 
-    fun setProductIncluded(product: ProductIncluded) {
-        basicDao.setProductIncluded(product)
-    }
 
     fun setPosition(pos: Int){
         basicDao.setPosition(pos)

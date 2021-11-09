@@ -52,7 +52,6 @@ class DishesFragment : Fragment() {
 
     private fun setAdapterToRecyclerView() {
         fragmentRecyclerAdapter = DishesFragmentRecyclerAdapter(
-            TAG,
             childFragmentManager,
             viewModelPassedToRecyclerView,
             listViewViewModelPassedToRecyclerView,

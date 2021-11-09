@@ -12,6 +12,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.databinding.AddProductsToDishBinding
+import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
 import com.erdees.foodcostcalc.utils.Constants.DISH_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.UNIT_SPINNER_ID
@@ -121,6 +122,7 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             AddProductToDishFragment()
 
         const val TAG = "AddProductToDishFragment"
+        lateinit var dishModelPassedFromAdapter: DishModel
     }
 
     private fun addChosenHalfProductToDish() {
@@ -210,8 +212,8 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     private fun selectChosenDish() {
         if (this.isOpenedFromDishAdapter()) {
-            val dishToSelect = viewModel.getDishToDialog().value
-            val positionToSelect = dishesAdapter.getPosition(dishToSelect!!.name)
+            val dishToSelect = dishModelPassedFromAdapter
+            val positionToSelect = dishesAdapter.getPosition(dishToSelect.name)
             binding.dishSpinner.setSelection(positionToSelect)
         }
     }
