@@ -60,7 +60,7 @@
 
 
     <Button
-        android:id="@+id/add_button_dialog"
+        android:id="@+id/create_half_product_btn"
         android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"

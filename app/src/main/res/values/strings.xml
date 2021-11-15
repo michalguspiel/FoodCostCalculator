@@ -91,6 +91,7 @@
     <string name="okay">Okay</string>
     <string name="successful_creation_message">%1$s created successfully!</string>
     <string name="cannot_make_nameless_dish">Cannot make nameless dish!</string>
+    <string name="cannot_make_nameless_half_product">"Cannot make nameless half product!"</string>
 
     <string name="cannot_leave_empty_fields">Cannot leave empty fields</string>
 

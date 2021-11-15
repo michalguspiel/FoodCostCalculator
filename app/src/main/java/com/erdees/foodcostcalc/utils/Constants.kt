@@ -9,6 +9,7 @@ object Constants {
 
     const val PRODUCT_SPINNER_ID = 1
     const val DISH_SPINNER_ID = 2
+    const val HALFPRODUCT_SPINNER_ID = 2
     const val UNIT_SPINNER_ID = 3
 
     const val DISH_CREATED = "dish_created"

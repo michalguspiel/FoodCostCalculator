@@ -83,7 +83,5 @@ object ViewUtils {
         }
         return result + (listView.dividerHeight * (listView.adapter.count - 1))
     }
-
-
 }
 
