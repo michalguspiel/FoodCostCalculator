@@ -6,45 +6,43 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.RecyclerView
-import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.databinding.FragmentProductsBinding
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
 import java.util.*
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 
 class ProductsFragment : Fragment() {
 
-    private lateinit var recyclerView: RecyclerView
+    private var _binding: FragmentProductsBinding? = null
+    private val binding get() = _binding!!
     private lateinit var viewModelPassedToRecycler: RecyclerViewAdapterViewModel
-    private lateinit var adapterFragment: ProductsFragmentRecyclerAdapter
-
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(R.layout.fragment_products, container, false)
+        _binding = FragmentProductsBinding.inflate(inflater, container, false)
+        val view: View = binding.root
         val viewModel = ViewModelProvider(this).get(ProductsFragmentViewModel::class.java)
         viewModelPassedToRecycler =
             ViewModelProvider(this).get(RecyclerViewAdapterViewModel::class.java)
-        recyclerView = view.findViewById(R.id.recycler_view_products)
-        recyclerView.setHasFixedSize(true)
+        binding.recyclerViewProducts.setHasFixedSize(true)
         setEmptyAdapterToRecyclerView()
 
         viewModel.getWhatToSearchFor().observe(viewLifecycleOwner, { searchWord ->
             viewModel.getProducts().observe(viewLifecycleOwner, { products ->
                 val listOfProducts = mutableListOf<ProductModel>()
                 products.forEach { listOfProducts.add(it) }
-                adapterFragment = ProductsFragmentRecyclerAdapter(requireActivity(), TAG,
-                    listOfProducts.filter {
-                        it.name.toLowerCase().contains(searchWord.toLowerCase())
-                    } as ArrayList<ProductModel>, childFragmentManager, viewModelPassedToRecycler)
-
-                recyclerView.adapter = adapterFragment
+                binding.recyclerViewProducts.adapter =
+                    ProductsFragmentRecyclerAdapter(requireActivity(),
+                        TAG,
+                        listOfProducts.filter {
+                            it.name.toLowerCase().contains(searchWord.toLowerCase())
+                        } as ArrayList<ProductModel>,
+                        childFragmentManager,
+                        viewModelPassedToRecycler)
             })
         })
         return view
@@ -52,18 +50,14 @@ class ProductsFragment : Fragment() {
 
     /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No adapterFragment attached; skipping layout" */
     private fun setEmptyAdapterToRecyclerView() {
-        adapterFragment =
-            ProductsFragmentRecyclerAdapter(
-                requireActivity(),
-                TAG, arrayListOf(), childFragmentManager, viewModelPassedToRecycler
-            )
-        recyclerView.adapter = adapterFragment
+        binding.recyclerViewProducts.adapter = ProductsFragmentRecyclerAdapter(
+            requireActivity(),
+            TAG, arrayListOf(), childFragmentManager, viewModelPassedToRecycler
+        )
     }
 
     companion object {
         fun newInstance(): ProductsFragment = ProductsFragment()
         const val TAG = "ProductsFragment"
     }
-
-
 }

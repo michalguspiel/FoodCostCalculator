@@ -4,65 +4,57 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.erdees.foodcostcalc.R
-
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
+import com.erdees.foodcostcalc.databinding.SettingsBinding
+import com.erdees.foodcostcalc.utils.Constants
 
 class SettingsFragment : Fragment() {
 
-    private lateinit var editMarginEditText: EditText
-    private lateinit var editTaxEditText: EditText
+    private var _binding: SettingsBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val view: View = inflater.inflate(R.layout.settings, container, false)
-
-        /**Binders*/
-        val saveBtn             = view.findViewById<Button>(R.id.save_settings_button)
-        editMarginEditText  = view.findViewById(R.id.default_margin_edittext)
-        editTaxEditText     = view.findViewById(R.id.default_dish_tax_edit_text)
-        val metricCheckBox      = view.findViewById<CheckBox>(R.id.checkBoxMetric)
-        val usaCheckBox         = view.findViewById<CheckBox>(R.id.checkBoxUS)
+        _binding = SettingsBinding.inflate(inflater, container, false)
+        val view = binding.root
 
         val sharedPreference = SharedPreferences(requireContext())
+        val marginAsString = sharedPreference.getValueString(Constants.MARGIN)
+        val taxAsString = sharedPreference.getValueString(Constants.TAX)
+        if (taxAsString != null) binding.defaultDishTaxEditText.setText(taxAsString)
+        if (marginAsString != null) binding.defaultMarginEdittext.setText(marginAsString)
 
-        val marginAsString = sharedPreference.getValueString("margin")
-        val taxAsString = sharedPreference.getValueString("tax")
-        if(taxAsString != null) editTaxEditText.setText(taxAsString)
-        if(marginAsString != null) editMarginEditText.setText(marginAsString)
+        val isMetricChecked = sharedPreference.getValueBoolean(Constants.METRIC, true)
+        val isUsaChecked = sharedPreference.getValueBoolean(Constants.USA, false)
 
-        val isMetricChecked = sharedPreference.getValueBoolean("metric",true)
-        val isUsaChecked = sharedPreference.getValueBoolean("usa",false)
+        binding.checkBoxMetric.isChecked = isMetricChecked
+        binding.checkBoxUS.isChecked = isUsaChecked
 
-        metricCheckBox.isChecked = isMetricChecked
-        usaCheckBox.isChecked = isUsaChecked
+        binding.saveSettingsButton.setOnClickListener {
+            if (marginAndTaxAreValid()) {
+                val margin = binding.defaultMarginEdittext.text.toString()
+                val tax = binding.defaultDishTaxEditText.text.toString()
+                sharedPreference.save(Constants.MARGIN, margin)
+                sharedPreference.save(Constants.TAX, tax)
+                if (binding.checkBoxMetric.isChecked) sharedPreference.save(Constants.METRIC, true)
+                else sharedPreference.save(Constants.METRIC, false)
+                if (binding.checkBoxUS.isChecked) sharedPreference.save(Constants.USA, true)
+                else sharedPreference.save(Constants.USA, false)
 
-        saveBtn.setOnClickListener{
-            if(marginAndTaxAreValid()) {
-                val margin = editMarginEditText.text.toString()
-                val tax = editTaxEditText.text.toString()
-                sharedPreference.save("margin", margin)
-                sharedPreference.save("tax", tax)
-                if (metricCheckBox.isChecked) sharedPreference.save("metric", true)
-                else sharedPreference.save("metric", false)
-                if (usaCheckBox.isChecked) sharedPreference.save("usa", true)
-                else sharedPreference.save("usa", false)
-
-                Toast.makeText(requireContext(), "SettingsFragment saved!", Toast.LENGTH_SHORT).show()
-            } else Toast.makeText(requireContext(),"Enter values to default tax and margin.",Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), R.string.settings_saved_prompt, Toast.LENGTH_SHORT)
+                    .show()
+            } else Toast.makeText(
+                requireContext(),
+                R.string.enter_default_tax_and_margin,
+                Toast.LENGTH_SHORT
+            ).show()
         }
-
         return view
-
     }
 
     companion object {
@@ -70,9 +62,8 @@ class SettingsFragment : Fragment() {
         const val TAG = "SettingsFragment"
     }
 
-    private fun marginAndTaxAreValid() : Boolean {
-        return (!editMarginEditText.text.isNullOrBlank() && editMarginEditText.text.toString() != "." &&
-                !editTaxEditText.text.isNullOrBlank() && editTaxEditText.text.toString() != ".")
+    private fun marginAndTaxAreValid(): Boolean {
+        return (!binding.defaultMarginEdittext.text.isNullOrBlank() && binding.defaultMarginEdittext.text.toString() != "." &&
+                !binding.defaultDishTaxEditText.text.isNullOrBlank() && binding.defaultDishTaxEditText.text.toString() != ".")
     }
-
 }

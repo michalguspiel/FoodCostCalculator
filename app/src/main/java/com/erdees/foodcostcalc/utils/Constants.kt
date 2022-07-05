@@ -44,6 +44,7 @@ object Constants {
     const val MARGIN = "margin"
     const val TAX = "tax"
 
+
     const val BASIC_MARGIN = 100
     const val BASIC_TAX = 23
 

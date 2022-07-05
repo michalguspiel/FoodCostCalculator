@@ -103,4 +103,8 @@
     <string name="dish_x_margin" formatted="true">Margin: %s%%</string>
     <string name="dish_x_tax" formatted="true">Tax: %s%%</string>
 
+
+    <string name="settings_saved_prompt">Settings saved!</string>
+    <string name="enter_default_tax_and_margin">Enter values to default tax and margin.</string>
+
 </resources>

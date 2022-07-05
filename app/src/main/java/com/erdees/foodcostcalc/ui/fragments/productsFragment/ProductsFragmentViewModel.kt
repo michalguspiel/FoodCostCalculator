@@ -9,13 +9,10 @@ import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
-
 class ProductsFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     private val productRepository: ProductRepository
-    val readAllProductModelData: LiveData<List<ProductModel>>
+    private val readAllProductModelData: LiveData<List<ProductModel>>
     val basicRepository: BasicRepository
 
     init {
@@ -24,7 +21,6 @@ class ProductsFragmentViewModel(application: Application) : AndroidViewModel(app
 
         basicRepository = BasicRepository(basicDao)
         productRepository = ProductRepository(productDao)
-
         readAllProductModelData = productRepository.readAllData
 
     }

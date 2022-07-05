@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.editHalfProductDialogFragment
 
+import android.annotation.SuppressLint
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -91,7 +92,10 @@ class EditHalfProductFragmentRecyclerAdapter(
     }
 
 
-    override fun onBindViewHolder(holder: EditHalfProductHolder, position: Int) {
+    override fun onBindViewHolder(
+        holder: EditHalfProductHolder,
+        @SuppressLint("RecyclerView") position: Int
+    ) {
         holder.nameTextView.text =
             list[position].productModelIncluded.name // name of product not changeable
         holder.editTextView.setText(list[position].weight.toString()) // To set EditText with current data
