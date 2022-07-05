@@ -46,7 +46,6 @@ It is my first android project as well as programming project in general. In tot
 
 ### TODO 
 - Printing recipe? 
-- Monetize strategy
 
 ## Icons and images source: 
 https://www.flaticon.com By wanicon ,  Freepik , Dmitri13
