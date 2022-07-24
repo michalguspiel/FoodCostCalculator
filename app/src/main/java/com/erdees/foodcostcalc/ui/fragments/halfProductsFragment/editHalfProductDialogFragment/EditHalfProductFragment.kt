@@ -27,8 +27,6 @@ import com.erdees.foodcostcalc.utils.Utils.getUnits
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
-
 class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
     private var chosenUnit = ""
@@ -137,6 +135,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
         }
 
         deleteBtn.setOnClickListener {
+          // TODO Just delete instead of asking
             AreYouSure().show(childFragmentManager, TAG)
         }
 

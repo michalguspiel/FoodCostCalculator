@@ -52,45 +52,45 @@ class AreYouSure : DialogFragment() {
         var listOfHalfProductsIncludedInDish = listOf<HalfProductIncludedInDishModel>()
 
         /**Observe data to set positions to provide parameters for delete methods */
-        viewModel.getPosition().observe(viewLifecycleOwner, { position ->
-            pos = position
-        })
+        viewModel.getPosition().observe(viewLifecycleOwner) { position ->
+          pos = position
+        }
 
-        /**
+      /**
          * Get list of every productincluded in half product
          * Get list of every halfProductModel Included in dishModel in order to erase them from database
          * when certain HalfProductModel gets erased.
          * */
-        viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner, { halfProduct ->
-            if (this.tag == EditHalfProductFragment.TAG) {
-                halfProductModelToDelete = halfProduct[pos!!]
-                viewModel.getProductsIncludedFromHalfProduct(halfProductModelToDelete.halfProductId)
-                    .observe(viewLifecycleOwner, Observer { listOfProductsIncludedInHalfProduct ->
-                        listOfProductsIncludedInHalfProductToErase =
-                            listOfProductsIncludedInHalfProduct
-                    })
-                viewModel.getHalfProductsIncludedInDishFromDishByHalfProduct(
-                    halfProductModelToDelete.halfProductId
-                )
-                    .observe(viewLifecycleOwner, {
-                        listOfHalfProductsIncludedInDish = it
-                    })
-            }
-        })
+        viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner) { halfProduct ->
+          if (this.tag == EditHalfProductFragment.TAG) {
+            halfProductModelToDelete = halfProduct[pos!!]
+            viewModel.getProductsIncludedFromHalfProduct(halfProductModelToDelete.halfProductId)
+              .observe(viewLifecycleOwner) { listOfProductsIncludedInHalfProduct ->
+                listOfProductsIncludedInHalfProductToErase =
+                  listOfProductsIncludedInHalfProduct
+              }
+            viewModel.getHalfProductsIncludedInDishFromDishByHalfProduct(
+              halfProductModelToDelete.halfProductId
+            )
+              .observe(viewLifecycleOwner) {
+                listOfHalfProductsIncludedInDish = it
+              }
+          }
+        }
 
-        /**Get product to delete only if this was called from EditProductFragment.*/
-        viewModel.readAllProductModelData.observe(viewLifecycleOwner, { product ->
-            if (this.tag == EditProductFragment.TAG) productModelToDelete = product[pos!!]
-        })
+      /**Get product to delete only if this was called from EditProductFragment.*/
+        viewModel.readAllProductModelData.observe(viewLifecycleOwner) { product ->
+          if (this.tag == EditProductFragment.TAG) productModelToDelete = product[pos!!]
+        }
 
-        /**Get Half product to delete only if this was called from EditHalfProductFragment*/
-        viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner, { halfProduct ->
-            if (this.tag == EditHalfProductFragment.TAG) halfProductModelToDelete =
-                halfProduct[pos!!]
-        })
+      /**Get Half product to delete only if this was called from EditHalfProductFragment*/
+        viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner) { halfProduct ->
+          if (this.tag == EditHalfProductFragment.TAG) halfProductModelToDelete =
+            halfProduct[pos!!]
+        }
 
 
-        /** Button logic: tag informs this dialog from where it was open so it knows what action to proceed.*
+      /** Button logic: tag informs this dialog from where it was open so it knows what action to proceed.*
          *  listOfProductsIncludedToErase is method which deletes every trace of dishModel in ProductIncluded query,
          *  so the database is neat and organized. --- It doesn't work 100% effectively and I can't see reason
          *  why just yet but this needs to be refactored somehow
@@ -125,13 +125,12 @@ class AreYouSure : DialogFragment() {
                 "EditHalfProductFragmentRecyclerAdapter" -> {
                     viewModel.getHalfProductWithProductIncluded()
                         .observe(
-                            viewLifecycleOwner,
-                            {
-                                viewModel.deleteProductIncludedInHalfProduct(
-                                    viewModel.getProductIncludedInHalfProduct().value!!
-                                )
-                            }
-                        )
+                            viewLifecycleOwner
+                        ) {
+                          viewModel.deleteProductIncludedInHalfProduct(
+                            viewModel.getProductIncludedInHalfProduct().value!!
+                          )
+                        }
                 }
                 else -> this.dismiss()
             }

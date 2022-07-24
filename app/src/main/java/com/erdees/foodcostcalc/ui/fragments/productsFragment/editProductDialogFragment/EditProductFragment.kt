@@ -90,11 +90,11 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
         /**Send data about which dishModel is being edited
          * so .setPosition(index of this dishModel in main list)*/
-        fragmentViewModel.getProducts().observe(viewLifecycleOwner, { products ->
-            fragmentViewModel.setPosition(products.indexOf(productModelPassedFromAdapter))
-        })
+        fragmentViewModel.getProducts().observe(viewLifecycleOwner) { products ->
+          fragmentViewModel.setPosition(products.indexOf(productModelPassedFromAdapter))
+        }
 
-        /** empty lists which gets populated by every 'ProductIncluded' and
+      /** empty lists which gets populated by every 'ProductIncluded' and
          * 'ProductIncludedInHalfProductModel' that has the same ID as edited product. */
         var productIncludedList = listOf<ProductIncluded>()
         var productIncludedInHalfProductList = listOf<ProductIncludedInHalfProductModel>()
@@ -111,31 +111,31 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
          * All of this needs to be inside Observer because otherwise dialog isn't closed when
          * product is deleted.*/
 
-        fragmentViewModel.getFlag().observe(viewLifecycleOwner, { flag ->
-            if (flag == false) {
-                this.dismiss()
-                fragmentViewModel.setFlag(true)
-            } else if (flag == true) {
-                saveProductIdOfEditedProduct(productModelPassedFromAdapter)
-                setDialogFieldsAccordinglyToProductEdited(productModelPassedFromAdapter)
-                /**GET LIST OF PRODUCTS INCLUDED
-                 * WITH THE SAME ID AS productID
-                 * AND SAVE IT IN 'productIncludedList
-                 * IT NEEDS TO BE HERE BECAUSE IF FLAG IS FALSE productId DOESN'T EXIST*/
-                fragmentViewModel.getCertainProductsIncluded(productId!!).observe(
-                    viewLifecycleOwner,
-                    { listOfProducts ->
-                        productIncludedList = listOfProducts
-                    })
-                fragmentViewModel.getCertainProductsIncludedInHalfProduct(productId!!)
-                    .observe(viewLifecycleOwner,
-                        { listOfProducts ->
-                            productIncludedInHalfProductList = listOfProducts
-                        })
+        fragmentViewModel.getFlag().observe(viewLifecycleOwner) { flag ->
+          if (flag == false) {
+            this.dismiss()
+            fragmentViewModel.setFlag(true)
+          } else if (flag == true) {
+            saveProductIdOfEditedProduct(productModelPassedFromAdapter)
+            setDialogFieldsAccordinglyToProductEdited(productModelPassedFromAdapter)
+            /**GET LIST OF PRODUCTS INCLUDED
+             * WITH THE SAME ID AS productID
+             * AND SAVE IT IN 'productIncludedList
+             * IT NEEDS TO BE HERE BECAUSE IF FLAG IS FALSE productId DOESN'T EXIST*/
+            fragmentViewModel.getCertainProductsIncluded(productId!!).observe(
+              viewLifecycleOwner
+            ) { listOfProducts ->
+              productIncludedList = listOfProducts
             }
-        })
+            fragmentViewModel.getCertainProductsIncludedInHalfProduct(productId!!)
+              .observe(viewLifecycleOwner
+              ) { listOfProducts ->
+                productIncludedInHalfProductList = listOfProducts
+              }
+          }
+        }
 
-        /** BUTTON LOGIC*/
+      /** BUTTON LOGIC*/
         saveButton.setOnClickListener {
             if(allFieldsAreLegit()) {
                 if (unitPosition == null) unitPosition =
@@ -244,10 +244,5 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
             }
         }
-    }
-
-
-    override fun onDismiss(dialog: DialogInterface) {
-        super.onDismiss(dialog)
     }
 }
