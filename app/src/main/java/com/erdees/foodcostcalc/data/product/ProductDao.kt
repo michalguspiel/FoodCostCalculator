@@ -19,5 +19,4 @@ interface ProductDao {
 
     @Delete
     suspend fun deleteProduct(productModel: ProductModel)
-
 }
