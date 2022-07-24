@@ -7,7 +7,6 @@ import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 /** DATA ACCESS OBJECT */
 @Dao
 interface ProductDao {
-
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addProduct(productModel: ProductModel)
 
