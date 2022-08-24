@@ -6,7 +6,6 @@ import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductInclu
 
 @Dao
 interface ProductIncludedDao {
-
   @Transaction
     @Query("SELECT * FROM productincluded WHERE productId = :id ")
     fun getCertainProductsIncluded(id: Long): LiveData<List<ProductIncluded>>

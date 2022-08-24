@@ -135,7 +135,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
         }
 
         deleteBtn.setOnClickListener {
-          // TODO Just delete instead of asking
+          // TODO Just delete instead of asking // Test
             AreYouSure().show(childFragmentManager, TAG)
         }
 
