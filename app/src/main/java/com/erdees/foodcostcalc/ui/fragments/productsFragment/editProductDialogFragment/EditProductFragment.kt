@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.ui.fragments.productsFragment.editProductDialogFragment
 
 import android.annotation.SuppressLint
-import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -9,8 +8,7 @@ import android.view.*
 import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.foodcostcalc.*
-import com.erdees.foodcostcalc.ui.dialogFragments.areYouSureFragment.AreYouSure
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
@@ -22,7 +20,6 @@ import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
-
 class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
     private var unitPosition: Int? = null
@@ -32,7 +29,6 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     private val spinnerId = 1
     private lateinit var fragmentViewModel: EditProductFragmentViewModel
     private lateinit var sharedPreferences: SharedPreferences
-
 
     private lateinit var name: EditText
     private lateinit var price: EditText
@@ -61,7 +57,6 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
             gravity = Gravity.CENTER
             id = spinnerId
         }
-
         super.onResume()
     }
 
@@ -87,12 +82,6 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
         }
         val saveButton = view.findViewById<Button>(R.id.save_changes_button)
         val deleteButton = view.findViewById<Button>(R.id.delete_product_button)
-
-        /**Send data about which dishModel is being edited
-         * so .setPosition(index of this dishModel in main list)*/
-        fragmentViewModel.getProducts().observe(viewLifecycleOwner) { products ->
-          fragmentViewModel.setPosition(products.indexOf(productModelPassedFromAdapter))
-        }
 
       /** empty lists which gets populated by every 'ProductIncluded' and
          * 'ProductIncludedInHalfProductModel' that has the same ID as edited product. */
@@ -154,14 +143,15 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
                     productToChange,
                     productIncludedInHalfProductList
                 )
-                Thread.sleep(100) // This is here because otherwise dialog gets closed before all viewmodel functions are called
+               // Thread.sleep(100) // This is here because otherwise dialog gets closed before all viewmodel functions are called
                 this.dismiss()
             }
             else Toast.makeText(requireContext(),"Fields must not be empty!",Toast.LENGTH_SHORT).show()
             }
 
         deleteButton.setOnClickListener {
-            AreYouSure().show(childFragmentManager, TAG)
+          fragmentViewModel.deleteProduct(productModelPassedFromAdapter)
+          this.dismiss()
         }
 
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -173,7 +163,6 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     companion object {
         const val TAG = "EditProductFragment"
 
-        /**Position of Edited product */
         lateinit var productModelPassedFromAdapter: ProductModel
     }
 

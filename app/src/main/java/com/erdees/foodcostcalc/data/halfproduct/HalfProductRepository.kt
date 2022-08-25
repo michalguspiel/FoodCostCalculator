@@ -15,6 +15,10 @@ class HalfProductRepository(private val halfProductDao: HalfProductDao) {
     suspend fun deleteHalfProduct(halfProductModel: HalfProductModel) =
         halfProductDao.deleteHalfProduct(halfProductModel)
 
+    fun deleteHalfProduct(id: Long){
+      halfProductDao.deleteHalfProduct(id)
+    }
+
     companion object{
         @Volatile
         private var instance: HalfProductRepository? = null

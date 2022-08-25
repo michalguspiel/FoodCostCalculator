@@ -29,5 +29,7 @@ interface ProductIncludedInHalfProductDao {
     @Query("SELECT * FROM PRODUCTINCLUDEDINHALFPRODUCT WHERE halfProductId = :halfProductId ORDER BY product_name ASC")
     fun getProductsFromHalfProduct(halfProductId: Long): LiveData<List<ProductIncludedInHalfProductModel>>
 
+    @Query("DELETE FROM PRODUCTINCLUDEDINHALFPRODUCT WHERE halfProductId =:id")
+    fun deleteAllProductsIncludedInHalfProduct(id: Long)
 
 }

@@ -77,7 +77,7 @@ class HalfProductFragmentRecyclerAdapter(
         private fun setEditButton(position: Int) {
             editButton.setOnClickListener {
                 EditHalfProductFragment().show(fragmentManager, EditHalfProductFragment.TAG)
-                EditHalfProductFragment.halfProductPassedFromAdapterModel = list[position]
+                EditHalfProductFragment.halfProductPassedFromAdapter = list[position]
             }
         }
 
@@ -125,14 +125,14 @@ class HalfProductFragmentRecyclerAdapter(
         private fun setHalfProductFinalPrice(position: Int) {
             viewModel
                 .getCertainHalfProductWithProductsIncluded(list[position].halfProductModel.halfProductId)
-                .observe(viewLifeCycleOwner,
-                    {
-                        if (it != null) {
-                            finalPriceOfHalfProductPerUnit.text =
-                                it.formattedPricePerUnit
-                            priceOfHalfProductPerRecipeTV.text = it.formattedPricePerRecipe
-                        }
-                    })
+                .observe(viewLifeCycleOwner
+                ) {
+                  if (it != null) {
+                    finalPriceOfHalfProductPerUnit.text =
+                      it.formattedPricePerUnit
+                    priceOfHalfProductPerRecipeTV.text = it.formattedPricePerRecipe
+                  }
+                }
         }
 
 

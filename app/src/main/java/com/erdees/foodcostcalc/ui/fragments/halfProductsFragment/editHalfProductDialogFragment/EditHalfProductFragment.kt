@@ -15,8 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.erdees.foodcostcalc.*
-import com.erdees.foodcostcalc.ui.dialogFragments.areYouSureFragment.AreYouSure
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductWithProductsIncludedModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
@@ -40,7 +39,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
     override fun onResume() {
         unitList = getUnits(resources, sharedPreferences)
         Log.i(TAG, unitList.joinToString { it })
-        unitList = when (halfProductPassedFromAdapterModel.halfProductModel.halfProductUnit) {
+        unitList = when (halfProductPassedFromAdapter.halfProductModel.halfProductUnit) {
             "per piece" -> mutableListOf("per piece")
             "per kilogram" -> unitList.filterWeight()
             "per liter" -> unitList.filterVol()
@@ -55,7 +54,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
             ArrayAdapter(requireContext(), R.layout.dropdown_item, unitList)
         with(spinner) {
             setAdapter(unitSpinnerAdapter)
-            setText(halfProductPassedFromAdapterModel.halfProductModel.halfProductUnit, false)
+            setText(halfProductPassedFromAdapter.halfProductModel.halfProductUnit, false)
             onItemClickListener = this@EditHalfProductFragment
             id = spinnerId
             gravity = Gravity.CENTER
@@ -84,9 +83,9 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
             view.findViewById<RecyclerView>(R.id.recycler_view_products_in_half_product)
         val recyclerViewAdapter =
             EditHalfProductFragmentRecyclerAdapter(
-                ViewModelProvider(this).get(
-                    EditHalfProductAdapterViewModel::class.java
-                ), childFragmentManager
+              ViewModelProvider(this).get(
+                  EditHalfProductAdapterViewModel::class.java
+              )
             )
         recycleView.adapter = recyclerViewAdapter
         recycleView.layoutManager =
@@ -96,37 +95,37 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
 
         /**Send data about which dishModel is being edited
          * so .setPosition(index of this dishModel in main list)*/
-        viewModel.getHalfProducts().observe(viewLifecycleOwner, Observer { halfProduct ->
-            viewModel.setPosition(halfProduct.indexOf(halfProductPassedFromAdapterModel.halfProductModel))
-        })
+        viewModel.getHalfProducts().observe(viewLifecycleOwner) { halfProduct ->
+          viewModel.setPosition(halfProduct.indexOf(halfProductPassedFromAdapter.halfProductModel))
+        }
 
-        /** Observe data from viewmodel */
+      /** Observe data from viewmodel */
         viewModel.getHalfProductWithProductIncluded()
-            .observe(viewLifecycleOwner, Observer {
-                if (viewModel.getFlag().value == false) {
-                    this.dismiss()
-                    viewModel.setFlag(true)
-                } else {
-                    name.setText(halfProductPassedFromAdapterModel.halfProductModel.name)
-                    viewModel
-                        .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapterModel.halfProductModel.halfProductId)
-                        .observe(viewLifecycleOwner, Observer { eachProduct ->
-                            val testData = mutableListOf<ProductIncludedInHalfProductModel>()
-                            testData.addAll(eachProduct)
-                            recyclerViewAdapter.switchLists(testData)
-                        })
-                }
-            })
+            .observe(viewLifecycleOwner) {
+              if (viewModel.getFlag().value == false) {
+                this.dismiss()
+                viewModel.setFlag(true)
+              } else {
+                name.setText(halfProductPassedFromAdapter.halfProductModel.name)
+                viewModel
+                  .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
+                  .observe(viewLifecycleOwner) { eachProduct ->
+                    val testData = mutableListOf<ProductIncludedInHalfProductModel>()
+                    testData.addAll(eachProduct)
+                    recyclerViewAdapter.switchLists(testData)
+                  }
+              }
+            }
 
-        /**Button logic*/
+      /**Button logic*/
 
         saveBtn.setOnClickListener {
             if (chosenUnit == "") {
-                chosenUnit = halfProductPassedFromAdapterModel.halfProductModel.halfProductUnit
+                chosenUnit = halfProductPassedFromAdapter.halfProductModel.halfProductUnit
             }
             recyclerViewAdapter.save(
                 HalfProductModel(
-                    halfProductPassedFromAdapterModel.halfProductModel.halfProductId,
+                    halfProductPassedFromAdapter.halfProductModel.halfProductId,
                     name.text.toString(),
                     chosenUnit // chosen unit from spinner
                 ), viewLifecycleOwner
@@ -135,8 +134,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
         }
 
         deleteBtn.setOnClickListener {
-          // TODO Just delete instead of asking // Test
-            AreYouSure().show(childFragmentManager, TAG)
+          viewModel.deleteHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
         }
 
 
@@ -150,14 +148,13 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
             EditHalfProductFragment()
 
         const val TAG = "EditHalfProductFragment"
-        lateinit var halfProductPassedFromAdapterModel: HalfProductWithProductsIncludedModel
+        lateinit var halfProductPassedFromAdapter: HalfProductWithProductsIncludedModel
     }
 
-
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        when (parent?.id) {
-            1 -> chosenUnit = unitList[position]
-            else -> chosenUnit = unitList[position]
-        }
+      chosenUnit = when (parent?.id) {
+        1 -> unitList[position]
+        else -> unitList[position]
+      }
     }
 }

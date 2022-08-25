@@ -68,6 +68,13 @@ class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel
             halfProductIncludedInDishRepository
                 .editHalfProductIncludedInDish(halfProductIncludedInDishModel)
         }
-
     }
+
+  fun deleteProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) {
+    viewModelScope.launch(Dispatchers.IO) {
+      productIncludedInHalfProductRepository.deleteProductIncludedInHalfProduct(
+        productIncludedInHalfProductModel
+      )
+    }
+  }
 }

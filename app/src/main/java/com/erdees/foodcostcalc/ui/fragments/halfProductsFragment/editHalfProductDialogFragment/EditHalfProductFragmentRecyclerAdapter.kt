@@ -13,18 +13,13 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.ui.dialogFragments.areYouSureFragment.AreYouSure
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
-
 class EditHalfProductFragmentRecyclerAdapter(
-    private val viewModel: EditHalfProductAdapterViewModel,
-    private val fragmentManager: FragmentManager
+  private val viewModel: EditHalfProductAdapterViewModel
 ) :
     RecyclerView.Adapter<EditHalfProductFragmentRecyclerAdapter.EditHalfProductHolder>() {
 
@@ -53,22 +48,22 @@ class EditHalfProductFragmentRecyclerAdapter(
 
         /**So every Half product in dishModel is also edited.*/
         viewModel.getHalfProductsIncludedInDishFromDishByHalfProduct(halfProductModel.halfProductId)
-            .observe(viewLifecycleOwner,
-                { halfProductList ->
-                    halfProductList.forEach {
-                        viewModel.editHalfProductIncludedInDish(
-                            HalfProductIncludedInDishModel(
-                                it.halfProductIncludedInDishId,
-                                it.dishModel,
-                                it.dishOwnerId,
-                                halfProductModel,
-                                halfProductModel.halfProductId,
-                                it.weight,
-                                it.unit
-                            )
-                        )
-                    }
-                })
+            .observe(viewLifecycleOwner
+            ) { halfProductList ->
+              halfProductList.forEach {
+                viewModel.editHalfProductIncludedInDish(
+                  HalfProductIncludedInDishModel(
+                    it.halfProductIncludedInDishId,
+                    it.dishModel,
+                    it.dishOwnerId,
+                    halfProductModel,
+                    halfProductModel.halfProductId,
+                    it.weight,
+                    it.unit
+                  )
+                )
+              }
+            }
 
     }
 
@@ -112,8 +107,7 @@ class EditHalfProductFragmentRecyclerAdapter(
 
         /**Holder for each delete product button */
         holder.deleteProductBtn.setOnClickListener {
-            viewModel.setProductIncludedInHalfProduct(list[position])
-            AreYouSure().show(this.fragmentManager, "EditHalfProductFragmentRecyclerAdapter")
+          viewModel.deleteProductIncludedInHalfProduct(list[position])
         }
 
         /** Edit text product weight.
@@ -135,7 +129,5 @@ class EditHalfProductFragmentRecyclerAdapter(
             }
         }
                 ))
-
-
     }
 }
