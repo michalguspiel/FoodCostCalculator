@@ -2,8 +2,8 @@ package com.erdees.foodcostcalc.ui.activities.mainActivity
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.*
-import android.widget.*
+import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -16,7 +16,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.ActivityMainBinding
 import com.erdees.foodcostcalc.ui.activities.onlineDataActivity.OnlineDataActivity
-import com.erdees.foodcostcalc.ui.fragments.*
 import com.erdees.foodcostcalc.ui.fragments.addFragment.AddFragment
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.DishesFragment
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.addProductToDishDialogFragment.AddProductToDishFragment
@@ -26,6 +25,7 @@ import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHal
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.createHalfProductDialogFragment.CreateHalfProductFragment
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.ProductsFragment
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SettingsFragment
+import com.erdees.foodcostcalc.utils.CallbackListener
 import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
 import com.erdees.foodcostcalc.utils.ViewUtils.uncheckAllItems
 import com.google.android.gms.ads.MobileAds
@@ -36,206 +36,220 @@ import com.google.android.material.navigation.NavigationView
  * MVVM IMPROVEMENT DONE*/
 
 class MainActivity : AppCompatActivity() {
+  private lateinit var viewBinding: ActivityMainBinding
 
-    private lateinit var viewBinding: ActivityMainBinding
+  /**Fragments instances*/
+  private val productsFragment = ProductsFragment.newInstance()
+  private val dishesFragment = DishesFragment.newInstance()
+  private val addFragment = AddFragment.newInstance()
+  private val settingsFragment = SettingsFragment.newInstance()
+  private val halfProductsFragment = HalfProductsFragment.newInstance()
 
-    /**Fragments instances*/
-    private val productsFragment = ProductsFragment.newInstance(navigateToAdd = { openAdd() })
-    private val dishesFragment = DishesFragment.newInstance(openCreateNewDishDialog = {openDialog(CreateDishFragment(viewBinding.drawerLayout))})
-    private val addFragment = AddFragment.newInstance()
-    private val settingsFragment = SettingsFragment.newInstance()
-    private val halfProductsFragment = HalfProductsFragment.newInstance(openCreateHalfProductDialog = {openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))})
+  /**Hide everything on toolbar but side menu button. */
+  private fun hideSearchToolbar() {
+    viewBinding.content.customToolbar.searchButton.visibility = View.GONE
+    viewBinding.content.customToolbar.searchTextField.visibility = View.GONE
+    viewBinding.content.customToolbar.searchBack.visibility = View.GONE
+    viewBinding.content.customToolbar.sideMenuButton.visibility = View.VISIBLE
+  }
 
-    /**Hide everything on toolbar but side menu button. */
-    private fun hideSearchToolbar() {
-        viewBinding.content.customToolbar.searchButton.visibility = View.GONE
-        viewBinding.content.customToolbar.searchTextField.visibility = View.GONE
-        viewBinding.content.customToolbar.searchBack.visibility = View.GONE
-        viewBinding.content.customToolbar.sideMenuButton.visibility = View.VISIBLE
-    }
+  /**Show search field and search button on toolbar. */
+  private fun setSearchToolbar() {
+    viewBinding.content.customToolbar.searchButton.visibility = View.VISIBLE
+    viewBinding.content.customToolbar.searchTextField.visibility = View.VISIBLE
+    viewBinding.content.customToolbar.searchTextField.hint = getString(R.string.search_by_name)
+  }
 
-    /**Show search field and search button on toolbar. */
-    private fun setSearchToolbar() {
-        viewBinding.content.customToolbar.searchButton.visibility = View.VISIBLE
-        viewBinding.content.customToolbar.searchTextField.visibility = View.VISIBLE
-        viewBinding.content.customToolbar.searchTextField.hint = getString(R.string.search_by_name)
-    }
+  fun openAdd() {
+    replaceFragment(addFragment, AddFragment.TAG)
+    viewBinding.content.navigationView.uncheckAllItems()
+    hideSearchToolbar()
+  }
 
-    private fun openAdd() {
-        replaceFragment(addFragment, AddFragment.TAG)
-        viewBinding.content.navigationView.uncheckAllItems()
-        hideSearchToolbar()
-    }
+  private fun checkIfSearchToolIsUsed(): Boolean {
+    return viewBinding.content.customToolbar.searchTextField.isVisible && viewBinding.content.customToolbar.searchTextField.text.isNotEmpty()
+  }
 
-    private fun checkIfSearchToolIsUsed(): Boolean {
-        return viewBinding.content.customToolbar.searchTextField.isVisible && viewBinding.content.customToolbar.searchTextField.text.isNotEmpty()
-    }
-
-    override fun onBackPressed() {
-        when {
-            viewBinding.navView.isVisible -> {
-                viewBinding.drawerLayout.closeDrawer(GravityCompat.START)
-                return
-            }
-            checkIfSearchToolIsUsed() -> {
-                viewBinding.content.customToolbar.searchBack.performClick()
-                return
-            }
-            supportFragmentManager.backStackEntryCount == 1 -> {
-                finish()
-            }
-            else -> {
-                super.onBackPressed()
-                viewBinding.content.customToolbar.searchBack.performClick()
-                when (supportFragmentManager.fragments.last()) { // to setup correct toolbar
-                    addFragment -> {
-                        hideSearchToolbar()
-                        viewBinding.content.navigationView.uncheckAllItems()
-                    }
-                    settingsFragment -> {
-                        hideSearchToolbar()
-                        viewBinding.content.navigationView.uncheckAllItems()
-                    }
-                    dishesFragment -> {
-                        setSearchToolbar()
-                        viewBinding.content.navigationView.selectedItemId = R.id.navigation_dishes
-                    }
-                    halfProductsFragment -> {
-                        setSearchToolbar()
-                        viewBinding.content.navigationView.selectedItemId =
-                            R.id.navigation_half_products
-                    }
-                    productsFragment -> {
-                        setSearchToolbar()
-                        viewBinding.content.navigationView.selectedItemId = R.id.navigation_products
-                    }
-                }
-            }
+  override fun onBackPressed() {
+    when {
+      viewBinding.navView.isVisible -> {
+        viewBinding.drawerLayout.closeDrawer(GravityCompat.START)
+        return
+      }
+      checkIfSearchToolIsUsed() -> {
+        viewBinding.content.customToolbar.searchBack.performClick()
+        return
+      }
+      supportFragmentManager.backStackEntryCount == 1 -> {
+        finish()
+      }
+      else -> {
+        super.onBackPressed()
+        viewBinding.content.customToolbar.searchBack.performClick()
+        when (supportFragmentManager.fragments.last()) { // to setup correct toolbar
+          addFragment -> {
+            hideSearchToolbar()
+            viewBinding.content.navigationView.uncheckAllItems()
+          }
+          settingsFragment -> {
+            hideSearchToolbar()
+            viewBinding.content.navigationView.uncheckAllItems()
+          }
+          dishesFragment -> {
+            setSearchToolbar()
+            viewBinding.content.navigationView.selectedItemId = R.id.navigation_dishes
+          }
+          halfProductsFragment -> {
+            setSearchToolbar()
+            viewBinding.content.navigationView.selectedItemId =
+              R.id.navigation_half_products
+          }
+          productsFragment -> {
+            setSearchToolbar()
+            viewBinding.content.navigationView.selectedItemId = R.id.navigation_products
+          }
         }
+      }
+    }
+  }
+
+  private fun replaceFragment(fragment: Fragment, fragmentTag: String) {
+    val backStateName = fragment.javaClass.name
+    val manager: FragmentManager = supportFragmentManager
+    val fragmentPopped = manager.popBackStackImmediate(backStateName, 0)
+    if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) { //if fragment isn't in backStack, create it
+      val ft: FragmentTransaction = manager.beginTransaction()
+      ft.replace(R.id.container, fragment, fragmentTag)
+      ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+      ft.addToBackStack(backStateName)
+      ft.commit()
+    }
+    if (fragment == productsFragment ||
+      fragment == dishesFragment ||
+      fragment == halfProductsFragment
+    ) viewBinding.content.customToolbar.searchBack.performClick() // to clear search while switching fragments.
+  }
+
+  private fun openDialog(dialog: DialogFragment) {
+    val transaction = supportFragmentManager.beginTransaction()
+    transaction.addToBackStack(dialog.tag)
+    dialog.show(transaction, dialog.tag)
+  }
+
+
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    viewBinding = ActivityMainBinding.inflate(layoutInflater)
+    productsFragment.callbackListener = object : CallbackListener {
+      override fun callback() {
+        openAdd()
+      }
+    }
+    dishesFragment.callbackListener = object : CallbackListener {
+      override fun callback() {
+        openDialog(CreateDishFragment(viewBinding.drawerLayout))
+      }
+    }
+    halfProductsFragment.callbackListener = object : CallbackListener {
+      override fun callback() {
+        openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))
+      }
     }
 
-    private fun replaceFragment(fragment: Fragment, fragmentTag: String) {
-        val backStateName = fragment.javaClass.name
-        val manager: FragmentManager = supportFragmentManager
-        val fragmentPopped = manager.popBackStackImmediate(backStateName, 0)
-        if (!fragmentPopped && manager.findFragmentByTag(fragmentTag) == null) { //if fragment isn't in backStack, create it
-            val ft: FragmentTransaction = manager.beginTransaction()
-            ft.replace(R.id.container, fragment, fragmentTag)
-            ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
-            ft.addToBackStack(backStateName)
-            ft.commit()
-        }
-        if (fragment == productsFragment ||
-            fragment == dishesFragment ||
-            fragment == halfProductsFragment
-        ) viewBinding.content.customToolbar.searchBack.performClick() // to clear search while switching fragments.
+    val view = viewBinding.root
+    setContentView(view)
+    MobileAds.initialize(this) {}
+
+    val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
+    viewBinding.content.customToolbar.searchTextField.setOnFocusChangeListener { _, hasFocus ->
+      if (!hasFocus) viewBinding.drawerLayout.hideKeyboard()
     }
 
-    private fun openDialog(dialog: DialogFragment) {
-        val transaction = supportFragmentManager.beginTransaction()
-        transaction.addToBackStack(dialog.tag)
-        dialog.show(transaction, dialog.tag)
+    viewBinding.content.customToolbar.searchBack.visibility = View.GONE
+
+    viewBinding.content.customToolbar.sideMenuButton.setOnClickListener {
+      viewBinding.drawerLayout.open()
+      viewBinding.drawerLayout.hideKeyboard()
+    }
+    viewBinding.content.customToolbar.searchButton.setOnClickListener {
+      viewModel.searchFor(viewBinding.content.customToolbar.searchTextField.text.toString())
+      viewBinding.content.customToolbar.sideMenuButton.visibility = View.INVISIBLE
+      viewBinding.content.customToolbar.sideMenuButton.isEnabled = false
+      viewBinding.content.customToolbar.searchBack.visibility = View.VISIBLE
+      viewBinding.drawerLayout.hideKeyboard()
+    }
+    viewBinding.content.customToolbar.searchBack.setOnClickListener {
+      viewModel.searchFor("")
+      viewBinding.content.customToolbar.searchTextField.text.clear()
+      viewBinding.content.customToolbar.searchBack.visibility = View.GONE
+      viewBinding.content.customToolbar.sideMenuButton.visibility = View.VISIBLE
+      viewBinding.content.customToolbar.sideMenuButton.isEnabled = true
+      viewBinding.drawerLayout.hideKeyboard()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    /**Side drawer menu */
+    val toggle = ActionBarDrawerToggle(this, viewBinding.drawerLayout, 0, 0)
+    viewBinding.drawerLayout.addDrawerListener(toggle)
+    toggle.syncState()
 
-        viewBinding = ActivityMainBinding.inflate(layoutInflater)
-        val view = viewBinding.root
-        setContentView(view)
-        MobileAds.initialize(this) {}
-
-        val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
-        viewBinding.content.customToolbar.searchTextField.setOnFocusChangeListener { _, hasFocus ->
-            if (!hasFocus) viewBinding.drawerLayout.hideKeyboard()
+    val sideNavigationClickListener =
+      NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
+        when (item.itemId) {
+          R.id.nav_add_product -> {
+            openAdd()
+          }
+          R.id.nav_create_new_dish -> {
+            openDialog(CreateDishFragment(viewBinding.drawerLayout))
+          }
+          R.id.nav_add_product_to_dish -> {
+            openDialog(AddProductToDishFragment())
+          }
+          R.id.nav_personalize -> {
+            replaceFragment(settingsFragment, SettingsFragment.TAG)
+            viewBinding.content.navigationView.uncheckAllItems()
+            hideSearchToolbar()
+          }
+          R.id.nav_create_half_product -> {
+            openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))
+          }
+          R.id.nav_add_product_to_half_product -> {
+            openDialog(AddProductToHalfProductFragment())
+          }
+          R.id.nav_online_data -> {
+            val intent = Intent(this, OnlineDataActivity::class.java)
+            startActivity(intent, savedInstanceState)
+          }
         }
+        viewBinding.drawerLayout.closeDrawer(GravityCompat.START)
+        return@OnNavigationItemSelectedListener true
+      }
 
-        viewBinding.content.customToolbar.searchBack.visibility = View.GONE
-
-        viewBinding.content.customToolbar.sideMenuButton.setOnClickListener {
-            viewBinding.drawerLayout.open()
-            viewBinding.drawerLayout.hideKeyboard()
+    /**Bottom Navigation menu */
+    val menuNavigationClickListener =
+      BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        when (item.itemId) {
+          R.id.navigation_products -> {
+            replaceFragment(productsFragment, ProductsFragment.TAG)
+            setSearchToolbar()
+            return@OnNavigationItemSelectedListener true
+          }
+          R.id.navigation_dishes -> {
+            replaceFragment(dishesFragment, DishesFragment.TAG)
+            setSearchToolbar()
+            return@OnNavigationItemSelectedListener true
+          }
+          R.id.navigation_half_products -> {
+            replaceFragment(halfProductsFragment, HalfProductsFragment.TAG)
+            setSearchToolbar()
+            return@OnNavigationItemSelectedListener true
+          }
         }
-        viewBinding.content.customToolbar.searchButton.setOnClickListener {
-            viewModel.searchFor(viewBinding.content.customToolbar.searchTextField.text.toString())
-            viewBinding.content.customToolbar.sideMenuButton.visibility = View.INVISIBLE
-            viewBinding.content.customToolbar.sideMenuButton.isEnabled = false
-            viewBinding.content.customToolbar.searchBack.visibility = View.VISIBLE
-            viewBinding.drawerLayout.hideKeyboard()
-        }
-        viewBinding.content.customToolbar.searchBack.setOnClickListener {
-            viewModel.searchFor("")
-            viewBinding.content.customToolbar.searchTextField.text.clear()
-            viewBinding.content.customToolbar.searchBack.visibility = View.GONE
-            viewBinding.content.customToolbar.sideMenuButton.visibility = View.VISIBLE
-            viewBinding.content.customToolbar.sideMenuButton.isEnabled = true
-            viewBinding.drawerLayout.hideKeyboard()
-        }
-
-      /**Side drawer menu */
-        val toggle = ActionBarDrawerToggle(this, viewBinding.drawerLayout, 0, 0)
-        viewBinding.drawerLayout.addDrawerListener(toggle)
-        toggle.syncState()
-
-        val sideNavigationClickListener =
-            NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
-                when (item.itemId) {
-                    R.id.nav_add_product -> {
-                        openAdd()
-                    }
-                    R.id.nav_create_new_dish -> {
-                        openDialog(CreateDishFragment(viewBinding.drawerLayout))
-                    }
-                    R.id.nav_add_product_to_dish -> {
-                        openDialog(AddProductToDishFragment())
-                    }
-                    R.id.nav_personalize -> {
-                        replaceFragment(settingsFragment, SettingsFragment.TAG)
-                        viewBinding.content.navigationView.uncheckAllItems()
-                        hideSearchToolbar()
-                    }
-                    R.id.nav_create_half_product -> {
-                        openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))
-                    }
-                    R.id.nav_add_product_to_half_product -> {
-                        openDialog(AddProductToHalfProductFragment())
-                    }
-                    R.id.nav_online_data -> {
-                        val intent = Intent(this, OnlineDataActivity::class.java)
-                        startActivity(intent, savedInstanceState)
-                    }
-                }
-                viewBinding.drawerLayout.closeDrawer(GravityCompat.START)
-                return@OnNavigationItemSelectedListener true
-            }
-
-        /**Bottom Navigation menu */
-        val menuNavigationClickListener =
-            BottomNavigationView.OnNavigationItemSelectedListener { item ->
-                when (item.itemId) {
-                    R.id.navigation_products -> {
-                        replaceFragment(productsFragment, ProductsFragment.TAG)
-                        setSearchToolbar()
-                        return@OnNavigationItemSelectedListener true
-                    }
-                    R.id.navigation_dishes -> {
-                        replaceFragment(dishesFragment, DishesFragment.TAG)
-                        setSearchToolbar()
-                        return@OnNavigationItemSelectedListener true
-                    }
-                    R.id.navigation_half_products -> {
-                        replaceFragment(halfProductsFragment, HalfProductsFragment.TAG)
-                        setSearchToolbar()
-                        return@OnNavigationItemSelectedListener true
-                    }
-                }
-                true
-            }
-        replaceFragment(productsFragment, ProductsFragment.TAG)
-        viewBinding.content.navigationView.setOnNavigationItemSelectedListener(
-            menuNavigationClickListener
-        )
-        viewBinding.navView.setNavigationItemSelectedListener(sideNavigationClickListener)
-    }
-
+        true
+      }
+    replaceFragment(productsFragment, ProductsFragment.TAG)
+    viewBinding.content.navigationView.setOnNavigationItemSelectedListener(
+      menuNavigationClickListener
+    )
+    viewBinding.navView.setNavigationItemSelectedListener(sideNavigationClickListener)
+  }
 }

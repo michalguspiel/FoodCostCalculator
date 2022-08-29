@@ -7,10 +7,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.databinding.FragmentDishesBinding
+import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.*
 
-class DishesFragment(private val openCreateNewDishDialog: () -> Unit) : Fragment() {
-
+class DishesFragment : Fragment() {
+  var callbackListener: CallbackListener? = null
   private lateinit var listViewViewModelPassedToRecyclerView: DishListViewAdapterViewModel
   private lateinit var viewModelPassedToRecyclerView: DishRVAdapterViewModel
   private lateinit var fragmentRecyclerAdapter: DishesFragmentRecyclerAdapter
@@ -32,7 +33,7 @@ class DishesFragment(private val openCreateNewDishDialog: () -> Unit) : Fragment
       ViewModelProvider(this).get(DishListViewAdapterViewModel::class.java)
 
     binding.recyclerViewDishes.setHasFixedSize(true)
-    setAdapterToRecyclerView(openCreateNewDishDialog)
+    setAdapterToRecyclerView{ callbackListener?.callback() }
 
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
       viewModel.getGrandDishes().observe(viewLifecycleOwner) { grandDishes ->
@@ -65,8 +66,8 @@ class DishesFragment(private val openCreateNewDishDialog: () -> Unit) : Fragment
   }
 
   companion object {
-    fun newInstance(openCreateNewDishDialog: () -> Unit): DishesFragment =
-      DishesFragment(openCreateNewDishDialog)
+    fun newInstance(): DishesFragment =
+      DishesFragment()
 
     const val TAG = "DishesFragment"
   }

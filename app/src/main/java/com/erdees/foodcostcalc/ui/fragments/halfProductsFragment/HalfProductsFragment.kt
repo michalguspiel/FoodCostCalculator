@@ -9,13 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
+import com.erdees.foodcostcalc.utils.CallbackListener
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import java.util.*
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
-class HalfProductsFragment(private val openCreateHalfProductDialog:()->Unit) : Fragment() {
-
+class HalfProductsFragment : Fragment() {
+  var callbackListener: CallbackListener? = null
   private lateinit var recyclerView: RecyclerView
   private lateinit var viewModelPassedToRecyclerView: HalfProductAdapterViewModel
   private lateinit var fragmentRecyclerAdapter: HalfProductFragmentRecyclerAdapter
@@ -34,7 +35,7 @@ class HalfProductsFragment(private val openCreateHalfProductDialog:()->Unit) : F
 
     recyclerView = view.findViewById(R.id.recycler_view_half_products)
     recyclerView.setHasFixedSize(true)
-    setEmptyAdapterToRecyclerView(openCreateHalfProductDialog)
+    setEmptyAdapterToRecyclerView { callbackListener?.callback() }
 
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
       viewModel.getHalfProductWithProductIncluded()
@@ -46,7 +47,7 @@ class HalfProductsFragment(private val openCreateHalfProductDialog:()->Unit) : F
               it.halfProductModel.name.toLowerCase()
                 .contains(searchWord.toLowerCase())
             } as ArrayList<HalfProductWithProductsIncludedModel>,
-            childFragmentManager, viewModelPassedToRecyclerView, requireActivity(),openCreateHalfProductDialog)
+            childFragmentManager, viewModelPassedToRecyclerView, requireActivity()) { callbackListener?.callback() }
           recyclerView.adapter = fragmentRecyclerAdapter
         }
     }
@@ -67,8 +68,7 @@ class HalfProductsFragment(private val openCreateHalfProductDialog:()->Unit) : F
   }
 
   companion object {
-    fun newInstance(openCreateHalfProductDialog: () -> Unit): HalfProductsFragment =
-      HalfProductsFragment(openCreateHalfProductDialog)
+    fun newInstance(): HalfProductsFragment = HalfProductsFragment()
     const val TAG = "HalfProductsFragment"
   }
 }
