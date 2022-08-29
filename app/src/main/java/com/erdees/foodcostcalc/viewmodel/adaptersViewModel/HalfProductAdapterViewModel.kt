@@ -20,9 +20,6 @@ class HalfProductAdapterViewModel(application: Application):AndroidViewModel(app
         basicRepository = BasicRepository(basicDao)
     }
 
-    fun passHalfProductToDialog(halfProductModel: HalfProductModel) =
-        basicRepository.passHalfProductToDialog(halfProductModel)
-
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long)
             = halfProductWithProductsIncludedRepository.getCertainHalfProductWithProductsIncluded(halfProductId)
 }

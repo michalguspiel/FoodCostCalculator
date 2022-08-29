@@ -84,8 +84,7 @@ class HalfProductFragmentRecyclerAdapter(
         private fun setAddButton(position: Int) {
             addProductButton.setOnClickListener {
                 AddProductToHalfProductFragment().show(fragmentManager, TAG)
-                viewModel.passHalfProductToDialog(list[position].halfProductModel)
-
+                AddProductToHalfProductFragment.halfProduct = list[position].halfProductModel
             }
         }
 

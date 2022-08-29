@@ -91,13 +91,6 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
         sharedPreferences = SharedPreferences(requireContext())
 
-
-        /**Send data about which dishModel is being edited
-         * so .setPosition(index of this dishModel in main list)*/
-        viewModel.getHalfProducts().observe(viewLifecycleOwner) { halfProduct ->
-          viewModel.setPosition(halfProduct.indexOf(halfProductPassedFromAdapter.halfProductModel))
-        }
-
       /** Observe data from viewmodel */
         viewModel.getHalfProductWithProductIncluded()
             .observe(viewLifecycleOwner) {

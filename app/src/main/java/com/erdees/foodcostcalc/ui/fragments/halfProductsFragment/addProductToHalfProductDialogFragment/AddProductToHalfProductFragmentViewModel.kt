@@ -25,28 +25,22 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
     val readAllHalfProductModelData: LiveData<List<HalfProductModel>>
     val readAllProductModelData: LiveData<List<ProductModel>>
 
-    private val basicRepository: BasicRepository
     private val productRepository: ProductRepository
     private val halfProductRepository: HalfProductRepository
     private val productIncludedInHalfProductRepository: ProductIncludedInHalfProductRepository
 
-
     init {
-        val basicDao = BasicDataBase.getInstance().basicDao
         val productDao = AppRoomDataBase.getDatabase(application).productDao()
         val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
         val productIncludedInHalfProductDao =
             AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
 
-        basicRepository = BasicRepository(basicDao)
         halfProductRepository = HalfProductRepository(halfProductDao)
         productRepository = ProductRepository(productDao)
         productIncludedInHalfProductRepository =
             ProductIncludedInHalfProductRepository((productIncludedInHalfProductDao))
-
         readAllHalfProductModelData = halfProductRepository.readAllData
         readAllProductModelData = productRepository.readAllData
-
     }
 
     var isProductPiece: Boolean = false
@@ -109,8 +103,6 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         metricCondition = sharedPreferences.getValueBoolean(Constants.METRIC, true)
         usaCondition = sharedPreferences.getValueBoolean(Constants.USA, false)
     }
-
-    fun getHalfProductToDialog() = basicRepository.getHalfProductToDialog()
 
     fun addProductToHalfProduct(
         weight: Double,

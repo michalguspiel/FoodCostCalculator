@@ -12,7 +12,6 @@ import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncluded
 
 /**TODO REFACTORING INTO VIEW BINDING +- MVVM PATTERN IMPROVEMENT */
 
-
 class EditHalfProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
   private val halfProductRepository: HalfProductRepository
@@ -40,16 +39,10 @@ class EditHalfProductFragmentViewModel(application: Application) : AndroidViewMo
       HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
   }
 
-  fun getHalfProducts() = halfProductRepository.readAllData
-
   fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
 
   fun getProductsIncludedFromHalfProduct(halfProductId: Long) =
     productIncludedInHalfProductRepository.getProductsIncludedFromHalfProduct(halfProductId)
-
-  fun setPosition(pos: Int) {
-    basicRepository.setPosition(pos)
-  }
 
   fun getFlag() = basicRepository.getFlag()
 
@@ -62,5 +55,4 @@ class EditHalfProductFragmentViewModel(application: Application) : AndroidViewMo
     productIncludedInHalfProductRepository.deleteProductsIncludedInHalfProduct(id)
     halfProductIncludedInDishRepository.deleteAllHalfProductsIncludedInDish(id)
   }
-
 }
