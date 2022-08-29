@@ -9,9 +9,9 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
@@ -159,10 +159,8 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
         return view
     }
 
-
     companion object {
         const val TAG = "EditProductFragment"
-
         lateinit var productModelPassedFromAdapter: ProductModel
     }
 

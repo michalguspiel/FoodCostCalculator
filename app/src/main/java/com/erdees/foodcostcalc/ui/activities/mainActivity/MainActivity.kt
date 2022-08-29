@@ -40,11 +40,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewBinding: ActivityMainBinding
 
     /**Fragments instances*/
-    private val productsFragment = ProductsFragment.newInstance()
-    private val dishesFragment = DishesFragment.newInstance()
+    private val productsFragment = ProductsFragment.newInstance(navigateToAdd = { openAdd() })
+    private val dishesFragment = DishesFragment.newInstance(openCreateNewDishDialog = {openDialog(CreateDishFragment(viewBinding.drawerLayout))})
     private val addFragment = AddFragment.newInstance()
     private val settingsFragment = SettingsFragment.newInstance()
-    private val halfProductsFragment = HalfProductsFragment.newInstance()
+    private val halfProductsFragment = HalfProductsFragment.newInstance(openCreateHalfProductDialog = {openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))})
 
     /**Hide everything on toolbar but side menu button. */
     private fun hideSearchToolbar() {
@@ -66,7 +66,6 @@ class MainActivity : AppCompatActivity() {
         viewBinding.content.navigationView.uncheckAllItems()
         hideSearchToolbar()
     }
-
 
     private fun checkIfSearchToolIsUsed(): Boolean {
         return viewBinding.content.customToolbar.searchTextField.isVisible && viewBinding.content.customToolbar.searchTextField.text.isNotEmpty()
@@ -173,26 +172,7 @@ class MainActivity : AppCompatActivity() {
             viewBinding.drawerLayout.hideKeyboard()
         }
 
-        /**Listen to viewmodel signals to open fragments or dialog fragments.
-         * TODO REFACTOR SO THESE 3 METHODS ARE NOT NECESSARY*/
-        viewModel.observeOpenAddFlag().observe(this, { shouldAddBeOpened ->
-            if (shouldAddBeOpened) {
-                openAdd()
-            }
-        })
-        viewModel.observeOpenCreateDishFlag().observe(this, { shouldCreateDishBeOpened ->
-            if (shouldCreateDishBeOpened) {
-                openDialog(CreateDishFragment(viewBinding.drawerLayout))
-            }
-        })
-        viewModel.observeOpenCreateHalfProductFlag()
-            .observe(this, { shouldCreateHalfProductBeOpened ->
-                if (shouldCreateHalfProductBeOpened) {
-                    openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))
-                }
-            })
-
-        /**Side drawer menu */
+      /**Side drawer menu */
         val toggle = ActionBarDrawerToggle(this, viewBinding.drawerLayout, 0, 0)
         viewBinding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()

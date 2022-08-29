@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.dishesFragment.models
+package com.erdees.foodcostcalc.domain.model.dish
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

@@ -9,7 +9,7 @@ import android.widget.TextView
 import androidx.lifecycle.LifecycleOwner
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.ListviewDishRowBinding
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
 import com.erdees.foodcostcalc.utils.Utils.formatPrice
@@ -17,11 +17,11 @@ import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
 import java.text.NumberFormat
 
 class DishesDetailedListViewAdapter(
-    private val context: Activity,
-    private var grandDishModel: GrandDishModel,
-    private val servings: Int,
-    private val viewModel: DishListViewAdapterViewModel,
-    private val viewLifecycleOwner: LifecycleOwner
+  private val context: Activity,
+  private var grandDishModel: GrandDishModel,
+  private val servings: Int,
+  private val viewModel: DishListViewAdapterViewModel,
+  private val viewLifecycleOwner: LifecycleOwner
 ) : ArrayAdapter<Any>(
     context, R.layout.listview_dish_row,
     grandDishModel.productsIncluded

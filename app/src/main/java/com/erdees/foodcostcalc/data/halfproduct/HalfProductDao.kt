@@ -2,7 +2,7 @@ package com.erdees.foodcostcalc.data.halfproduct
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
 
 @Dao
 interface HalfProductDao {

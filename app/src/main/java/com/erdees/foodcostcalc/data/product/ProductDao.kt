@@ -2,7 +2,7 @@ package com.erdees.foodcostcalc.data.product
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 
 /** DATA ACCESS OBJECT */
 @Dao

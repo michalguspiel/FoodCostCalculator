@@ -10,9 +10,9 @@ import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.UnitsUtils

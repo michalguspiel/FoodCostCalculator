@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.data.product
 
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 
 // Dao must be passed in - it is a dependency
 // You could also instantiate the DAO right inside the class without all the fuss, right?

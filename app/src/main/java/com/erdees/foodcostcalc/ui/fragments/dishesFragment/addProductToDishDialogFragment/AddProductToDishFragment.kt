@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.databinding.AddProductsToDishBinding
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.domain.model.dish.DishModel
 import com.erdees.foodcostcalc.utils.Constants.DISH_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.UNIT_SPINNER_ID

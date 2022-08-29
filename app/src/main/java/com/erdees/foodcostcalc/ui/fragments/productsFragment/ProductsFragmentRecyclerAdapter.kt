@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.editProductDialogFragment.EditProductFragment
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.ui.views.MaskedItemView
 import com.erdees.foodcostcalc.utils.Constants.ADMOB_PRODUCTS_RV_AD_UNIT_ID
 import com.erdees.foodcostcalc.utils.Constants.LAST_ITEM_TYPE
@@ -20,7 +20,6 @@ import com.erdees.foodcostcalc.utils.Constants.PRODUCT_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Utils.formatPrice
 import com.erdees.foodcostcalc.utils.ads.AdHelper
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
@@ -29,13 +28,12 @@ import java.util.*
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
-
 class ProductsFragmentRecyclerAdapter(
-    val activity: Activity,
-    val tag: String?,
-    private val list: ArrayList<ProductModel>,
-    private val fragmentManager: FragmentManager,
-    val viewModel: RecyclerViewAdapterViewModel
+  val activity: Activity,
+  val tag: String?,
+  private val list: ArrayList<ProductModel>,
+  private val fragmentManager: FragmentManager,
+  private val navigateToAdd : () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
@@ -75,8 +73,7 @@ class ProductsFragmentRecyclerAdapter(
 
         fun bind() {
             layoutAsButton.setOnClickListener {
-                viewModel.setOpenAddFlag(true)
-                viewModel.setOpenAddFlag(false)
+              navigateToAdd()
             }
         }
     }
@@ -112,7 +109,6 @@ class ProductsFragmentRecyclerAdapter(
         }
     }
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
             PRODUCT_ITEM_TYPE -> {
@@ -139,7 +135,6 @@ class ProductsFragmentRecyclerAdapter(
         return itemsSizeWithAds
     }
 
-
     override fun getItemViewType(position: Int): Int {
         return if (position == itemsSizeWithAds - 1) LAST_ITEM_TYPE
         else if (positionsOfAds.contains(position)) PRODUCT_AD_ITEM_TYPE
@@ -155,6 +150,4 @@ class ProductsFragmentRecyclerAdapter(
         else (holder as LastItemViewHolder).bind()
 
     }
-
-
 }

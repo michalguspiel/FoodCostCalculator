@@ -13,12 +13,12 @@ import com.erdees.foodcostcalc.data.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.product.ProductDao
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedDao
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductDao
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.dish.DishModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import java.io.File
 
 @Database(

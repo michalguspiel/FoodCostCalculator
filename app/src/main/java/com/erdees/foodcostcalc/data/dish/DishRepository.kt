@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.data.dish
 
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.domain.model.dish.DishModel
 
 class DishRepository(private val dishDao: DishDao) {
 

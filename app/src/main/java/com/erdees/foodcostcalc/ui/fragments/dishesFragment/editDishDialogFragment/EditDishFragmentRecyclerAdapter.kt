@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.EditDishProductRowBinding
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
 import com.erdees.foodcostcalc.utils.Utils.isNotBlankNorJustDot
 
 class EditDishFragmentRecyclerAdapter(

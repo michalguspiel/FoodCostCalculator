@@ -13,7 +13,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentEditDishBinding
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
 import com.erdees.foodcostcalc.utils.ViewUtils.isNotEmptyNorJustDot
 
 class EditDishFragment : DialogFragment() {

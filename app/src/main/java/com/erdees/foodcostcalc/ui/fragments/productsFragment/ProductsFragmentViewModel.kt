@@ -7,7 +7,7 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.basic.BasicDataBase
 import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 
 class ProductsFragmentViewModel(application: Application) : AndroidViewModel(application) {
 

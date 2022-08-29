@@ -1,23 +1,23 @@
-package com.erdees.foodcostcalc.ui.fragments.productsFragment.models
+package com.erdees.foodcostcalc.domain.model.product
 
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.domain.model.dish.DishModel
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 
 
 /**  Its a product but with dishOwnerId reference and weight */
 @Entity
 data class ProductIncluded(
-    @PrimaryKey(autoGenerate = true) val productIncludedId: Long,
-    @Embedded val productModelIncluded: ProductModel,
-    val dishOwnerId: Long,
-    @Embedded val dishModel: DishModel,
-    val productOwnerId: Long,
-    var weight: Double,
-    val weightUnit: String
+  @PrimaryKey(autoGenerate = true) val productIncludedId: Long,
+  @Embedded val productModelIncluded: ProductModel,
+  val dishOwnerId: Long,
+  @Embedded val dishModel: DishModel,
+  val productOwnerId: Long,
+  var weight: Double,
+  val weightUnit: String
 ) {
 
 

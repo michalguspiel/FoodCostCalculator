@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
 import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
 import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
 import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRecipe
@@ -21,10 +21,10 @@ import java.text.NumberFormat
 
 
 class HalfProductDetailedListViewAdapter(
-    private val context: Activity,
-    private val productIncludedInHalfProductModelList: List<ProductIncludedInHalfProductModel>,
-    private val quantity: Double,
-    private val totalWeightOfMainRecipe: Double
+  private val context: Activity,
+  private val productIncludedInHalfProductModelList: List<ProductIncludedInHalfProductModel>,
+  private val quantity: Double,
+  private val totalWeightOfMainRecipe: Double
 ) : ArrayAdapter<ProductIncludedInHalfProductModel>(
     context,
     R.layout.listview_dish_row,

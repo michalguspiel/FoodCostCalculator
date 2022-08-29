@@ -2,10 +2,10 @@ package com.erdees.foodcostcalc.data.basic
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
 
 class BasicDao {
     /** Data access object to basic database  */
@@ -31,7 +31,6 @@ class BasicDao {
 
     private var halfProductIncludedModel: HalfProductIncludedInDishModel? = null
     private val halfProductIncludedLive = MutableLiveData<HalfProductIncludedInDishModel>()
-
 
     private var halfProductModelPassedToDialog: HalfProductModel? = null
     private val halfProductPassedToDialogLive = MutableLiveData<HalfProductModel>()
@@ -83,7 +82,6 @@ class BasicDao {
 
     fun observeOpenCreateHalfProductFlag() = openCreateHalfProductFlagLive as LiveData<Boolean>
 
-
     fun passHalfProductToDialog(halfProductModel: HalfProductModel) {
         halfProductModelPassedToDialog = halfProductModel
         halfProductPassedToDialogLive.value = halfProductModelPassedToDialog
@@ -91,53 +89,28 @@ class BasicDao {
 
     fun getHalfProductToDialog() = halfProductPassedToDialogLive as LiveData<HalfProductModel>
 
-
     fun setProductIncludedInHalfProduct(productModel: ProductIncludedInHalfProductModel) {
         productIncludedInHalfProductModel = productModel
         productIncludedInHalfProductLive.value = productIncludedInHalfProductModel
     }
 
-    fun getProductIncludedInHalfProduct() =
-        productIncludedInHalfProductLive as LiveData<ProductIncludedInHalfProductModel>
-
-
-    fun searchFor(word: String) {
+  fun searchFor(word: String) {
         searchWord = word
         searchWordLive.value = searchWord
     }
 
     fun getWhatToSearchFor() = searchWordLive as LiveData<String>
 
-    fun setProductIncluded(product: ProductIncluded) {
-        productIncluded = product
-        productIncludedLive.value = productIncluded
-    }
-
-    fun getProductIncluded() = productIncludedLive as LiveData<ProductIncluded>
-
-
-    fun setHalfProductIncluded(halfProductModel: HalfProductIncludedInDishModel) {
-        halfProductIncludedModel = halfProductModel
-        halfProductIncludedLive.value = halfProductIncludedModel
-    }
-
-    fun getHalfProductIncluded() =
-        halfProductIncludedLive as LiveData<HalfProductIncludedInDishModel>
-
-
-    fun setPosition(pos: Int) {
+  fun setPosition(pos: Int) {
         mutablePosition = pos
         position.value = mutablePosition
     }
 
-    fun getPosition() = position as LiveData<Int>
-
-    fun setFlag(boolean: Boolean) {
+  fun setFlag(boolean: Boolean) {
         mutableFlag = boolean
         flag.value = mutableFlag
     }
 
     fun getFlag() = flag as LiveData<Boolean>
-
 
 }

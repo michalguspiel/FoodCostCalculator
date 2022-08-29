@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHalfProductDialogFragment.AddProductToHalfProductFragment
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.editHalfProductDialogFragment.EditHalfProductFragment
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductWithProductsIncludedModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
 import com.erdees.foodcostcalc.ui.views.MaskedItemView
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Constants.HALF_PRODUCT_AD_ITEM_TYPE
@@ -38,13 +38,13 @@ import io.reactivex.subjects.PublishSubject
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
-
 class HalfProductFragmentRecyclerAdapter(
-    private val viewLifeCycleOwner: LifecycleOwner,
-    private val list: ArrayList<HalfProductWithProductsIncludedModel>,
-    private val fragmentManager: FragmentManager,
-    val viewModel: HalfProductAdapterViewModel,
-    val activity: Activity
+  private val viewLifeCycleOwner: LifecycleOwner,
+  private val list: ArrayList<HalfProductWithProductsIncludedModel>,
+  private val fragmentManager: FragmentManager,
+  val viewModel: HalfProductAdapterViewModel,
+  val activity: Activity,
+  private val openCreateHalfProductDialog:()->Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val adCase = AdHelper(list.size, Constants.HALF_PRODUCTS_AD_FREQUENCY)
@@ -286,12 +286,10 @@ class HalfProductFragmentRecyclerAdapter(
         fun bind() {
             text.text = activity.getString(R.string.create_half_product)
             layoutAsButton.setOnClickListener {
-                viewModel.setOpenCreateHalfProductFlag(true)
-                viewModel.setOpenCreateHalfProductFlag(false)
+            openCreateHalfProductDialog()
             }
         }
     }
-
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return when (viewType) {
@@ -335,6 +333,4 @@ class HalfProductFragmentRecyclerAdapter(
     companion object {
         const val TAG = "HalfProductFragmentRecyclerAdapter"
     }
-
-
 }

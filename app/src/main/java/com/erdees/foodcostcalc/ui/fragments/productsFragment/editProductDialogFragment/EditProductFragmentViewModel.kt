@@ -9,14 +9,13 @@ import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 
 class EditProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -39,9 +38,6 @@ class EditProductFragmentViewModel(application: Application) : AndroidViewModel(
       ProductIncludedInHalfProductRepository(productIncludedInHalfProductDao)
 
   }
-
-  /**ProductModel repository methods*/
-
   /**ProductModel Repository methods*/
   fun deleteProduct(productModel: ProductModel) {
     viewModelScope.launch(Dispatchers.IO) {
@@ -68,7 +64,6 @@ class EditProductFragmentViewModel(application: Application) : AndroidViewModel(
   fun getCertainProductsIncludedInHalfProduct(productId: Long) =
     productIncludedInHalfProductRepository.getCertainProductsIncluded(productId)
 
-
   fun editProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) {
     viewModelScope.launch(Dispatchers.IO) {
       productIncludedInHalfProductRepository.editProductIncludedInHalfProduct(
@@ -77,18 +72,11 @@ class EditProductFragmentViewModel(application: Application) : AndroidViewModel(
     }
   }
 
-
   /**Basic Repository methods*/
-
-  fun setPosition(pos: Int) {
-    basicRepository.setPosition(pos)
-  }
 
   fun setFlag(boolean: Boolean) {
     basicRepository.setFlag(boolean)
   }
 
   fun getFlag() = basicRepository.getFlag()
-
-
 }

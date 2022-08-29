@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models
+package com.erdees.foodcostcalc.domain.model.halfProduct
 
 import androidx.room.Embedded
 import androidx.room.Ignore
@@ -9,8 +9,8 @@ import java.text.NumberFormat
 /**TODO REFACTOR*/
 
 data class HalfProductWithProductsIncludedModel(
-    @Embedded val halfProductModel: HalfProductModel,
-    @Relation(
+  @Embedded val halfProductModel: HalfProductModel,
+  @Relation(
         parentColumn = "halfProductId",
         entityColumn = "halfProductHostId"
     )

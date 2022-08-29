@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.dish.DishRepository
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.domain.model.dish.DishModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
 import com.google.firebase.analytics.FirebaseAnalytics

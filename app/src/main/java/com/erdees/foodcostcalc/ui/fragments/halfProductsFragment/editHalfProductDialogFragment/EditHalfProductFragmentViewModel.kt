@@ -9,7 +9,6 @@ import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductInclude
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductWithProductsIncludedModel
 
 /**TODO REFACTORING INTO VIEW BINDING +- MVVM PATTERN IMPROVEMENT */
 

@@ -9,13 +9,12 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
 class EditHalfProductFragmentRecyclerAdapter(

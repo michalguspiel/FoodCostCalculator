@@ -2,7 +2,7 @@ package com.erdees.foodcostcalc.data.dish
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
+import com.erdees.foodcostcalc.domain.model.dish.DishModel
 
 @Dao
 interface DishDao {

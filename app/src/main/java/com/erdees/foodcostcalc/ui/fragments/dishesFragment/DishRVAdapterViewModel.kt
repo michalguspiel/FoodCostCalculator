@@ -14,7 +14,7 @@ class DishRVAdapterViewModel(application: Application) : AndroidViewModel(applic
 
     private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
     val basicRepository: BasicRepository
-    val grandDishRepository: GrandDishRepository
+    private val grandDishRepository: GrandDishRepository
 
     init {
         val halfProductWithProductsIncludedDao =
@@ -26,8 +26,6 @@ class DishRVAdapterViewModel(application: Application) : AndroidViewModel(applic
         grandDishRepository = GrandDishRepository(grandDishDao)
         basicRepository = BasicRepository(basicDao)
     }
-
-    fun setOpenCreateDishFlag(boolean: Boolean) = basicRepository.setOpenCreateDishFlag(boolean)
 
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long) =
         halfProductWithProductsIncludedRepository.getCertainHalfProductWithProductsIncluded(

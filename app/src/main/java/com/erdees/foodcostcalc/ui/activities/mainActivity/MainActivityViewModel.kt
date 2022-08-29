@@ -14,12 +14,6 @@ class MainActivityViewModel(application: Application):AndroidViewModel(applicati
         basicRepository = BasicRepository(basicDao)
     }
 
-    fun observeOpenAddFlag() = basicRepository.observeOpenAddFlag()
-
-    fun observeOpenCreateDishFlag() = basicRepository.observeOpenCreateDishFlag()
-
-    fun observeOpenCreateHalfProductFlag() = basicRepository.observeOpenCreateHalfProductFlag()
-
     fun searchFor(word: String) {
         basicRepository.searchFor(word)
     }

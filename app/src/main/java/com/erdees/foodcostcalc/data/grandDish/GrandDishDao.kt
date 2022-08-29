@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
 
 @Dao
 interface GrandDishDao {

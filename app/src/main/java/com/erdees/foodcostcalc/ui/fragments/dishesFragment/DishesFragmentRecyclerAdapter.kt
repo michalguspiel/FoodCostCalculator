@@ -18,7 +18,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.DishCardViewBinding
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.addProductToDishDialogFragment.AddProductToDishFragment
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.editDishDialogFragment.EditDishFragment
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
 import com.erdees.foodcostcalc.ui.views.MaskedItemView
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Constants.DISH_AD_ITEM_TYPE
@@ -35,14 +35,14 @@ import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.play.core.review.ReviewManagerFactory
 import io.reactivex.subjects.PublishSubject
-import java.util.*
 
 class DishesFragmentRecyclerAdapter(
     private val fragmentManager: FragmentManager,
     val viewModel: DishRVAdapterViewModel,
     private val dishListViewAdapterViewModel: DishListViewAdapterViewModel,
     val viewLifecycleOwner: LifecycleOwner,
-    private val activity: Activity
+    private val activity: Activity,
+    private val openCreateNewDishDialog: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     lateinit var list: List<GrandDishModel>
@@ -87,20 +87,20 @@ class DishesFragmentRecyclerAdapter(
             list[position].halfProducts.forEach {
                 viewModel
                     .getCertainHalfProductWithProductsIncluded(it.halfProductOwnerId)
-                    .observe(viewLifecycleOwner, { halfProductWithProductsIncluded ->
-                        viewModel.addToTotalPrice(
-                            list[position].dishModel.dishId,
-                            halfProductWithProductsIncluded.pricePerUnit(),
-                            it.weight,
-                            halfProductWithProductsIncluded.halfProductModel.halfProductUnit,
-                            it.unit
+                    .observe(viewLifecycleOwner) { halfProductWithProductsIncluded ->
+                      viewModel.addToTotalPrice(
+                        list[position].dishModel.dishId,
+                        halfProductWithProductsIncluded.pricePerUnit(),
+                        it.weight,
+                        halfProductWithProductsIncluded.halfProductModel.halfProductUnit,
+                        it.unit
+                      )
+                      if (isThisLastItemOfTheList(
+                          list[position].halfProducts.indexOf(it),
+                          list[position].halfProducts.size
                         )
-                        if (isThisLastItemOfTheList(
-                                list[position].halfProducts.indexOf(it),
-                                list[position].halfProducts.size
-                            )
-                        ) setPriceData(amountOfServingsToPresent, list[position].dishModel.dishId)
-                    })
+                      ) setPriceData(amountOfServingsToPresent, list[position].dishModel.dishId)
+                    }
             }
         }
 
@@ -239,10 +239,9 @@ class DishesFragmentRecyclerAdapter(
                 viewBinding.howManyServingsTextView,
                 positionIncludedAdsBinded
             )
-            viewModel.getGrandDishes.observe(viewLifecycleOwner, {
-                if (viewBinding.listView.adapter == null) {
-                } else setAdapterToTheList(position)
-            })
+            viewModel.getGrandDishes.observe(viewLifecycleOwner) {
+              if (viewBinding.listView.adapter != null) setAdapterToTheList(position)
+            }
         }
     }
 
@@ -284,9 +283,7 @@ class DishesFragmentRecyclerAdapter(
         fun bind() {
             text.text = activity.getString(R.string.create_dish)
             layoutAsButton.setOnClickListener {
-                /**TODO IN THE FUTURE CHANGE FUNCTIONALITY OF THIS*/
-                viewModel.setOpenCreateDishFlag(true)
-                viewModel.setOpenCreateDishFlag(false)
+                openCreateNewDishDialog()
             }
         }
     }
