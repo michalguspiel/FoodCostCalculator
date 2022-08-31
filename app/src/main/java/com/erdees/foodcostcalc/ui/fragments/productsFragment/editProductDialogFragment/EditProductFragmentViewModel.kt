@@ -20,19 +20,16 @@ import kotlinx.coroutines.launch
 class EditProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
   private val productRepository: ProductRepository
-  private val basicRepository: BasicRepository
   private val productIncludedRepository: ProductIncludedRepository
   private val productIncludedInHalfProductRepository: ProductIncludedInHalfProductRepository
 
   init {
     val productDao = AppRoomDataBase.getDatabase(application).productDao()
-    val basicDao = BasicDataBase.getInstance().basicDao
     val productIncludedDao = AppRoomDataBase.getDatabase(application).productIncludedDao()
     val productIncludedInHalfProductDao =
       AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
 
     productRepository = ProductRepository(productDao)
-    basicRepository = BasicRepository(basicDao)
     productIncludedRepository = ProductIncludedRepository(productIncludedDao)
     productIncludedInHalfProductRepository =
       ProductIncludedInHalfProductRepository(productIncludedInHalfProductDao)
@@ -71,12 +68,4 @@ class EditProductFragmentViewModel(application: Application) : AndroidViewModel(
       )
     }
   }
-
-  /**Basic Repository methods*/
-
-  fun setFlag(boolean: Boolean) {
-    basicRepository.setFlag(boolean)
-  }
-
-  fun getFlag() = basicRepository.getFlag()
 }

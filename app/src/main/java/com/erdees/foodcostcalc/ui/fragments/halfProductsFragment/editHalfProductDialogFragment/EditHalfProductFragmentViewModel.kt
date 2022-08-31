@@ -15,13 +15,11 @@ import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncluded
 class EditHalfProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
   private val halfProductRepository: HalfProductRepository
-  private val basicRepository: BasicRepository
   private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
   private val productIncludedInHalfProductRepository: ProductIncludedInHalfProductRepository
   private val halfProductIncludedInDishRepository : HalfProductIncludedInDishRepository
 
   init {
-    val basicDao = BasicDataBase.getInstance().basicDao
     val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
     val halfProductWithProductIncludedDao =
       AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
@@ -30,7 +28,6 @@ class EditHalfProductFragmentViewModel(application: Application) : AndroidViewMo
     val halfProductIncludedInDishDao =
       AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
     halfProductRepository = HalfProductRepository(halfProductDao)
-    basicRepository = BasicRepository(basicDao)
     halfProductWithProductsIncludedRepository =
       HalfProductWithProductsIncludedRepository(halfProductWithProductIncludedDao)
     productIncludedInHalfProductRepository =
@@ -43,12 +40,6 @@ class EditHalfProductFragmentViewModel(application: Application) : AndroidViewMo
 
   fun getProductsIncludedFromHalfProduct(halfProductId: Long) =
     productIncludedInHalfProductRepository.getProductsIncludedFromHalfProduct(halfProductId)
-
-  fun getFlag() = basicRepository.getFlag()
-
-  fun setFlag(boolean: Boolean) {
-    basicRepository.setFlag(boolean)
-  }
 
   fun deleteHalfProduct(id: Long){
     halfProductRepository.deleteHalfProduct(id)

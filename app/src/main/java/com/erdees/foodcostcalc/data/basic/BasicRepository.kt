@@ -6,12 +6,6 @@ class BasicRepository(private val basicDao: BasicDao) {
 
   fun searchFor(word: String) = basicDao.searchFor(word)
 
-  fun setFlag(boolean: Boolean) {
-    basicDao.setFlag(boolean)
-  }
-
-  fun getFlag() = basicDao.getFlag()
-
   companion object {
     @Volatile
     private var instance: BasicRepository? = null

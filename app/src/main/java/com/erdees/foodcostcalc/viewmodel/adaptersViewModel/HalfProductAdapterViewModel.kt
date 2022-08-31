@@ -11,13 +11,10 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
 class HalfProductAdapterViewModel(application: Application):AndroidViewModel(application) {
 
     val halfProductWithProductsIncludedRepository : HalfProductWithProductsIncludedRepository
-    val basicRepository : BasicRepository
 
     init {
         val halfProductWithProductsIncludedDao = AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
-        val basicDao = BasicDataBase.getInstance().basicDao
         halfProductWithProductsIncludedRepository = HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
-        basicRepository = BasicRepository(basicDao)
     }
 
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long)
