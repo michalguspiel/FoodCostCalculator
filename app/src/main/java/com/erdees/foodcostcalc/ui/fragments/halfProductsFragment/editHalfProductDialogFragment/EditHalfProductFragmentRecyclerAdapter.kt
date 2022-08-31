@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
 class EditHalfProductFragmentRecyclerAdapter(
@@ -26,14 +26,14 @@ class EditHalfProductFragmentRecyclerAdapter(
      * initially empty,gets populated with method 'switchLists'
      * it works like this so after save button is hit
      * this list have the same ProductsIncluded as 'cloneOfList'*/
-    var list: MutableList<ProductIncludedInHalfProductModel> = mutableListOf()
+    var list: MutableList<ProductIncludedInHalfProduct> = mutableListOf()
 
     /**List of same ProductsIncluded as a data which populates an adapter
      * created in order to change this list with each holder edit text field
      * and afterwards override original list with this one(with save btn)*/
-    var cloneOfList: MutableList<ProductIncludedInHalfProductModel> = mutableListOf()
+    var cloneOfList: MutableList<ProductIncludedInHalfProduct> = mutableListOf()
 
-    fun switchLists(passedList: MutableList<ProductIncludedInHalfProductModel>) {
+    fun switchLists(passedList: MutableList<ProductIncludedInHalfProduct>) {
         this.list = passedList
         cloneOfList = passedList
         notifyDataSetChanged()

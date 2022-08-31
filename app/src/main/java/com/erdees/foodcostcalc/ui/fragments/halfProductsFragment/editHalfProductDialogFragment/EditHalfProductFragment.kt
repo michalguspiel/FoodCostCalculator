@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
@@ -98,7 +98,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
         viewModel
           .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
           .observe(viewLifecycleOwner) { eachProduct ->
-            val testData = mutableListOf<ProductIncludedInHalfProductModel>()
+            val testData = mutableListOf<ProductIncludedInHalfProduct>()
             testData.addAll(eachProduct)
             recyclerViewAdapter.switchLists(testData)
           }

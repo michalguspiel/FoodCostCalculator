@@ -8,7 +8,6 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsI
 
 @Dao
 interface HalfProductWithProductsIncludedDao {
-
     @Transaction
     @Query("SELECT * FROM HALFPRODUCT ORDER BY name ASC")
     fun getHalfProductsWithProductsIncluded(): LiveData<List<HalfProductWithProductsIncludedModel>>
@@ -16,6 +15,4 @@ interface HalfProductWithProductsIncludedDao {
     @Transaction
     @Query("SELECT * FROM HALFPRODUCT WHERE halfProductId = :halfProductId ORDER BY name ASC")
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long): LiveData<HalfProductWithProductsIncludedModel>
-
-
 }

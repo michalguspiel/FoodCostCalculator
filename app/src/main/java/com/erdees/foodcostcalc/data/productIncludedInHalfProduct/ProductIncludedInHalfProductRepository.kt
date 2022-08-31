@@ -1,31 +1,31 @@
 package com.erdees.foodcostcalc.data.productIncludedInHalfProduct
 
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 
 class ProductIncludedInHalfProductRepository(private val productIncludedInHalfProductDao: ProductIncludedInHalfProductDao) {
-    val readAllData: LiveData<List<ProductIncludedInHalfProductModel>> =
+    val readAllData: LiveData<List<ProductIncludedInHalfProduct>> =
         productIncludedInHalfProductDao.getAllProductIncludedInHalfProduct()
 
-    val readAllDataNotAsc: LiveData<List<ProductIncludedInHalfProductModel>> =
+    val readAllDataNotAsc: LiveData<List<ProductIncludedInHalfProduct>> =
         productIncludedInHalfProductDao.getAllProductIncludedInHalfProductNotAsc()
 
     fun getCertainProductsIncluded(productId: Long) =
         productIncludedInHalfProductDao.getCertainProductsIncluded(productId)
 
-    suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) =
+    suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) =
         productIncludedInHalfProductDao.addProductIncludedInHalfProduct(
-            productIncludedInHalfProductModel
+            productIncludedInHalfProduct
         )
 
-    suspend fun editProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) =
+    suspend fun editProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) =
         productIncludedInHalfProductDao.editProductIncludedInHalfProduct(
-            productIncludedInHalfProductModel
+            productIncludedInHalfProduct
         )
 
-    suspend fun deleteProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) =
+    suspend fun deleteProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) =
         productIncludedInHalfProductDao.deleteProductIncludedInHalfProduct(
-            productIncludedInHalfProductModel
+            productIncludedInHalfProduct
         )
 
     fun getProductsIncludedFromHalfProduct(halfProductId: Long) =

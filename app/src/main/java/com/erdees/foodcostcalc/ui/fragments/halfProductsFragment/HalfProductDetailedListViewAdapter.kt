@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.TextView
 import android.widget.Toast
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
 import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
 import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRecipe
@@ -21,14 +21,14 @@ import java.text.NumberFormat
 
 
 class HalfProductDetailedListViewAdapter(
-  private val context: Activity,
-  private val productIncludedInHalfProductModelList: List<ProductIncludedInHalfProductModel>,
-  private val quantity: Double,
-  private val totalWeightOfMainRecipe: Double
-) : ArrayAdapter<ProductIncludedInHalfProductModel>(
+    private val context: Activity,
+    private val productIncludedInHalfProductList: List<ProductIncludedInHalfProduct>,
+    private val quantity: Double,
+    private val totalWeightOfMainRecipe: Double
+) : ArrayAdapter<ProductIncludedInHalfProduct>(
     context,
     R.layout.listview_dish_row,
-    productIncludedInHalfProductModelList
+    productIncludedInHalfProductList
 ) {
 
     lateinit var productNameText: TextView
@@ -47,12 +47,12 @@ class HalfProductDetailedListViewAdapter(
         val quantityPercent =
             getBasicRecipeAsPercentageOfTargetRecipe(quantity, totalWeightOfMainRecipe)
         val weightIncludedQuantity = getIngredientForHundredPercentOfRecipe(
-            productIncludedInHalfProductModelList[position].weight,
+            productIncludedInHalfProductList[position].weight,
             quantityPercent
         )
         val formattedWeight = formatPriceOrWeight(weightIncludedQuantity)
         val priceIncludedQuantity = getPriceForHundredPercentOfRecipe(
-            productIncludedInHalfProductModelList[position].totalPriceOfThisProduct,
+            productIncludedInHalfProductList[position].totalPriceOfThisProduct,
             quantityPercent
         )
         val formatedPrice = NumberFormat.getCurrencyInstance().format(priceIncludedQuantity)
@@ -63,11 +63,11 @@ class HalfProductDetailedListViewAdapter(
 
     private fun setRowAsClickListener(rowView : View, position: Int){
         rowView.setOnClickListener {
-            if (productIncludedInHalfProductModelList[position].weightUnit == "piece") {
+            if (productIncludedInHalfProductList[position].weightUnit == "piece") {
                 Toast.makeText(context, totalWeightMessage(position), Toast.LENGTH_SHORT).show()
             } else Toast.makeText(
                 context,
-                productIncludedInHalfProductModelList[position].productModelIncluded.name,
+                productIncludedInHalfProductList[position].productModelIncluded.name,
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -75,23 +75,23 @@ class HalfProductDetailedListViewAdapter(
 
     private fun setRowTextViews(position: Int, formattedWeight : String, formatedPrice : String){
         productNameText.text =
-            productIncludedInHalfProductModelList[position].productModelIncluded.name
+            productIncludedInHalfProductList[position].productModelIncluded.name
         productWeightText.text = formattedWeight
         productPriceText.text = formatedPrice
         productUnit.text =
-            getUnitAbbreviation(productIncludedInHalfProductModelList[position].weightUnit)
+            getUnitAbbreviation(productIncludedInHalfProductList[position].weightUnit)
     }
 
     private fun totalWeightMessage(position: Int):String {
         val isWeight =
-            productIncludedInHalfProductModelList[position].halfProductModel.halfProductUnit == "per kilogram" ||
-                    productIncludedInHalfProductModelList[position].halfProductModel.halfProductUnit == "per pound"
+            productIncludedInHalfProductList[position].halfProductModel.halfProductUnit == "per kilogram" ||
+                    productIncludedInHalfProductList[position].halfProductModel.halfProductUnit == "per pound"
         val unitType: String = if (isWeight) " of weight " else " of volume "
-        return productIncludedInHalfProductModelList[position].productModelIncluded.name +
+        return productIncludedInHalfProductList[position].productModelIncluded.name +
                 unitType +
-                productIncludedInHalfProductModelList[position].totalWeightForPiece.toString() + " " +
+                productIncludedInHalfProductList[position].totalWeightForPiece.toString() + " " +
                 getUnitAbbreviation(
-                    productIncludedInHalfProductModelList[position].halfProductModel.halfProductUnit.drop(
+                    productIncludedInHalfProductList[position].halfProductModel.halfProductUnit.drop(
                         4
                     )
                 ) + "."

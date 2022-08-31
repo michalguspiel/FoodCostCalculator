@@ -8,7 +8,7 @@ import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 
 @Entity(tableName = "ProductIncludedInHalfProduct")
-data class ProductIncludedInHalfProductModel(
+data class ProductIncludedInHalfProduct(
   @PrimaryKey(autoGenerate = true) val productIncludedInHalfProductId: Long,
   @Embedded val productModelIncluded: ProductModel,
   @Embedded val halfProductModel: HalfProductModel,

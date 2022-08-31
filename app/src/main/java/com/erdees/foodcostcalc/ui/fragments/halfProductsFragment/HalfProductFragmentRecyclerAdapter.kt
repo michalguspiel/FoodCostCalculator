@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentManager
-import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHalfProductDialogFragment.AddProductToHalfProductFragment
@@ -26,7 +25,6 @@ import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRec
 import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
 import com.erdees.foodcostcalc.utils.ViewUtils.getListSize
 import com.erdees.foodcostcalc.utils.ads.AdHelper
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
@@ -39,12 +37,10 @@ import io.reactivex.subjects.PublishSubject
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 class HalfProductFragmentRecyclerAdapter(
-  private val viewLifeCycleOwner: LifecycleOwner,
   private val list: ArrayList<HalfProductWithProductsIncludedModel>,
   private val fragmentManager: FragmentManager,
-  val viewModel: HalfProductAdapterViewModel,
   val activity: Activity,
-  private val openCreateHalfProductDialog:()->Unit
+  private val openCreateHalfProductDialog:()->Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private val adCase = AdHelper(list.size, Constants.HALF_PRODUCTS_AD_FREQUENCY)
@@ -95,7 +91,7 @@ class HalfProductFragmentRecyclerAdapter(
                     listView.adapter =
                         HalfProductDetailedListViewAdapter(
                             activity,
-                            list[position].halfProductsListModel,
+                            list[position].halfProductsList,
                             quantity,
                             totalWeightOfMainRecipe
                         )
@@ -103,7 +99,7 @@ class HalfProductFragmentRecyclerAdapter(
                         LinearLayout.LayoutParams(
                             listView.layoutParams.width,
                             getListSize(
-                                list[position].halfProductsListModel.indices.toList(),
+                                list[position].halfProductsList.indices.toList(),
                                 listView
                             )
                         )
@@ -122,18 +118,9 @@ class HalfProductFragmentRecyclerAdapter(
         }
 
         private fun setHalfProductFinalPrice(position: Int) {
-            viewModel
-                .getCertainHalfProductWithProductsIncluded(list[position].halfProductModel.halfProductId)
-                .observe(viewLifeCycleOwner
-                ) {
-                  if (it != null) {
-                    finalPriceOfHalfProductPerUnit.text =
-                      it.formattedPricePerUnit
-                    priceOfHalfProductPerRecipeTV.text = it.formattedPricePerRecipe
-                  }
-                }
+          finalPriceOfHalfProductPerUnit.text = list[position].formattedPricePerUnit
+          priceOfHalfProductPerRecipeTV.text = list[position].formattedPricePerRecipe
         }
-
 
         private fun setQuantityOfDataTextView(position: Int) {
             val halfProduct = list[position]
@@ -155,11 +142,10 @@ class HalfProductFragmentRecyclerAdapter(
         private fun makeAdapterForList(position: Int, quantity: Double): ListAdapter {
             return HalfProductDetailedListViewAdapter(
                 activity,
-                list[position].halfProductsListModel,
+                list[position].halfProductsList,
                 quantity,
                 totalWeightOfMainRecipe
             )
-
         }
 
         private fun setPositiveButtonFunctionality(
@@ -179,7 +165,7 @@ class HalfProductFragmentRecyclerAdapter(
                 listView.layoutParams =
                     LinearLayout.LayoutParams(
                         listView.layoutParams.width,
-                        getListSize(list[position].halfProductsListModel.indices.toList(), listView)
+                        getListSize(list[position].halfProductsList.indices.toList(), listView)
                     )
                 alertDialog.dismiss()
             }
@@ -222,7 +208,6 @@ class HalfProductFragmentRecyclerAdapter(
             val pricePerRecipeForGivenQuantity =
                 getPriceForHundredPercentOfRecipe(pricePerMainRecipe, quantityPercent)
             priceOfHalfProductPerRecipeTV.text = formatPrice(pricePerRecipeForGivenQuantity)
-
         }
 
         @SuppressLint("CheckResult")
@@ -243,7 +228,6 @@ class HalfProductFragmentRecyclerAdapter(
                 updatePriceOfHalfProductPerRecipe(positionIncludedAdsBinded)
             }
         }
-
     }
 
     inner class AdItemViewHolder(val view: NativeAdView) : RecyclerView.ViewHolder(view) {
@@ -275,7 +259,6 @@ class HalfProductFragmentRecyclerAdapter(
             adLoader.loadAd(AdRequest.Builder().build())
         }
     }
-
 
     inner class LastItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val layoutAsButton: MaskedItemView =
@@ -316,7 +299,6 @@ class HalfProductFragmentRecyclerAdapter(
         )
         else if (holder.itemViewType == HALF_PRODUCT_AD_ITEM_TYPE) (holder as AdItemViewHolder).bind()
         else (holder as LastItemViewHolder).bind()
-
     }
 
     override fun getItemViewType(position: Int): Int {

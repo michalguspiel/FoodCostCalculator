@@ -4,12 +4,10 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
 import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import kotlinx.coroutines.Dispatchers
@@ -61,10 +59,10 @@ class EditProductFragmentViewModel(application: Application) : AndroidViewModel(
   fun getCertainProductsIncludedInHalfProduct(productId: Long) =
     productIncludedInHalfProductRepository.getCertainProductsIncluded(productId)
 
-  fun editProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) {
+  fun editProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) {
     viewModelScope.launch(Dispatchers.IO) {
       productIncludedInHalfProductRepository.editProductIncludedInHalfProduct(
-        productIncludedInHalfProductModel
+        productIncludedInHalfProduct
       )
     }
   }

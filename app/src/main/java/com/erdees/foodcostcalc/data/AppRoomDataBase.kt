@@ -16,7 +16,7 @@ import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncluded
 import com.erdees.foodcostcalc.domain.model.dish.DishModel
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
 import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import java.io.File
@@ -26,7 +26,7 @@ import java.io.File
         ProductModel::class, DishModel::class,
         ProductIncluded::class,
         HalfProductModel::class,
-        ProductIncludedInHalfProductModel::class,
+        ProductIncludedInHalfProduct::class,
         HalfProductIncludedInDishModel::class,
     ], version = 1, exportSchema = true
 )

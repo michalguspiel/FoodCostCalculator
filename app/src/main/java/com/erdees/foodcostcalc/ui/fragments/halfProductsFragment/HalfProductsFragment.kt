@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
 import com.erdees.foodcostcalc.utils.CallbackListener
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.HalfProductAdapterViewModel
 import java.util.*
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
@@ -18,7 +17,6 @@ import java.util.*
 class HalfProductsFragment : Fragment() {
   var callbackListener: CallbackListener? = null
   private lateinit var recyclerView: RecyclerView
-  private lateinit var viewModelPassedToRecyclerView: HalfProductAdapterViewModel
   private lateinit var fragmentRecyclerAdapter: HalfProductFragmentRecyclerAdapter
 
   override fun onCreateView(
@@ -30,8 +28,6 @@ class HalfProductsFragment : Fragment() {
     val view: View = inflater.inflate(R.layout.fragment_half_products, container, false)
 
     val viewModel = ViewModelProvider(this).get(HalfProductsFragmentViewModel::class.java)
-    viewModelPassedToRecyclerView =
-      ViewModelProvider(this).get(HalfProductAdapterViewModel::class.java)
 
     recyclerView = view.findViewById(R.id.recycler_view_half_products)
     recyclerView.setHasFixedSize(true)
@@ -42,12 +38,12 @@ class HalfProductsFragment : Fragment() {
         .observe(viewLifecycleOwner) { halfProducts ->
           val listOfHalfProducts = mutableListOf<HalfProductWithProductsIncludedModel>()
           halfProducts.forEach { listOfHalfProducts.add(it) }
-          fragmentRecyclerAdapter = HalfProductFragmentRecyclerAdapter(viewLifecycleOwner,
+          fragmentRecyclerAdapter = HalfProductFragmentRecyclerAdapter(
             listOfHalfProducts.filter {
               it.halfProductModel.name.toLowerCase()
                 .contains(searchWord.toLowerCase())
             } as ArrayList<HalfProductWithProductsIncludedModel>,
-            childFragmentManager, viewModelPassedToRecyclerView, requireActivity()) { callbackListener?.callback() }
+            childFragmentManager, requireActivity()) { callbackListener?.callback() }
           recyclerView.adapter = fragmentRecyclerAdapter
         }
     }
@@ -57,10 +53,8 @@ class HalfProductsFragment : Fragment() {
   /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No fragmentRecyclerAdapter attached; skipping layout" */
   private fun setEmptyAdapterToRecyclerView(openCreateHalfProductDialog: () -> Unit) {
     fragmentRecyclerAdapter = HalfProductFragmentRecyclerAdapter(
-      viewLifecycleOwner,
       arrayListOf(),
       childFragmentManager,
-      viewModelPassedToRecyclerView,
       requireActivity(),
       openCreateHalfProductDialog
     )

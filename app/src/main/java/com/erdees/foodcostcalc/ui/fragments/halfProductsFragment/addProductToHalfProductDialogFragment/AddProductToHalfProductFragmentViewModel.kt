@@ -5,13 +5,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
@@ -115,7 +113,7 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         val chosenProduct =
             readAllProductModelData.value?.get(productPosition!!)
         addProductIncludedInHalfProduct(
-            ProductIncludedInHalfProductModel(
+            ProductIncludedInHalfProduct(
                 0,
                 chosenProduct!!,
                 chosenHalfProduct!!,
@@ -127,10 +125,10 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         )
     }
 
-    private fun addProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) {
+    private fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) {
         viewModelScope.launch(Dispatchers.IO) {
             productIncludedInHalfProductRepository.addProductIncludedInHalfProduct(
-                productIncludedInHalfProductModel
+                productIncludedInHalfProduct
             )
         }
     }

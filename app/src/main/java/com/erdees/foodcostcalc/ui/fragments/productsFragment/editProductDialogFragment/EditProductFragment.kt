@@ -9,7 +9,7 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
 import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
@@ -86,7 +86,7 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     /** empty lists which gets populated by every 'ProductIncluded' and
      * 'ProductIncludedInHalfProductModel' that has the same ID as edited product. */
     var productIncludedList = listOf<ProductIncluded>()
-    var productIncludedInHalfProductList = listOf<ProductIncludedInHalfProductModel>()
+    var productIncludedInHalfProductList = listOf<ProductIncludedInHalfProduct>()
     setProductIdOfEditedProduct(productModelPassedFromAdapter)
     setDialogFieldsAccordinglyToProductEdited(productModelPassedFromAdapter)
     if(productId != null) {
@@ -170,11 +170,11 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
   private fun changeEveryProductIncludedInHalfProduct(
     productModelToChange: ProductModel,
-    listToChange: List<ProductIncludedInHalfProductModel>
+    listToChange: List<ProductIncludedInHalfProduct>
   ) {
     listToChange.forEach {
       fragmentViewModel.editProductIncludedInHalfProduct(
-        ProductIncludedInHalfProductModel(
+        ProductIncludedInHalfProduct(
           it.productIncludedInHalfProductId,
           productModelToChange,
           it.halfProductModel,

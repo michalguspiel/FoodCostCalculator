@@ -2,14 +2,10 @@ package com.erdees.foodcostcalc.data.halfProductWithProductsIncluded
 
 class HalfProductWithProductsIncludedRepository(private val halfProductWithProductsIncludedDao : HalfProductWithProductsIncludedDao) {
 
-
     val readAllData = halfProductWithProductsIncludedDao.getHalfProductsWithProductsIncluded()
 
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long)
     = halfProductWithProductsIncludedDao.getCertainHalfProductWithProductsIncluded(halfProductId)
-
-
-
 
     companion object{
         @Volatile
