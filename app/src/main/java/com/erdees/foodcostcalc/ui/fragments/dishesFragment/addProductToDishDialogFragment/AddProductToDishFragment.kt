@@ -75,23 +75,23 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             else setUiToProductsSpinner()
         }
 
-        viewModel.readAllProductModelData.observe(viewLifecycleOwner, { products ->
-            productsAdapter.addAll(products.map { it.name })
-            productsAdapter.notifyDataSetChanged()
-        })
+        viewModel.readAllProductModelData.observe(viewLifecycleOwner) { products ->
+          productsAdapter.addAll(products.map { it.name })
+          productsAdapter.notifyDataSetChanged()
+        }
 
-        viewModel.readAllDishModelData.observe(viewLifecycleOwner, { dishes ->
-            dishesAdapter.addAll(dishes.map { it.name })
-            dishesAdapter.notifyDataSetChanged()
-            selectChosenDish()
-        })
+      viewModel.readAllDishModelData.observe(viewLifecycleOwner) { dishes ->
+          dishesAdapter.addAll(dishes.map { it.name })
+          dishesAdapter.notifyDataSetChanged()
+          selectChosenDish()
+        }
 
-        viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner, { halfProducts ->
-            halfProductAdapter.addAll(halfProducts.map { it.name })
-            halfProductAdapter.notifyDataSetChanged()
-        })
+      viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner) { halfProducts ->
+          halfProductAdapter.addAll(halfProducts.map { it.name })
+          halfProductAdapter.notifyDataSetChanged()
+        }
 
-        binding.addProductToDishBtn.setOnClickListener {
+      binding.addProductToDishBtn.setOnClickListener {
             if (isProductWeightInvalid()) {
                 showShortToast(
                     requireContext(),

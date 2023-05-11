@@ -3,8 +3,6 @@ package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.editHalfProduc
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository

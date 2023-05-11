@@ -32,17 +32,17 @@ class EditDishFragment : DialogFragment() {
         val viewModel = ViewModelProvider(this).get(EditDishFragmentViewModel::class.java)
 
         viewModel.getGrandDishById(grandDishModelPassedFromAdapter.dishModel.dishId)
-            .observe(viewLifecycleOwner, { grandDish ->
-                setFields()
-                recyclerFragmentRecyclerAdapter = EditDishFragmentRecyclerAdapter(
-                    ViewModelProvider(this).get(EditDishAdapterViewModel::class.java),
-                    requireActivity(),
-                    grandDish
-                )
-                binding.recyclerViewProductsInDish.adapter = recyclerFragmentRecyclerAdapter
-            })
+            .observe(viewLifecycleOwner) { grandDish ->
+              setFields()
+              recyclerFragmentRecyclerAdapter = EditDishFragmentRecyclerAdapter(
+                ViewModelProvider(this).get(EditDishAdapterViewModel::class.java),
+                requireActivity(),
+                grandDish
+              )
+              binding.recyclerViewProductsInDish.adapter = recyclerFragmentRecyclerAdapter
+            }
 
-        binding.saveDishChangesButton.setOnClickListener {
+      binding.saveDishChangesButton.setOnClickListener {
             if (allFieldsAreLegit()) {
                 viewModel.saveDish(
                     grandDishModelPassedFromAdapter.dishModel.dishId,
@@ -60,21 +60,8 @@ class EditDishFragment : DialogFragment() {
         }
 
         binding.deleteDishButton.setOnClickListener {
-            val alertDialog = AlertDialog.Builder(requireContext()).setTitle(R.string.are_you_sure)
-                .setPositiveButton(getString(R.string.yes), null)
-                .setNegativeButton(getString(R.string.back), null)
-                .show()
-            alertDialog.window?.setBackgroundDrawable(
-                ContextCompat.getDrawable(
-                    requireContext(),
-                    R.drawable.background_for_dialogs
-                )
-            )
-            alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
                 viewModel.deleteGrandDish(grandDishModelPassedFromAdapter)
-                alertDialog.dismiss()
                 this.dismiss()
-            }
         }
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         return view

@@ -36,11 +36,12 @@ import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.play.core.review.ReviewManagerFactory
 import io.reactivex.subjects.PublishSubject
 
+
 class DishesFragmentRecyclerAdapter(
     private val fragmentManager: FragmentManager,
-    val viewModel: DishRVAdapterViewModel,
+    private val viewModel: DishRVAdapterViewModel,
     private val dishListViewAdapterViewModel: DishListViewAdapterViewModel,
-    val viewLifecycleOwner: LifecycleOwner,
+    private val viewLifecycleOwner: LifecycleOwner,
     private val activity: Activity,
     private val openCreateNewDishDialog: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -61,7 +62,6 @@ class DishesFragmentRecyclerAdapter(
 
     inner class DishRecyclerViewHolder(private val viewBinding: DishCardViewBinding) :
         RecyclerView.ViewHolder(viewBinding.root) {
-
 
         private var amountOfServingsToPresent = 1
         private val amountOfServingsSubject = PublishSubject.create<Int>()
@@ -222,6 +222,7 @@ class DishesFragmentRecyclerAdapter(
 
         @SuppressLint("CheckResult")
         fun bind(position: Int) {
+            if(position > list.size) return
             val positionIncludedAdsBinded = adCase.correctElementFromListToBind(position)
             if (position == 3) openFeedBackForm()
             setDishData(positionIncludedAdsBinded)

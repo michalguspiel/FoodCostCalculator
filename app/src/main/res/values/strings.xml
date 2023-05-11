@@ -72,7 +72,7 @@
 
     <string name="fill_all_data">Fill all data!</string>
 
-    <string name="information_add_product_to_half_product">Try to use same units inside half product for best performance, otherwise all products included are converted to the same unit as half productModel as pure water of temperature  4°C.</string>
+    <string name="information_add_product_to_half_product">Try to use same units inside half product for best performance, otherwise all products included are converted to the same unit as half product as pure water of temperature  4°C.</string>
     <string name="information_add_fragment_general">Provide all of the necessary data in order to add product to your list, when adding product with per piece unit provide price per each piece, in case You do not know waste percentage or price per piece of product use tools on to bottom of this screen.</string>
     <string name="information_waste_calculator">To learn the waste percentage of product, weight product before processing it and amount of waste afterwards. Press calculate and waste percentage will appear in waste percent field.</string>
     <string name="information_price_per_piece_calculator">In Box price pass how much do You pay per box, in quantity pass how many pieces there is in box. Press calculate Price per piece will appear in price field.</string>

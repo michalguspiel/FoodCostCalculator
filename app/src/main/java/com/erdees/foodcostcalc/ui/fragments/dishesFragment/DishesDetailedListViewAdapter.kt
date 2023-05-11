@@ -51,17 +51,17 @@ class DishesDetailedListViewAdapter(
     private fun setHalfProductRowPrice(positionOfHalfProduct: Int, productPriceTextView: TextView) {
         viewModel.getCertainHalfProductWithProductsIncluded(grandDishModel.halfProducts[positionOfHalfProduct].halfProductOwnerId)
             .observe(
-                viewLifecycleOwner,
-                {
-                    productPriceTextView.text = formatPrice(
-                        calculatePrice(
-                            it.pricePerUnit(),
-                            grandDishModel.halfProducts[positionOfHalfProduct].weight,
-                            it.halfProductModel.halfProductUnit,
-                            grandDishModel.halfProducts[positionOfHalfProduct].unit
-                        ) * servings
-                    )
-                })
+                viewLifecycleOwner
+            ) {
+              productPriceTextView.text = formatPrice(
+                calculatePrice(
+                  it.pricePerUnit(),
+                  grandDishModel.halfProducts[positionOfHalfProduct].weight,
+                  it.halfProductModel.halfProductUnit,
+                  grandDishModel.halfProducts[positionOfHalfProduct].unit
+                ) * servings
+              )
+            }
     }
 
     private fun setRowAsHalfProduct(positionOfHalfProduct: Int) {

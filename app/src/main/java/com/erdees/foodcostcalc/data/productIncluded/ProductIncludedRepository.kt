@@ -21,6 +21,4 @@ class ProductIncludedRepository(val productIncludedDao: ProductIncludedDao) {
 
     fun getCertainProductIncluded(id: Long) = productIncludedDao.getCertainProductsIncluded(id)
 
-    fun getProductIncludedByDishID(id: Long) = productIncludedDao.getProductIncludedFromDishId(id)
-
 }

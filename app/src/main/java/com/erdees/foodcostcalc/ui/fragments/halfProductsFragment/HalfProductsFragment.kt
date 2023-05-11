@@ -12,8 +12,6 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsI
 import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.*
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 class HalfProductsFragment : Fragment() {
   var callbackListener: CallbackListener? = null
   private lateinit var recyclerView: RecyclerView
@@ -28,7 +26,6 @@ class HalfProductsFragment : Fragment() {
     val view: View = inflater.inflate(R.layout.fragment_half_products, container, false)
 
     val viewModel = ViewModelProvider(this).get(HalfProductsFragmentViewModel::class.java)
-
     recyclerView = view.findViewById(R.id.recycler_view_half_products)
     recyclerView.setHasFixedSize(true)
     setEmptyAdapterToRecyclerView { callbackListener?.callback() }
@@ -40,8 +37,8 @@ class HalfProductsFragment : Fragment() {
           halfProducts.forEach { listOfHalfProducts.add(it) }
           fragmentRecyclerAdapter = HalfProductFragmentRecyclerAdapter(
             listOfHalfProducts.filter {
-              it.halfProductModel.name.toLowerCase()
-                .contains(searchWord.toLowerCase())
+              it.halfProductModel.name.lowercase(Locale.getDefault())
+                .contains(searchWord.lowercase(Locale.getDefault()))
             } as ArrayList<HalfProductWithProductsIncludedModel>,
             childFragmentManager, requireActivity()) { callbackListener?.callback() }
           recyclerView.adapter = fragmentRecyclerAdapter

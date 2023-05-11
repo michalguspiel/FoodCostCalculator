@@ -9,6 +9,7 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.databinding.FragmentEditProductBinding
 import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
 import com.erdees.foodcostcalc.domain.model.product.ProductModel
@@ -18,22 +19,17 @@ import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
 import com.erdees.foodcostcalc.utils.Utils.getUnits
 import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
+
+  private var _binding: FragmentEditProductBinding? = null
+  private val binding get() = _binding!!
 
   private var unitPosition: Int? = null
   private var productId: Long? = null
   private var unitList: MutableList<String> = mutableListOf()
-  private lateinit var unitSpinner: AutoCompleteTextView
   private val spinnerId = 1
   private lateinit var fragmentViewModel: EditProductFragmentViewModel
   private lateinit var sharedPreferences: SharedPreferences
-
-  private lateinit var name: EditText
-  private lateinit var price: EditText
-  private lateinit var tax: EditText
-  private lateinit var waste: EditText
 
   override fun onResume() {
     unitList = getUnits(resources, sharedPreferences)
@@ -47,11 +43,9 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     }
 
     val unitsAdapter = ArrayAdapter(
-      requireActivity(),
-      R.layout.dropdown_item,
-      unitList
+      requireActivity(), R.layout.dropdown_item, unitList
     )
-    with(unitSpinner) {
+    with(binding.spinnerEditProduct) {
       setAdapter(unitsAdapter)
       onItemClickListener = this@EditProductFragment
       gravity = Gravity.CENTER
@@ -62,26 +56,16 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
   @SuppressLint("ResourceType")
   override fun onCreateView(
-    inflater: LayoutInflater,
-    container: ViewGroup?,
-    savedInstanceState: Bundle?
+    inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
   ): View {
-    val view: View = inflater.inflate(R.layout.fragment_edit_product, container, false)
-
+    _binding = FragmentEditProductBinding.inflate(inflater, container, false)
+    val view = binding.root
     fragmentViewModel = ViewModelProvider(this).get(EditProductFragmentViewModel::class.java)
     sharedPreferences = SharedPreferences(requireContext())
 
-    /** Binders*/
-    name = view.findViewById(R.id.edit_product_name)
-    price = view.findViewById(R.id.edit_product_price)
-    tax = view.findViewById(R.id.edit_product_tax)
-    waste = view.findViewById(R.id.edit_product_waste)
-    unitSpinner = view.findViewById(R.id.spinner_edit_product)
-    unitSpinner.setOnFocusChangeListener { _, hasFocus ->
+    binding.spinnerEditProduct.setOnFocusChangeListener { _, hasFocus ->
       if (hasFocus) view.hideKeyboard()
     }
-    val saveButton = view.findViewById<Button>(R.id.save_changes_button)
-    val deleteButton = view.findViewById<Button>(R.id.delete_product_button)
 
     /** empty lists which gets populated by every 'ProductIncluded' and
      * 'ProductIncludedInHalfProductModel' that has the same ID as edited product. */
@@ -89,14 +73,13 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     var productIncludedInHalfProductList = listOf<ProductIncludedInHalfProduct>()
     setProductIdOfEditedProduct(productModelPassedFromAdapter)
     setDialogFieldsAccordinglyToProductEdited(productModelPassedFromAdapter)
-    if(productId != null) {
+    if (productId != null) {
       fragmentViewModel.getCertainProductsIncluded(productId!!).observe(
         viewLifecycleOwner
       ) { listOfProducts ->
         productIncludedList = listOfProducts
       }
-      fragmentViewModel.getCertainProductsIncludedInHalfProduct(productId!!)
-        .observe(
+      fragmentViewModel.getCertainProductsIncludedInHalfProduct(productId!!).observe(
           viewLifecycleOwner
         ) { listOfProducts ->
           productIncludedInHalfProductList = listOfProducts
@@ -104,30 +87,29 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     }
 
     /** BUTTON LOGIC*/
-    saveButton.setOnClickListener {
+    binding.saveChangesButton.setOnClickListener {
       if (allFieldsAreLegit()) {
         if (unitPosition == null) unitPosition =
           unitList.indexOf(productModelPassedFromAdapter.unit)
         val productToChange = ProductModel(
           productId!!,
-          name.text.toString(),
-          price.text.toString().toDouble(),
-          tax.text.toString().toDouble(),
-          waste.text.toString().toDouble(),
+          binding.editProductName.text.toString(),
+          binding.editProductPrice.text.toString().toDouble(),
+          binding.editProductTax.text.toString().toDouble(),
+          binding.editProductWaste.text.toString().toDouble(),
           unitList[unitPosition!!]
         )
         fragmentViewModel.editProduct(productToChange)
         changeEveryProductIncluded(productToChange, productIncludedList)
         changeEveryProductIncludedInHalfProduct(
-          productToChange,
-          productIncludedInHalfProductList
+          productToChange, productIncludedInHalfProductList
         )
         this.dismiss()
       } else Toast.makeText(requireContext(), "Fields must not be empty!", Toast.LENGTH_SHORT)
         .show()
     }
 
-    deleteButton.setOnClickListener {
+    binding.deleteProductButton.setOnClickListener {
       fragmentViewModel.deleteProduct(productModelPassedFromAdapter)
       this.dismiss()
     }
@@ -143,15 +125,11 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
   }
 
   private fun allFieldsAreLegit(): Boolean {
-    return (!name.text.isNullOrBlank() &&
-      !price.text.isNullOrBlank() && price.text.toString() != "." &&
-      !tax.text.isNullOrBlank() && tax.text.toString() != "." &&
-      !waste.text.isNullOrBlank() && waste.text.toString() != ".")
+    return (!binding.editProductName.text.isNullOrBlank() && !binding.editProductPrice.text.isNullOrBlank() && binding.editProductPrice.text.toString() != "." && !binding.editProductTax.text.isNullOrBlank() && binding.editProductTax.text.toString() != "." && !binding.editProductWaste.text.isNullOrBlank() && binding.editProductWaste.text.toString() != ".")
   }
 
   private fun changeEveryProductIncluded(
-    productModelToChange: ProductModel,
-    listOfProductsToChange: List<ProductIncluded>
+    productModelToChange: ProductModel, listOfProductsToChange: List<ProductIncluded>
   ) {
     listOfProductsToChange.forEach {
       fragmentViewModel.editProductsIncluded(
@@ -169,8 +147,7 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
   }
 
   private fun changeEveryProductIncludedInHalfProduct(
-    productModelToChange: ProductModel,
-    listToChange: List<ProductIncludedInHalfProduct>
+    productModelToChange: ProductModel, listToChange: List<ProductIncludedInHalfProduct>
   ) {
     listToChange.forEach {
       fragmentViewModel.editProductIncludedInHalfProduct(
@@ -192,22 +169,17 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
   }
 
   private fun setDialogFieldsAccordinglyToProductEdited(productModelPassedFromAdapter: ProductModel) {
-    name.setText(productModelPassedFromAdapter.name)
-    price.setText(productModelPassedFromAdapter.pricePerUnit.toString())
-    tax.setText(productModelPassedFromAdapter.tax.toString())
-    waste.setText(productModelPassedFromAdapter.waste.toString())
-    unitSpinner.setText(productModelPassedFromAdapter.unit, false)
+    binding.editProductName.setText(productModelPassedFromAdapter.name)
+    binding.editProductPrice.setText(productModelPassedFromAdapter.pricePerUnit.toString())
+    binding.editProductTax.setText(productModelPassedFromAdapter.tax.toString())
+    binding.editProductWaste.setText(productModelPassedFromAdapter.waste.toString())
+    binding.spinnerEditProduct.setText(productModelPassedFromAdapter.unit, false)
   }
 
   override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-    when (parent?.id) {
-      1 -> {
-        unitPosition = position
-      }
-      else -> {
-        unitPosition = position
-
-      }
+    unitPosition = when (parent?.id) {
+      1 -> position
+      else -> position
     }
   }
 }

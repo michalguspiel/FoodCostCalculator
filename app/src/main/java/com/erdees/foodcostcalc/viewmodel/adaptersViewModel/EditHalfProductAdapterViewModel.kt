@@ -4,8 +4,6 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
@@ -20,7 +18,6 @@ class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel
     val halfProductRepository: HalfProductRepository
     val halfProductIncludedInDishRepository: HalfProductIncludedInDishRepository
     val productIncludedInHalfProductRepository: ProductIncludedInHalfProductRepository
-    val basicRepository: BasicRepository
 
     init {
         val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
@@ -28,14 +25,12 @@ class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel
             AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
         val productIncludedInHalfProductDao =
             AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
-        val basicDao = BasicDataBase.getInstance().basicDao
 
         halfProductRepository = HalfProductRepository(halfProductDao)
         halfProductIncludedInDishRepository =
             HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
         productIncludedInHalfProductRepository =
             ProductIncludedInHalfProductRepository(productIncludedInHalfProductDao)
-        basicRepository = BasicRepository(basicDao)
     }
 
 

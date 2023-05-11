@@ -3,8 +3,7 @@ package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
+import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
 
 /**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
@@ -12,14 +11,12 @@ import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductW
 
 class HalfProductsFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
-    val basicRepository: BasicRepository
+    private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
+    private val searchEngineRepository: SearchEngineRepository = SearchEngineRepository.getInstance()
 
-    init {
-        val basicDao = BasicDataBase.getInstance().basicDao
-        basicRepository = BasicRepository(basicDao)
+  init {
 
-        val halfProductWithProductsIncludedDao =
+    val halfProductWithProductsIncludedDao =
             AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
         halfProductWithProductsIncludedRepository =
             HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
@@ -28,5 +25,5 @@ class HalfProductsFragmentViewModel(application: Application) : AndroidViewModel
 
     fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
 
-    fun getWhatToSearchFor() = basicRepository.getWhatToSearchFor()
+    fun getWhatToSearchFor() = searchEngineRepository.getWhatToSearchFor()
 }

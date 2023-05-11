@@ -3,8 +3,6 @@ package com.erdees.foodcostcalc.ui.fragments.dishesFragment
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.grandDish.GrandDishRepository
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
@@ -13,18 +11,15 @@ import com.erdees.foodcostcalc.utils.Utils.formatPrice
 class DishRVAdapterViewModel(application: Application) : AndroidViewModel(application) {
 
     private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
-    val basicRepository: BasicRepository
     private val grandDishRepository: GrandDishRepository
 
     init {
         val halfProductWithProductsIncludedDao =
             AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
-        val basicDao = BasicDataBase.getInstance().basicDao
         val grandDishDao = AppRoomDataBase.getDatabase(application).grandDishDao()
         halfProductWithProductsIncludedRepository =
             HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
         grandDishRepository = GrandDishRepository(grandDishDao)
-        basicRepository = BasicRepository(basicDao)
     }
 
     fun getCertainHalfProductWithProductsIncluded(halfProductId: Long) =

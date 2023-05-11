@@ -13,7 +13,6 @@ import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
 
 class EditProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
 

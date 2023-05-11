@@ -15,7 +15,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-/** REFACTORED !*/
 class AddFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     private val productRepository: ProductRepository
@@ -76,6 +75,4 @@ class AddFragmentViewModel(application: Application) : AndroidViewModel(applicat
         val result = pricePerBox / quantityInBox
         return formatResultAndCheckCommas(result)
     }
-
-
 }
