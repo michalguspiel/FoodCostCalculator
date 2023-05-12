@@ -34,9 +34,6 @@ import com.google.gson.Gson
 import java.io.*
 import java.util.*
 
-
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 class OnlineDataActivity : AppCompatActivity() {
 
     private lateinit var signInButton: SignInButton

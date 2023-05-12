@@ -5,20 +5,16 @@ import android.app.Activity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import android.widget.Toast
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.databinding.ListviewDishRowBinding
 import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
 import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
 import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRecipe
 import com.erdees.foodcostcalc.utils.Utils.getIngredientForHundredPercentOfRecipe
 import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
-
 import java.text.NumberFormat
-
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 
 class HalfProductDetailedListViewAdapter(
     private val context: Activity,
@@ -30,20 +26,14 @@ class HalfProductDetailedListViewAdapter(
     R.layout.listview_dish_row,
     productIncludedInHalfProductList
 ) {
-
-    lateinit var productNameText: TextView
-    lateinit var productPriceText: TextView
-    lateinit var productWeightText: TextView
-    lateinit var productUnit: TextView
+    private var _binding : ListviewDishRowBinding? = null
+    private val binding : ListviewDishRowBinding get() = _binding!!
 
     @SuppressLint("ViewHolder")
     override fun getView(position: Int, view: View?, parent: ViewGroup): View {
         val inflater = context.layoutInflater
-        val rowView = inflater.inflate(R.layout.listview_dish_row, null, true)
-        productNameText     = rowView.findViewById(R.id.product_name_in_dish_row)
-        productWeightText   = rowView.findViewById(R.id.product_weight_in_dish_row)
-        productPriceText    = rowView.findViewById(R.id.product_price_in_dish_row)
-        productUnit         = rowView.findViewById(R.id.product_weight_unit_in_dish_row)
+        _binding = ListviewDishRowBinding.inflate(inflater,parent,false)
+
         val quantityPercent =
             getBasicRecipeAsPercentageOfTargetRecipe(quantity, totalWeightOfMainRecipe)
         val weightIncludedQuantity = getIngredientForHundredPercentOfRecipe(
@@ -57,8 +47,8 @@ class HalfProductDetailedListViewAdapter(
         )
         val formatedPrice = NumberFormat.getCurrencyInstance().format(priceIncludedQuantity)
         setRowTextViews(position,formattedWeight,formatedPrice)
-        setRowAsClickListener(rowView,position)
-        return rowView
+        setRowAsClickListener(binding.root,position)
+        return binding.root
     }
 
     private fun setRowAsClickListener(rowView : View, position: Int){
@@ -74,11 +64,11 @@ class HalfProductDetailedListViewAdapter(
     }
 
     private fun setRowTextViews(position: Int, formattedWeight : String, formatedPrice : String){
-        productNameText.text =
+        binding.productNameInDishRow.text =
             productIncludedInHalfProductList[position].productModelIncluded.name
-        productWeightText.text = formattedWeight
-        productPriceText.text = formatedPrice
-        productUnit.text =
+        binding.productWeightInDishRow.text = formattedWeight
+        binding.productPriceInDishRow.text = formatedPrice
+        binding.productWeightUnitInDishRow.text =
             getUnitAbbreviation(productIncludedInHalfProductList[position].weightUnit)
     }
 
