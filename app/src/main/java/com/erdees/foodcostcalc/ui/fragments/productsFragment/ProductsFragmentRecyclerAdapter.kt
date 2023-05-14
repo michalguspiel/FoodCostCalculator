@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.ListProductBinding
@@ -21,6 +22,7 @@ import com.erdees.foodcostcalc.utils.Constants.PRODUCT_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Utils.formatPrice
 import com.erdees.foodcostcalc.utils.ads.AdHelper
+import com.erdees.foodcostcalc.utils.diffutils.ProductDiffUtil
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
@@ -30,27 +32,44 @@ import java.util.*
 class ProductsFragmentRecyclerAdapter(
   val activity: Activity,
   val tag: String?,
-  private val list: ArrayList<ProductModel>,
   private val fragmentManager: FragmentManager,
   private val navigateToAdd: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-  private val adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
+  private var list : List<ProductModel> = listOf()
 
-  private val itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
+  private var adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
 
-  private val positionsOfAds = adCase.positionsOfAds()
+  private var itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
+
+  private var positionsOfAds = adCase.positionsOfAds()
 
   private var currentNativeAd: NativeAd? = null
+
+  fun switchLists(passedList: List<ProductModel>) {
+    Log.i(ProductsFragment.TAG,"Switching lists")
+    val diffUtil = ProductDiffUtil(oldList = this.list, newList = passedList)
+    val diffResult = DiffUtil.calculateDiff(diffUtil)
+    this.list = passedList
+    refreshAdCase()
+    diffResult.dispatchUpdatesTo(this)
+    notifyDataSetChanged()
+  }
+
+  private fun refreshAdCase(){
+    adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
+    itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
+    positionsOfAds = adCase.positionsOfAds()
+  }
 
   inner class RecyclerViewHolder(private val viewBinding: ListProductBinding) :
     RecyclerView.ViewHolder(viewBinding.root) {
     @SuppressLint("SetTextI18n")
-    fun bind(position: Int) {
-      val positionIncludedAdsBinded = adCase.correctElementFromListToBind(position)
+    fun bind() {
+      val positionIncludedAdsBinded = adCase.correctElementFromListToBind(this.adapterPosition)
       Log.i(
         "ProductsRecycler",
-        "position : $position , positionIncludedWithAdsBinded : $positionIncludedAdsBinded , listSize : ${list.size} , positionOfAds : $positionsOfAds"
+        "position : ${this.adapterPosition} , positionIncludedWithAdsBinded : $positionIncludedAdsBinded , listSize : ${list.size} , positionOfAds : $positionsOfAds"
       )
       viewBinding.productTitle.text = list[positionIncludedAdsBinded].name
       viewBinding.productNettoPrice.text =
@@ -106,6 +125,8 @@ class ProductsFragmentRecyclerAdapter(
   }
 
   override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    Log.i(ProductsFragment.TAG,"OnCreateViewHolder")
+
     return when (viewType) {
       PRODUCT_ITEM_TYPE -> {
         RecyclerViewHolder(
@@ -134,6 +155,7 @@ class ProductsFragmentRecyclerAdapter(
   }
 
   override fun getItemViewType(position: Int): Int {
+    Log.i(ProductsFragment.TAG,"getItemType")
     return if (position == itemsSizeWithAds - 1) LAST_ITEM_TYPE
     else if (positionsOfAds.contains(position)) PRODUCT_AD_ITEM_TYPE
     else PRODUCT_ITEM_TYPE
@@ -141,9 +163,8 @@ class ProductsFragmentRecyclerAdapter(
 
   @SuppressLint("WrongConstant", "ShowToast")
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-    if (holder.itemViewType == PRODUCT_ITEM_TYPE) (holder as RecyclerViewHolder).bind(
-      position
-    )
+    Log.i(ProductsFragment.TAG,"OnBindViewHolder")
+    if (holder.itemViewType == PRODUCT_ITEM_TYPE) (holder as RecyclerViewHolder).bind()
     else if (holder.itemViewType == PRODUCT_AD_ITEM_TYPE) (holder as AdItemViewHolder).bind()
     else (holder as LastItemViewHolder).bind()
   }

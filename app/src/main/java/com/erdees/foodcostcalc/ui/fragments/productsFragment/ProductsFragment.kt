@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.fragments.productsFragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.databinding.FragmentProductsBinding
 import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.utils.CallbackListener
-import java.util.*
+import java.util.Locale
 
 class ProductsFragment : Fragment() {
   var callbackListener: CallbackListener? = null
@@ -26,31 +27,22 @@ class ProductsFragment : Fragment() {
     val view: View = binding.root
     val viewModel = ViewModelProvider(this).get(ProductsFragmentViewModel::class.java)
     binding.recyclerViewProducts.setHasFixedSize(true)
-    setEmptyAdapterToRecyclerView()
+    val adapter = ProductsFragmentRecyclerAdapter(
+      requireActivity(),
+      TAG, childFragmentManager, navigateToAdd = { callbackListener?.callback() }
+    )
+    binding.recyclerViewProducts.adapter = adapter
 
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
       viewModel.getProducts().observe(viewLifecycleOwner) { products ->
-        val listOfProducts = mutableListOf<ProductModel>()
-        products.forEach { listOfProducts.add(it) }
-        binding.recyclerViewProducts.adapter =
-          ProductsFragmentRecyclerAdapter(requireActivity(),
-            TAG,
-            listOfProducts.filter {
-              it.name.lowercase(Locale.getDefault()).contains(searchWord.toLowerCase())
-            } as ArrayList<ProductModel>,
-            childFragmentManager,
-            navigateToAdd = { callbackListener?.callback() })
+        Log.i(TAG,"Get new products")
+        val list = products.filter {
+          it.name.lowercase(Locale.getDefault()).contains(searchWord.lowercase())
+        } as ArrayList<ProductModel>
+        adapter.switchLists(list)
       }
     }
     return view
-  }
-
-  /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No adapterFragment attached; skipping layout" */
-  private fun setEmptyAdapterToRecyclerView() {
-    binding.recyclerViewProducts.adapter = ProductsFragmentRecyclerAdapter(
-      requireActivity(),
-      TAG, arrayListOf(), childFragmentManager
-    ) {}
   }
 
   companion object {

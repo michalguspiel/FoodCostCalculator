@@ -17,7 +17,6 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentEditHalfProductBinding
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
@@ -73,7 +72,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
     /** initialize ui with viewmodel*/
     val viewModel = ViewModelProvider(this).get(EditHalfProductFragmentViewModel::class.java)
     val recyclerViewAdapter =
-      EditHalfProductFragmentRecyclerAdapter(
+      EditHalfProductAdapter(
         activity = requireActivity(), viewModel =
         ViewModelProvider(this).get(
           EditHalfProductAdapterViewModel::class.java
@@ -91,9 +90,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
         viewModel
           .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
           .observe(viewLifecycleOwner) { eachProduct ->
-            val data = mutableListOf<ProductIncludedInHalfProduct>()
-            data.addAll(eachProduct)
-            recyclerViewAdapter.switchLists(data)
+            recyclerViewAdapter.switchLists(eachProduct)
           }
       }
 
