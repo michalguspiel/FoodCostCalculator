@@ -15,7 +15,6 @@ import java.util.*
 class HalfProductsFragment : Fragment() {
   var callbackListener: CallbackListener? = null
   private lateinit var recyclerView: RecyclerView
-  private lateinit var fragmentRecyclerAdapter: HalfProductFragmentRecyclerAdapter
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -28,34 +27,23 @@ class HalfProductsFragment : Fragment() {
     val viewModel = ViewModelProvider(this).get(HalfProductsFragmentViewModel::class.java)
     recyclerView = view.findViewById(R.id.recycler_view_half_products)
     recyclerView.setHasFixedSize(true)
-    setEmptyAdapterToRecyclerView { callbackListener?.callback() }
+    val adapter = HalfProductFragmentRecyclerAdapter(
+      childFragmentManager,
+      requireActivity()
+    ) { callbackListener?.callback() }
+    recyclerView.adapter = adapter
 
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
       viewModel.getHalfProductWithProductIncluded()
         .observe(viewLifecycleOwner) { halfProducts ->
-          val listOfHalfProducts = mutableListOf<HalfProductWithProductsIncludedModel>()
-          halfProducts.forEach { listOfHalfProducts.add(it) }
-          fragmentRecyclerAdapter = HalfProductFragmentRecyclerAdapter(
-            listOfHalfProducts.filter {
-              it.halfProductModel.name.lowercase(Locale.getDefault())
-                .contains(searchWord.lowercase(Locale.getDefault()))
-            } as ArrayList<HalfProductWithProductsIncludedModel>,
-            childFragmentManager, requireActivity()) { callbackListener?.callback() }
-          recyclerView.adapter = fragmentRecyclerAdapter
+          val data = halfProducts.filter {
+            it.halfProductModel.name.lowercase(Locale.getDefault())
+              .contains(searchWord.lowercase(Locale.getDefault()))
+          } as ArrayList<HalfProductWithProductsIncludedModel>
+          adapter.switchList(data)
         }
     }
     return view
-  }
-
-  /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No fragmentRecyclerAdapter attached; skipping layout" */
-  private fun setEmptyAdapterToRecyclerView(openCreateHalfProductDialog: () -> Unit) {
-    fragmentRecyclerAdapter = HalfProductFragmentRecyclerAdapter(
-      arrayListOf(),
-      childFragmentManager,
-      requireActivity(),
-      openCreateHalfProductDialog
-    )
-    recyclerView.adapter = fragmentRecyclerAdapter
   }
 
   companion object {

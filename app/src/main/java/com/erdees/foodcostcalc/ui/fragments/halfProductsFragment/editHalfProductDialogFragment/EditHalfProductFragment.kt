@@ -68,7 +68,6 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
     savedInstanceState: Bundle?
   ): View {
     _binding = FragmentEditHalfProductBinding.inflate(inflater,container,false)
-
     /** initialize ui with viewmodel*/
     val viewModel = ViewModelProvider(this).get(EditHalfProductFragmentViewModel::class.java)
     val recyclerViewAdapter =
@@ -111,6 +110,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
 
     binding.deleteDishButton.setOnClickListener {
       viewModel.deleteHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
+      this.dismiss()
     }
 
     dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))

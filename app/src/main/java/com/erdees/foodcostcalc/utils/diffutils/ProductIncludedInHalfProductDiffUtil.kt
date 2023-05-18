@@ -3,7 +3,7 @@ package com.erdees.foodcostcalc.utils.diffutils
 import androidx.recyclerview.widget.DiffUtil
 import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 
- class HalfProductDiffUtil(
+ class ProductIncludedInHalfProductDiffUtil(
   private val oldList : List<ProductIncludedInHalfProduct>,
   private val newList : List<ProductIncludedInHalfProduct>
 ): DiffUtil.Callback(){

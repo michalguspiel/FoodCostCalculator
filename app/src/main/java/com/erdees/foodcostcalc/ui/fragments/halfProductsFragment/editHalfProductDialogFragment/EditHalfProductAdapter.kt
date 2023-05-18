@@ -13,7 +13,7 @@ import com.erdees.foodcostcalc.databinding.EditDishProductRowBinding
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
 import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.utils.diffutils.HalfProductDiffUtil
+import com.erdees.foodcostcalc.utils.diffutils.ProductIncludedInHalfProductDiffUtil
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
 class EditHalfProductAdapter(
@@ -34,7 +34,7 @@ class EditHalfProductAdapter(
   var cloneOfList: List<ProductIncludedInHalfProduct> = mutableListOf()
 
   fun switchLists(passedList: List<ProductIncludedInHalfProduct>) {
-    val diffUtil = HalfProductDiffUtil(oldList = this.list, newList = passedList)
+    val diffUtil = ProductIncludedInHalfProductDiffUtil(oldList = this.list, newList = passedList)
     val diffResult = DiffUtil.calculateDiff(diffUtil)
     this.list = passedList
     this.cloneOfList = passedList

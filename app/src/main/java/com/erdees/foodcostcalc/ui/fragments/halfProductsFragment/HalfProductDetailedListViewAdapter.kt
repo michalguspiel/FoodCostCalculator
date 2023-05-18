@@ -18,13 +18,13 @@ import java.text.NumberFormat
 
 class HalfProductDetailedListViewAdapter(
     private val context: Activity,
-    private val productIncludedInHalfProductList: List<ProductIncludedInHalfProduct>,
+    private val list: List<ProductIncludedInHalfProduct>,
     private val quantity: Double,
     private val totalWeightOfMainRecipe: Double
 ) : ArrayAdapter<ProductIncludedInHalfProduct>(
     context,
     R.layout.listview_dish_row,
-    productIncludedInHalfProductList
+    list
 ) {
     private var _binding : ListviewDishRowBinding? = null
     private val binding : ListviewDishRowBinding get() = _binding!!
@@ -37,12 +37,12 @@ class HalfProductDetailedListViewAdapter(
         val quantityPercent =
             getBasicRecipeAsPercentageOfTargetRecipe(quantity, totalWeightOfMainRecipe)
         val weightIncludedQuantity = getIngredientForHundredPercentOfRecipe(
-            productIncludedInHalfProductList[position].weight,
+            list[position].weight,
             quantityPercent
         )
         val formattedWeight = formatPriceOrWeight(weightIncludedQuantity)
         val priceIncludedQuantity = getPriceForHundredPercentOfRecipe(
-            productIncludedInHalfProductList[position].totalPriceOfThisProduct,
+            list[position].totalPriceOfThisProduct,
             quantityPercent
         )
         val formatedPrice = NumberFormat.getCurrencyInstance().format(priceIncludedQuantity)
@@ -53,11 +53,11 @@ class HalfProductDetailedListViewAdapter(
 
     private fun setRowAsClickListener(rowView : View, position: Int){
         rowView.setOnClickListener {
-            if (productIncludedInHalfProductList[position].weightUnit == "piece") {
+            if (list[position].weightUnit == "piece") {
                 Toast.makeText(context, totalWeightMessage(position), Toast.LENGTH_SHORT).show()
             } else Toast.makeText(
                 context,
-                productIncludedInHalfProductList[position].productModelIncluded.name,
+                list[position].productModelIncluded.name,
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -65,23 +65,23 @@ class HalfProductDetailedListViewAdapter(
 
     private fun setRowTextViews(position: Int, formattedWeight : String, formatedPrice : String){
         binding.productNameInDishRow.text =
-            productIncludedInHalfProductList[position].productModelIncluded.name
+            list[position].productModelIncluded.name
         binding.productWeightInDishRow.text = formattedWeight
         binding.productPriceInDishRow.text = formatedPrice
         binding.productWeightUnitInDishRow.text =
-            getUnitAbbreviation(productIncludedInHalfProductList[position].weightUnit)
+            getUnitAbbreviation(list[position].weightUnit)
     }
 
     private fun totalWeightMessage(position: Int):String {
         val isWeight =
-            productIncludedInHalfProductList[position].halfProductModel.halfProductUnit == "per kilogram" ||
-                    productIncludedInHalfProductList[position].halfProductModel.halfProductUnit == "per pound"
+            list[position].halfProductModel.halfProductUnit == "per kilogram" ||
+                    list[position].halfProductModel.halfProductUnit == "per pound"
         val unitType: String = if (isWeight) " of weight " else " of volume "
-        return productIncludedInHalfProductList[position].productModelIncluded.name +
+        return list[position].productModelIncluded.name +
                 unitType +
-                productIncludedInHalfProductList[position].totalWeightForPiece.toString() + " " +
+                list[position].totalWeightForPiece.toString() + " " +
                 getUnitAbbreviation(
-                    productIncludedInHalfProductList[position].halfProductModel.halfProductUnit.drop(
+                    list[position].halfProductModel.halfProductUnit.drop(
                         4
                     )
                 ) + "."
