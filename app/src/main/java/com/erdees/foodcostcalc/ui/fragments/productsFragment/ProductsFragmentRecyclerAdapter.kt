@@ -64,9 +64,10 @@ class ProductsFragmentRecyclerAdapter(
 
   inner class RecyclerViewHolder(private val viewBinding: ListProductBinding) :
     RecyclerView.ViewHolder(viewBinding.root) {
+    private val positionIncludedAdsBinded get() =  adCase.correctElementFromListToBind(this.adapterPosition)
+
     @SuppressLint("SetTextI18n")
     fun bind() {
-      val positionIncludedAdsBinded = adCase.correctElementFromListToBind(this.adapterPosition)
       Log.i(
         "ProductsRecycler",
         "position : ${this.adapterPosition} , positionIncludedWithAdsBinded : $positionIncludedAdsBinded , listSize : ${list.size} , positionOfAds : $positionsOfAds"
