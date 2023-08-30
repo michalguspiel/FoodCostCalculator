@@ -27,9 +27,7 @@ class DishRVAdapterViewModel(application: Application) : AndroidViewModel(applic
             halfProductId
         )
 
-    val getGrandDishes = grandDishRepository.getGrandDishes()
-
-    fun formattedPriceData(dishModelId: Long, amountOfServings: Int): String {
+  fun formattedPriceData(dishModelId: Long, amountOfServings: Int): String {
         return formatPrice(getDishData(dishModelId).totalPrice * amountOfServings)
     }
 
@@ -103,7 +101,7 @@ class DishRVAdapterViewModel(application: Application) : AndroidViewModel(applic
     }
 
     private fun getDishData(dishModelId: Long): DishPriceData {
-        return dishMap[dishModelId]!!
+        return dishMap[dishModelId] ?: DishPriceData(0.0,0.0,0.0)
     }
 
 }

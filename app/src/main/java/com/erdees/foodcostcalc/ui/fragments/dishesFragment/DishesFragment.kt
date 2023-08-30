@@ -12,7 +12,6 @@ import java.util.*
 
 class DishesFragment : Fragment() {
   var callbackListener: CallbackListener? = null
-  private lateinit var listViewViewModelPassedToRecyclerView: DishListViewAdapterViewModel
   private lateinit var viewModelPassedToRecyclerView: DishRVAdapterViewModel
   private lateinit var fragmentRecyclerAdapter: DishesFragmentRecyclerAdapter
 
@@ -29,23 +28,17 @@ class DishesFragment : Fragment() {
     val viewModel = ViewModelProvider(this).get(DishesFragmentViewModel::class.java)
     viewModelPassedToRecyclerView =
       ViewModelProvider(this).get(DishRVAdapterViewModel::class.java)
-    listViewViewModelPassedToRecyclerView =
-      ViewModelProvider(this).get(DishListViewAdapterViewModel::class.java)
 
-    binding.recyclerViewDishes.setHasFixedSize(true)
     setAdapterToRecyclerView{ callbackListener?.callback() }
 
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
       viewModel.getGrandDishes().observe(viewLifecycleOwner) { grandDishes ->
         fragmentRecyclerAdapter.setGrandDishList(
           grandDishes.filter {
-            it.dishModel.name.toLowerCase(Locale.ROOT).contains(
-              searchWord.toLowerCase(
-                Locale.ROOT
-              )
+            it.dishModel.name.lowercase(Locale.ROOT).contains(
+              searchWord.lowercase(Locale.ROOT)
             )
           })
-        fragmentRecyclerAdapter.initializeAdHelper()
       }
     }
     return view
@@ -55,14 +48,16 @@ class DishesFragment : Fragment() {
     fragmentRecyclerAdapter = DishesFragmentRecyclerAdapter(
       childFragmentManager,
       viewModelPassedToRecyclerView,
-      listViewViewModelPassedToRecyclerView,
       viewLifecycleOwner,
       requireActivity(),
       openCreateNewDishDialog
     )
-    fragmentRecyclerAdapter.setGrandDishList(arrayListOf())
-    fragmentRecyclerAdapter.initializeAdHelper()
     binding.recyclerViewDishes.adapter = fragmentRecyclerAdapter
+  }
+
+  override fun onDestroy() {
+    fragmentRecyclerAdapter.onDestroy()
+    super.onDestroy()
   }
 
   companion object {

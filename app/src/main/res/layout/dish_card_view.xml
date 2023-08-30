@@ -1,200 +1,188 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/linear_layout_dish_card"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/linear_layout_dish_card"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:layout_margin="8dp"
+  android:background="@drawable/recycler_card"
+  android:orientation="vertical"
+  android:padding="4dp">
+
+
+  <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp"
-    android:background="@drawable/recycler_card"
-    android:orientation="vertical"
-    android:padding="4dp">
+    android:layout_gravity="center"
+    android:layout_margin="8dp">
 
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_margin="8dp">
-
-
-        <TextView
-            android:id="@+id/dish_name_in_adapter"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:textColor="#000000"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/linearLayout2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <LinearLayout
-            android:id="@+id/linearLayout2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginEnd="0dp"
-            android:orientation="horizontal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/linear_layout_image_buttons"
-            app:layout_constraintStart_toEndOf="@+id/dish_name_in_adapter"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/dish_margin_tv_in_adapter"
-                android:layout_width="60dp"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                tools:text="Margin: 233%"
-                android:textColor="#000000"
-                android:textSize="14sp"
-                android:textStyle="normal" />
-
-            <TextView
-                android:id="@+id/dish_tax_tv_in_adapter"
-                android:layout_width="50dp"
-                tools:text="Tax: 23%"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textColor="#000000"
-                android:textSize="14sp"
-                android:textStyle="normal" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linear_layout_image_buttons"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-
-        <ImageButton
-            android:id="@+id/add_product_to_dish_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_marginEnd="8dp"
-            android:layout_weight="1"
-            android:background="@null"
-            android:contentDescription="@string/edit_button"
-            app:srcCompat="@drawable/add_quick_button" />
-        <ImageButton
-            android:id="@+id/edit_button_in_dish_adapter"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="start"
-            android:layout_weight="1"
-            android:background="@null"
-            android:contentDescription="@string/edit_button"
-            app:srcCompat="@drawable/ic_edit"
-          />
-
-        </LinearLayout>
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-        <TextView
-            android:visibility="gone"
-            android:id="@+id/how_many_servings_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="@string/data_per_1_serving"
-            tools:text="Data per 1 serving."
-            tools:visibility="visible"/>
-
-
-
+    <TextView
+      android:id="@+id/dish_name_in_adapter"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:textColor="#000000"
+      android:textSize="18sp"
+      android:textStyle="bold"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@id/linearLayout2"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
+      android:id="@+id/linearLayout2"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:layout_marginEnd="0dp"
+      android:orientation="horizontal"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toStartOf="@+id/linear_layout_image_buttons"
+      app:layout_constraintStart_toEndOf="@+id/dish_name_in_adapter"
+      app:layout_constraintTop_toTopOf="parent">
 
-        <ListView
-            android:id="@+id/list_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:divider="@color/gray_200"
-            android:dividerHeight="1dp"
-            android:animateLayoutChanges="true"
-            android:layoutAnimation="@anim/layout_animation"
-            android:layout_margin="4dp" />
+      <TextView
+        android:id="@+id/dish_margin_tv_in_adapter"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        tools:text="Margin: 233%" />
+
+      <TextView
+        android:id="@+id/dish_tax_tv_in_adapter"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textColor="#000000"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        tools:text="Tax: 23%" />
 
     </LinearLayout>
 
+    <LinearLayout
+      android:id="@+id/linear_layout_image_buttons"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:orientation="horizontal"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent">
 
-    <TableRow
-        android:id="@+id/hr"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/orange_500" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+      <ImageButton
+        android:id="@+id/add_product_to_dish_button"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="4dp"
-        android:padding="4dp"
-        >
+        android:layout_gravity="start"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:background="@null"
+        android:contentDescription="@string/edit_button"
+        app:srcCompat="@drawable/add_quick_button" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/total_price"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-        <TextView
-            android:id="@+id/total_price_dish_card_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
+      <ImageButton
+        android:id="@+id/edit_button_in_dish_adapter"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_margin="4dp"
-        android:padding="4dp"
-        >
+        android:layout_gravity="start"
+        android:layout_weight="1"
+        android:background="@null"
+        android:contentDescription="@string/edit_button"
+        app:srcCompat="@drawable/ic_edit" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/final_price_with_margin_and_tax"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+    </LinearLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <TextView
-            android:id="@+id/total_price_with_margin_dish_card_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+  <TextView
+    android:id="@+id/how_many_servings_text_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center"
+    android:text="@string/data_per_1_serving"
+    android:visibility="gone"
+    tools:text="Data per 1 serving."
+    tools:visibility="visible" />
+
+
+  <LinearLayout
+    android:id="@+id/ingredient_list"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layoutAnimation="@anim/layout_animation"
+    android:animateLayoutChanges="true"
+    android:layout_margin="4dp"
+    android:orientation="vertical"
+    android:visibility="gone">
+
+  </LinearLayout>
+
+
+  <TableRow
+    android:id="@+id/hr"
+    android:layout_width="match_parent"
+    android:layout_height="1dp"
+    android:background="@color/orange_500" />
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:orientation="horizontal"
+    android:padding="4dp">
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:text="@string/total_price"
+      android:textColor="#000000"
+      android:textSize="16sp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+      android:id="@+id/total_price_dish_card_view"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:textColor="#000000"
+      android:textSize="16sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
+
+  <androidx.constraintlayout.widget.ConstraintLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:orientation="horizontal"
+    android:padding="4dp">
+
+    <TextView
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="center"
+      android:text="@string/final_price_with_margin_and_tax"
+      android:textColor="#000000"
+      android:textSize="16sp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+      android:id="@+id/total_price_with_margin_dish_card_view"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_gravity="end"
+      android:textColor="#000000"
+      android:textSize="16sp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent" />
+
+  </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

@@ -1,7 +1,8 @@
 package com.erdees.foodcostcalc
 
-import com.erdees.foodcostcalc.utils.SharedFunctions.calculatePrice
-import com.erdees.foodcostcalc.utils.SharedFunctions.computeWeightAndVolumeToSameUnit
+
+import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
+import com.erdees.foodcostcalc.utils.UnitsUtils.computeWeightAndVolumeToSameUnit
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

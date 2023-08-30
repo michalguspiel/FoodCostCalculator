@@ -98,7 +98,7 @@
     <string name="string_plural">%1$ss</string>
     <string name="data_per_1_serving">Data per 1 serving.</string>
     <string name="data_per_serving">Data per serving.</string>
-    <string name="data_per_x_servings">Data per %1$x servings.</string>
+    <string name="data_per_x_servings">Data per %1$s servings.</string>
 
     <string name="dish_x_margin" formatted="true">Margin: %s%%</string>
     <string name="dish_x_tax" formatted="true">Tax: %s%%</string>

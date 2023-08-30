@@ -64,7 +64,7 @@ class HalfProductFragmentRecyclerAdapter(
       notifyDataSetChanged()
   }
   private fun refreshAdCase(){
-    adCase = AdHelper(list.size, Constants.PRODUCTS_AD_FREQUENCY)
+    adCase = AdHelper(list.size, Constants.HALF_PRODUCTS_AD_FREQUENCY)
     itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
     positionsOfAds = adCase.positionsOfAds()
   }

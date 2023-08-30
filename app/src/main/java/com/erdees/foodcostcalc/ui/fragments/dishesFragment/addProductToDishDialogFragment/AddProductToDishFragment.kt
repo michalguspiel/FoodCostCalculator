@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.ui.fragments.dishesFragment.addProductToDishDial
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.databinding.AddProductsToDishBinding
 import com.erdees.foodcostcalc.domain.model.dish.DishModel
+import com.erdees.foodcostcalc.ui.fragments.dishesFragment.DishesFragmentRecyclerAdapter
 import com.erdees.foodcostcalc.utils.Constants.DISH_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.UNIT_SPINNER_ID
@@ -211,9 +213,11 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     }
 
     private fun selectChosenDish() {
+      Log.i(this.tag,"selectChosenDish ${dishModelPassedFromAdapter.name}")
         if (this.isOpenedFromDishAdapter()) {
             val dishToSelect = dishModelPassedFromAdapter
             val positionToSelect = dishesAdapter.getPosition(dishToSelect.name)
+          Log.i(this.tag,"position to select $positionToSelect")
             binding.dishSpinner.setSelection(positionToSelect)
         }
     }
@@ -223,6 +227,6 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     }
 
     private fun isOpenedFromDishAdapter(): Boolean {
-        return this.tag == "DishesFragmentRecyclerAdapter"
+        return this.tag == DishesFragmentRecyclerAdapter.TAG
     }
 }
