@@ -31,7 +31,7 @@ android {
         applicationId "com.erdees.foodcostcalc"
         minSdkVersion 21
         targetSdkVersion 31
-        versionCode 23
+        versionCode 24
         versionName "2.43"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
