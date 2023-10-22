@@ -49,7 +49,6 @@ import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.play.core.review.ReviewManagerFactory
 import java.text.NumberFormat
 
-// TODO : Fix it, buggy AF
 class DishesFragmentRecyclerAdapter(
   private val fragmentManager: FragmentManager,
   private val viewModel: DishesFragmentViewModel,
@@ -250,13 +249,10 @@ class DishesFragmentRecyclerAdapter(
         val isExpanded = viewModel.determineIfDishIsExpanded(dishId)
         if(isExpanded) {
           viewModel.expandedList.remove(dishId)
-          viewBinding.ingredientList.makeGone()
-          viewBinding.howManyServingsTextView.makeGone()
+          hideDishCardElements()
         } else {
           viewModel.expandedList.add(dishId)
-          viewBinding.ingredientList.makeVisible()
-          viewBinding.howManyServingsTextView.makeVisible()
-          setIngredientList(position)
+          showDishCardElements(position)
         }
       }
     }
@@ -264,14 +260,19 @@ class DishesFragmentRecyclerAdapter(
     private fun openOrCloseCard(position: Int){
       val dishId = list[position].dishModel.dishId
       val isExpanded = viewModel.determineIfDishIsExpanded(dishId)
-      if (isExpanded) {
-        viewBinding.ingredientList.makeVisible()
-        viewBinding.howManyServingsTextView.makeVisible()
-        setIngredientList(position)
-      } else {
-        viewBinding.ingredientList.makeGone()
-        viewBinding.howManyServingsTextView.makeGone()
-      }
+      if (isExpanded) showDishCardElements(position)
+      else hideDishCardElements()
+    }
+
+    private fun showDishCardElements(position: Int) {
+      viewBinding.ingredientList.makeVisible()
+      viewBinding.howManyServingsTextView.makeVisible()
+      setIngredientList(position)
+    }
+
+    private fun hideDishCardElements() {
+      viewBinding.ingredientList.makeGone()
+      viewBinding.howManyServingsTextView.makeGone()
     }
 
     private fun setPositiveButtonFunctionality(
