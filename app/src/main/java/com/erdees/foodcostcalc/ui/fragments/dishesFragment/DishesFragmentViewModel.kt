@@ -16,6 +16,11 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
   private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
   private val searchEngineRepository = SearchEngineRepository.getInstance()
   var idToQuantityMap = mutableMapOf<Long, Int>()
+  var expandedList = mutableListOf<Long>()
+
+  fun determineIfDishIsExpanded(dishModelId: Long): Boolean {
+    return expandedList.contains(dishModelId)
+  }
   init {
     val halfProductWithProductsIncludedDao =
       AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()

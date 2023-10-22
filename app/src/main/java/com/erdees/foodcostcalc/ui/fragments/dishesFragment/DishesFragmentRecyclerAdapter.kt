@@ -15,7 +15,6 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import androidx.core.view.isGone
-import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
@@ -239,16 +238,39 @@ class DishesFragmentRecyclerAdapter(
       setHalfProductRowPrice(servings,halfProduct,view.productPriceInDishRow)
     }
 
+    /**
+     * Makes dish card openable.
+     * When clicked, adds the dish id to the list in viewmodel.
+     * Based on that list UI determines if it should be open or closed.
+     * @param position Int
+     */
     private fun makeDishCardOpenable(position: Int) {
       viewBinding.linearLayoutDishCard.setOnClickListener {
-        if (viewBinding.ingredientList.isVisible) {
+        val dishId = list[position].dishModel.dishId
+        val isExpanded = viewModel.determineIfDishIsExpanded(dishId)
+        if(isExpanded) {
+          viewModel.expandedList.remove(dishId)
           viewBinding.ingredientList.makeGone()
           viewBinding.howManyServingsTextView.makeGone()
         } else {
+          viewModel.expandedList.add(dishId)
           viewBinding.ingredientList.makeVisible()
           viewBinding.howManyServingsTextView.makeVisible()
           setIngredientList(position)
         }
+      }
+    }
+
+    private fun openOrCloseCard(position: Int){
+      val dishId = list[position].dishModel.dishId
+      val isExpanded = viewModel.determineIfDishIsExpanded(dishId)
+      if (isExpanded) {
+        viewBinding.ingredientList.makeVisible()
+        viewBinding.howManyServingsTextView.makeVisible()
+        setIngredientList(position)
+      } else {
+        viewBinding.ingredientList.makeGone()
+        viewBinding.howManyServingsTextView.makeGone()
       }
     }
 
@@ -326,6 +348,7 @@ class DishesFragmentRecyclerAdapter(
       setNameTaxAndMarginAccordingly(positionIncludedAdsBinded)
       setButtons(positionIncludedAdsBinded)
       makeDishCardOpenable(positionIncludedAdsBinded)
+      openOrCloseCard(positionIncludedAdsBinded)
       setHowManyServingsTvAsButton(
         viewBinding.howManyServingsTextView,
         positionIncludedAdsBinded
