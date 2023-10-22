@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc.data.halfProductIncludedInDish
 
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
 
 class HalfProductIncludedInDishRepository(private val halfProductIncludedInDishDao: HalfProductIncludedInDishDao ) {
 

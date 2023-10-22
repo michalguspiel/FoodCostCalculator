@@ -1,63 +1,53 @@
 package com.erdees.foodcostcalc.ui.fragments.productsFragment
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.databinding.FragmentProductsBinding
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
-import java.util.*
-
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.utils.CallbackListener
+import java.util.Locale
 
 class ProductsFragment : Fragment() {
+  var callbackListener: CallbackListener? = null
 
-    private var _binding: FragmentProductsBinding? = null
-    private val binding get() = _binding!!
-    private lateinit var viewModelPassedToRecycler: RecyclerViewAdapterViewModel
+  private var _binding: FragmentProductsBinding? = null
+  private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentProductsBinding.inflate(inflater, container, false)
-        val view: View = binding.root
-        val viewModel = ViewModelProvider(this).get(ProductsFragmentViewModel::class.java)
-        viewModelPassedToRecycler =
-            ViewModelProvider(this).get(RecyclerViewAdapterViewModel::class.java)
-        binding.recyclerViewProducts.setHasFixedSize(true)
-        setEmptyAdapterToRecyclerView()
+  override fun onCreateView(
+    inflater: LayoutInflater,
+    container: ViewGroup?,
+    savedInstanceState: Bundle?
+  ): View {
+    _binding = FragmentProductsBinding.inflate(inflater, container, false)
+    val view: View = binding.root
+    val viewModel = ViewModelProvider(this).get(ProductsFragmentViewModel::class.java)
+    binding.recyclerViewProducts.setHasFixedSize(true)
+    val adapter = ProductsFragmentRecyclerAdapter(
+      requireActivity(),
+      TAG, childFragmentManager, navigateToAdd = { callbackListener?.callback() }
+    )
+    binding.recyclerViewProducts.adapter = adapter
 
-        viewModel.getWhatToSearchFor().observe(viewLifecycleOwner, { searchWord ->
-            viewModel.getProducts().observe(viewLifecycleOwner, { products ->
-                val listOfProducts = mutableListOf<ProductModel>()
-                products.forEach { listOfProducts.add(it) }
-                binding.recyclerViewProducts.adapter =
-                    ProductsFragmentRecyclerAdapter(requireActivity(),
-                        TAG,
-                        listOfProducts.filter {
-                            it.name.toLowerCase().contains(searchWord.toLowerCase())
-                        } as ArrayList<ProductModel>,
-                        childFragmentManager,
-                        viewModelPassedToRecycler)
-            })
-        })
-        return view
+    //TODO NOT IN THIS REFACTOR: do not use nested .observe
+    viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
+      viewModel.getProducts().observe(viewLifecycleOwner) { products ->
+        Log.i(TAG,"Get new products")
+        val list = products.filter {
+          it.name.lowercase(Locale.getDefault()).contains(searchWord.lowercase())
+        } as ArrayList<ProductModel>
+        adapter.switchLists(list)
+      }
     }
+    return view
+  }
 
-    /**This must be called immediately in onCreate to avoid error: "E/RecyclerView: No adapterFragment attached; skipping layout" */
-    private fun setEmptyAdapterToRecyclerView() {
-        binding.recyclerViewProducts.adapter = ProductsFragmentRecyclerAdapter(
-            requireActivity(),
-            TAG, arrayListOf(), childFragmentManager, viewModelPassedToRecycler
-        )
-    }
-
-    companion object {
-        fun newInstance(): ProductsFragment = ProductsFragment()
-        const val TAG = "ProductsFragment"
-    }
+  companion object {
+    fun newInstance(): ProductsFragment = ProductsFragment()
+    const val TAG = "ProductsFragment"
+  }
 }

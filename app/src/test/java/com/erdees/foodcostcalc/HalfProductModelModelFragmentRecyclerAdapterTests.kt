@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc
 
-import com.erdees.foodcostcalc.utils.SharedFunctions.getBasicRecipeAsPercentageOfTargetRecipe
-import com.erdees.foodcostcalc.utils.SharedFunctions.getIngredientForHundredPercentOfRecipe
+import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRecipe
+import com.erdees.foodcostcalc.utils.Utils.getIngredientForHundredPercentOfRecipe
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

@@ -5,7 +5,6 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.erdees.foodcostcalc.data.dish.DishDao
-import com.erdees.foodcostcalc.data.dishWithProductIncluded.DishWithProductIncludedDao
 import com.erdees.foodcostcalc.data.grandDish.GrandDishDao
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishDao
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedDao
@@ -13,12 +12,12 @@ import com.erdees.foodcostcalc.data.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.product.ProductDao
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedDao
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductDao
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.DishModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.dish.DishModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import java.io.File
 
 @Database(
@@ -26,7 +25,7 @@ import java.io.File
         ProductModel::class, DishModel::class,
         ProductIncluded::class,
         HalfProductModel::class,
-        ProductIncludedInHalfProductModel::class,
+        ProductIncludedInHalfProduct::class,
         HalfProductIncludedInDishModel::class,
     ], version = 1, exportSchema = true
 )
@@ -39,7 +38,6 @@ abstract class AppRoomDataBase : RoomDatabase() {
     abstract fun halfProductWithProductsIncludedDao(): HalfProductWithProductsIncludedDao
     abstract fun halfProductIncludedInDishDao() : HalfProductIncludedInDishDao
     abstract fun productIncludedDao() : ProductIncludedDao
-    abstract fun dishWithProductIncludedDao() : DishWithProductIncludedDao
     abstract fun grandDishDao() : GrandDishDao
 
     /**Singleton of database.*/
@@ -74,5 +72,4 @@ abstract class AppRoomDataBase : RoomDatabase() {
         }
 
     }
-
 }

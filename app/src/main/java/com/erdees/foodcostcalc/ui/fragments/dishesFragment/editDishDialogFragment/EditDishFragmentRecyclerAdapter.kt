@@ -10,7 +10,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.EditDishProductRowBinding
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
 import com.erdees.foodcostcalc.utils.Utils.isNotBlankNorJustDot
 
 class EditDishFragmentRecyclerAdapter(
@@ -50,7 +50,7 @@ class EditDishFragmentRecyclerAdapter(
                 holder
             )
             holder.viewBinding.deleteProductInDishButton.setOnClickListener {
-                buildDeleteProductAlertDialog(holder)
+              viewModel.deleteProductIncluded(grandDishModel.productsIncluded[holder.adapterPosition])
             }
             addProductWeightTextChangedListener(holder)
         } else if (isRowHalfProduct(holder)) {
@@ -63,7 +63,7 @@ class EditDishFragmentRecyclerAdapter(
                 holder
             )
             holder.viewBinding.deleteProductInDishButton.setOnClickListener {
-                buildDeleteHalfProductAlertDialog(thisPosition)
+              viewModel.deleteHalfProductIncluded(grandDishModel.halfProducts[thisPosition])
             }
             addHalfProductWeightTextChangedListener(holder, thisPosition)
         }
@@ -93,43 +93,7 @@ class EditDishFragmentRecyclerAdapter(
         }))
     }
 
-    private fun buildDeleteProductAlertDialog(holder: EditDishViewHolder) {
-        val alertDialog =
-            AlertDialog.Builder(activity).setTitle(activity.getString(R.string.are_you_sure))
-                .setPositiveButton(R.string.yes, null)
-                .setNegativeButton(R.string.back, null)
-                .show()
-        alertDialog.window?.setBackgroundDrawable(
-            ContextCompat.getDrawable(
-                activity,
-                R.drawable.background_for_dialogs
-            )
-        )
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            viewModel.deleteProductIncluded(grandDishModel.productsIncluded[holder.adapterPosition])
-            alertDialog.dismiss()
-        }
-    }
-
-    private fun buildDeleteHalfProductAlertDialog(pos: Int) {
-        val alertDialog =
-            AlertDialog.Builder(activity).setTitle(activity.getString(R.string.are_you_sure))
-                .setPositiveButton(R.string.yes, null)
-                .setNegativeButton(R.string.back, null)
-                .show()
-        alertDialog.window?.setBackgroundDrawable(
-            ContextCompat.getDrawable(
-                activity,
-                R.drawable.background_for_dialogs
-            )
-        )
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-            viewModel.deleteHalfProductIncluded(grandDishModel.halfProducts[pos])
-            alertDialog.dismiss()
-        }
-    }
-
-    private fun setFields(name: String, weight: Double, unit: String, holder: EditDishViewHolder) {
+  private fun setFields(name: String, weight: Double, unit: String, holder: EditDishViewHolder) {
         holder.viewBinding.productNameTextView.text = name
         holder.viewBinding.productWeightEdittext.setText(weight.toString())
         setUnit(unit, weight, holder)

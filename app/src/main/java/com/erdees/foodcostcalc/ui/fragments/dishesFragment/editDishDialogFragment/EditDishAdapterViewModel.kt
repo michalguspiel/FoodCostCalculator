@@ -7,9 +7,9 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.dish.DishRepository
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.models.GrandDishModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

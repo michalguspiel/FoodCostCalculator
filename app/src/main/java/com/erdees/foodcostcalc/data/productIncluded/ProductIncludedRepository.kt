@@ -1,8 +1,8 @@
 package com.erdees.foodcostcalc.data.productIncluded
 
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
 
-class ProductIncludedRepository(val productIncludedDao: ProductIncludedDao) {
+class ProductIncludedRepository(private val productIncludedDao: ProductIncludedDao) {
 
     suspend fun addProductToDish(product: ProductIncluded) =
         productIncludedDao.addProductToDish(product)
@@ -20,7 +20,5 @@ class ProductIncludedRepository(val productIncludedDao: ProductIncludedDao) {
     }
 
     fun getCertainProductIncluded(id: Long) = productIncludedDao.getCertainProductsIncluded(id)
-
-    fun getProductIncludedByDishID(id: Long) = productIncludedDao.getProductIncludedFromDishId(id)
 
 }

@@ -3,24 +3,116 @@ package com.erdees.foodcostcalc.ui.fragments.dishesFragment
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
+import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
 import com.erdees.foodcostcalc.data.grandDish.GrandDishRepository
+import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
+import com.erdees.foodcostcalc.domain.model.dish.DishPriceData
+import com.erdees.foodcostcalc.utils.UnitsUtils
+import com.erdees.foodcostcalc.utils.Utils
 
 class DishesFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val grandDishRepository: GrandDishRepository
-    val basicRepository: BasicRepository
+  private val grandDishRepository: GrandDishRepository
+  private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
+  private val searchEngineRepository = SearchEngineRepository.getInstance()
+  val idToQuantityMap = mutableMapOf<Long, Int>()
+  val expandedList = mutableListOf<Long>()
 
-    init {
-        val grandDishDao = AppRoomDataBase.getDatabase(application).grandDishDao()
-        val basicDao = BasicDataBase.getInstance().basicDao
+  fun determineIfDishIsExpanded(dishModelId: Long): Boolean {
+    return expandedList.contains(dishModelId)
+  }
+  init {
+    val halfProductWithProductsIncludedDao =
+      AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
+    val grandDishDao = AppRoomDataBase.getDatabase(application).grandDishDao()
+    grandDishRepository = GrandDishRepository(grandDishDao)
+    halfProductWithProductsIncludedRepository =
+      HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
+  }
 
-        grandDishRepository = GrandDishRepository(grandDishDao)
-        basicRepository = BasicRepository(basicDao)
-    }
+  fun getGrandDishes() = grandDishRepository.getGrandDishes()
 
-    fun getGrandDishes() = grandDishRepository.getGrandDishes()
+  fun getWhatToSearchFor() = searchEngineRepository.getWhatToSearchFor()
 
-    fun getWhatToSearchFor() = basicRepository.getWhatToSearchFor()
+  fun getCertainHalfProductWithProductsIncluded(halfProductId: Long) =
+    halfProductWithProductsIncludedRepository.getCertainHalfProductWithProductsIncluded(
+      halfProductId
+    )
+
+  fun formattedPriceData(dishModelId: Long, amountOfServings: Int): String {
+    return Utils.formatPrice(getDishData(dishModelId).totalPrice * amountOfServings)
+  }
+
+  fun formattedTotalPriceData(dishModelId: Long, amountOfServings: Int): String {
+    val dishData = getDishData(dishModelId)
+    return formattedTotalPriceData(
+      dishData.totalPrice,
+      dishData.margin,
+      dishData.tax,
+      amountOfServings
+    )
+  }
+
+  private fun formattedTotalPriceData(
+    totalPrice: Double,
+    dishMargin: Double,
+    dishTax: Double,
+    amountOfServings: Int
+  ): String {
+    return Utils.formatPrice(
+      priceAfterMarginAndTax(
+        totalPrice,
+        dishMargin,
+        dishTax,
+        amountOfServings
+      )
+    )
+  }
+
+  private fun priceAfterMarginAndTax(
+    totalPrice: Double,
+    margin: Double,
+    tax: Double,
+    amountOfServings: Int
+  ): Double {
+    val priceWithMargin = totalPrice * margin / 100
+    val amountOfTax = priceWithMargin * tax / 100
+    return (priceWithMargin + amountOfTax) * amountOfServings
+  }
+
+  fun addToTotalPrice(
+    dishModelId: Long, pricePerUnit: Double,
+    weight: Double,
+    halfProductUnit: String,
+    halfProductHostUnit: String
+  ) {
+    val dish = getDishData(dishModelId)
+    val dishNewTotalPrice = dish.totalPrice + totalPriceOfHalfProduct(
+      pricePerUnit,
+      weight,
+      halfProductUnit,
+      halfProductHostUnit
+    )
+    setDishData(dishModelId, dishNewTotalPrice, dish.margin, dish.tax)
+  }
+
+  private fun totalPriceOfHalfProduct(
+    pricePerUnit: Double,
+    weight: Double,
+    halfProductUnit: String,
+    halfProductHostUnit: String
+  ): Double {
+    return UnitsUtils.calculatePrice(pricePerUnit, weight, halfProductUnit, halfProductHostUnit)
+  }
+
+  private val dishMap: MutableMap<Long, DishPriceData> = mutableMapOf()
+
+  fun setDishData(dishModelId: Long, totalPrice: Double, margin: Double, tax: Double) {
+    val newData = DishPriceData(totalPrice, margin, tax)
+    dishMap[dishModelId] = newData
+  }
+
+  private fun getDishData(dishModelId: Long): DishPriceData {
+    return dishMap[dishModelId] ?: DishPriceData(0.0, 0.0, 0.0)
+  }
 }

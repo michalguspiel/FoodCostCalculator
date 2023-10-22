@@ -10,7 +10,7 @@ import com.google.android.gms.ads.VideoController
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 
-class AdHelper(private val itemsSize: Int, private val adFrequency: Int) {
+class AdHelper(itemsSize: Int, private val adFrequency: Int) {
 
     private val initialCountOfAds = itemsSize / adFrequency
 

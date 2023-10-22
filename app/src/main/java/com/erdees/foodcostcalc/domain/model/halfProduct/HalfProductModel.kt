@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models
+package com.erdees.foodcostcalc.domain.model.halfProduct
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

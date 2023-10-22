@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.Utils.formatResultAndCheckCommas
@@ -15,7 +15,6 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-/** REFACTORED !*/
 class AddFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
     private val productRepository: ProductRepository
@@ -76,6 +75,4 @@ class AddFragmentViewModel(application: Application) : AndroidViewModel(applicat
         val result = pricePerBox / quantityInBox
         return formatResultAndCheckCommas(result)
     }
-
-
 }

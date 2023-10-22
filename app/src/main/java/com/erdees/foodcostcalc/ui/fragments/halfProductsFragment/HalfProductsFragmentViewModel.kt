@@ -3,30 +3,28 @@ package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
+import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
 import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
-
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
 
 class HalfProductsFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
-    val basicRepository: BasicRepository
+  private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
+  private val searchEngineRepository: SearchEngineRepository = SearchEngineRepository.getInstance()
+  val idToQuantityMap = mutableMapOf<Long, Double>()
+  val expandedList = mutableListOf<Long>()
 
-    init {
-        val basicDao = BasicDataBase.getInstance().basicDao
-        basicRepository = BasicRepository(basicDao)
+  init {
+    val halfProductWithProductsIncludedDao =
+      AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
+    halfProductWithProductsIncludedRepository =
+      HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
+  }
 
-        val halfProductWithProductsIncludedDao =
-            AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
-        halfProductWithProductsIncludedRepository =
-            HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
-    }
+  fun determineIfCardIsExpanded(id: Long): Boolean {
+  return expandedList.contains(id)
+  }
 
+  fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
 
-    fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
-
-    fun getWhatToSearchFor() = basicRepository.getWhatToSearchFor()
+  fun getWhatToSearchFor() = searchEngineRepository.getWhatToSearchFor()
 }

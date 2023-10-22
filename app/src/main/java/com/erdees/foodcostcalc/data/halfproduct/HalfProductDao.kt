@@ -2,7 +2,7 @@ package com.erdees.foodcostcalc.data.halfproduct
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
 
 @Dao
 interface HalfProductDao {
@@ -18,4 +18,7 @@ interface HalfProductDao {
 
     @Delete
     suspend fun deleteHalfProduct(halfProductModel: HalfProductModel)
+
+    @Query("DELETE FROM HalfProduct WHERE HalfProductId =:id")
+    fun deleteHalfProduct(id: Long)
 }

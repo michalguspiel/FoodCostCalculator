@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.productsFragment.models
+package com.erdees.foodcostcalc.domain.model.product
 
 
 import androidx.room.ColumnInfo

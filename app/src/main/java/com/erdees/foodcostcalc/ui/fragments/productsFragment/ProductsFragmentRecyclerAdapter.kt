@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.FragmentManager
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.databinding.ListProductBinding
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.editProductDialogFragment.EditProductFragment
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
 import com.erdees.foodcostcalc.ui.views.MaskedItemView
 import com.erdees.foodcostcalc.utils.Constants.ADMOB_PRODUCTS_RV_AD_UNIT_ID
 import com.erdees.foodcostcalc.utils.Constants.LAST_ITEM_TYPE
@@ -20,141 +22,151 @@ import com.erdees.foodcostcalc.utils.Constants.PRODUCT_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Utils.formatPrice
 import com.erdees.foodcostcalc.utils.ads.AdHelper
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.RecyclerViewAdapterViewModel
+import com.erdees.foodcostcalc.utils.diffutils.ProductDiffUtil
 import com.google.android.gms.ads.*
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import java.util.*
 
-/**TODO REFACTORING INTO VIEW BINDING + MVVM PATTERN IMPROVEMENT */
-
-
 class ProductsFragmentRecyclerAdapter(
-    val activity: Activity,
-    val tag: String?,
-    private val list: ArrayList<ProductModel>,
-    private val fragmentManager: FragmentManager,
-    val viewModel: RecyclerViewAdapterViewModel
+  val activity: Activity,
+  val tag: String?,
+  private val fragmentManager: FragmentManager,
+  private val navigateToAdd: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private val adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
+  private var list : List<ProductModel> = listOf()
 
-    private val itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
+  private var adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
 
-    private val positionsOfAds = adCase.positionsOfAds()
+  private var itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
 
-    private var currentNativeAd: NativeAd? = null
+  private var positionsOfAds = adCase.positionsOfAds()
 
-    inner class RecyclerViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val textView: TextView = view.findViewById(R.id.product_title)
-        private val nettoTextView: TextView = view.findViewById(R.id.product_netto_price)
-        private val foodcostTextView: TextView = view.findViewById(R.id.product_foodcost_price)
-        private val editButton: ImageButton = view.findViewById(R.id.edit_button)
+  private var currentNativeAd: NativeAd? = null
 
-        @SuppressLint("SetTextI18n")
-        fun bind(position: Int) {
+  fun switchLists(passedList: List<ProductModel>) {
+    Log.i(ProductsFragment.TAG,"Switching lists")
+    val diffUtil = ProductDiffUtil(oldList = this.list, newList = passedList)
+    val diffResult = DiffUtil.calculateDiff(diffUtil)
+    this.list = passedList
+    refreshAdCase()
+    diffResult.dispatchUpdatesTo(this)
+    notifyDataSetChanged()
+  }
 
-            val positionIncludedAdsBinded = adCase.correctElementFromListToBind(position)
-            Log.i("ProductsRecycler", "position : $position , positionIncludedWithAdsBinded : $positionIncludedAdsBinded , listSize : ${list.size} , positionOfAds : $positionsOfAds")
-            textView.text = list[positionIncludedAdsBinded].name
-            nettoTextView.text =
-                "Price ${list[positionIncludedAdsBinded].unit} netto: ${formatPrice(list[positionIncludedAdsBinded].pricePerUnit)}."
-            foodcostTextView.text =
-                "Price ${list[positionIncludedAdsBinded].unit} with foodcost: ${formatPrice(list[positionIncludedAdsBinded].priceAfterWasteAndTax)}."
-            editButton.setOnClickListener {
-                EditProductFragment().show(fragmentManager, EditProductFragment.TAG)
-                EditProductFragment.productModelPassedFromAdapter = list[positionIncludedAdsBinded]
-            }
+  private fun refreshAdCase(){
+    adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
+    itemsSizeWithAds = adCase.finalListSize + 1 // +1 to include button as footer.
+    positionsOfAds = adCase.positionsOfAds()
+  }
+
+  inner class RecyclerViewHolder(private val viewBinding: ListProductBinding) :
+    RecyclerView.ViewHolder(viewBinding.root) {
+    private val positionIncludedAdsBinded get() =  adCase.correctElementFromListToBind(this.adapterPosition)
+
+    @SuppressLint("SetTextI18n")
+    fun bind() {
+      Log.i(
+        "ProductsRecycler",
+        "position : ${this.adapterPosition} , positionIncludedWithAdsBinded : $positionIncludedAdsBinded , listSize : ${list.size} , positionOfAds : $positionsOfAds"
+      )
+      viewBinding.productTitle.text = list[positionIncludedAdsBinded].name
+      viewBinding.productNettoPrice.text =
+        "Price ${list[positionIncludedAdsBinded].unit} netto: ${formatPrice(list[positionIncludedAdsBinded].pricePerUnit)}."
+      viewBinding.productFoodcostPrice.text =
+        "Price ${list[positionIncludedAdsBinded].unit} with foodcost: ${formatPrice(list[positionIncludedAdsBinded].priceAfterWasteAndTax)}."
+      viewBinding.editButton.setOnClickListener {
+        EditProductFragment().show(fragmentManager, EditProductFragment.TAG)
+        EditProductFragment.productModelPassedFromAdapter = list[positionIncludedAdsBinded]
+      }
+    }
+  }
+
+  inner class LastItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    private val layoutAsButton: MaskedItemView =
+      view.findViewById(R.id.products_last_item_layout)
+
+    fun bind() {
+      layoutAsButton.setOnClickListener {
+        navigateToAdd()
+      }
+    }
+  }
+
+  inner class AdItemViewHolder(val view: NativeAdView) : RecyclerView.ViewHolder(view) {
+    fun bind() {
+      val builder = AdLoader.Builder(activity, ADMOB_PRODUCTS_RV_AD_UNIT_ID)
+      builder.forNativeAd { nativeAd ->
+        // OnUnifiedNativeAdLoadedListener implementation.
+        // If this callback occurs after the activity is destroyed, you must call
+        // destroy and return or you may get a memory leak.
+        val activityDestroyed: Boolean = activity.isDestroyed
+        if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
+          nativeAd.destroy()
+          return@forNativeAd
         }
+        // You must call destroy on old ads when you are done with them,
+        // otherwise you will have a memory leak.
+        currentNativeAd?.destroy()
+        currentNativeAd = nativeAd
+        adCase.populateNativeAdView(nativeAd, view)
+      }
+      val videoOptions = VideoOptions.Builder()
+        .build()
+      val adOptions = NativeAdOptions.Builder()
+        .setVideoOptions(videoOptions)
+        .build()
+      builder.withNativeAdOptions(adOptions)
+      val adLoader = builder.withAdListener(object : AdListener() {
+      }).build()
+      adLoader.loadAd(AdRequest.Builder().build())
     }
+  }
 
-    inner class LastItemViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val layoutAsButton: MaskedItemView =
-            view.findViewById(R.id.products_last_item_layout)
+  override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    Log.i(ProductsFragment.TAG,"OnCreateViewHolder")
 
-        fun bind() {
-            layoutAsButton.setOnClickListener {
-                viewModel.setOpenAddFlag(true)
-                viewModel.setOpenAddFlag(false)
-            }
-        }
+    return when (viewType) {
+      PRODUCT_ITEM_TYPE -> {
+        RecyclerViewHolder(
+          ListProductBinding.inflate(
+          LayoutInflater.from(activity),parent,false
+        ))
+      }
+
+      PRODUCT_AD_ITEM_TYPE -> {
+        val adapterLayout = LayoutInflater.from(parent.context)
+          .inflate(R.layout.product_ad_custom_layout, parent, false) as NativeAdView
+        AdItemViewHolder(adapterLayout)
+      }
+
+      else -> {
+        val adapterLayout =
+          LayoutInflater.from(parent.context)
+            .inflate(R.layout.products_recycler_last_item, parent, false)
+        LastItemViewHolder(adapterLayout)
+      }
     }
+  }
 
-    inner class AdItemViewHolder(val view: NativeAdView) : RecyclerView.ViewHolder(view) {
-        fun bind() {
-            val builder = AdLoader.Builder(activity, ADMOB_PRODUCTS_RV_AD_UNIT_ID)
-            builder.forNativeAd { nativeAd ->
-                // OnUnifiedNativeAdLoadedListener implementation.
-                // If this callback occurs after the activity is destroyed, you must call
-                // destroy and return or you may get a memory leak.
-                val activityDestroyed: Boolean = activity.isDestroyed
-                if (activityDestroyed || activity.isFinishing || activity.isChangingConfigurations) {
-                    nativeAd.destroy()
-                    Log.i("TESTTT", " THIS RETURN IS CALLED ")
-                    return@forNativeAd
-                }
-                // You must call destroy on old ads when you are done with them,
-                // otherwise you will have a memory leak.
-                currentNativeAd?.destroy()
-                currentNativeAd = nativeAd
-                adCase.populateNativeAdView(nativeAd, view)
-            }
-            val videoOptions = VideoOptions.Builder()
-                .build()
-            val adOptions = NativeAdOptions.Builder()
-                .setVideoOptions(videoOptions)
-                .build()
-            builder.withNativeAdOptions(adOptions)
-            val adLoader = builder.withAdListener(object : AdListener() {
-            }).build()
-            adLoader.loadAd(AdRequest.Builder().build())
-        }
-    }
+  override fun getItemCount(): Int {
+    return itemsSizeWithAds
+  }
 
+  override fun getItemViewType(position: Int): Int {
+    Log.i(ProductsFragment.TAG,"getItemType")
+    return if (position == itemsSizeWithAds - 1) LAST_ITEM_TYPE
+    else if (positionsOfAds.contains(position)) PRODUCT_AD_ITEM_TYPE
+    else PRODUCT_ITEM_TYPE
+  }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return when (viewType) {
-            PRODUCT_ITEM_TYPE -> {
-                val adapterLayout =
-                    LayoutInflater.from(parent.context)
-                        .inflate(R.layout.list_product, parent, false)
-                RecyclerViewHolder(adapterLayout)
-            }
-            PRODUCT_AD_ITEM_TYPE -> {
-                val adapterLayout = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.product_ad_custom_layout, parent, false) as NativeAdView
-                AdItemViewHolder(adapterLayout)
-            }
-            else -> {
-                val adapterLayout =
-                    LayoutInflater.from(parent.context)
-                        .inflate(R.layout.products_recycler_last_item, parent, false)
-                LastItemViewHolder(adapterLayout)
-            }
-        }
-    }
-
-    override fun getItemCount(): Int {
-        return itemsSizeWithAds
-    }
-
-
-    override fun getItemViewType(position: Int): Int {
-        return if (position == itemsSizeWithAds - 1) LAST_ITEM_TYPE
-        else if (positionsOfAds.contains(position)) PRODUCT_AD_ITEM_TYPE
-        else PRODUCT_ITEM_TYPE
-    }
-
-    @SuppressLint("WrongConstant", "ShowToast")
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        if (holder.itemViewType == PRODUCT_ITEM_TYPE) (holder as RecyclerViewHolder).bind(
-            position
-        )
-        else if (holder.itemViewType == PRODUCT_AD_ITEM_TYPE) (holder as AdItemViewHolder).bind()
-        else (holder as LastItemViewHolder).bind()
-
-    }
-
-
+  @SuppressLint("WrongConstant", "ShowToast")
+  override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    Log.i(ProductsFragment.TAG,"OnBindViewHolder")
+    if (holder.itemViewType == PRODUCT_ITEM_TYPE) (holder as RecyclerViewHolder).bind()
+    else if (holder.itemViewType == PRODUCT_AD_ITEM_TYPE) (holder as AdItemViewHolder).bind()
+    else (holder as LastItemViewHolder).bind()
+  }
 }

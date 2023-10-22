@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models
+package com.erdees.foodcostcalc.domain.model.halfProduct
 
 import androidx.room.Embedded
 import androidx.room.Ignore
@@ -6,19 +6,17 @@ import androidx.room.Relation
 import com.erdees.foodcostcalc.utils.UnitsUtils.computeWeightAndVolumeToSameUnit
 import java.text.NumberFormat
 
-/**TODO REFACTOR*/
-
 data class HalfProductWithProductsIncludedModel(
-    @Embedded val halfProductModel: HalfProductModel,
-    @Relation(
+  @Embedded val halfProductModel: HalfProductModel,
+  @Relation(
         parentColumn = "halfProductId",
         entityColumn = "halfProductHostId"
     )
-    val halfProductsListModel: List<ProductIncludedInHalfProductModel>
+    val halfProductsList: List<ProductIncludedInHalfProduct>
 ) {
     fun totalWeight(): Double {
         return if (halfProductModel.halfProductUnit == "per piece") 1.0
-        else halfProductsListModel.map {
+        else halfProductsList.map {
             if (it.weightUnit != "piece")
                 computeWeightAndVolumeToSameUnit(
                     halfProductModel.halfProductUnit,
@@ -36,11 +34,11 @@ data class HalfProductWithProductsIncludedModel(
     }
 
     fun pricePerRecipe(): Double {
-        return halfProductsListModel.map { it.totalPriceOfThisProduct }.sum()
+        return halfProductsList.map { it.totalPriceOfThisProduct }.sum()
     }
 
     fun pricePerUnit(): Double {
-        val totalPrice = halfProductsListModel.map { it.totalPriceOfThisProduct }.sum()
+        val totalPrice = halfProductsList.map { it.totalPriceOfThisProduct }.sum()
         return when (halfProductModel.halfProductUnit) {
             "per piece" -> totalPrice
             "per kilogram" -> totalPrice / totalWeight()
@@ -58,4 +56,3 @@ data class HalfProductWithProductsIncludedModel(
     @Ignore
     val formattedPricePerRecipe : String = NumberFormat.getCurrencyInstance().format(pricePerRecipe())
 }
-

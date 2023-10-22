@@ -5,14 +5,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.basic.BasicDataBase
-import com.erdees.foodcostcalc.data.basic.BasicRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.HalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.models.ProductIncludedInHalfProductModel
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.models.ProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.domain.model.product.ProductModel
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.UnitsUtils
@@ -25,28 +23,22 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
     val readAllHalfProductModelData: LiveData<List<HalfProductModel>>
     val readAllProductModelData: LiveData<List<ProductModel>>
 
-    private val basicRepository: BasicRepository
     private val productRepository: ProductRepository
     private val halfProductRepository: HalfProductRepository
     private val productIncludedInHalfProductRepository: ProductIncludedInHalfProductRepository
 
-
     init {
-        val basicDao = BasicDataBase.getInstance().basicDao
         val productDao = AppRoomDataBase.getDatabase(application).productDao()
         val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
         val productIncludedInHalfProductDao =
             AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
 
-        basicRepository = BasicRepository(basicDao)
         halfProductRepository = HalfProductRepository(halfProductDao)
         productRepository = ProductRepository(productDao)
         productIncludedInHalfProductRepository =
             ProductIncludedInHalfProductRepository((productIncludedInHalfProductDao))
-
         readAllHalfProductModelData = halfProductRepository.readAllData
         readAllProductModelData = productRepository.readAllData
-
     }
 
     var isProductPiece: Boolean = false
@@ -110,8 +102,6 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         usaCondition = sharedPreferences.getValueBoolean(Constants.USA, false)
     }
 
-    fun getHalfProductToDialog() = basicRepository.getHalfProductToDialog()
-
     fun addProductToHalfProduct(
         weight: Double,
         pieceWeight: Double
@@ -123,7 +113,7 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         val chosenProduct =
             readAllProductModelData.value?.get(productPosition!!)
         addProductIncludedInHalfProduct(
-            ProductIncludedInHalfProductModel(
+            ProductIncludedInHalfProduct(
                 0,
                 chosenProduct!!,
                 chosenHalfProduct!!,
@@ -135,10 +125,10 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         )
     }
 
-    private fun addProductIncludedInHalfProduct(productIncludedInHalfProductModel: ProductIncludedInHalfProductModel) {
+    private fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) {
         viewModelScope.launch(Dispatchers.IO) {
             productIncludedInHalfProductRepository.addProductIncludedInHalfProduct(
-                productIncludedInHalfProductModel
+                productIncludedInHalfProduct
             )
         }
     }

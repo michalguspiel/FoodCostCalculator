@@ -12,6 +12,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.*
 import com.erdees.foodcostcalc.databinding.AddProductToHalfProductBinding
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
 import com.erdees.foodcostcalc.utils.Constants.HALFPRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
@@ -60,39 +61,39 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
         setUnitsSpinner()
 
         viewModel.readAllHalfProductModelData.observe(
-            viewLifecycleOwner,
-            {
-                it.forEach { halfProduct -> halfProductsList.add(halfProduct.name) }
-                if (this.isOpenFromHalfProductAdapter()) {
-                    pickHalfProduct()
-                }
-            })
+            viewLifecycleOwner
+        ) {
+          it.forEach { halfProduct -> halfProductsList.add(halfProduct.name) }
+          if (this.isOpenFromHalfProductAdapter()) {
+            pickHalfProduct()
+          }
+        }
 
-        viewModel.readAllProductModelData.observe(
-            viewLifecycleOwner,
-            { it.forEach { product -> productList.add(product.name) } })
+      viewModel.readAllProductModelData.observe(
+            viewLifecycleOwner
+        ) { it.forEach { product -> productList.add(product.name) } }
 
-        viewModel.readAllProductModelData.observe(
-            viewLifecycleOwner,
-            { products ->
-                productAdapter.clear()
-                products.forEach { product ->
-                    productAdapter.add(product.name)
-                    productAdapter.notifyDataSetChanged()
-                }
-            })
+      viewModel.readAllProductModelData.observe(
+            viewLifecycleOwner
+        ) { products ->
+          productAdapter.clear()
+          products.forEach { product ->
+            productAdapter.add(product.name)
+            productAdapter.notifyDataSetChanged()
+          }
+        }
 
-        viewModel.readAllHalfProductModelData.observe(
-            viewLifecycleOwner,
-            { halfProducts ->
-                halfProductAdapter.clear()
-                halfProducts.forEach { halfProduct ->
-                    halfProductAdapter.add(halfProduct.name)
-                    halfProductAdapter.notifyDataSetChanged()
-                }
-            })
+      viewModel.readAllHalfProductModelData.observe(
+            viewLifecycleOwner
+        ) { halfProducts ->
+          halfProductAdapter.clear()
+          halfProducts.forEach { halfProduct ->
+            halfProductAdapter.add(halfProduct.name)
+            halfProductAdapter.notifyDataSetChanged()
+          }
+        }
 
-        binding.calculateWasteInfoButton.setOnClickListener {
+      binding.calculateWasteInfoButton.setOnClickListener {
             InformationDialogFragment().show(
                 this.parentFragmentManager,
                 TAG
@@ -135,8 +136,8 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
     }
 
     private fun pickHalfProduct() {
-        val halfProductToSelect = viewModel.getHalfProductToDialog().value
-        val positionToSelect = halfProductsList.indexOf(halfProductToSelect!!.name)
+        val halfProductToSelect = halfProduct
+        val positionToSelect = halfProductsList.indexOf(halfProductToSelect.name)
         binding.halfProductSpinner.setSelection(positionToSelect)
     }
 
@@ -189,7 +190,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
     companion object {
         fun newInstance(): AddProductToHalfProductFragment =
             AddProductToHalfProductFragment()
-
+        lateinit var halfProduct : HalfProductModel
         const val TAG = "AddProductToHalfProductFragment"
     }
 
