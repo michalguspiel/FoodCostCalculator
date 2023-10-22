@@ -24,9 +24,9 @@ android {
     defaultConfig {
         applicationId "com.erdees.foodcostcalc"
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 23
-        versionName "2.43"
+        targetSdkVersion 31
+        versionCode 25
+        versionName "2.5.0"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -127,5 +127,7 @@ dependencies {
 
     //ERROR HANDLE
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+
+    implementation 'androidx.work:work-runtime-ktx:2.7.1'
 
 }
