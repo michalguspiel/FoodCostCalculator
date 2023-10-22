@@ -7,7 +7,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.Button
+import android.widget.EditText
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.text.isDigitsOnly
 import androidx.core.view.isGone
@@ -44,14 +48,12 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.play.core.review.ReviewManagerFactory
-import io.reactivex.disposables.Disposable
-import io.reactivex.subjects.PublishSubject
 import java.text.NumberFormat
 
 // TODO : Fix it, buggy AF
 class DishesFragmentRecyclerAdapter(
   private val fragmentManager: FragmentManager,
-  private val viewModel: DishRVAdapterViewModel,
+  private val viewModel: DishesFragmentViewModel,
   private val viewLifecycleOwner: LifecycleOwner,
   private val activity: Activity,
   private val openCreateNewDishDialog: () -> Unit
@@ -69,41 +71,11 @@ class DishesFragmentRecyclerAdapter(
     this.list = listToSet
     diffResult.dispatchUpdatesTo(this)
     refreshAdHelper()
-    cleanupSubjects(list)
     notifyDataSetChanged()
   }
 
   private fun refreshAdHelper() {
     adCase = AdHelper(list.size, Constants.DISHES_AD_FREQUENCY)
-  }
-
-  private fun cleanupSubjects(list: List<GrandDishModel>) {
-    val subjects = amountOfServingsSubjects.filter { subject ->
-      list.map { it.dishModel.dishId }.contains(subject.first)
-    }
-    amountOfServingsSubjects = subjects
-    val disposables = disposables.filterNot { disposable ->
-      list.map { it.dishModel.dishId }.contains(disposable.first)
-    }
-    disposables.forEach { it.second.dispose() }
-    val newCurrentValueMap = currentValueMap.filter { value ->
-      list.map { it.dishModel.dishId }.contains(value.key)
-    }
-    currentValueMap = newCurrentValueMap.toMutableMap()
-  }
-
-  private var amountOfServingsSubjects: List<Pair<Long, PublishSubject<Int>>> = listOf()
-  private var disposables: List<Pair<Long, Disposable>> = listOf()
-  private var currentValueMap: MutableMap<Long, Int> = mutableMapOf()
-
-  fun getPublishSubjectById(itemId: Long): PublishSubject<Int>? {
-    return amountOfServingsSubjects.find { it.first == itemId }?.second
-  }
-
-  fun onDestroy() {
-    disposables.forEach { (dishId, disposable) ->
-      disposable.dispose()
-    }
   }
 
   inner class DishRecyclerViewHolder(private val viewBinding: DishCardViewBinding) :
@@ -120,10 +92,13 @@ class DishesFragmentRecyclerAdapter(
     }
 
     private fun setHowManyServingsTV(i: Int) {
-      if (i == 1) viewBinding.howManyServingsTextView.text =
+      val quantity =
+      viewModel.idToQuantityMap[list[i].dishModel.dishId] ?: 1
+      Log.i(TAG,"setHowManyServingsTV, $i")
+      if (quantity == 1) viewBinding.howManyServingsTextView.text =
         activity.getString(R.string.data_per_serving)
       else viewBinding.howManyServingsTextView.text =
-        activity.getString(R.string.data_per_x_servings, i.toString())
+        activity.getString(R.string.data_per_x_servings, quantity.toString())
     }
 
     /**Summing up total price of products included and then one by one adding price of each half product.*/
@@ -157,7 +132,9 @@ class DishesFragmentRecyclerAdapter(
     }
 
     private fun getAmountOfServings(position: Int): Int {
-      return currentValueMap[list[position].dishModel.dishId] ?: 1
+      val dishID = list[position].dishModel.dishId
+      val amountOfServings = viewModel.idToQuantityMap[dishID]
+      return amountOfServings ?: 1 // If we don't have data it's 1
     }
 
     private fun setNameTaxAndMarginAccordingly(position: Int) {
@@ -286,9 +263,9 @@ class DishesFragmentRecyclerAdapter(
           Toast.makeText(activity, "Wrong input!", Toast.LENGTH_SHORT).show()
           return@setOnClickListener
         }
-        getPublishSubjectById(list[position].dishModel.dishId)?.onNext(
-          editText.text.toString().toInt()
-        )
+        val dishId = list[position].dishModel.dishId
+        viewModel.idToQuantityMap[dishId] = editText.text.toString().toInt()
+        setGrandDishList(list) // to refresh the list
         alertDialog.dismiss()
       }
     }
@@ -333,29 +310,6 @@ class DishesFragmentRecyclerAdapter(
       )
     }
 
-    private fun createSubjectIfDoesNotExist(position: Int) {
-      val thisDishId = list[position].dishModel.dishId
-      val subject = getPublishSubjectById(thisDishId)
-      if (subject == null) {
-        val newSubject = PublishSubject.create<Int>()
-        val pair = thisDishId to newSubject
-        val foo = newSubject.subscribe { value ->
-          Log.i(TAG, "Subscribe value $value $thisDishId")
-          currentValueMap[thisDishId] = value
-          setHowManyServingsTV(value)
-          setPriceData(value, list[position].dishModel.dishId)
-          setIngredientList(position)
-        }
-        disposables += disposables + (thisDishId to foo)
-        newSubject.onNext(1)
-        amountOfServingsSubjects = amountOfServingsSubjects + pair
-      } else {
-        val value = currentValueMap.getValue(list[position].dishModel.dishId)
-        setHowManyServingsTV(value)
-        setPriceData(value, list[position].dishModel.dishId)
-      }
-    }
-
     private val positionIncludedAdsBinded get() = adCase.correctElementFromListToBind(this.adapterPosition)
 
     fun bind() {
@@ -366,7 +320,7 @@ class DishesFragmentRecyclerAdapter(
       }
       setDishData(positionIncludedAdsBinded)
       sumPriceAndSetPriceData(positionIncludedAdsBinded)
-      createSubjectIfDoesNotExist(positionIncludedAdsBinded)
+      setHowManyServingsTV(positionIncludedAdsBinded)
       setIngredientList(positionIncludedAdsBinded)
       if (positionIncludedAdsBinded == 6) openFeedBackForm()
       setNameTaxAndMarginAccordingly(positionIncludedAdsBinded)

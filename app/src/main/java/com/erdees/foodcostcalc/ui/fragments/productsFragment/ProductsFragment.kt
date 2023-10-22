@@ -33,6 +33,7 @@ class ProductsFragment : Fragment() {
     )
     binding.recyclerViewProducts.adapter = adapter
 
+    //TODO NOT IN THIS REFACTOR: do not use nested .observe
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
       viewModel.getProducts().observe(viewLifecycleOwner) { products ->
         Log.i(TAG,"Get new products")
