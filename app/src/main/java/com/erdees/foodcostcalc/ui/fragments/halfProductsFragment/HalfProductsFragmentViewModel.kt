@@ -8,18 +8,23 @@ import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductW
 
 class HalfProductsFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
-    private val searchEngineRepository: SearchEngineRepository = SearchEngineRepository.getInstance()
+  private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
+  private val searchEngineRepository: SearchEngineRepository = SearchEngineRepository.getInstance()
+  val idToQuantityMap = mutableMapOf<Long, Double>()
+  val expandedList = mutableListOf<Long>()
 
   init {
     val halfProductWithProductsIncludedDao =
-            AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
-        halfProductWithProductsIncludedRepository =
-            HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
-    }
+      AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
+    halfProductWithProductsIncludedRepository =
+      HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
+  }
 
+  fun determineIfCardIsExpanded(id: Long): Boolean {
+  return expandedList.contains(id)
+  }
 
-    fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
+  fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData
 
-    fun getWhatToSearchFor() = searchEngineRepository.getWhatToSearchFor()
+  fun getWhatToSearchFor() = searchEngineRepository.getWhatToSearchFor()
 }

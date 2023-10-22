@@ -15,8 +15,8 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
   private val grandDishRepository: GrandDishRepository
   private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
   private val searchEngineRepository = SearchEngineRepository.getInstance()
-  var idToQuantityMap = mutableMapOf<Long, Int>()
-  var expandedList = mutableListOf<Long>()
+  val idToQuantityMap = mutableMapOf<Long, Int>()
+  val expandedList = mutableListOf<Long>()
 
   fun determineIfDishIsExpanded(dishModelId: Long): Boolean {
     return expandedList.contains(dishModelId)

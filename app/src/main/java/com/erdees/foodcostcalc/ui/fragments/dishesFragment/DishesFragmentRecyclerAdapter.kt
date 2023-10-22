@@ -238,12 +238,12 @@ class DishesFragmentRecyclerAdapter(
     }
 
     /**
-     * Makes dish card openable.
+     * Makes dish card expandable.
      * When clicked, adds the dish id to the list in viewmodel.
      * Based on that list UI determines if it should be open or closed.
      * @param position Int
      */
-    private fun makeDishCardOpenable(position: Int) {
+    private fun makeDishCardExpandable(position: Int) {
       viewBinding.linearLayoutDishCard.setOnClickListener {
         val dishId = list[position].dishModel.dishId
         val isExpanded = viewModel.determineIfDishIsExpanded(dishId)
@@ -348,7 +348,7 @@ class DishesFragmentRecyclerAdapter(
       if (positionIncludedAdsBinded == 6) openFeedBackForm()
       setNameTaxAndMarginAccordingly(positionIncludedAdsBinded)
       setButtons(positionIncludedAdsBinded)
-      makeDishCardOpenable(positionIncludedAdsBinded)
+      makeDishCardExpandable(positionIncludedAdsBinded)
       openOrCloseCard(positionIncludedAdsBinded)
       setHowManyServingsTvAsButton(
         viewBinding.howManyServingsTextView,

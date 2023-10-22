@@ -15,6 +15,7 @@ import java.util.*
 class HalfProductsFragment : Fragment() {
   var callbackListener: CallbackListener? = null
   private lateinit var recyclerView: RecyclerView
+  private lateinit var adapter: HalfProductFragmentRecyclerAdapter
 
   override fun onCreateView(
     inflater: LayoutInflater,
@@ -27,23 +28,36 @@ class HalfProductsFragment : Fragment() {
     val viewModel = ViewModelProvider(this).get(HalfProductsFragmentViewModel::class.java)
     recyclerView = view.findViewById(R.id.recycler_view_half_products)
     recyclerView.setHasFixedSize(true)
-    val adapter = HalfProductFragmentRecyclerAdapter(
-      childFragmentManager,
-      requireActivity()
-    ) { callbackListener?.callback() }
-    recyclerView.adapter = adapter
+    setAdapterToRecyclerView(viewModel)
 
+    var searchKeyWord = ""
+    var halfProducts = listOf<HalfProductWithProductsIncludedModel>()
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
-      viewModel.getHalfProductWithProductIncluded()
-        .observe(viewLifecycleOwner) { halfProducts ->
-          val data = halfProducts.filter {
-            it.halfProductModel.name.lowercase(Locale.getDefault())
-              .contains(searchWord.lowercase(Locale.getDefault()))
-          } as ArrayList<HalfProductWithProductsIncludedModel>
-          adapter.switchList(data)
-        }
+      searchKeyWord = searchWord
+      setAdapter(halfProducts, searchKeyWord)
+    }
+    viewModel.getHalfProductWithProductIncluded().observe(viewLifecycleOwner) { halfProduct ->
+      halfProducts = halfProduct
+      setAdapter(halfProducts, searchKeyWord)
     }
     return view
+  }
+
+  private fun setAdapter(halfProducts: List<HalfProductWithProductsIncludedModel>, searchWord: String){
+    val data = halfProducts.filter {
+      it.halfProductModel.name.lowercase(Locale.getDefault())
+        .contains(searchWord.lowercase(Locale.getDefault()))
+    } as ArrayList<HalfProductWithProductsIncludedModel>
+    adapter.setHalfProductsList(data)
+  }
+
+  private fun setAdapterToRecyclerView(viewModel: HalfProductsFragmentViewModel) {
+    adapter = HalfProductFragmentRecyclerAdapter(
+      childFragmentManager,
+      requireActivity(),
+      viewModel
+    ) { callbackListener?.callback() }
+    recyclerView.adapter = adapter
   }
 
   companion object {
