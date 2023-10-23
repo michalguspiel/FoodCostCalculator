@@ -8,9 +8,6 @@ plugins {
 }
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.3"
-
     buildFeatures {
         viewBinding true
     }
@@ -22,11 +19,12 @@ android {
 
 
     defaultConfig {
+        compileSdk = 33
         applicationId "com.erdees.foodcostcalc"
         minSdkVersion 21
-        targetSdkVersion 31
-        versionCode 25
-        versionName "2.5.0"
+        targetSdkVersion 33
+        versionCode 26
+        versionName "2.5.01"
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
