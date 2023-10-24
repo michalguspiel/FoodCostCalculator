@@ -8,13 +8,14 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.CompoundButton
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import com.erdees.foodcostcalc.*
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.AddProductsToDishBinding
 import com.erdees.foodcostcalc.domain.model.dish.DishModel
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.DishesFragmentRecyclerAdapter
 import com.erdees.foodcostcalc.utils.Constants.DISH_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.UNIT_SPINNER_ID
@@ -124,7 +125,7 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
             AddProductToDishFragment()
 
         const val TAG = "AddProductToDishFragment"
-        lateinit var dishModelPassedFromAdapter: DishModel
+        var dishModelPassedFromAdapter: DishModel? = null
     }
 
     private fun addChosenHalfProductToDish() {
@@ -213,20 +214,14 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     }
 
     private fun selectChosenDish() {
-      Log.i(this.tag,"selectChosenDish ${dishModelPassedFromAdapter.name}")
-        if (this.isOpenedFromDishAdapter()) {
-            val dishToSelect = dishModelPassedFromAdapter
+            Log.i(this.tag,"selectChosenDish ${dishModelPassedFromAdapter?.name}")
+            val dishToSelect = dishModelPassedFromAdapter ?: return
             val positionToSelect = dishesAdapter.getPosition(dishToSelect.name)
-          Log.i(this.tag,"position to select $positionToSelect")
+            Log.i(this.tag,"position to select $positionToSelect")
             binding.dishSpinner.setSelection(positionToSelect)
-        }
     }
 
     private fun isProductWeightInvalid(): Boolean {
         return (binding.productWeight.text.isNullOrEmpty() || binding.productWeight.text.toString() == ".")
-    }
-
-    private fun isOpenedFromDishAdapter(): Boolean {
-        return this.tag == DishesFragmentRecyclerAdapter.TAG
     }
 }

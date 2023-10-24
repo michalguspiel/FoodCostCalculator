@@ -64,9 +64,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
             viewLifecycleOwner
         ) {
           it.forEach { halfProduct -> halfProductsList.add(halfProduct.name) }
-          if (this.isOpenFromHalfProductAdapter()) {
-            pickHalfProduct()
-          }
+          pickHalfProductIfPresent()
         }
 
       viewModel.readAllProductModelData.observe(
@@ -135,8 +133,8 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
         return view
     }
 
-    private fun pickHalfProduct() {
-        val halfProductToSelect = halfProduct
+    private fun pickHalfProductIfPresent() {
+        val halfProductToSelect = passedHalfProduct ?: return
         val positionToSelect = halfProductsList.indexOf(halfProductToSelect.name)
         binding.halfProductSpinner.setSelection(positionToSelect)
     }
@@ -190,7 +188,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
     companion object {
         fun newInstance(): AddProductToHalfProductFragment =
             AddProductToHalfProductFragment()
-        lateinit var halfProduct : HalfProductModel
+        var passedHalfProduct : HalfProductModel? = null
         const val TAG = "AddProductToHalfProductFragment"
     }
 
@@ -233,9 +231,5 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
         this.dismiss()
-    }
-
-    private fun isOpenFromHalfProductAdapter(): Boolean {
-        return this.tag == "HalfProductFragmentRecyclerAdapter"
     }
 }
