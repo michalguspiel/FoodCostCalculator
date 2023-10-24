@@ -90,7 +90,7 @@ class HalfProductFragmentRecyclerAdapter(
       viewBinding.addProductToHalfproductButton.setOnClickListener {
         positionOfListAdapterToUpdate = position
         AddProductToHalfProductFragment().show(fragmentManager, TAG)
-        AddProductToHalfProductFragment.halfProduct = list[position].halfProductModel
+        AddProductToHalfProductFragment.passedHalfProduct = list[position].halfProductModel
       }
     }
 

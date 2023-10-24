@@ -202,6 +202,7 @@ class MainActivity : AppCompatActivity() {
             openDialog(CreateDishFragment(viewBinding.drawerLayout))
           }
           R.id.nav_add_product_to_dish -> {
+            AddProductToDishFragment.dishModelPassedFromAdapter = null
             openDialog(AddProductToDishFragment())
           }
           R.id.nav_personalize -> {
@@ -213,6 +214,7 @@ class MainActivity : AppCompatActivity() {
             openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))
           }
           R.id.nav_add_product_to_half_product -> {
+            AddProductToHalfProductFragment.passedHalfProduct = null
             openDialog(AddProductToHalfProductFragment())
           }
           R.id.nav_online_data -> {
