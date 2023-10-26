@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
@@ -70,7 +71,7 @@ class MainActivity : AppCompatActivity() {
     return viewBinding.content.customToolbar.searchTextField.isVisible && viewBinding.content.customToolbar.searchTextField.text.isNotEmpty()
   }
 
-  override fun onBackPressed() {
+  fun handleBackPressed() {
     when {
       viewBinding.navView.isVisible -> {
         viewBinding.drawerLayout.closeDrawer(GravityCompat.START)
@@ -84,7 +85,7 @@ class MainActivity : AppCompatActivity() {
         finish()
       }
       else -> {
-        super.onBackPressed()
+        super.getOnBackPressedDispatcher().onBackPressed()
         viewBinding.content.customToolbar.searchBack.performClick()
         when (supportFragmentManager.fragments.last()) { // to setup correct toolbar
           addFragment -> {
@@ -140,6 +141,13 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     viewBinding = ActivityMainBinding.inflate(layoutInflater)
+
+    onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+      override fun handleOnBackPressed() {
+        handleBackPressed()
+      }
+    })
+
     productsFragment.callbackListener = object : CallbackListener {
       override fun callback() {
         openAdd()
@@ -160,7 +168,7 @@ class MainActivity : AppCompatActivity() {
     setContentView(view)
     MobileAds.initialize(this) {}
 
-    val viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
+    val viewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
     viewBinding.content.customToolbar.searchTextField.setOnFocusChangeListener { _, hasFocus ->
       if (!hasFocus) viewBinding.drawerLayout.hideKeyboard()
     }
