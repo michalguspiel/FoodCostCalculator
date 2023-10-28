@@ -35,6 +35,7 @@
         </activity>
         <activity
             android:name="com.erdees.foodcostcalc.ui.activities.onlineDataActivity.OnlineDataActivity"
+            android:exported="false"
             android:theme="@style/Theme.OnlineDataActivity" />
         <meta-data
             android:name="com.google.android.gms.version"
