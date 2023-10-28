@@ -31,9 +31,16 @@ object Utils {
         return df.format(number)
     }
 
+  //TODO THIS HAS TO USE CHOSEN CURRENCY
+  /**
+   * Formats price to currency.
+   *
+   * This function is used in the whole project to get number formatted to currency.
+   * @param number Double
+   * @return String
+   */
     fun formatPrice(number: Double): String {
-        return NumberFormat.getCurrencyInstance()
-            .format(number)
+        return NumberFormat.getCurrencyInstance().format(number)
     }
 
     /**Get units preferred by the user.*/

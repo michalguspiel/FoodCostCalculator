@@ -201,8 +201,7 @@ class DishesFragmentRecyclerAdapter(
         product.productModelIncluded.name
       view.productWeightInDishRow.text =
         Utils.formatPriceOrWeight(product.weight * servings)
-      view.productPriceInDishRow.text = NumberFormat.getCurrencyInstance()
-        .format(product.totalPriceOfThisProduct * servings)
+      view.productPriceInDishRow.text = Utils.formatPrice(product.totalPriceOfThisProduct * servings)
       view.productWeightUnitInDishRow.text =
         UnitsUtils.getUnitAbbreviation(product.weightUnit)
     }
