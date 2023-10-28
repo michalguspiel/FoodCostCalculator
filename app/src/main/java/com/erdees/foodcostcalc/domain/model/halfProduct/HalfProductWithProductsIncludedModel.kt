@@ -1,11 +1,13 @@
 package com.erdees.foodcostcalc.domain.model.halfProduct
 
+import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
 import com.erdees.foodcostcalc.utils.UnitsUtils.computeWeightAndVolumeToSameUnit
 import java.text.NumberFormat
 
+@Keep
 data class HalfProductWithProductsIncludedModel(
   @Embedded val halfProductModel: HalfProductModel,
   @Relation(

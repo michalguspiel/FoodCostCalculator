@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.domain.model.product
 
+import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
@@ -9,6 +10,7 @@ import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 
 
 /**  Its a product but with dishOwnerId reference and weight */
+@Keep
 @Entity
 data class ProductIncluded(
   @PrimaryKey(autoGenerate = true) val productIncludedId: Long,
