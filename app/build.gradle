@@ -40,6 +40,11 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+  configurations {
+    all {
+      exclude module: 'httpclient'
+    }
+  }
 }
 
 dependencies {
