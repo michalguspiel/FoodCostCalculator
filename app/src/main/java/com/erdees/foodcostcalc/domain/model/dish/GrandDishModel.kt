@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.domain.model.dish
 
+import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
@@ -7,6 +8,7 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDis
 import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
 
 /**[GrandDishModel] is a dish which contains products and half products]*/
+@Keep
 data class GrandDishModel(
   @Embedded val dishModel: DishModel,
   @Relation(
