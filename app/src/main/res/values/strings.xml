@@ -52,7 +52,7 @@
     <string name="add_product">Add product</string>
     <string name="create_a_new_dish">Create a new dish</string>
     <string name="add_products_to_your_dish">Add products to your dish</string>
-    <string name="personalize">Personalize</string>
+    <string name="personalize">Settings</string>
     <string name="total_price">Total Price:</string>
     <string name="final_price_with_margin_and_tax">Final price with margin and tax:</string>
     <string name="calculate_price_per_piece">Calculate price per piece</string>

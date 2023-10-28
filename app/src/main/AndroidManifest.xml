@@ -26,7 +26,7 @@
 
         <activity
             android:name="com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity"
-            android:windowSoftInputMode="adjustResize|stateAlwaysHidden"
+            android:windowSoftInputMode="adjustPan"
           android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
