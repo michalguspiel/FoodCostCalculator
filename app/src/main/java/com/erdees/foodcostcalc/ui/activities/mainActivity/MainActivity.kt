@@ -55,7 +55,7 @@ class MainActivity : AppCompatActivity() {
   }
 
   /**Show search field and search button on toolbar. */
-  private fun setSearchToolbar() {
+  fun setSearchToolbar() {
     viewBinding.content.customToolbar.toolBarTitle.text = ""
     viewBinding.content.customToolbar.toolBarTitle.makeGone()
     viewBinding.content.customToolbar.searchButton.makeVisible()
@@ -151,9 +151,9 @@ class MainActivity : AppCompatActivity() {
       return
     }
     if (currentPosition < newPosition) {
-      this.setCustomAnimations(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left);
+      this.setCustomAnimations(R.anim.anim_slide_in_left, R.anim.anim_slide_out_left)
     } else {
-      this.setCustomAnimations(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right);
+      this.setCustomAnimations(R.anim.anim_slide_in_right, R.anim.anim_slide_out_right)
     }
 
   }

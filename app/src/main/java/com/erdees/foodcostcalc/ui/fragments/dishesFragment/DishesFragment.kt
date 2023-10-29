@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.databinding.FragmentDishesBinding
 import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
+import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.*
 
@@ -68,6 +69,11 @@ class DishesFragment : Fragment() {
       openCreateNewDishDialog
     )
     binding.recyclerViewDishes.adapter = fragmentRecyclerAdapter
+  }
+
+  override fun onResume() {
+    (activity as MainActivity).setSearchToolbar()
+    super.onResume()
   }
 
   companion object {

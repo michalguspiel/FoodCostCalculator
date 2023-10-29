@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.databinding.FragmentProductsBinding
 import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.Locale
 
@@ -44,6 +45,11 @@ class ProductsFragment : Fragment() {
       }
     }
     return view
+  }
+
+  override fun onResume() {
+    (activity as MainActivity).setSearchToolbar()
+    super.onResume()
   }
 
   companion object {
