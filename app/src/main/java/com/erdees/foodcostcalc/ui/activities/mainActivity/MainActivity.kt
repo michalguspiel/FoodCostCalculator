@@ -28,6 +28,8 @@ import com.erdees.foodcostcalc.ui.fragments.productsFragment.ProductsFragment
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SettingsFragment
 import com.erdees.foodcostcalc.utils.CallbackListener
 import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
+import com.erdees.foodcostcalc.utils.ViewUtils.makeGone
+import com.erdees.foodcostcalc.utils.ViewUtils.makeVisible
 import com.erdees.foodcostcalc.utils.ViewUtils.uncheckAllItems
 import com.google.android.gms.ads.MobileAds
 import com.google.android.material.navigation.NavigationView
@@ -45,16 +47,18 @@ class MainActivity : AppCompatActivity() {
 
   /**Hide everything on toolbar but side menu button. */
   private fun hideSearchToolbar() {
-    viewBinding.content.customToolbar.searchButton.visibility = View.GONE
-    viewBinding.content.customToolbar.searchTextField.visibility = View.GONE
-    viewBinding.content.customToolbar.searchBack.visibility = View.GONE
-    viewBinding.content.customToolbar.sideMenuButton.visibility = View.VISIBLE
+    viewBinding.content.customToolbar.searchButton.makeGone()
+    viewBinding.content.customToolbar.searchTextField.makeGone()
+    viewBinding.content.customToolbar.searchBack.makeGone()
+    viewBinding.content.customToolbar.sideMenuButton.makeVisible()
   }
 
   /**Show search field and search button on toolbar. */
   private fun setSearchToolbar() {
-    viewBinding.content.customToolbar.searchButton.visibility = View.VISIBLE
-    viewBinding.content.customToolbar.searchTextField.visibility = View.VISIBLE
+    viewBinding.content.customToolbar.toolBarTitle.text = ""
+    viewBinding.content.customToolbar.toolBarTitle.makeGone()
+    viewBinding.content.customToolbar.searchButton.makeVisible()
+    viewBinding.content.customToolbar.searchTextField.makeVisible()
     viewBinding.content.customToolbar.searchTextField.hint = getString(R.string.search_by_name)
   }
 
@@ -62,6 +66,11 @@ class MainActivity : AppCompatActivity() {
     replaceFragment(addFragment, AddFragment.TAG)
     viewBinding.content.navigationView.uncheckAllItems()
     hideSearchToolbar()
+  }
+
+  fun setToolBarTitle(text: String){
+    viewBinding.content.customToolbar.toolBarTitle.makeVisible()
+    viewBinding.content.customToolbar.toolBarTitle.text = text
   }
 
   private fun checkIfSearchToolIsUsed(): Boolean {

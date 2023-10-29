@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.ui.fragments.settingsFragment
 
 import android.icu.util.Currency
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.Gravity
@@ -16,6 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.SettingsBinding
+import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.Constants
 
 class SettingsFragment : Fragment(), AdapterView.OnItemClickListener {
@@ -56,6 +56,7 @@ class SettingsFragment : Fragment(), AdapterView.OnItemClickListener {
   ): View {
     _binding = SettingsBinding.inflate(inflater, container, false)
     val view = binding.root
+    setToolbarTitle()
     viewModel = ViewModelProvider(this)[SettingsViewModel::class.java]
     binding.aboutTextView.text =
       getString(R.string.app_info_template, BuildConfig.VERSION_NAME, "Michał Guśpiel")
@@ -102,6 +103,10 @@ class SettingsFragment : Fragment(), AdapterView.OnItemClickListener {
       gravity = Gravity.START
       id = Constants.CURRENCIES_SPINNER_ID
     }
+  }
+
+  private fun setToolbarTitle(){
+    (activity as MainActivity).setToolBarTitle(getString(R.string.settings))
   }
 
   companion object {
