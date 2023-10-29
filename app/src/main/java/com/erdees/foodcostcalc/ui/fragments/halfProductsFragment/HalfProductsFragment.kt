@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
+import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.*
 
@@ -58,6 +59,11 @@ class HalfProductsFragment : Fragment() {
       viewModel
     ) { callbackListener?.callback() }
     recyclerView.adapter = adapter
+  }
+
+  override fun onResume() {
+    (activity as MainActivity).setSearchToolbar()
+    super.onResume()
   }
 
   companion object {
