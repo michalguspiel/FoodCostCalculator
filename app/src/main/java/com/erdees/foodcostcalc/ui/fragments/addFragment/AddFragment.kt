@@ -10,6 +10,7 @@ import androidx.fragment.app.*
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentAddBinding
+import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants.ADD_FRAGMENT_SPINNER_ID
@@ -56,6 +57,7 @@ class AddFragment : Fragment(), AdapterView.OnItemClickListener {
     ): View {
         _binding = FragmentAddBinding.inflate(inflater, container, false)
         val view = binding.root
+        setToolbar()
         sharedPreferences = SharedPreferences(requireContext())
         viewModel.getUnits(resources, sharedPreferences)
 
@@ -129,6 +131,10 @@ class AddFragment : Fragment(), AdapterView.OnItemClickListener {
             informationDialog.show(parentFragmentManager, "BoxPriceCalculatorInfo")
         }
         return view
+    }
+
+    private fun setToolbar(){
+        (activity as MainActivity).setToolBarTitle(getString(R.string.add_product))
     }
 
     companion object {
