@@ -15,7 +15,6 @@ import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
 import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRecipe
 import com.erdees.foodcostcalc.utils.Utils.getIngredientForHundredPercentOfRecipe
 import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
-import java.text.NumberFormat
 
 class HalfProductDetailedListViewAdapter(
     private val context: Activity,
@@ -46,7 +45,7 @@ class HalfProductDetailedListViewAdapter(
             list[position].totalPriceOfThisProduct,
             quantityPercent
         )
-        val formattedPrice = Utils.formatPrice(priceIncludedQuantity)
+        val formattedPrice = Utils.formatPrice(priceIncludedQuantity,context)
         setRowTextViews(position,formattedWeight,formattedPrice)
         setRowAsClickListener(binding.root,position)
         return binding.root

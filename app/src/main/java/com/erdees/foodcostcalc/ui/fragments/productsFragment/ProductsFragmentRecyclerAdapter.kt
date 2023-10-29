@@ -74,9 +74,9 @@ class ProductsFragmentRecyclerAdapter(
       )
       viewBinding.productTitle.text = list[positionIncludedAdsBinded].name
       viewBinding.productNettoPrice.text =
-        "Price ${list[positionIncludedAdsBinded].unit} netto: ${formatPrice(list[positionIncludedAdsBinded].pricePerUnit)}."
+        "Price ${list[positionIncludedAdsBinded].unit} netto: ${formatPrice(list[positionIncludedAdsBinded].pricePerUnit,activity)}."
       viewBinding.productFoodcostPrice.text =
-        "Price ${list[positionIncludedAdsBinded].unit} with foodcost: ${formatPrice(list[positionIncludedAdsBinded].priceAfterWasteAndTax)}."
+        "Price ${list[positionIncludedAdsBinded].unit} with foodcost: ${formatPrice(list[positionIncludedAdsBinded].priceAfterWasteAndTax,activity)}."
       viewBinding.editButton.setOnClickListener {
         EditProductFragment().show(fragmentManager, EditProductFragment.TAG)
         EditProductFragment.productModelPassedFromAdapter = list[positionIncludedAdsBinded]
