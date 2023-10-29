@@ -11,6 +11,7 @@ object Constants {
     const val DISH_SPINNER_ID = 2
     const val HALFPRODUCT_SPINNER_ID = 2
     const val UNIT_SPINNER_ID = 3
+    const val CURRENCIES_SPINNER_ID = 4
 
     const val DISH_CREATED = "dish_created"
     const val HALF_PRODUCT_CREATED = "half_product_created"
@@ -39,10 +40,11 @@ object Constants {
     const val ADMOB_HALF_PRODUCTS_RV_AD_UNIT_ID = "ca-app-pub-5093191239349402/9594143514"
 
     const val METRIC = "metric"
-    const val USA = "usa"
+    const val IMPERIAL = "usa"
 
     const val MARGIN = "margin"
     const val TAX = "tax"
+    const val PREFERRED_CURRENCY_CODE = "preferred_currency"
 
 
     const val BASIC_MARGIN = 100

@@ -63,7 +63,7 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
 
     fun updateUnitsConditions() {
         metricCondition = sharedPreferences.getValueBoolean(Constants.METRIC, true)
-        usaCondition = sharedPreferences.getValueBoolean(Constants.USA, false)
+        usaCondition = sharedPreferences.getValueBoolean(Constants.IMPERIAL, false)
     }
 
     private val unitList = arrayListOf<String>() // list for units, to populate spinner

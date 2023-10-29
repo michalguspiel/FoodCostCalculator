@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.fragments.dishesFragment
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
@@ -21,6 +22,7 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
   fun determineIfDishIsExpanded(dishModelId: Long): Boolean {
     return expandedList.contains(dishModelId)
   }
+
   init {
     val halfProductWithProductsIncludedDao =
       AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
@@ -39,17 +41,18 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
       halfProductId
     )
 
-  fun formattedPriceData(dishModelId: Long, amountOfServings: Int): String {
-    return Utils.formatPrice(getDishData(dishModelId).totalPrice * amountOfServings)
+  fun formattedPriceData(dishModelId: Long, amountOfServings: Int, context: Context): String {
+    return Utils.formatPrice(getDishData(dishModelId).totalPrice * amountOfServings, context)
   }
 
-  fun formattedTotalPriceData(dishModelId: Long, amountOfServings: Int): String {
+  fun formattedTotalPriceData(dishModelId: Long, amountOfServings: Int, context: Context): String {
     val dishData = getDishData(dishModelId)
     return formattedTotalPriceData(
       dishData.totalPrice,
       dishData.margin,
       dishData.tax,
-      amountOfServings
+      amountOfServings,
+      context
     )
   }
 
@@ -57,7 +60,8 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
     totalPrice: Double,
     dishMargin: Double,
     dishTax: Double,
-    amountOfServings: Int
+    amountOfServings: Int,
+    context: Context
   ): String {
     return Utils.formatPrice(
       priceAfterMarginAndTax(
@@ -65,7 +69,7 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
         dishMargin,
         dishTax,
         amountOfServings
-      )
+      ), context
     )
   }
 

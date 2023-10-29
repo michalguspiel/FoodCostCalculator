@@ -47,7 +47,6 @@ import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
 import com.google.android.gms.ads.nativead.NativeAdView
 import com.google.android.play.core.review.ReviewManagerFactory
-import java.text.NumberFormat
 
 class DishesFragmentRecyclerAdapter(
   private val fragmentManager: FragmentManager,
@@ -82,10 +81,11 @@ class DishesFragmentRecyclerAdapter(
     private fun setPriceData(amountOfServings: Int, dishModelId: Long) {
       Log.i(TAG, "Setting price data for dish $dishModelId with: $amountOfServings servings")
       viewBinding.totalPriceDishCardView.text =
-        viewModel.formattedPriceData(dishModelId, amountOfServings)
+        viewModel.formattedPriceData(dishModelId, amountOfServings,activity)
       viewBinding.totalPriceWithMarginDishCardView.text = viewModel.formattedTotalPriceData(
         dishModelId,
-        amountOfServings
+        amountOfServings,
+        activity
       )
     }
 
@@ -201,8 +201,7 @@ class DishesFragmentRecyclerAdapter(
         product.productModelIncluded.name
       view.productWeightInDishRow.text =
         Utils.formatPriceOrWeight(product.weight * servings)
-      view.productPriceInDishRow.text = NumberFormat.getCurrencyInstance()
-        .format(product.totalPriceOfThisProduct * servings)
+      view.productPriceInDishRow.text = Utils.formatPrice(product.totalPriceOfThisProduct * servings,activity)
       view.productWeightUnitInDishRow.text =
         UnitsUtils.getUnitAbbreviation(product.weightUnit)
     }
@@ -218,7 +217,7 @@ class DishesFragmentRecyclerAdapter(
               halfProduct.weight,
               it.halfProductModel.halfProductUnit,
               halfProduct.unit
-            ) * servings
+            ) * servings,activity
           )
         }
     }

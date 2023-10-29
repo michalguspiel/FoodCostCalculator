@@ -1,11 +1,12 @@
 package com.erdees.foodcostcalc.domain.model.halfProduct
 
+import android.content.Context
 import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
 import com.erdees.foodcostcalc.utils.UnitsUtils.computeWeightAndVolumeToSameUnit
-import java.text.NumberFormat
+import com.erdees.foodcostcalc.utils.Utils
 
 @Keep
 data class HalfProductWithProductsIncludedModel(
@@ -53,8 +54,8 @@ data class HalfProductWithProductsIncludedModel(
     }
 
     @Ignore
-    val formattedPricePerUnit: String = NumberFormat.getCurrencyInstance().format(pricePerUnit())
+    fun formattedPricePerUnit(context: Context): String = Utils.formatPrice(pricePerUnit(),context)
 
     @Ignore
-    val formattedPricePerRecipe : String = NumberFormat.getCurrencyInstance().format(pricePerRecipe())
+    fun formattedPricePerRecipe(context: Context) : String = Utils.formatPrice(pricePerRecipe(),context)
 }

@@ -10,11 +10,11 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.ListviewDishRowBinding
 import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
+import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
 import com.erdees.foodcostcalc.utils.Utils.getBasicRecipeAsPercentageOfTargetRecipe
 import com.erdees.foodcostcalc.utils.Utils.getIngredientForHundredPercentOfRecipe
 import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
-import java.text.NumberFormat
 
 class HalfProductDetailedListViewAdapter(
     private val context: Activity,
@@ -45,8 +45,8 @@ class HalfProductDetailedListViewAdapter(
             list[position].totalPriceOfThisProduct,
             quantityPercent
         )
-        val formatedPrice = NumberFormat.getCurrencyInstance().format(priceIncludedQuantity)
-        setRowTextViews(position,formattedWeight,formatedPrice)
+        val formattedPrice = Utils.formatPrice(priceIncludedQuantity,context)
+        setRowTextViews(position,formattedWeight,formattedPrice)
         setRowAsClickListener(binding.root,position)
         return binding.root
     }

@@ -7,7 +7,8 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
@@ -37,7 +38,7 @@ class CreateHalfProductFragment(private val parentView: View) : DialogFragment()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this).get(CreateHalfProductFragmentViewModel::class.java)
+        viewModel = ViewModelProvider(this)[CreateHalfProductFragmentViewModel::class.java]
         viewModel.updateFirebase()
     }
 
@@ -87,13 +88,6 @@ class CreateHalfProductFragment(private val parentView: View) : DialogFragment()
     }
 
     override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        chosenUnit = when (parent?.id) {
-            1 -> {
-                unitList[position]
-            }
-            else -> {
-                unitList[position]
-            }
-        }
+        chosenUnit = unitList[position]
     }
 }

@@ -37,7 +37,7 @@
     <string name="calculate_your_menu">Calculate your menu</string>
     <string name="edit_button">edit button</string>
     <string name="use_metric_units">Use metric units.</string>
-    <string name="use_us_units">Use US units.</string>
+    <string name="use_us_units">Use imperial units.</string>
     <string name="choose_dish">Choose dish:</string>
     <string name="choose_product">Choose product:</string>
     <string name="choose_half_product">Choose half product:</string>
@@ -52,7 +52,7 @@
     <string name="add_product">Add product</string>
     <string name="create_a_new_dish">Create a new dish</string>
     <string name="add_products_to_your_dish">Add products to your dish</string>
-    <string name="personalize">Personalize</string>
+    <string name="personalize">Settings</string>
     <string name="total_price">Total Price:</string>
     <string name="final_price_with_margin_and_tax">Final price with margin and tax:</string>
     <string name="calculate_price_per_piece">Calculate price per piece</string>
@@ -106,5 +106,13 @@
 
     <string name="settings_saved_prompt">Settings saved!</string>
     <string name="enter_default_tax_and_margin">Enter values to default tax and margin.</string>
+
+    <string name="default_dish_tax">Default dish tax</string>
+    <string name="default_dish_tax_hint">Tax %</string>
+    <string name="default_dish_margin">Default dish margin</string>
+    <string name="default_dish_margin_hint">Margin %</string>
+    <string name="units_section">Units</string>
+    <string name="default_currency">Default currency</string>
+    <string name="app_info_template">App Version: %1$s\nDeveloper: %2$s</string>
 
 </resources>

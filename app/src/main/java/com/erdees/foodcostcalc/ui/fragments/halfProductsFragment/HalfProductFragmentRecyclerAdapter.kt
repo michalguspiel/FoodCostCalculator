@@ -153,8 +153,8 @@ class HalfProductFragmentRecyclerAdapter(
     }
 
     private fun setHalfProductFinalPrice(position: Int) {
-      viewBinding.priceOfHalfProductPerUnit.text = list[position].formattedPricePerUnit
-      viewBinding.priceOfHalfProductPerRecipe.text = list[position].formattedPricePerRecipe
+      viewBinding.priceOfHalfProductPerUnit.text = list[position].formattedPricePerUnit(activity)
+      viewBinding.priceOfHalfProductPerRecipe.text = list[position].formattedPricePerRecipe(activity)
     }
 
     private fun getTotalWeightOfOneRecipe(position: Int): Double {
@@ -252,7 +252,7 @@ class HalfProductFragmentRecyclerAdapter(
       val pricePerMainRecipe = list[position].pricePerRecipe()
       val pricePerRecipeForGivenQuantity =
         getPriceForHundredPercentOfRecipe(pricePerMainRecipe, quantityPercent)
-      viewBinding.priceOfHalfProductPerRecipe.text = formatPrice(pricePerRecipeForGivenQuantity)
+      viewBinding.priceOfHalfProductPerRecipe.text = formatPrice(pricePerRecipeForGivenQuantity,activity)
     }
 
     private val positionIncludedAdsBinded get() = adCase.correctElementFromListToBind(this.adapterPosition)
