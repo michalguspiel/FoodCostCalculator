@@ -99,7 +99,7 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
 
     fun updateUnitsConditions() {
         metricCondition = sharedPreferences.getValueBoolean(Constants.METRIC, true)
-        usaCondition = sharedPreferences.getValueBoolean(Constants.USA, false)
+        usaCondition = sharedPreferences.getValueBoolean(Constants.IMPERIAL, false)
     }
 
     fun addProductToHalfProduct(

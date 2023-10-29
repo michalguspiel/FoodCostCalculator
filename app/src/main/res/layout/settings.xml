@@ -3,14 +3,14 @@
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
+  xmlns:tools="http://schemas.android.com/tools"
   android:background="@drawable/background"
   android:fillViewport="true">
 
   <androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingHorizontal="12dp"
-    >
+    android:paddingHorizontal="12dp">
 
     <LinearLayout
       android:id="@+id/linearLayout6"
@@ -28,14 +28,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Default dish tax"
+        android:text="@string/default_dish_tax"
         android:textStyle="bold" />
 
       <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Tax %"
+        android:hint="@string/default_dish_tax_hint"
         app:boxStrokeColor="@color/orange_500"
         app:hintTextColor="@color/black">
 
@@ -58,14 +58,14 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Default dish margin"
+        android:text="@string/default_dish_margin"
         android:textStyle="bold" />
 
       <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.FilledBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Margin %"
+        android:hint="@string/default_dish_margin_hint"
         app:boxStrokeColor="@color/orange_500"
         app:hintTextColor="@color/black">
 
@@ -85,7 +85,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:text="Units"
+        android:text="@string/units_section"
         android:textStyle="bold" />
 
       <androidx.constraintlayout.widget.ConstraintLayout
@@ -127,7 +127,7 @@
           app:layout_constraintTop_toTopOf="parent" />
 
         <CheckBox
-          android:id="@+id/checkBoxUS"
+          android:id="@+id/check_box_imperial"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           app:layout_constraintBottom_toBottomOf="parent"
@@ -138,47 +138,64 @@
       <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Default currency"
-        android:textStyle="bold"
-        android:paddingStart="8dp"
+        android:paddingHorizontal="8dp"
         android:paddingTop="8dp"
-        />
+        android:text="@string/default_currency"
+        android:textStyle="bold" />
 
       <com.google.android.material.textfield.TextInputLayout
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Choose currency"
+        android:layout_gravity="start"
+        android:gravity="start"
+        android:textAlignment="textStart"
         android:textColorHint="@color/black"
-        android:layout_gravity="center_horizontal"
         android:textSize="16sp"
         android:textStyle="bold"
         app:boxStrokeColor="@color/orange_500">
 
-      <AutoCompleteTextView
-        android:id="@+id/unit_spinner_create_half_product"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:inputType="none" />
+        <AutoCompleteTextView
+          android:id="@+id/currencies_spinner"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_weight="1"
+          android:gravity="start"
+          android:inputType="none" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+      </com.google.android.material.textfield.TextInputLayout>
 
     </LinearLayout>
 
-
-    <androidx.appcompat.widget.AppCompatButton
-      android:id="@+id/save_settings_button"
-      android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_gravity="end"
-      android:layout_marginEnd="12dp"
       android:layout_marginBottom="24dp"
-      android:background="@drawable/button_gradient"
-      android:text="@string/save"
-      android:textColor="@color/white"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent" />
+      app:layout_constraintEnd_toEndOf="parent">
+
+      <TextView
+        android:id="@+id/about_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="8sp"
+        android:textStyle="normal"
+        tools:text="App Version: 2.5.1\nDeveloper: Michal Guspiel"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
+      <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/save_settings_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_gradient"
+        android:text="@string/save"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
   </androidx.constraintlayout.widget.ConstraintLayout>
 
