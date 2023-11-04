@@ -201,14 +201,14 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
 
     private fun setUiToProductsSpinner() {
         binding.chooseProductOrHalfProductTv.text =
-            resources.getString(R.string.choose_product)
+            resources.getString(R.string.product)
         binding.productHalfproductSwitch.text = getString(R.string.switch_to_half_products)
         binding.productSpinner.adapter = productsAdapter
     }
 
     private fun setUiToHalfProductsSpinner() {
         binding.chooseProductOrHalfProductTv.text =
-            resources.getString(R.string.choose_half_product)
+            resources.getString(R.string.half_product)
         binding.productHalfproductSwitch.text = getString(R.string.switch_to_products)
         binding.productSpinner.adapter = halfProductAdapter
     }

@@ -47,7 +47,9 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
     private var productPosition: Int? = null
     private var halfProductPosition: Int? = null
 
-    private var chosenUnit: String = ""
+    private var _chosenUnit: String = ""
+    val chosenUnit : String get() = _chosenUnit
+
     private var halfProductUnit = ""
     private var chosenProductName = ""
     private var halfProductUnitType = ""
@@ -89,7 +91,7 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
     }
 
     fun setUnit(unit: String) {
-        chosenUnit = unit
+        _chosenUnit = unit
     }
 
     var metricCondition = true
@@ -119,7 +121,7 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
                 chosenHalfProduct!!,
                 chosenHalfProduct.halfProductId,
                 weight,
-                chosenUnit,
+                _chosenUnit,
                 pieceWeight
             )
         )

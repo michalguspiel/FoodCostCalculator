@@ -34,13 +34,13 @@
     <string name="set_your_default_margin">Set your default margin as %</string>
     <string name="set_your_default_dish_tax">Set your default dish tax as %</string>
     <string name="hamburger_picture">hamburger picture</string>
-    <string name="calculate_your_menu">Calculate your menu</string>
     <string name="edit_button">edit button</string>
     <string name="use_metric_units">Use metric units.</string>
     <string name="use_us_units">Use imperial units.</string>
-    <string name="choose_dish">Choose dish:</string>
-    <string name="choose_product">Choose product:</string>
-    <string name="choose_half_product">Choose half product:</string>
+    <string name="choose_dish">Dish</string>
+    <string name="product">Product</string>
+    <string name="choose_product">Choose Product</string>
+    <string name="choose_half_product">Choose Half Product</string>
 
     <string name="search_button">search button</string>
     <string name="open_side_menu_button">open side menu button</string>

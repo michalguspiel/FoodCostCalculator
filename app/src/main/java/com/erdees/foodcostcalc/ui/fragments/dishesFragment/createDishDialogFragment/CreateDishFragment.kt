@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.fragments.dishesFragment.createDishDialogFragment
 
+import android.app.Dialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -19,6 +20,11 @@ class CreateDishFragment(private val parentView: View) : DialogFragment() {
 
     private var _binding: FragmentCreateDishBinding? = null
     private val binding get() = _binding!!
+
+  override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+    setStyle(STYLE_NO_TITLE, R.style.DialogStyle);
+    return super.onCreateDialog(savedInstanceState)
+  }
 
     override fun onCreateView(
         inflater: LayoutInflater,

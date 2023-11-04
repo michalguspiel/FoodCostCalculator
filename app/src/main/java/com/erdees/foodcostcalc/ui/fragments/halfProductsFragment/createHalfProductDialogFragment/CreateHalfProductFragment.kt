@@ -37,6 +37,7 @@ class CreateHalfProductFragment(private val parentView: View) : DialogFragment()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        setStyle(STYLE_NO_TITLE, R.style.DialogStyle);
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[CreateHalfProductFragmentViewModel::class.java]
         viewModel.updateFirebase()
