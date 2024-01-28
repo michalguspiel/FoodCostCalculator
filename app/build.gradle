@@ -87,10 +87,7 @@ dependencies {
   implementation("com.google.firebase:firebase-analytics-ktx")
 
   //GOOGLE ADS
-  implementation 'com.google.android.gms:play-services-ads:22.4.0'
-  //Facebook Ads for open bidding
-  implementation 'com.google.ads.mediation:facebook:6.16.0.0'
-
+  implementation 'com.google.android.gms:play-services-ads:22.6.0'
   //ERROR HANDLE
   implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
