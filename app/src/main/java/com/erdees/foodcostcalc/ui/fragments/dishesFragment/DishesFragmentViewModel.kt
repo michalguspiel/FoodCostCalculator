@@ -27,7 +27,7 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
     val halfProductWithProductsIncludedDao =
       AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
     val grandDishDao = AppRoomDataBase.getDatabase(application).grandDishDao()
-    grandDishRepository = GrandDishRepository(grandDishDao)
+    grandDishRepository = GrandDishRepository.getInstance(grandDishDao)
     halfProductWithProductsIncludedRepository =
       HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
   }

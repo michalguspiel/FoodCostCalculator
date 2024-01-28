@@ -33,8 +33,8 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         val productIncludedInHalfProductDao =
             AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
 
-        halfProductRepository = HalfProductRepository(halfProductDao)
-        productRepository = ProductRepository(productDao)
+        halfProductRepository = HalfProductRepository.getInstance(halfProductDao)
+        productRepository = ProductRepository.getInstance(productDao)
         productIncludedInHalfProductRepository =
             ProductIncludedInHalfProductRepository((productIncludedInHalfProductDao))
         readAllHalfProductModelData = halfProductRepository.readAllData

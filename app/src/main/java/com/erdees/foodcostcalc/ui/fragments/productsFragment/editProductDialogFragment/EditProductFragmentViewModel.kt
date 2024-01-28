@@ -26,10 +26,10 @@ class EditProductFragmentViewModel(application: Application) : AndroidViewModel(
     val productIncludedInHalfProductDao =
       AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
 
-    productRepository = ProductRepository(productDao)
-    productIncludedRepository = ProductIncludedRepository(productIncludedDao)
+    productRepository = ProductRepository.getInstance(productDao)
+    productIncludedRepository = ProductIncludedRepository.getInstance(productIncludedDao)
     productIncludedInHalfProductRepository =
-      ProductIncludedInHalfProductRepository(productIncludedInHalfProductDao)
+      ProductIncludedInHalfProductRepository.getInstance(productIncludedInHalfProductDao)
 
   }
   /**ProductModel Repository methods*/

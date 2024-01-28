@@ -12,10 +12,7 @@ class HalfProductRepository(private val halfProductDao: HalfProductDao) {
     suspend fun editHalfProduct(halfProductModel: HalfProductModel) =
         halfProductDao.editHalfProduct(halfProductModel)
 
-    suspend fun deleteHalfProduct(halfProductModel: HalfProductModel) =
-        halfProductDao.deleteHalfProduct(halfProductModel)
-
-    fun deleteHalfProduct(id: Long){
+  fun deleteHalfProduct(id: Long){
       halfProductDao.deleteHalfProduct(id)
     }
 

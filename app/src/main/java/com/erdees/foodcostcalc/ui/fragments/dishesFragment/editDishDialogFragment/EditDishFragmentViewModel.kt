@@ -27,11 +27,11 @@ class EditDishFragmentViewModel(application: Application) : AndroidViewModel(app
         val halfProductIncludedInDishDao =
             AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
 
-        dishRepository = DishRepository(dishDao)
-        grandDishRepository = GrandDishRepository(grandDishDao)
+        dishRepository = DishRepository.getInstance(dishDao)
+        grandDishRepository = GrandDishRepository.getInstance(grandDishDao)
         productIncludedRepository = ProductIncludedRepository((productIncludedDao))
         halfProductIncludedInDishRepository =
-            HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
+            HalfProductIncludedInDishRepository.getInstance(halfProductIncludedInDishDao)
     }
 
     fun saveDish(dishId: Long, dishName: String, dishMargin: Double, dishTax: Double) {

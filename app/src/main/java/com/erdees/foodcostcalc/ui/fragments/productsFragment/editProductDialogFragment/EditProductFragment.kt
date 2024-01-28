@@ -91,13 +91,14 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
       if (allFieldsAreLegit()) {
         if (unitPosition == null) unitPosition =
           unitList.indexOf(productModelPassedFromAdapter.unit)
+        val unit = unitList.getOrNull(unitPosition ?: 0) ?: productModelPassedFromAdapter.unit
         val productToChange = ProductModel(
           productId!!,
           binding.editProductName.text.toString(),
           binding.editProductPrice.text.toString().toDouble(),
           binding.editProductTax.text.toString().toDouble(),
           binding.editProductWaste.text.toString().toDouble(),
-          unitList[unitPosition!!]
+          unit
         )
         fragmentViewModel.editProduct(productToChange)
         changeEveryProductIncluded(productToChange, productIncludedList)

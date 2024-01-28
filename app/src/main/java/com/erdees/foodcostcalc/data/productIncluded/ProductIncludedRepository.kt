@@ -21,4 +21,14 @@ class ProductIncludedRepository(private val productIncludedDao: ProductIncludedD
 
     fun getCertainProductIncluded(id: Long) = productIncludedDao.getCertainProductsIncluded(id)
 
+  companion object {
+    @Volatile
+    private var instance: ProductIncludedRepository? = null
+
+    fun getInstance(productIncludedDao: ProductIncludedDao) =
+      instance ?: synchronized(this) {
+        instance
+          ?: ProductIncludedRepository(productIncludedDao).also { instance = it }
+      }
+  }
 }

@@ -25,10 +25,10 @@ class EditDishAdapterViewModel(application: Application) : AndroidViewModel(appl
         val halfProductIncludedInDishDao =
             AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
 
-        dishRepository = DishRepository(dishDao)
-        productIncludedRepository = ProductIncludedRepository(productIncludedDao)
+        dishRepository = DishRepository.getInstance(dishDao)
+        productIncludedRepository = ProductIncludedRepository.getInstance(productIncludedDao)
         halfProductIncludedInDishRepository =
-            HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
+            HalfProductIncludedInDishRepository.getInstance(halfProductIncludedInDishDao)
     }
 
     var cloneOfListOfProductsIncluded: MutableList<ProductIncluded> = mutableListOf()
