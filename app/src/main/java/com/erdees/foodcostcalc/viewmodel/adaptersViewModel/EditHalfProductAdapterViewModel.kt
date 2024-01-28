@@ -26,11 +26,11 @@ class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel
         val productIncludedInHalfProductDao =
             AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
 
-        halfProductRepository = HalfProductRepository(halfProductDao)
+        halfProductRepository = HalfProductRepository.getInstance(halfProductDao)
         halfProductIncludedInDishRepository =
-            HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
+            HalfProductIncludedInDishRepository.getInstance(halfProductIncludedInDishDao)
         productIncludedInHalfProductRepository =
-            ProductIncludedInHalfProductRepository(productIncludedInHalfProductDao)
+            ProductIncludedInHalfProductRepository.getInstance(productIncludedInHalfProductDao)
     }
 
 

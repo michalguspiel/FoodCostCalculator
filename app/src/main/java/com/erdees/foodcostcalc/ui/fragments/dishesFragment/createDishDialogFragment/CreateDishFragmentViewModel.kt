@@ -23,7 +23,7 @@ class CreateDishFragmentViewModel(application: Application) : AndroidViewModel(a
 
     init {
         val dishDao = AppRoomDataBase.getDatabase(application).dishDao()
-        dishRepository = DishRepository(dishDao)
+        dishRepository = DishRepository.getInstance(dishDao)
     }
 
     private var margin: String? = ""

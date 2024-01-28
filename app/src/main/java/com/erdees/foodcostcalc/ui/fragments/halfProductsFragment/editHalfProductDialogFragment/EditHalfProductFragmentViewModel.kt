@@ -23,13 +23,13 @@ class EditHalfProductFragmentViewModel(application: Application) : AndroidViewMo
       AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
     val halfProductIncludedInDishDao =
       AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
-    halfProductRepository = HalfProductRepository(halfProductDao)
+    halfProductRepository = HalfProductRepository.getInstance(halfProductDao)
     halfProductWithProductsIncludedRepository =
       HalfProductWithProductsIncludedRepository(halfProductWithProductIncludedDao)
     productIncludedInHalfProductRepository =
-      ProductIncludedInHalfProductRepository(productIncludedInHalfProductDao)
+      ProductIncludedInHalfProductRepository.getInstance(productIncludedInHalfProductDao)
     halfProductIncludedInDishRepository =
-      HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
+      HalfProductIncludedInDishRepository.getInstance(halfProductIncludedInDishDao)
   }
 
   fun getHalfProductWithProductIncluded() = halfProductWithProductsIncludedRepository.readAllData

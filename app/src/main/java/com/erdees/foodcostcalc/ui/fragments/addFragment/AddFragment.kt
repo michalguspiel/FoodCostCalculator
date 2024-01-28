@@ -5,8 +5,9 @@ import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.*
-import androidx.fragment.app.*
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentAddBinding
@@ -81,6 +82,7 @@ class AddFragment : Fragment(), AdapterView.OnItemClickListener {
                         binding.productPriceEditText.text.toString().toDouble(),
                         binding.productTaxEditText.text.toString().toDouble(),
                         binding.productWasteEditText.text.toString().toDouble(),
+                        binding.unitsSpinner.text.toString()
                     )
                     binding.root.makeCreationConfirmationSnackBar(
                         binding.productNameEditText.text.toString(),

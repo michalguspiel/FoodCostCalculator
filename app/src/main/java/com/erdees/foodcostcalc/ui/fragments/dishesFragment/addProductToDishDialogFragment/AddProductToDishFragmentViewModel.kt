@@ -46,12 +46,12 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
             AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
 
 
-        halfProductRepository = HalfProductRepository(halfProductDao)
-        productRepository = ProductRepository(productDao)
-        dishRepository = DishRepository(dishDao)
-        productIncludedRepository = ProductIncludedRepository(productIncludedDao)
+        halfProductRepository = HalfProductRepository.getInstance(halfProductDao)
+        productRepository = ProductRepository.getInstance(productDao)
+        dishRepository = DishRepository.getInstance(dishDao)
+        productIncludedRepository = ProductIncludedRepository.getInstance(productIncludedDao)
         halfProductIncludedInDishRepository =
-            HalfProductIncludedInDishRepository(halfProductIncludedInDishDao)
+            HalfProductIncludedInDishRepository.getInstance(halfProductIncludedInDishDao)
 
         readAllHalfProductModelData = halfProductRepository.readAllData
         readAllProductModelData = productRepository.readAllData

@@ -7,7 +7,7 @@ import com.erdees.foodcostcalc.domain.model.product.ProductModel
 /** DATA ACCESS OBJECT */
 @Dao
 interface ProductDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun addProduct(productModel: ProductModel)
 
     @Query("SELECT * from products ORDER BY product_name ASC")

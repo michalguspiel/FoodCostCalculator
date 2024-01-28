@@ -16,9 +16,6 @@ interface HalfProductDao {
     @Update
     suspend fun editHalfProduct(halfProductModel: HalfProductModel)
 
-    @Delete
-    suspend fun deleteHalfProduct(halfProductModel: HalfProductModel)
-
     @Query("DELETE FROM HalfProduct WHERE HalfProductId =:id")
     fun deleteHalfProduct(id: Long)
 }

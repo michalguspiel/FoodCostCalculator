@@ -26,7 +26,7 @@ class AddFragmentViewModel(application: Application) : AndroidViewModel(applicat
 
     init {
         val productDao = AppRoomDataBase.getDatabase(application).productDao()
-        productRepository = ProductRepository(productDao)
+        productRepository = ProductRepository.getInstance(productDao)
     }
 
     fun getUnits(
@@ -41,6 +41,7 @@ class AddFragmentViewModel(application: Application) : AndroidViewModel(applicat
         productPrice: Double,
         productTax: Double,
         productWaste: Double,
+        chosenUnit : String
     ) {
         val product = ProductModel(
             0,

@@ -68,24 +68,20 @@ class SettingsFragment : Fragment(), AdapterView.OnItemClickListener {
     binding.checkBoxImperial.isChecked = viewModel.getIsImperialUsed()
 
     binding.saveSettingsButton.setOnClickListener {
-      if (marginAndTaxAreValid()) {
-        val margin = binding.defaultMarginEdittext.text.toString()
-        val tax = binding.defaultDishTaxEditText.text.toString()
-        val chosenCurrencyCode = chosenCurrency?.currencyCode
-        viewModel.saveSettings(
-          margin,
-          tax,
-          binding.checkBoxMetric.isChecked,
-          binding.checkBoxImperial.isChecked,
-          chosenCurrencyCode
-        )
-        Toast.makeText(requireContext(), R.string.settings_saved_prompt, Toast.LENGTH_SHORT)
-          .show()
-      } else Toast.makeText(
-        requireContext(),
-        R.string.enter_default_tax_and_margin,
-        Toast.LENGTH_SHORT
-      ).show()
+      val result = viewModel.saveSettings(
+        binding.defaultMarginEdittext.text.toString(),
+        binding.defaultDishTaxEditText.text.toString(),
+        binding.checkBoxMetric.isChecked,
+        binding.checkBoxImperial.isChecked,
+        chosenCurrency?.currencyCode
+      )
+      val message = when (result) {
+        Result.SUCCESS -> R.string.settings_saved_prompt
+        Result.FAILED_UNIT_SYSTEM_MISSING -> R.string.settings_failed_units_missing
+        Result.FAILED_TAX_MISSING -> R.string.settings_failed_tax_missing
+        Result.FAILED_MARGIN_MISSING -> R.string.settings_failed_margin_missing
+      }
+      Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
     }
     return view
   }
@@ -105,18 +101,13 @@ class SettingsFragment : Fragment(), AdapterView.OnItemClickListener {
     }
   }
 
-  private fun setToolbarTitle(){
+  private fun setToolbarTitle() {
     (activity as MainActivity).setToolBarTitle(getString(R.string.settings))
   }
 
   companion object {
     fun newInstance(): SettingsFragment = SettingsFragment()
     const val TAG = "SettingsFragment"
-  }
-
-  private fun marginAndTaxAreValid(): Boolean {
-    return (!binding.defaultMarginEdittext.text.isNullOrBlank() && binding.defaultMarginEdittext.text.toString() != "." &&
-      !binding.defaultDishTaxEditText.text.isNullOrBlank() && binding.defaultDishTaxEditText.text.toString() != ".")
   }
 
   override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

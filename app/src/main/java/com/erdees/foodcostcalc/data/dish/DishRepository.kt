@@ -11,9 +11,7 @@ class DishRepository(private val dishDao: DishDao) {
         dishDao.addDish(dishModel)
     }
 
-    fun getDishes() = dishDao.getDishes()
-
-    suspend fun deleteDish(dishModel: DishModel) {
+  suspend fun deleteDish(dishModel: DishModel) {
         dishDao.deleteDish(dishModel)
     }
 

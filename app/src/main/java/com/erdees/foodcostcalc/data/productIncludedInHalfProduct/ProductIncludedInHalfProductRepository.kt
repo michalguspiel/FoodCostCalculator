@@ -7,10 +7,7 @@ class ProductIncludedInHalfProductRepository(private val productIncludedInHalfPr
     val readAllData: LiveData<List<ProductIncludedInHalfProduct>> =
         productIncludedInHalfProductDao.getAllProductIncludedInHalfProduct()
 
-    val readAllDataNotAsc: LiveData<List<ProductIncludedInHalfProduct>> =
-        productIncludedInHalfProductDao.getAllProductIncludedInHalfProductNotAsc()
-
-    fun getCertainProductsIncluded(productId: Long) =
+  fun getCertainProductsIncluded(productId: Long) =
         productIncludedInHalfProductDao.getCertainProductsIncluded(productId)
 
     suspend fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) =

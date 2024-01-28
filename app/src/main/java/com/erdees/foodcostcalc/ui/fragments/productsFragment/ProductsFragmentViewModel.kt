@@ -16,7 +16,7 @@ class ProductsFragmentViewModel(application: Application) : AndroidViewModel(app
 
     init {
         val productDao = AppRoomDataBase.getDatabase(application).productDao()
-        productRepository = ProductRepository(productDao)
+        productRepository = ProductRepository.getInstance(productDao)
         readAllProductModelData = productRepository.readAllData
     }
 

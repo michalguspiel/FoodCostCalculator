@@ -21,7 +21,7 @@ class CreateHalfProductFragmentViewModel(application: Application) : AndroidView
 
     init {
         val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
-        halfProductRepository = HalfProductRepository(halfProductDao)
+        halfProductRepository = HalfProductRepository.getInstance(halfProductDao)
     }
 
     val sharedPreferences = SharedPreferences(application)

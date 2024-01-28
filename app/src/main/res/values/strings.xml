@@ -105,7 +105,9 @@
 
 
     <string name="settings_saved_prompt">Settings saved!</string>
-    <string name="enter_default_tax_and_margin">Enter values to default tax and margin.</string>
+    <string name="settings_failed_tax_missing">Default tax missing.</string>
+    <string name="settings_failed_margin_missing">Default margin missing.</string>
+    <string name="settings_failed_units_missing">At least one unit system must be checked.</string>
 
     <string name="default_dish_tax">Default dish tax</string>
     <string name="default_dish_tax_hint">Tax %</string>
