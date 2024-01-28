@@ -7,7 +7,7 @@
         tools:ignore="ScopedStorage" />
   <uses-permission android:name="com.google.android.gms.permission.AD_ID"/>
 
-  
+
   <application
         android:allowBackup="true"
         android:icon="@mipmap/final_launcher"
