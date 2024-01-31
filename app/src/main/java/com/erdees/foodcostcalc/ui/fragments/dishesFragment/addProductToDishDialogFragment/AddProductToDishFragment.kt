@@ -23,205 +23,171 @@ import com.erdees.foodcostcalc.utils.ViewUtils.showShortToast
 
 class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedListener {
 
-    private var _binding: AddProductsToDishBinding? = null
-    private val binding get() = _binding!!
+  private var _binding: AddProductsToDishBinding? = null
+  private val binding get() = _binding!!
 
-    lateinit var viewModel: AddProductToDishFragmentViewModel
-    private lateinit var unitAdapter: ArrayAdapter<*>
-    private lateinit var dishesAdapter: ArrayAdapter<String>
-    private lateinit var productsAdapter: ArrayAdapter<String>
-    private lateinit var halfProductAdapter: ArrayAdapter<String>
+  lateinit var viewModel: AddProductToDishFragmentViewModel
+  private lateinit var unitAdapter: ArrayAdapter<String>
+  private lateinit var dishesAdapter: ArrayAdapter<String>
+  private lateinit var productsAdapter: ArrayAdapter<String>
+  private lateinit var halfProductAdapter: ArrayAdapter<String>
 
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        this.dismiss()
-    }
+  override fun onNothingSelected(parent: AdapterView<*>?) {}
 
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        when (parent?.id) {
-            PRODUCT_SPINNER_ID -> {
-                viewModel.productPosition = position
-                if (!binding.productHalfproductSwitch.isChecked) viewModel.setProductUnitType(
-                    position
-                )
-                else viewModel.setHalfProductUnitType(position)
-                viewModel.updateUnitList()
-                unitAdapter.notifyDataSetChanged()
-                binding.unitSpinner.setSelection(0) // when the product is chosen first units got chosen immediately
-            }
-            DISH_SPINNER_ID -> {
-                viewModel.dishPosition = position
-            }
-            UNIT_SPINNER_ID -> {
-                viewModel.chooseUnit(position)
-            }
-        }
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = AddProductsToDishBinding.inflate(inflater, container, false)
-        val view = binding.root
-
-        viewModel =
-            ViewModelProvider(this).get(AddProductToDishFragmentViewModel::class.java)
-        viewModel.updateUnitsConditions()
-        setAdapters()
-        setProductsSpinner() //because initially dialog start with products
-        setDishesSpinner()
+  override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+    when (parent?.id) {
+      PRODUCT_SPINNER_ID -> {
+        viewModel.productPosition = position
+        if (!binding.productHalfproductSwitch.isChecked) viewModel.setProductUnitType(
+          position
+        )
+        else viewModel.setHalfProductUnitType(position)
+        viewModel.updateUnitList()
         setUnitsSpinner()
+        unitAdapter.notifyDataSetChanged()
+        binding.unitSpinner.setSelection(0) // when the product is chosen first units got chosen immediately
+      }
 
-        binding.productHalfproductSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
-            if (isChecked) setUiToHalfProductsSpinner()
-            else setUiToProductsSpinner()
-        }
+      DISH_SPINNER_ID -> {
+        viewModel.dishPosition = position
+      }
 
-        viewModel.readAllProductModelData.observe(viewLifecycleOwner) { products ->
-          productsAdapter.addAll(products.map { it.name })
-          productsAdapter.notifyDataSetChanged()
-        }
+      UNIT_SPINNER_ID -> {
+        viewModel.chooseUnit(position)
+      }
+    }
+  }
 
-      viewModel.readAllDishModelData.observe(viewLifecycleOwner) { dishes ->
-          dishesAdapter.addAll(dishes.map { it.name })
-          dishesAdapter.notifyDataSetChanged()
-          selectChosenDish()
-        }
+  override fun onCreateView(
+    inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+  ): View {
+    _binding = AddProductsToDishBinding.inflate(inflater, container, false)
+    val view = binding.root
 
-      viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner) { halfProducts ->
-          halfProductAdapter.addAll(halfProducts.map { it.name })
-          halfProductAdapter.notifyDataSetChanged()
-        }
+    viewModel = ViewModelProvider(this)[AddProductToDishFragmentViewModel::class.java]
+    viewModel.updateUnitsConditions()
 
-      binding.addProductToDishBtn.setOnClickListener {
-            if (isProductWeightInvalid()) {
-                showShortToast(
-                    requireContext(),
-                    getString(R.string.cant_add_product_without_weight)
-                )
-            } else if (viewModel.readAllDishModelData.value.isNullOrEmpty()) {
-                showShortToast(requireContext(), getString(R.string.you_must_pick_dish))
-            } else if (!binding.productHalfproductSwitch.isChecked) {
-                if (viewModel.readAllProductModelData.value.isNullOrEmpty()) {
-                    showShortToast(requireContext(), getString(R.string.you_must_pick_product))
-                    return@setOnClickListener
-                }
-                addChosenProductToDish()
-            } else {
-                if (viewModel.getHalfProducts().value.isNullOrEmpty()) {
-                    showShortToast(requireContext(), getString(R.string.you_must_pick_product))
-                    return@setOnClickListener
-                }
-                addChosenHalfProductToDish()
-            }
-        }
-        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        return view
+    binding.productHalfproductSwitch.setOnCheckedChangeListener { _: CompoundButton, isChecked: Boolean ->
+      if (isChecked) setUiToHalfProductsSpinner()
+      else setUiToProductsSpinner()
     }
 
-    companion object {
-        fun newInstance(): AddProductToDishFragment =
-            AddProductToDishFragment()
-
-        const val TAG = "AddProductToDishFragment"
-        var dishModelPassedFromAdapter: DishModel? = null
+    viewModel.readAllProductModelData.observe(viewLifecycleOwner) { products ->
+      productsAdapter =
+        ArrayAdapter(requireActivity(), R.layout.spinner_layout, products.map { it.name })
+      setProductsSpinner()
+      productsAdapter.notifyDataSetChanged()
     }
 
-    private fun addChosenHalfProductToDish() {
-        val halfProductAdded = viewModel.addHalfProductIncludedInDish(
-            binding.productWeight.text.toString().toDouble()
+    viewModel.readAllDishModelData.observe(viewLifecycleOwner) { dishes ->
+      dishesAdapter =
+        ArrayAdapter(requireActivity(), R.layout.spinner_layout, dishes.map { it.name })
+      setDishesSpinner()
+      dishesAdapter.notifyDataSetChanged()
+      selectChosenDish()
+    }
+
+    viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner) { halfProducts ->
+      halfProductAdapter =
+        ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProducts.map { it.name })
+      halfProductAdapter.notifyDataSetChanged()
+    }
+
+    binding.addProductToDishBtn.setOnClickListener {
+      val result = viewModel.addToDish(
+        binding.productWeight.text.toString(), binding.productHalfproductSwitch.isChecked
+      )
+      when (result) {
+        AddProductToDishFragmentViewModel.Result.FailureProduct -> showShortToast(
+          requireContext(), getString(R.string.you_must_pick_product)
         )
-        binding.productWeight.text.clear()
-        showShortToast(
-            requireContext(),
-            getString(R.string.product_added, halfProductAdded.name)
+
+        AddProductToDishFragmentViewModel.Result.FailureDish -> showShortToast(
+          requireContext(), getString(R.string.you_must_pick_dish)
         )
-    }
 
-    private fun addChosenProductToDish() {
-        val productAdded = viewModel.addProductToDish(
-            binding.productWeight.text.toString().toDouble(),
+        AddProductToDishFragmentViewModel.Result.FailureWeight -> showShortToast(
+          requireContext(), getString(R.string.cant_add_product_without_weight)
         )
-        binding.productWeight.text.clear()
-        showShortToast(
-            requireContext(), getString(
-                R.string.product_added, productAdded.name
-            )
-        )
-    }
 
-    private fun setAdapters() {
-        halfProductAdapter =
-            ArrayAdapter(requireActivity(), R.layout.spinner_layout, mutableListOf<String>())
-        dishesAdapter =
-            ArrayAdapter(requireActivity(), R.layout.spinner_layout, mutableListOf<String>())
-        productsAdapter =
-            ArrayAdapter(requireActivity(), R.layout.spinner_layout, mutableListOf<String>())
-        unitAdapter =
-            ArrayAdapter(
-                requireActivity(),
-                R.layout.support_simple_spinner_dropdown_item,
-                viewModel.getUnitList()
-            )
-    }
-
-    private fun setUnitsSpinner() {
-        with(binding.unitSpinner) {
-            adapter = unitAdapter
-            setSelection(0, false)
-            onItemSelectedListener = this@AddProductToDishFragment
-            prompt = getString(R.string.select_unit)
-            gravity = Gravity.CENTER
-            id = UNIT_SPINNER_ID
+        is AddProductToDishFragmentViewModel.Result.SuccessProduct -> {
+          binding.productWeight.text.clear()
+          showShortToast(
+            requireContext(), getString(R.string.product_added, result.name)
+          )
         }
-    }
 
-    private fun setDishesSpinner() {
-        with(binding.dishSpinner) {
-            adapter = dishesAdapter
-            onItemSelectedListener = this@AddProductToDishFragment
-            prompt = getString(R.string.select_dish)
-            gravity = Gravity.CENTER
-            id = DISH_SPINNER_ID
+        is AddProductToDishFragmentViewModel.Result.SuccessHalfProduct -> {
+          binding.productWeight.text.clear()
+          showShortToast(
+            requireContext(), getString(R.string.product_added, result.name)
+          )
         }
+      }
     }
+    dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    return view
+  }
 
-    private fun setProductsSpinner() {
-        with(binding.productSpinner)
-        {
-            adapter = productsAdapter
-            setSelection(0, false)
-            onItemSelectedListener = this@AddProductToDishFragment
-            prompt = getString(R.string.select_product)
-            gravity = Gravity.CENTER
-            id = PRODUCT_SPINNER_ID
-        }
-    }
+  companion object {
+    fun newInstance(): AddProductToDishFragment = AddProductToDishFragment()
 
-    private fun setUiToProductsSpinner() {
-        binding.chooseProductOrHalfProductTv.text =
-            resources.getString(R.string.choose_product)
-        binding.productHalfproductSwitch.text = getString(R.string.switch_to_half_products)
-        binding.productSpinner.adapter = productsAdapter
-    }
+    const val TAG = "AddProductToDishFragment"
+    var dishModelPassedFromAdapter: DishModel? = null
+  }
 
-    private fun setUiToHalfProductsSpinner() {
-        binding.chooseProductOrHalfProductTv.text =
-            resources.getString(R.string.choose_half_product)
-        binding.productHalfproductSwitch.text = getString(R.string.switch_to_products)
-        binding.productSpinner.adapter = halfProductAdapter
+  private fun setUnitsSpinner() {
+    unitAdapter = ArrayAdapter(
+      requireActivity(), R.layout.support_simple_spinner_dropdown_item, viewModel.getUnitList()
+    )
+    with(binding.unitSpinner) {
+      adapter = unitAdapter
+      onItemSelectedListener = this@AddProductToDishFragment
+      prompt = getString(R.string.select_unit)
+      gravity = Gravity.CENTER
+      id = UNIT_SPINNER_ID
+      setSelection(0, false)
     }
+  }
 
-    private fun selectChosenDish() {
-            Log.i(this.tag,"selectChosenDish ${dishModelPassedFromAdapter?.name}")
-            val dishToSelect = dishModelPassedFromAdapter ?: return
-            val positionToSelect = dishesAdapter.getPosition(dishToSelect.name)
-            Log.i(this.tag,"position to select $positionToSelect")
-            binding.dishSpinner.setSelection(positionToSelect)
+  private fun setDishesSpinner() {
+    with(binding.dishSpinner) {
+      adapter = dishesAdapter
+      onItemSelectedListener = this@AddProductToDishFragment
+      prompt = getString(R.string.select_dish)
+      gravity = Gravity.CENTER
+      id = DISH_SPINNER_ID
     }
+  }
 
-    private fun isProductWeightInvalid(): Boolean {
-        return (binding.productWeight.text.isNullOrEmpty() || binding.productWeight.text.toString() == ".")
+  private fun setProductsSpinner() {
+    with(binding.productSpinner) {
+      adapter = productsAdapter
+      onItemSelectedListener = this@AddProductToDishFragment
+      prompt = getString(R.string.select_product)
+      gravity = Gravity.CENTER
+      id = PRODUCT_SPINNER_ID
+      setSelection(0)
     }
+  }
+
+  private fun setUiToProductsSpinner() {
+    binding.chooseProductOrHalfProductTv.text = resources.getString(R.string.choose_product)
+    binding.productHalfproductSwitch.text = getString(R.string.switch_to_half_products)
+    binding.productSpinner.adapter = productsAdapter
+  }
+
+  private fun setUiToHalfProductsSpinner() {
+    binding.chooseProductOrHalfProductTv.text = resources.getString(R.string.choose_half_product)
+    binding.productHalfproductSwitch.text = getString(R.string.switch_to_products)
+    binding.productSpinner.adapter = halfProductAdapter
+  }
+
+  private fun selectChosenDish() {
+    Log.i(this.tag, "selectChosenDish ${dishModelPassedFromAdapter?.name}")
+    val dishToSelect = dishModelPassedFromAdapter ?: return
+    val positionToSelect = dishesAdapter.getPosition(dishToSelect.name)
+    Log.i(this.tag, "position to select $positionToSelect")
+    binding.dishSpinner.setSelection(positionToSelect)
+  }
 }
