@@ -1,0 +1,71 @@
+' State of current database.
+' Drawing it's design since the it's refacor and migration is necessary
+' if app development will continue.
+' This database was never designed, it was developed randomly
+' with novice decisions and a lack of strategic planning.
+@startuml
+
+skinparam linetype ortho
+
+entity "Product" as p {
+    *product_id : number <<generated>>
+    --
+    *name : text
+    *pricePerUnit : number
+    *tax : number
+    *waste : number
+    *unit : text
+}
+
+entity "ProductIncluded" as pi {
+    *product_included_id : number <<generated>>
+    --
+    *productModel : Product
+    *dishOwnerId: number
+    *dishModel : Dish
+    *productOwnerId : number
+    *weight : Double
+    *weightUnit : String
+}
+
+entity "Dish" as d {
+    *dish_id : number <<generated>>
+    --
+    *name : text
+    *marginPercent : number
+    *dishTax : number
+}
+
+entity "HalfProduct" as hp {
+    *half_product_id : number <<generated>>
+    --
+    *name : text
+    *halfProductUnit : text
+}
+
+entity "ProductIncludedInHalfProduct" as pihp {
+    *pihp_id : number <<generated>>
+    --
+    *productModel : Product 
+    *halfProductModel : HalfProduct
+    *halfProductHostId : number
+    *weight : number
+    *weightUnit : text
+    *weightOfPiece: number
+}
+
+
+entity "HalfProductIncludedInDishModel" as hpid {
+    *hpid_id : number <<generated>>
+    --
+    *dishModel : Dish
+    *dishOwnerId : number
+    *halfProductModel : HalfProduct
+    *halfProductOwnerId : number
+    *weight : number
+    *unit : text
+}
+
+
+
+@enduml
