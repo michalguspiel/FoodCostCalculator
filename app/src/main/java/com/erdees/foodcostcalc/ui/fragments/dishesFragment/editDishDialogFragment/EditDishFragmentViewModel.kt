@@ -8,8 +8,8 @@ import com.erdees.foodcostcalc.data.dish.DishRepository
 import com.erdees.foodcostcalc.data.grandDish.GrandDishRepository
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
-import com.erdees.foodcostcalc.domain.model.dish.DishModel
-import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
+import com.erdees.foodcostcalc.entities.Dish
+import com.erdees.foodcostcalc.domain.model.dish.GrandDish
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -35,7 +35,7 @@ class EditDishFragmentViewModel(application: Application) : AndroidViewModel(app
     }
 
     fun saveDish(dishId: Long, dishName: String, dishMargin: Double, dishTax: Double) {
-        val dish = DishModel(dishId, dishName, dishMargin, dishTax)
+        val dish = Dish(dishId, dishName, dishMargin, dishTax)
         viewModelScope.launch(Dispatchers.IO) {
             dishRepository.editDish(dish)
         }
@@ -43,15 +43,15 @@ class EditDishFragmentViewModel(application: Application) : AndroidViewModel(app
 
     fun getGrandDishById(dishId: Long) = grandDishRepository.getGrandDishById(dishId)
 
-    fun deleteGrandDish(grandDishModel: GrandDishModel) {
-        deleteDish(grandDishModel.dishModel)
-        deleteAllProductsIncludedInThisDish(grandDishModel.dishModel.dishId)
-        deleteAllHalfProductsIncludedInThisDish(grandDishModel.dishModel.dishId)
+    fun deleteGrandDish(grandDish: GrandDish) {
+        deleteDish(grandDish.dish)
+        deleteAllProductsIncludedInThisDish(grandDish.dish.dishId)
+        deleteAllHalfProductsIncludedInThisDish(grandDish.dish.dishId)
     }
 
-    private fun deleteDish(dishModel: DishModel) {
+    private fun deleteDish(dish: Dish) {
         viewModelScope.launch(Dispatchers.IO) {
-            dishRepository.deleteDish(dishModel)
+            dishRepository.deleteDish(dish)
         }
     }
 

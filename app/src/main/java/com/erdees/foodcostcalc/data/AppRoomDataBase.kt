@@ -12,21 +12,21 @@ import com.erdees.foodcostcalc.data.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.product.ProductDao
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedDao
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductDao
-import com.erdees.foodcostcalc.domain.model.dish.DishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.entities.Dish
+import com.erdees.foodcostcalc.entities.HalfProductIncludedInDish
+import com.erdees.foodcostcalc.entities.HalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncluded
+import com.erdees.foodcostcalc.entities.Product
 import java.io.File
 
 @Database(
     entities = [
-        ProductModel::class, DishModel::class,
+        Product::class, Dish::class,
         ProductIncluded::class,
-        HalfProductModel::class,
+        HalfProduct::class,
         ProductIncludedInHalfProduct::class,
-        HalfProductIncludedInDishModel::class,
+        HalfProductIncludedInDish::class,
     ], version = 1, exportSchema = true
 )
 abstract class AppRoomDataBase : RoomDatabase() {

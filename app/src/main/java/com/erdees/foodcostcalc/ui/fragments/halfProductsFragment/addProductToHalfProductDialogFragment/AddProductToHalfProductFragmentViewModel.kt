@@ -8,9 +8,9 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.entities.HalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.Product
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.UnitsUtils
@@ -20,8 +20,8 @@ import kotlinx.coroutines.launch
 class AddProductToHalfProductFragmentViewModel(application: Application) :
     AndroidViewModel(application) {
 
-    val readAllHalfProductModelData: LiveData<List<HalfProductModel>>
-    val readAllProductModelData: LiveData<List<ProductModel>>
+    val readAllHalfProductData: LiveData<List<HalfProduct>>
+    val readAllProductData: LiveData<List<Product>>
 
     private val productRepository: ProductRepository
     private val halfProductRepository: HalfProductRepository
@@ -37,8 +37,8 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         productRepository = ProductRepository.getInstance(productDao)
         productIncludedInHalfProductRepository =
             ProductIncludedInHalfProductRepository((productIncludedInHalfProductDao))
-        readAllHalfProductModelData = halfProductRepository.readAllData
-        readAllProductModelData = productRepository.readAllData
+        readAllHalfProductData = halfProductRepository.readAllData
+        readAllProductData = productRepository.readAllData
     }
 
     var isProductPiece: Boolean = false
@@ -55,7 +55,7 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
 
     fun updateChosenHalfProductData(position: Int) {
         halfProductPosition = position
-        val thisHalfProduct = readAllHalfProductModelData.value!![halfProductPosition!!]
+        val thisHalfProduct = readAllHalfProductData.value!![halfProductPosition!!]
         halfProductUnit = thisHalfProduct.halfProductUnit
         isHalfProductPiece = thisHalfProduct.halfProductUnit == "per piece"
         halfProductUnitType = UnitsUtils.getUnitType(thisHalfProduct.halfProductUnit)
@@ -64,12 +64,12 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
     fun updateChosenProductData(position: Int) {
         productPosition = position
         val chosenProduct =
-            readAllProductModelData.value?.get(position)
+            readAllProductData.value?.get(position)
         unitType = UnitsUtils.getUnitType(
             chosenProduct?.unit
         )
         chosenProductName = chosenProduct!!.name
-        isProductPiece = readAllProductModelData.value!![productPosition!!].unit == "per piece"
+        isProductPiece = readAllProductData.value!![productPosition!!].unit == "per piece"
     }
 
     fun getUnitType(): String {
@@ -107,11 +107,11 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
         pieceWeight: Double
     ) {
         val chosenHalfProduct =
-            readAllHalfProductModelData.value?.get(
+            readAllHalfProductData.value?.get(
                 halfProductPosition!!
             )
         val chosenProduct =
-            readAllProductModelData.value?.get(productPosition!!)
+            readAllProductData.value?.get(productPosition!!)
         addProductIncludedInHalfProduct(
             ProductIncludedInHalfProduct(
                 0,

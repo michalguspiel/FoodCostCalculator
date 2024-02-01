@@ -5,12 +5,14 @@ import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
+import com.erdees.foodcostcalc.entities.HalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.utils.UnitsUtils.computeWeightAndVolumeToSameUnit
 import com.erdees.foodcostcalc.utils.Utils
 
 @Keep
-data class HalfProductWithProductsIncludedModel(
-  @Embedded val halfProductModel: HalfProductModel,
+data class HalfProductWithProductsIncluded(
+  @Embedded val halfProduct: HalfProduct,
   @Relation(
         parentColumn = "halfProductId",
         entityColumn = "halfProductHostId"
@@ -18,18 +20,18 @@ data class HalfProductWithProductsIncludedModel(
     val halfProductsList: List<ProductIncludedInHalfProduct>
 ) {
     fun totalWeight(): Double {
-        return if (halfProductModel.halfProductUnit == "per piece") 1.0
+        return if (halfProduct.halfProductUnit == "per piece") 1.0
         else halfProductsList.map {
             if (it.weightUnit != "piece")
                 computeWeightAndVolumeToSameUnit(
-                    halfProductModel.halfProductUnit,
+                    halfProduct.halfProductUnit,
                     it.weightUnit,
                     it.weight
                 )
             else {
                 computeWeightAndVolumeToSameUnit(
-                    halfProductModel.halfProductUnit,
-                    (halfProductModel.halfProductUnit.drop(4)),
+                    halfProduct.halfProductUnit,
+                    (halfProduct.halfProductUnit.drop(4)),
                     it.weightOfPiece * it.weight
                 )
             }
@@ -42,7 +44,7 @@ data class HalfProductWithProductsIncludedModel(
 
     fun pricePerUnit(): Double {
         val totalPrice = halfProductsList.map { it.totalPriceOfThisProduct }.sum()
-        return when (halfProductModel.halfProductUnit) {
+        return when (halfProduct.halfProductUnit) {
             "per piece" -> totalPrice
             "per kilogram" -> totalPrice / totalWeight()
             "per liter" -> totalPrice / totalWeight()

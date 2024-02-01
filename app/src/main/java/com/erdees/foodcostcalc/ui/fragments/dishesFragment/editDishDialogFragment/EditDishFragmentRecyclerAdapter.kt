@@ -1,29 +1,27 @@
 package com.erdees.foodcostcalc.ui.fragments.dishesFragment.editDishDialogFragment
 
 import android.app.Activity
-import android.app.AlertDialog
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.EditDishProductRowBinding
-import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDish
 import com.erdees.foodcostcalc.utils.Utils.isNotBlankNorJustDot
 
 class EditDishFragmentRecyclerAdapter(
     private val viewModel: EditDishAdapterViewModel,
     private val activity: Activity,
-    private val grandDishModel: GrandDishModel
+    private val grandDish: GrandDish
 ) : RecyclerView.Adapter<EditDishFragmentRecyclerAdapter.EditDishViewHolder>() {
 
     class EditDishViewHolder(val viewBinding: EditDishProductRowBinding) :
         RecyclerView.ViewHolder(viewBinding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditDishViewHolder {
-        viewModel.updateClonesOfLists(grandDishModel)
+        viewModel.updateClonesOfLists(grandDish)
         return EditDishViewHolder(
             EditDishProductRowBinding.inflate(
                 LayoutInflater.from(activity),
@@ -34,7 +32,7 @@ class EditDishFragmentRecyclerAdapter(
     }
 
     override fun getItemCount(): Int {
-        return grandDishModel.halfProducts.size + grandDishModel.productsIncluded.size
+        return grandDish.halfProducts.size + grandDish.productsIncluded.size
     }
 
     fun save() {
@@ -44,26 +42,26 @@ class EditDishFragmentRecyclerAdapter(
     override fun onBindViewHolder(holder: EditDishViewHolder, position: Int) {
         if (isRowAProduct(holder)) {
             setFields(
-                grandDishModel.productsIncluded[holder.adapterPosition].productModelIncluded.name,
-                grandDishModel.productsIncluded[holder.adapterPosition].weight,
-                grandDishModel.productsIncluded[holder.adapterPosition].weightUnit,
+                grandDish.productsIncluded[holder.adapterPosition].productIncluded.name,
+                grandDish.productsIncluded[holder.adapterPosition].weight,
+                grandDish.productsIncluded[holder.adapterPosition].weightUnit,
                 holder
             )
             holder.viewBinding.deleteProductInDishButton.setOnClickListener {
-              viewModel.deleteProductIncluded(grandDishModel.productsIncluded[holder.adapterPosition])
+              viewModel.deleteProductIncluded(grandDish.productsIncluded[holder.adapterPosition])
             }
             addProductWeightTextChangedListener(holder)
         } else if (isRowHalfProduct(holder)) {
             val thisPosition =
-                holder.adapterPosition - grandDishModel.productsIncluded.size // to start counting position from new list
+                holder.adapterPosition - grandDish.productsIncluded.size // to start counting position from new list
             setFields(
-                grandDishModel.halfProducts[thisPosition].halfProductModel.name,
-                grandDishModel.halfProducts[thisPosition].weight,
-                grandDishModel.halfProducts[thisPosition].unit,
+                grandDish.halfProducts[thisPosition].halfProduct.name,
+                grandDish.halfProducts[thisPosition].weight,
+                grandDish.halfProducts[thisPosition].unit,
                 holder
             )
             holder.viewBinding.deleteProductInDishButton.setOnClickListener {
-              viewModel.deleteHalfProductIncluded(grandDishModel.halfProducts[thisPosition])
+              viewModel.deleteHalfProductIncluded(grandDish.halfProducts[thisPosition])
             }
             addHalfProductWeightTextChangedListener(holder, thisPosition)
         }
@@ -100,10 +98,10 @@ class EditDishFragmentRecyclerAdapter(
     }
 
     private fun isRowHalfProduct(holder: EditDishViewHolder): Boolean =
-        (holder.adapterPosition >= grandDishModel.productsIncluded.size)
+        (holder.adapterPosition >= grandDish.productsIncluded.size)
 
     private fun isRowAProduct(holder: EditDishViewHolder): Boolean =
-        (holder.adapterPosition < grandDishModel.productsIncluded.size)
+        (holder.adapterPosition < grandDish.productsIncluded.size)
 
     private fun addProductWeightTextChangedListener(holder: EditDishViewHolder) {
         holder.viewBinding.productWeightEdittext.addTextChangedListener((object : TextWatcher {

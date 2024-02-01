@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.domain.model.product
+package com.erdees.foodcostcalc.entities
 
 
 import androidx.annotation.Keep
@@ -12,7 +12,7 @@ import java.text.DecimalFormat
 /** Data class provides a product. */
 @Keep
 @Entity(tableName = "products")
-data class ProductModel(
+data class Product(
     @PrimaryKey(autoGenerate = true) val productId: Long,
     @ColumnInfo(name = "product_name") val name: String,
     val pricePerUnit: Double,

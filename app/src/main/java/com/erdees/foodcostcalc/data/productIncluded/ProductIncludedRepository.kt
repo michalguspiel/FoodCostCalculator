@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc.data.productIncluded
 
-import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
+import com.erdees.foodcostcalc.entities.ProductIncluded
 
 class ProductIncludedRepository(private val productIncludedDao: ProductIncludedDao) {
 

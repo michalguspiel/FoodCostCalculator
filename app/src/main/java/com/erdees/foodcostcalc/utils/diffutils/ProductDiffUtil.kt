@@ -1,11 +1,11 @@
 package com.erdees.foodcostcalc.utils.diffutils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.entities.Product
 
 class ProductDiffUtil(
-  private val oldList : List<ProductModel>,
-  private val newList : List<ProductModel>
+  private val oldList : List<Product>,
+  private val newList : List<Product>
 ): DiffUtil.Callback(){
    override fun getOldListSize(): Int {
      return oldList.size

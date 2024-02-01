@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.ListviewDishRowBinding
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.Utils.formatPriceOrWeight
@@ -17,10 +17,10 @@ import com.erdees.foodcostcalc.utils.Utils.getIngredientForHundredPercentOfRecip
 import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
 
 class HalfProductDetailedListViewAdapter(
-    private val context: Activity,
-    private val list: List<ProductIncludedInHalfProduct>,
-    private val quantity: Double,
-    private val totalWeightOfMainRecipe: Double
+  private val context: Activity,
+  private val list: List<ProductIncludedInHalfProduct>,
+  private val quantity: Double,
+  private val totalWeightOfMainRecipe: Double
 ) : ArrayAdapter<ProductIncludedInHalfProduct>(
     context,
     R.layout.listview_dish_row,
@@ -57,7 +57,7 @@ class HalfProductDetailedListViewAdapter(
                 Toast.makeText(context, totalWeightMessage(position), Toast.LENGTH_SHORT).show()
             } else Toast.makeText(
                 context,
-                list[position].productModelIncluded.name,
+                list[position].productIncluded.name,
                 Toast.LENGTH_SHORT
             ).show()
         }
@@ -65,7 +65,7 @@ class HalfProductDetailedListViewAdapter(
 
     private fun setRowTextViews(position: Int, formattedWeight : String, formatedPrice : String){
         binding.productNameInDishRow.text =
-            list[position].productModelIncluded.name
+            list[position].productIncluded.name
         binding.productWeightInDishRow.text = formattedWeight
         binding.productPriceInDishRow.text = formatedPrice
         binding.productWeightUnitInDishRow.text =
@@ -74,14 +74,14 @@ class HalfProductDetailedListViewAdapter(
 
     private fun totalWeightMessage(position: Int):String {
         val isWeight =
-            list[position].halfProductModel.halfProductUnit == "per kilogram" ||
-                    list[position].halfProductModel.halfProductUnit == "per pound"
+            list[position].halfProduct.halfProductUnit == "per kilogram" ||
+                    list[position].halfProduct.halfProductUnit == "per pound"
         val unitType: String = if (isWeight) " of weight " else " of volume "
-        return list[position].productModelIncluded.name +
+        return list[position].productIncluded.name +
                 unitType +
                 list[position].totalWeightForPiece.toString() + " " +
                 getUnitAbbreviation(
-                    list[position].halfProductModel.halfProductUnit.drop(
+                    list[position].halfProduct.halfProductUnit.drop(
                         4
                     )
                 ) + "."

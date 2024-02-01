@@ -17,7 +17,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.HalfProductCardViewBinding
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHalfProductDialogFragment.AddProductToHalfProductFragment
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.editHalfProductDialogFragment.EditHalfProductFragment
 import com.erdees.foodcostcalc.ui.views.MaskedItemView
@@ -47,7 +47,7 @@ class HalfProductFragmentRecyclerAdapter(
   private val openCreateHalfProductDialog: () -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-  private var list: List<HalfProductWithProductsIncludedModel> = listOf()
+  private var list: List<HalfProductWithProductsIncluded> = listOf()
 
   private var adCase = AdHelper(list.size, Constants.HALF_PRODUCTS_AD_FREQUENCY)
 
@@ -59,7 +59,7 @@ class HalfProductFragmentRecyclerAdapter(
 
   private var positionOfListAdapterToUpdate: Int? = null
 
-  fun setHalfProductsList(passedList: List<HalfProductWithProductsIncludedModel>) {
+  fun setHalfProductsList(passedList: List<HalfProductWithProductsIncluded>) {
     val diffUtil =
       HalfProductWithProductsIncludedDiffUtil(oldList = this.list, newList = passedList)
     val diffResult = DiffUtil.calculateDiff(diffUtil)
@@ -90,18 +90,18 @@ class HalfProductFragmentRecyclerAdapter(
       viewBinding.addProductToHalfproductButton.setOnClickListener {
         positionOfListAdapterToUpdate = position
         AddProductToHalfProductFragment().show(fragmentManager, TAG)
-        AddProductToHalfProductFragment.passedHalfProduct = list[position].halfProductModel
+        AddProductToHalfProductFragment.passedHalfProduct = list[position].halfProduct
       }
     }
 
     private fun getHalfProductQuantity(position: Int): Double {
-      val halfProductID = list[position].halfProductModel.halfProductId
+      val halfProductID = list[position].halfProduct.halfProductId
       return viewModel.idToQuantityMap[halfProductID] ?: getTotalWeightOfOneRecipe(position)
     }
 
     private fun makeExpandable(position: Int) {
       viewBinding.linearLayoutDishCard.setOnClickListener {
-        val halfProductID = list[position].halfProductModel.halfProductId
+        val halfProductID = list[position].halfProduct.halfProductId
         val isExpanded = viewModel.determineIfCardIsExpanded(halfProductID)
         if (isExpanded) {
           viewModel.expandedList.remove(halfProductID)
@@ -114,7 +114,7 @@ class HalfProductFragmentRecyclerAdapter(
     }
 
     private fun openOrCloseCard(position: Int){
-      val halfProductID = list[position].halfProductModel.halfProductId
+      val halfProductID = list[position].halfProduct.halfProductId
       val isExpanded = viewModel.determineIfCardIsExpanded(halfProductID)
       if (isExpanded) showCardElements(position)
       else hideCardElements()
@@ -147,9 +147,9 @@ class HalfProductFragmentRecyclerAdapter(
     }
 
     private fun setNameAndUnitAccordingly(position: Int) {
-      viewBinding.halfProductNameInAdapter.text = list[position].halfProductModel.name
+      viewBinding.halfProductNameInAdapter.text = list[position].halfProduct.name
       viewBinding.unitToPopulateHalfProductCardView.text =
-        list[position].halfProductModel.halfProductUnit + ":"
+        list[position].halfProduct.halfProductUnit + ":"
     }
 
     private fun setHalfProductFinalPrice(position: Int) {
@@ -163,14 +163,14 @@ class HalfProductFragmentRecyclerAdapter(
 
     private fun setQuantityOfDataTextView(position: Int) {
       val halfProduct = list[position]
-      val unit = halfProduct.halfProductModel.halfProductUnit
+      val unit = halfProduct.halfProduct.halfProductUnit
       viewBinding.quantityOfDataTv.text =
         "Recipe per ${getHalfProductQuantity(position)} ${getPerUnitAbbreviation(unit)} of product."
     }
 
     private fun updateQuantityTV(position: Int) {
       val halfProduct = list[position]
-      val unit = halfProduct.halfProductModel.halfProductUnit
+      val unit = halfProduct.halfProduct.halfProductUnit
       viewBinding.quantityOfDataTv.text =
         "Recipe per ${getHalfProductQuantity(position)} ${getPerUnitAbbreviation(unit)} of product."
     }
@@ -195,7 +195,7 @@ class HalfProductFragmentRecyclerAdapter(
           Toast.makeText(activity, "Wrong input!", Toast.LENGTH_SHORT).show()
           return@setOnClickListener
         }
-        val halfProductID = list[position].halfProductModel.halfProductId
+        val halfProductID = list[position].halfProduct.halfProductId
         viewModel.idToQuantityMap[halfProductID] = editText.text.toString().toDouble()
         setHalfProductsList(list)
         refreshAdapter(position)

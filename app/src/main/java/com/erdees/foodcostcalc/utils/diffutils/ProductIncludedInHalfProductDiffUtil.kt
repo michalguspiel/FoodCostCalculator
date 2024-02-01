@@ -1,11 +1,11 @@
 package com.erdees.foodcostcalc.utils.diffutils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
 
  class ProductIncludedInHalfProductDiffUtil(
-  private val oldList : List<ProductIncludedInHalfProduct>,
-  private val newList : List<ProductIncludedInHalfProduct>
+   private val oldList : List<ProductIncludedInHalfProduct>,
+   private val newList : List<ProductIncludedInHalfProduct>
 ): DiffUtil.Callback(){
    override fun getOldListSize(): Int {
      return oldList.size
@@ -25,11 +25,11 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfPro
          false
        }
 
-       oldList[oldItemPosition].productModelIncluded != newList[newItemPosition].productModelIncluded -> {
+       oldList[oldItemPosition].productIncluded != newList[newItemPosition].productIncluded -> {
          false
        }
 
-       oldList[oldItemPosition].halfProductModel != newList[newItemPosition].halfProductModel -> {
+       oldList[oldItemPosition].halfProduct != newList[newItemPosition].halfProduct -> {
          false
        }
 

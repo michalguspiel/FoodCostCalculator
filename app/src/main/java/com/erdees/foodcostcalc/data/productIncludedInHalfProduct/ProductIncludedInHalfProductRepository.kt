@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.data.productIncludedInHalfProduct
 
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
 
 class ProductIncludedInHalfProductRepository(private val productIncludedInHalfProductDao: ProductIncludedInHalfProductDao) {
     val readAllData: LiveData<List<ProductIncludedInHalfProduct>> =

@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.ListProductBinding
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.entities.Product
 import com.erdees.foodcostcalc.ui.fragments.productsFragment.editProductDialogFragment.EditProductFragment
 import com.erdees.foodcostcalc.ui.views.MaskedItemView
 import com.erdees.foodcostcalc.utils.Constants.ADMOB_PRODUCTS_RV_AD_UNIT_ID
@@ -36,7 +36,7 @@ class ProductsFragmentRecyclerAdapter(
   private val navigateToAdd: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-  private var list : List<ProductModel> = listOf()
+  private var list : List<Product> = listOf()
 
   private var adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
 
@@ -46,7 +46,7 @@ class ProductsFragmentRecyclerAdapter(
 
   private var currentNativeAd: NativeAd? = null
 
-  fun switchLists(passedList: List<ProductModel>) {
+  fun switchLists(passedList: List<Product>) {
     Log.i(ProductsFragment.TAG,"Switching lists")
     val diffUtil = ProductDiffUtil(oldList = this.list, newList = passedList)
     val diffResult = DiffUtil.calculateDiff(diffUtil)
@@ -79,7 +79,7 @@ class ProductsFragmentRecyclerAdapter(
         "Price ${list[positionIncludedAdsBinded].unit} with foodcost: ${formatPrice(list[positionIncludedAdsBinded].priceAfterWasteAndTax,activity)}."
       viewBinding.editButton.setOnClickListener {
         EditProductFragment().show(fragmentManager, EditProductFragment.TAG)
-        EditProductFragment.productModelPassedFromAdapter = list[positionIncludedAdsBinded]
+        EditProductFragment.productPassedFromAdapter = list[positionIncludedAdsBinded]
       }
     }
   }

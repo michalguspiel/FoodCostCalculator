@@ -10,9 +10,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.databinding.EditDishProductRowBinding
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.HalfProductIncludedInDish
+import com.erdees.foodcostcalc.entities.HalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
 import com.erdees.foodcostcalc.utils.diffutils.ProductIncludedInHalfProductDiffUtil
 import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
 
@@ -42,23 +42,23 @@ class EditHalfProductAdapter(
   }
 
   @SuppressLint("NotifyDataSetChanged")
-  fun save(halfProductModel: HalfProductModel, viewLifecycleOwner: LifecycleOwner) {
-    viewModel.editHalfProducts(halfProductModel)
+  fun save(halfProduct: HalfProduct, viewLifecycleOwner: LifecycleOwner) {
+    viewModel.editHalfProducts(halfProduct)
     cloneOfList.forEach { viewModel.editProductIncludedInHalfProduct(it) }
 
     /**So every Half product in dishModel is also edited.*/
-    viewModel.getHalfProductsIncludedInDishFromDishByHalfProduct(halfProductModel.halfProductId)
+    viewModel.getHalfProductsIncludedInDishFromDishByHalfProduct(halfProduct.halfProductId)
       .observe(
         viewLifecycleOwner
       ) { halfProductList ->
         halfProductList.forEach {
           viewModel.editHalfProductIncludedInDish(
-            HalfProductIncludedInDishModel(
+            HalfProductIncludedInDish(
               it.halfProductIncludedInDishId,
-              it.dishModel,
+              it.dish,
               it.dishOwnerId,
-              halfProductModel,
-              halfProductModel.halfProductId,
+              halfProduct,
+              halfProduct.halfProductId,
               it.weight,
               it.unit
             )
@@ -86,7 +86,7 @@ class EditHalfProductAdapter(
     position: Int
   ) {
     holder.viewBinding.productNameTextView.text =
-      list[holder.adapterPosition].productModelIncluded.name // name of product not changeable
+      list[holder.adapterPosition].productIncluded.name // name of product not changeable
     holder.viewBinding.productWeightEdittext.setText(list[holder.adapterPosition].weight.toString()) // To set EditText with current data
 
     fun setUnit() {

@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.AddProductToHalfProductBinding
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.entities.HalfProduct
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
 import com.erdees.foodcostcalc.utils.Constants.HALFPRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
@@ -55,7 +55,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
 
     viewModel.updateUnitsConditions()
 
-    viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner) { halfProducts ->
+    viewModel.readAllHalfProductData.observe(viewLifecycleOwner) { halfProducts ->
       halfProductAdapter =
         ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProducts.map { it.name })
       setHalfProductsSpinner()
@@ -63,7 +63,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
       pickHalfProductIfPresent()
     }
 
-    viewModel.readAllProductModelData.observe(viewLifecycleOwner) { products ->
+    viewModel.readAllProductData.observe(viewLifecycleOwner) { products ->
       Log.i(TAG,"readAllProductModelData $products")
       productsAdapter =
         ArrayAdapter(requireActivity(), R.layout.spinner_layout, products.map { it.name })
@@ -156,12 +156,12 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
     fun newInstance(): AddProductToHalfProductFragment =
       AddProductToHalfProductFragment()
 
-    var passedHalfProduct: HalfProductModel? = null
+    var passedHalfProduct: HalfProduct? = null
     const val TAG = "AddProductToHalfProductFragment"
   }
 
   private fun eitherOfSpinnersIsEmpty(): Boolean {
-    return (viewModel.readAllProductModelData.value.isNullOrEmpty() || viewModel.readAllHalfProductModelData.value.isNullOrEmpty())
+    return (viewModel.readAllProductData.value.isNullOrEmpty() || viewModel.readAllHalfProductData.value.isNullOrEmpty())
   }
 
   private fun setTextField() {

@@ -6,7 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.dish.DishRepository
-import com.erdees.foodcostcalc.domain.model.dish.DishModel
+import com.erdees.foodcostcalc.entities.Dish
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -34,24 +34,24 @@ class CreateDishFragmentViewModel(application: Application) : AndroidViewModel(a
         tax = sharedPreferences.getValueString(Constants.TAX)
     }
 
-    private fun addDish(dishModel: DishModel) {
+    private fun addDish(dish: Dish) {
         viewModelScope.launch(Dispatchers.IO) {
-            dishRepository.addDish(dishModel)
+            dishRepository.addDish(dish)
         }
     }
 
-    fun addDish(dishName: String): DishModel {
+    fun addDish(dishName: String): Dish {
         if (margin.isNullOrEmpty()) margin = Constants.BASIC_MARGIN.toString()
         if (tax.isNullOrEmpty()) tax = Constants.BASIC_TAX.toString()
-        val dish = DishModel(0, dishName, margin!!.toDouble(), tax!!.toDouble())
+        val dish = Dish(0, dishName, margin!!.toDouble(), tax!!.toDouble())
         addDish(dish)
         sendEventDataToAnalytics(dish)
         return dish
     }
 
-    private fun sendEventDataToAnalytics(dishModel: DishModel) {
+    private fun sendEventDataToAnalytics(dish: Dish) {
         val thisDishBundle = Bundle()
-        thisDishBundle.putString(Constants.DISH_NAME, dishModel.name)
+        thisDishBundle.putString(Constants.DISH_NAME, dish.name)
         firebaseAnalytics.logEvent(Constants.DISH_CREATED, thisDishBundle)
     }
 }

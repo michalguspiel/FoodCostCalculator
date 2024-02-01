@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.databinding.FragmentDishesBinding
-import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDish
 import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.*
@@ -36,7 +36,7 @@ class DishesFragment : Fragment() {
 
     setAdapterToRecyclerView(viewModel) { callbackListener?.callback() }
     var searchKey = ""
-    var grandDishes = listOf<GrandDishModel>()
+    var grandDishes = listOf<GrandDish>()
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) {
       searchKey = it
       setAdapter(grandDishes, searchKey)
@@ -48,10 +48,10 @@ class DishesFragment : Fragment() {
     return view
   }
 
-  private fun setAdapter(grandDishes: List<GrandDishModel>, searchWord: String) {
+  private fun setAdapter(grandDishes: List<GrandDish>, searchWord: String) {
     fragmentRecyclerAdapter.setGrandDishList(
       grandDishes.filter {
-        it.dishModel.name.lowercase(Locale.ROOT).contains(
+        it.dish.name.lowercase(Locale.ROOT).contains(
           searchWord.lowercase(Locale.ROOT)
         )
       })

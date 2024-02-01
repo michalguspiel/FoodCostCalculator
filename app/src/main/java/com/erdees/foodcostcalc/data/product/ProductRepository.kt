@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.data.product
 
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.entities.Product
 
 // Dao must be passed in - it is a dependency
 // You could also instantiate the DAO right inside the class without all the fuss, right?
@@ -10,17 +10,17 @@ import com.erdees.foodcostcalc.domain.model.product.ProductModel
 // This is the core idea behind DEPENDENCY INJECTION - making things completely modular and independent.
 class ProductRepository(private val productDao: ProductDao) {
 
-    val readAllData: LiveData<List<ProductModel>> = productDao.getProducts()
+    val readAllData: LiveData<List<Product>> = productDao.getProducts()
 
-    suspend fun addProduct(productModel: ProductModel) {
-        productDao.addProduct(productModel)
+    suspend fun addProduct(product: Product) {
+        productDao.addProduct(product)
     }
 
     fun getProducts() = productDao.getProducts()
 
-    suspend fun editProduct(newProductModel: ProductModel) = productDao.editProduct(newProductModel)
+    suspend fun editProduct(newProduct: Product) = productDao.editProduct(newProduct)
 
-    suspend fun deleteProduct(productModel: ProductModel) = productDao.deleteProduct(productModel)
+    suspend fun deleteProduct(product: Product) = productDao.deleteProduct(product)
 
 
     companion object {

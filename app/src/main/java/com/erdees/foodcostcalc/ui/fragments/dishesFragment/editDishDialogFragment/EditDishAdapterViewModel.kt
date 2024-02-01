@@ -7,9 +7,9 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.dish.DishRepository
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
-import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.dish.GrandDish
+import com.erdees.foodcostcalc.entities.HalfProductIncludedInDish
+import com.erdees.foodcostcalc.entities.ProductIncluded
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -32,13 +32,13 @@ class EditDishAdapterViewModel(application: Application) : AndroidViewModel(appl
     }
 
     var cloneOfListOfProductsIncluded: MutableList<ProductIncluded> = mutableListOf()
-    var cloneOfListOfHalfProductModels: MutableList<HalfProductIncludedInDishModel> =
+    var cloneOfListOfHalfProductModels: MutableList<HalfProductIncludedInDish> =
         mutableListOf()
 
 
-    fun updateClonesOfLists(grandDishModel: GrandDishModel) {
-        cloneOfListOfProductsIncluded = grandDishModel.productsIncluded.toMutableList()
-        cloneOfListOfHalfProductModels = grandDishModel.halfProducts.toMutableList()
+    fun updateClonesOfLists(grandDish: GrandDish) {
+        cloneOfListOfProductsIncluded = grandDish.productsIncluded.toMutableList()
+        cloneOfListOfHalfProductModels = grandDish.halfProducts.toMutableList()
     }
 
     fun saveLists() {
@@ -46,10 +46,10 @@ class EditDishAdapterViewModel(application: Application) : AndroidViewModel(appl
         cloneOfListOfHalfProductModels.forEach { editHalfProductIncludedInDish(it) }
     }
 
-    private fun editHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) {
+    private fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish) {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductIncludedInDishRepository
-                .editHalfProductIncludedInDish(halfProductIncludedInDishModel)
+                .editHalfProductIncludedInDish(halfProductIncludedInDish)
         }
     }
 
@@ -60,10 +60,10 @@ class EditDishAdapterViewModel(application: Application) : AndroidViewModel(appl
         }
     }
 
-    fun deleteHalfProductIncluded(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) {
+    fun deleteHalfProductIncluded(halfProductIncludedInDish: HalfProductIncludedInDish) {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductIncludedInDishRepository.deleteHalfProductIncludedInDish(
-                halfProductIncludedInDishModel
+                halfProductIncludedInDish
             )
         }
     }

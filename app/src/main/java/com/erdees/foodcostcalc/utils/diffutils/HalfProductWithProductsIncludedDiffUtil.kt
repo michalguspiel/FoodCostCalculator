@@ -1,11 +1,11 @@
 package com.erdees.foodcostcalc.utils.diffutils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncluded
 
 class HalfProductWithProductsIncludedDiffUtil(
-  private val oldList : List<HalfProductWithProductsIncludedModel>,
-  private val newList : List<HalfProductWithProductsIncludedModel>
+  private val oldList : List<HalfProductWithProductsIncluded>,
+  private val newList : List<HalfProductWithProductsIncluded>
 ): DiffUtil.Callback(){
   override fun getOldListSize(): Int {
     return oldList.size
@@ -16,12 +16,12 @@ class HalfProductWithProductsIncludedDiffUtil(
   }
 
   override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-    return oldList[oldItemPosition].halfProductModel.halfProductId == newList[newItemPosition].halfProductModel.halfProductId
+    return oldList[oldItemPosition].halfProduct.halfProductId == newList[newItemPosition].halfProduct.halfProductId
   }
 
   override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
     return when {
-      oldList[oldItemPosition].halfProductModel != newList[newItemPosition].halfProductModel -> {
+      oldList[oldItemPosition].halfProduct != newList[newItemPosition].halfProduct -> {
         false
       }
       oldList[oldItemPosition].halfProductsList != newList[newItemPosition].halfProductsList -> {

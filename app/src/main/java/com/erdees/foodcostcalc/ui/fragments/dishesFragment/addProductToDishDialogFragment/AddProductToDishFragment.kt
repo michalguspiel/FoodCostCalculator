@@ -15,7 +15,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.AddProductsToDishBinding
-import com.erdees.foodcostcalc.domain.model.dish.DishModel
+import com.erdees.foodcostcalc.entities.Dish
 import com.erdees.foodcostcalc.utils.Constants.DISH_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.UNIT_SPINNER_ID
@@ -72,14 +72,14 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
       else setUiToProductsSpinner()
     }
 
-    viewModel.readAllProductModelData.observe(viewLifecycleOwner) { products ->
+    viewModel.readAllProductData.observe(viewLifecycleOwner) { products ->
       productsAdapter =
         ArrayAdapter(requireActivity(), R.layout.spinner_layout, products.map { it.name })
       setProductsSpinner()
       productsAdapter.notifyDataSetChanged()
     }
 
-    viewModel.readAllDishModelData.observe(viewLifecycleOwner) { dishes ->
+    viewModel.readAllDishData.observe(viewLifecycleOwner) { dishes ->
       dishesAdapter =
         ArrayAdapter(requireActivity(), R.layout.spinner_layout, dishes.map { it.name })
       setDishesSpinner()
@@ -87,7 +87,7 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
       selectChosenDish()
     }
 
-    viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner) { halfProducts ->
+    viewModel.readAllHalfProductData.observe(viewLifecycleOwner) { halfProducts ->
       halfProductAdapter =
         ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProducts.map { it.name })
       halfProductAdapter.notifyDataSetChanged()
@@ -133,7 +133,7 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
     fun newInstance(): AddProductToDishFragment = AddProductToDishFragment()
 
     const val TAG = "AddProductToDishFragment"
-    var dishModelPassedFromAdapter: DishModel? = null
+    var dishPassedFromAdapter: Dish? = null
   }
 
   private fun setUnitsSpinner() {
@@ -184,8 +184,8 @@ class AddProductToDishFragment : DialogFragment(), AdapterView.OnItemSelectedLis
   }
 
   private fun selectChosenDish() {
-    Log.i(this.tag, "selectChosenDish ${dishModelPassedFromAdapter?.name}")
-    val dishToSelect = dishModelPassedFromAdapter ?: return
+    Log.i(this.tag, "selectChosenDish ${dishPassedFromAdapter?.name}")
+    val dishToSelect = dishPassedFromAdapter ?: return
     val positionToSelect = dishesAdapter.getPosition(dishToSelect.name)
     Log.i(this.tag, "position to select $positionToSelect")
     binding.dishSpinner.setSelection(positionToSelect)

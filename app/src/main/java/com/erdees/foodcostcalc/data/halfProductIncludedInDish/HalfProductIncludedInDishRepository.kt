@@ -1,20 +1,20 @@
 package com.erdees.foodcostcalc.data.halfProductIncludedInDish
 
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
+import com.erdees.foodcostcalc.entities.HalfProductIncludedInDish
 
 class HalfProductIncludedInDishRepository(private val halfProductIncludedInDishDao: HalfProductIncludedInDishDao) {
 
   fun getHalfProductsIncludedInDishFromDishByHalfProduct(productId: Long) =
     halfProductIncludedInDishDao.getHalfProductsIncludedInDishFromDishByHalfProduct(productId)
 
-  fun addHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) =
-    halfProductIncludedInDishDao.addHalfProductIncludedInDish(halfProductIncludedInDishModel)
+  fun addHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish) =
+    halfProductIncludedInDishDao.addHalfProductIncludedInDish(halfProductIncludedInDish)
 
-  suspend fun editHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) =
-    halfProductIncludedInDishDao.editHalfProductIncludedInDish(halfProductIncludedInDishModel)
+  suspend fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish) =
+    halfProductIncludedInDishDao.editHalfProductIncludedInDish(halfProductIncludedInDish)
 
-  suspend fun deleteHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) =
-    halfProductIncludedInDishDao.deleteHalfProductIncludedInDish(halfProductIncludedInDishModel)
+  suspend fun deleteHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish) =
+    halfProductIncludedInDishDao.deleteHalfProductIncludedInDish(halfProductIncludedInDish)
 
   fun deleteAllHalfProductsIncludedInDish(dishId: Long) {
     halfProductIncludedInDishDao.deleteAllHalfProductsIncludedInDish(dishId)

@@ -6,7 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 
-class HalfProductModelModelFragmentRecyclerAdapterTests {
+class HalfProductFragmentRecyclerAdapterTests {
 
     @Test
     fun additionIsCorrect() {

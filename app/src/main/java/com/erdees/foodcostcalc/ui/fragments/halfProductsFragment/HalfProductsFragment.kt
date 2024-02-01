@@ -8,7 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.*
@@ -32,7 +32,7 @@ class HalfProductsFragment : Fragment() {
     setAdapterToRecyclerView(viewModel)
 
     var searchKeyWord = ""
-    var halfProducts = listOf<HalfProductWithProductsIncludedModel>()
+    var halfProducts = listOf<HalfProductWithProductsIncluded>()
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
       searchKeyWord = searchWord
       setAdapter(halfProducts, searchKeyWord)
@@ -44,11 +44,11 @@ class HalfProductsFragment : Fragment() {
     return view
   }
 
-  private fun setAdapter(halfProducts: List<HalfProductWithProductsIncludedModel>, searchWord: String){
+  private fun setAdapter(halfProducts: List<HalfProductWithProductsIncluded>, searchWord: String){
     val data = halfProducts.filter {
-      it.halfProductModel.name.lowercase(Locale.getDefault())
+      it.halfProduct.name.lowercase(Locale.getDefault())
         .contains(searchWord.lowercase(Locale.getDefault()))
-    } as ArrayList<HalfProductWithProductsIncludedModel>
+    } as ArrayList<HalfProductWithProductsIncluded>
     adapter.setHalfProductsList(data)
   }
 

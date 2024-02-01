@@ -23,9 +23,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.DishCardViewBinding
 import com.erdees.foodcostcalc.databinding.ListviewDishRowBinding
-import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
+import com.erdees.foodcostcalc.domain.model.dish.GrandDish
+import com.erdees.foodcostcalc.entities.HalfProductIncludedInDish
+import com.erdees.foodcostcalc.entities.ProductIncluded
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.addProductToDishDialogFragment.AddProductToDishFragment
 import com.erdees.foodcostcalc.ui.fragments.dishesFragment.editDishDialogFragment.EditDishFragment
 import com.erdees.foodcostcalc.ui.views.MaskedItemView
@@ -56,12 +56,12 @@ class DishesFragmentRecyclerAdapter(
   private val openCreateNewDishDialog: () -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-  var list: List<GrandDishModel> = listOf()
+  var list: List<GrandDish> = listOf()
   var adCase: AdHelper = AdHelper(list.size, Constants.DISHES_AD_FREQUENCY)
   private var currentNativeAd: NativeAd? = null
   private var positionOfListAdapterToUpdate: Int? = null
 
-  fun setGrandDishList(listToSet: List<GrandDishModel>) {
+  fun setGrandDishList(listToSet: List<GrandDish>) {
     Log.i(TAG,"setGrandDishList")
     val diffUtil = GrandDishDiffUtil(oldList = this.list, newList = listToSet)
     val diffResult = DiffUtil.calculateDiff(diffUtil)
@@ -91,7 +91,7 @@ class DishesFragmentRecyclerAdapter(
 
     private fun setHowManyServingsTV(i: Int) {
       val quantity =
-      viewModel.idToQuantityMap[list[i].dishModel.dishId] ?: 1
+      viewModel.idToQuantityMap[list[i].dish.dishId] ?: 1
       Log.i(TAG,"setHowManyServingsTV, $i")
       if (quantity == 1) viewBinding.howManyServingsTextView.text =
         activity.getString(R.string.data_per_serving)
@@ -104,7 +104,7 @@ class DishesFragmentRecyclerAdapter(
       Log.i(TAG, "sumPriceAndSetPriceData, $position")
       if (list[position].halfProducts.isEmpty()) setPriceData(
         getAmountOfServings(position),
-        list[position].dishModel.dishId
+        list[position].dish.dishId
       )
 
       list[position].halfProducts.forEach {
@@ -112,10 +112,10 @@ class DishesFragmentRecyclerAdapter(
           .getCertainHalfProductWithProductsIncluded(it.halfProductOwnerId)
           .observe(viewLifecycleOwner) { halfProductWithProductsIncluded ->
             viewModel.addToTotalPrice(
-              list[position].dishModel.dishId,
+              list[position].dish.dishId,
               halfProductWithProductsIncluded.pricePerUnit(),
               it.weight,
-              halfProductWithProductsIncluded.halfProductModel.halfProductUnit,
+              halfProductWithProductsIncluded.halfProduct.halfProductUnit,
               it.unit
             )
             if (isThisLastItemOfTheList(
@@ -123,28 +123,28 @@ class DishesFragmentRecyclerAdapter(
                 list[position].halfProducts.size
               )
             ) {
-              setPriceData(getAmountOfServings(position), list[position].dishModel.dishId)
+              setPriceData(getAmountOfServings(position), list[position].dish.dishId)
             }
           }
       }
     }
 
     private fun getAmountOfServings(position: Int): Int {
-      val dishID = list[position].dishModel.dishId
+      val dishID = list[position].dish.dishId
       val amountOfServings = viewModel.idToQuantityMap[dishID]
       return amountOfServings ?: 1 // If we don't have data it's 1
     }
 
     private fun setNameTaxAndMarginAccordingly(position: Int) {
-      viewBinding.dishNameInAdapter.text = list[position].dishModel.name
+      viewBinding.dishNameInAdapter.text = list[position].dish.name
       viewBinding.dishMarginTvInAdapter.text = (activity.getString(
         R.string.dish_x_margin, String.format(
-          list[position].dishModel.marginPercent.toString()
+          list[position].dish.marginPercent.toString()
         )
       ))
       viewBinding.dishTaxTvInAdapter.text = activity.getString(
         R.string.dish_x_tax, String.format(
-          list[position].dishModel.dishTax.toString()
+          list[position].dish.dishTax.toString()
         )
       )
     }
@@ -153,12 +153,12 @@ class DishesFragmentRecyclerAdapter(
       viewBinding.editButtonInDishAdapter.setOnClickListener {
         positionOfListAdapterToUpdate = position
         openDialog(EditDishFragment())
-        EditDishFragment.grandDishModelPassedFromAdapter = list[position]
+        EditDishFragment.grandDishPassedFromAdapter = list[position]
       }
       viewBinding.addProductToDishButton.setOnClickListener {
-        Log.i(TAG,"opening dialog of $position ${list[position].dishModel.name} ")
+        Log.i(TAG,"opening dialog of $position ${list[position].dish.name} ")
         positionOfListAdapterToUpdate = position
-        AddProductToDishFragment.dishModelPassedFromAdapter = list[position].dishModel
+        AddProductToDishFragment.dishPassedFromAdapter = list[position].dish
         openDialog(AddProductToDishFragment())
       }
     }
@@ -174,7 +174,7 @@ class DishesFragmentRecyclerAdapter(
       ingredients.forEachIndexed { index, ingredient ->
         val row =  ListviewDishRowBinding.inflate(LayoutInflater.from(activity))
         when (ingredient) {
-          is HalfProductIncludedInDishModel -> {
+          is HalfProductIncludedInDish -> {
             setRowAsHalfProduct(row,ingredient,servings)
           }
           is ProductIncluded -> setRowAsProduct(ingredient,row,servings)
@@ -196,9 +196,9 @@ class DishesFragmentRecyclerAdapter(
         }
       }
     }
-    private fun setRowAsProduct(product: ProductIncluded, view: ListviewDishRowBinding,servings: Int) {
+    private fun setRowAsProduct(product: ProductIncluded, view: ListviewDishRowBinding, servings: Int) {
       view.productNameInDishRow.text =
-        product.productModelIncluded.name
+        product.productIncluded.name
       view.productWeightInDishRow.text =
         Utils.formatPriceOrWeight(product.weight * servings)
       view.productPriceInDishRow.text = Utils.formatPrice(product.totalPriceOfThisProduct * servings,activity)
@@ -206,7 +206,7 @@ class DishesFragmentRecyclerAdapter(
         UnitsUtils.getUnitAbbreviation(product.weightUnit)
     }
 
-    private fun setHalfProductRowPrice(servings: Int,halfProduct: HalfProductIncludedInDishModel, productPriceTextView: TextView) {
+    private fun setHalfProductRowPrice(servings: Int, halfProduct: HalfProductIncludedInDish, productPriceTextView: TextView) {
       viewModel.getCertainHalfProductWithProductsIncluded(halfProduct.halfProductOwnerId)
         .observe(
           viewLifecycleOwner
@@ -215,7 +215,7 @@ class DishesFragmentRecyclerAdapter(
             UnitsUtils.calculatePrice(
               it.pricePerUnit(),
               halfProduct.weight,
-              it.halfProductModel.halfProductUnit,
+              it.halfProduct.halfProductUnit,
               halfProduct.unit
             ) * servings,activity
           )
@@ -224,11 +224,11 @@ class DishesFragmentRecyclerAdapter(
 
     private fun setRowAsHalfProduct(
       view: ListviewDishRowBinding,
-      halfProduct: HalfProductIncludedInDishModel,
+      halfProduct: HalfProductIncludedInDish,
       servings: Int
     ) {
       view.productNameInDishRow.text =
-        halfProduct.halfProductModel.name
+        halfProduct.halfProduct.name
       view.productWeightInDishRow.text =
         (halfProduct.weight * servings).toString()
       view.productWeightUnitInDishRow.text =
@@ -244,7 +244,7 @@ class DishesFragmentRecyclerAdapter(
      */
     private fun makeDishCardExpandable(position: Int) {
       viewBinding.linearLayoutDishCard.setOnClickListener {
-        val dishId = list[position].dishModel.dishId
+        val dishId = list[position].dish.dishId
         val isExpanded = viewModel.determineIfDishIsExpanded(dishId)
         if(isExpanded) {
           viewModel.expandedList.remove(dishId)
@@ -257,7 +257,7 @@ class DishesFragmentRecyclerAdapter(
     }
 
     private fun openOrCloseCard(position: Int){
-      val dishId = list[position].dishModel.dishId
+      val dishId = list[position].dish.dishId
       val isExpanded = viewModel.determineIfDishIsExpanded(dishId)
       if (isExpanded) showDishCardElements(position)
       else hideDishCardElements()
@@ -285,7 +285,7 @@ class DishesFragmentRecyclerAdapter(
           Toast.makeText(activity, "Wrong input!", Toast.LENGTH_SHORT).show()
           return@setOnClickListener
         }
-        val dishId = list[position].dishModel.dishId
+        val dishId = list[position].dish.dishId
         viewModel.idToQuantityMap[dishId] = editText.text.toString().toInt()
         setGrandDishList(list) // to refresh the list
         alertDialog.dismiss()
@@ -325,10 +325,10 @@ class DishesFragmentRecyclerAdapter(
 
     private fun setDishData(position: Int) {
       viewModel.setDishData(
-        list[position].dishModel.dishId,
+        list[position].dish.dishId,
         list[position].totalPrice,
-        list[position].dishModel.marginPercent,
-        list[position].dishModel.dishTax
+        list[position].dish.marginPercent,
+        list[position].dish.dishTax
       )
     }
 

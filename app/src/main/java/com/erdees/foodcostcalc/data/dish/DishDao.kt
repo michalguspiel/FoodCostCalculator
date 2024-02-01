@@ -2,21 +2,21 @@ package com.erdees.foodcostcalc.data.dish
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import com.erdees.foodcostcalc.domain.model.dish.DishModel
+import com.erdees.foodcostcalc.entities.Dish
 
 @Dao
 interface DishDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addDish(dishModel: DishModel)
+    suspend fun addDish(dish: Dish)
 
     @Query("SELECT * FROM dishes ORDER BY dish_name ASC")
-    fun getDishes(): LiveData<List<DishModel>>
+    fun getDishes(): LiveData<List<Dish>>
 
     @Update
-    suspend fun editDish(dishModel: DishModel)
+    suspend fun editDish(dish: Dish)
 
     @Delete
-    suspend fun deleteDish(dishModel: DishModel)
+    suspend fun deleteDish(dish: Dish)
 
 }

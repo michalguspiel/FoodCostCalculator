@@ -15,8 +15,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentEditHalfProductBinding
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
+import com.erdees.foodcostcalc.entities.HalfProduct
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
@@ -37,7 +37,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
   override fun onResume() {
     unitList = getUnits(resources, sharedPreferences)
     Log.i(TAG, unitList.joinToString { it })
-    unitList = when (halfProductPassedFromAdapter.halfProductModel.halfProductUnit) {
+    unitList = when (halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
       "per piece" -> mutableListOf("per piece")
       "per kilogram" -> unitList.filterWeight()
       "per liter" -> unitList.filterVol()
@@ -52,7 +52,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
       ArrayAdapter(requireContext(), R.layout.dropdown_item, unitList)
     with(binding.editHalfProductSpinner) {
       setAdapter(unitSpinnerAdapter)
-      setText(halfProductPassedFromAdapter.halfProductModel.halfProductUnit, false)
+      setText(halfProductPassedFromAdapter.halfProduct.halfProductUnit, false)
       onItemClickListener = this@EditHalfProductFragment
       id = spinnerId
       gravity = Gravity.CENTER
@@ -85,9 +85,9 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
     /** Observe data from viewmodel */
     viewModel.getHalfProductWithProductIncluded()
       .observe(viewLifecycleOwner) {
-        binding.editHalfProductName.setText(halfProductPassedFromAdapter.halfProductModel.name)
+        binding.editHalfProductName.setText(halfProductPassedFromAdapter.halfProduct.name)
         viewModel
-          .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
+          .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapter.halfProduct.halfProductId)
           .observe(viewLifecycleOwner) { eachProduct ->
             recyclerViewAdapter.switchLists(eachProduct)
           }
@@ -96,11 +96,11 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
     /**Button logic*/
     binding.saveHalfproductChangesButton.setOnClickListener {
       if (chosenUnit.isEmpty()) {
-        chosenUnit = halfProductPassedFromAdapter.halfProductModel.halfProductUnit
+        chosenUnit = halfProductPassedFromAdapter.halfProduct.halfProductUnit
       }
       recyclerViewAdapter.save(
-        HalfProductModel(
-          halfProductPassedFromAdapter.halfProductModel.halfProductId,
+        HalfProduct(
+          halfProductPassedFromAdapter.halfProduct.halfProductId,
           binding.editHalfProductName.text.toString(),
           chosenUnit // chosen unit from spinner
         ), viewLifecycleOwner
@@ -109,7 +109,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
     }
 
     binding.deleteDishButton.setOnClickListener {
-      viewModel.deleteHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
+      viewModel.deleteHalfProduct(halfProductPassedFromAdapter.halfProduct.halfProductId)
       this.dismiss()
     }
 
@@ -123,7 +123,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
       EditHalfProductFragment()
 
     const val TAG = "EditHalfProductFragment"
-    lateinit var halfProductPassedFromAdapter: HalfProductWithProductsIncludedModel
+    lateinit var halfProductPassedFromAdapter: HalfProductWithProductsIncluded
   }
 
   override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

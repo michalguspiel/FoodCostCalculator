@@ -3,7 +3,6 @@ package com.erdees.foodcostcalc.ui.activities.mainActivity
 import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
@@ -215,7 +214,7 @@ class MainActivity : AppCompatActivity() {
           }
 
           R.id.nav_add_product_to_dish -> {
-            AddProductToDishFragment.dishModelPassedFromAdapter = null
+            AddProductToDishFragment.dishPassedFromAdapter = null
             openDialog(AddProductToDishFragment())
           }
 

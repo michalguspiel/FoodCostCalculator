@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.entities.Product
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.Utils.formatResultAndCheckCommas
@@ -43,7 +43,7 @@ class AddFragmentViewModel(application: Application) : AndroidViewModel(applicat
         productWaste: Double,
         chosenUnit : String
     ) {
-        val product = ProductModel(
+        val product = Product(
             0,
             productName, productPrice, productTax, productWaste, chosenUnit
         )
@@ -51,19 +51,19 @@ class AddFragmentViewModel(application: Application) : AndroidViewModel(applicat
         sendDataAboutProduct(product)
     }
 
-    private fun addProducts(productModel: ProductModel) {
+    private fun addProducts(product: Product) {
         viewModelScope.launch(Dispatchers.IO) {
-            productRepository.addProduct(productModel)
+            productRepository.addProduct(product)
         }
     }
 
-    private fun sendDataAboutProduct(productModel: ProductModel) {
+    private fun sendDataAboutProduct(product: Product) {
         val bundle = Bundle()
-        bundle.putString(Constants.PRODUCT_NAME, productModel.name)
-        bundle.putString(Constants.PRODUCT_TAX, productModel.tax.toString())
-        bundle.putString(Constants.PRODUCT_WASTE, productModel.waste.toString())
-        bundle.putString(Constants.PRODUCT_UNIT, productModel.unit)
-        bundle.putString(Constants.PRODUCT_PRICE_PER_UNIT, productModel.pricePerUnit.toString())
+        bundle.putString(Constants.PRODUCT_NAME, product.name)
+        bundle.putString(Constants.PRODUCT_TAX, product.tax.toString())
+        bundle.putString(Constants.PRODUCT_WASTE, product.waste.toString())
+        bundle.putString(Constants.PRODUCT_UNIT, product.unit)
+        bundle.putString(Constants.PRODUCT_PRICE_PER_UNIT, product.pricePerUnit.toString())
         firebaseAnalytics.logEvent(Constants.PRODUCT_CREATED, bundle)
     }
 

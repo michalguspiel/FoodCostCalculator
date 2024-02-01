@@ -1,11 +1,10 @@
-package com.erdees.foodcostcalc.domain.model.product
+package com.erdees.foodcostcalc.entities
 
 import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.erdees.foodcostcalc.domain.model.dish.DishModel
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 
 
@@ -14,9 +13,9 @@ import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 @Entity
 data class ProductIncluded(
   @PrimaryKey(autoGenerate = true) val productIncludedId: Long,
-  @Embedded val productModelIncluded: ProductModel,
+  @Embedded val productIncluded: Product,
   val dishOwnerId: Long,
-  @Embedded val dishModel: DishModel,
+  @Embedded val dish: Dish, // Completely unused? Serves no purpose
   val productOwnerId: Long,
   var weight: Double,
   val weightUnit: String
@@ -25,9 +24,9 @@ data class ProductIncluded(
 
     @Ignore
     val totalPriceOfThisProduct: Double = calculatePrice(
-        this.productModelIncluded.priceAfterWasteAndTax,
+        this.productIncluded.priceAfterWasteAndTax,
         this.weight,
-        this.productModelIncluded.unit,
+        this.productIncluded.unit,
         this.weightUnit
     )
 

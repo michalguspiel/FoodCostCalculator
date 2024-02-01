@@ -1,16 +1,16 @@
 package com.erdees.foodcostcalc.data.halfproduct
 
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.entities.HalfProduct
 
 class HalfProductRepository(private val halfProductDao: HalfProductDao) {
-    val readAllData: LiveData<List<HalfProductModel>> = halfProductDao.getHalfProducts()
+    val readAllData: LiveData<List<HalfProduct>> = halfProductDao.getHalfProducts()
 
-    suspend fun addHalfProduct(halfProductModel: HalfProductModel) =
-        halfProductDao.addHalfProduct(halfProductModel)
+    suspend fun addHalfProduct(halfProduct: HalfProduct) =
+        halfProductDao.addHalfProduct(halfProduct)
 
-    suspend fun editHalfProduct(halfProductModel: HalfProductModel) =
-        halfProductDao.editHalfProduct(halfProductModel)
+    suspend fun editHalfProduct(halfProduct: HalfProduct) =
+        halfProductDao.editHalfProduct(halfProduct)
 
   fun deleteHalfProduct(id: Long){
       halfProductDao.deleteHalfProduct(id)

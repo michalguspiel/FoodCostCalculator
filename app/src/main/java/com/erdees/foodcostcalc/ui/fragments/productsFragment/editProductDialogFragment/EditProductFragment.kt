@@ -10,9 +10,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentEditProductBinding
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncluded
+import com.erdees.foodcostcalc.entities.Product
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
@@ -33,7 +33,7 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
   override fun onResume() {
     unitList = getUnits(resources, sharedPreferences)
-    unitList = when (productModelPassedFromAdapter.unit) {
+    unitList = when (productPassedFromAdapter.unit) {
       "per piece" -> mutableListOf("per piece")
       "per kilogram" -> unitList.filterWeight()
       "per liter" -> unitList.filterVol()
@@ -71,8 +71,8 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
      * 'ProductIncludedInHalfProductModel' that has the same ID as edited product. */
     var productIncludedList = listOf<ProductIncluded>()
     var productIncludedInHalfProductList = listOf<ProductIncludedInHalfProduct>()
-    setProductIdOfEditedProduct(productModelPassedFromAdapter)
-    setDialogFieldsAccordinglyToProductEdited(productModelPassedFromAdapter)
+    setProductIdOfEditedProduct(productPassedFromAdapter)
+    setDialogFieldsAccordinglyToProductEdited(productPassedFromAdapter)
     if (productId != null) {
       fragmentViewModel.getCertainProductsIncluded(productId!!).observe(
         viewLifecycleOwner
@@ -90,9 +90,9 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     binding.saveChangesButton.setOnClickListener {
       if (allFieldsAreLegit()) {
         if (unitPosition == null) unitPosition =
-          unitList.indexOf(productModelPassedFromAdapter.unit)
-        val unit = unitList.getOrNull(unitPosition ?: 0) ?: productModelPassedFromAdapter.unit
-        val productToChange = ProductModel(
+          unitList.indexOf(productPassedFromAdapter.unit)
+        val unit = unitList.getOrNull(unitPosition ?: 0) ?: productPassedFromAdapter.unit
+        val productToChange = Product(
           productId!!,
           binding.editProductName.text.toString(),
           binding.editProductPrice.text.toString().toDouble(),
@@ -111,7 +111,7 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     }
 
     binding.deleteProductButton.setOnClickListener {
-      fragmentViewModel.deleteProduct(productModelPassedFromAdapter)
+      fragmentViewModel.deleteProduct(productPassedFromAdapter)
       this.dismiss()
     }
 
@@ -122,7 +122,7 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
   companion object {
     const val TAG = "EditProductFragment"
-    lateinit var productModelPassedFromAdapter: ProductModel
+    lateinit var productPassedFromAdapter: Product
   }
 
   private fun allFieldsAreLegit(): Boolean {
@@ -130,15 +130,15 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
   }
 
   private fun changeEveryProductIncluded(
-    productModelToChange: ProductModel, listOfProductsToChange: List<ProductIncluded>
+    productToChange: Product, listOfProductsToChange: List<ProductIncluded>
   ) {
     listOfProductsToChange.forEach {
       fragmentViewModel.editProductsIncluded(
         ProductIncluded(
           it.productIncludedId,
-          productModelToChange,
+          productToChange,
           it.dishOwnerId,
-          it.dishModel,
+          it.dish,
           it.productOwnerId,
           it.weight,
           it.weightUnit
@@ -148,14 +148,14 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
   }
 
   private fun changeEveryProductIncludedInHalfProduct(
-    productModelToChange: ProductModel, listToChange: List<ProductIncludedInHalfProduct>
+    productToChange: Product, listToChange: List<ProductIncludedInHalfProduct>
   ) {
     listToChange.forEach {
       fragmentViewModel.editProductIncludedInHalfProduct(
         ProductIncludedInHalfProduct(
           it.productIncludedInHalfProductId,
-          productModelToChange,
-          it.halfProductModel,
+          productToChange,
+          it.halfProduct,
           it.halfProductHostId,
           it.weight,
           it.weightUnit,
@@ -165,16 +165,16 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
     }
   }
 
-  private fun setProductIdOfEditedProduct(productModelEdited: ProductModel) {
-    productId = productModelEdited.productId
+  private fun setProductIdOfEditedProduct(productEdited: Product) {
+    productId = productEdited.productId
   }
 
-  private fun setDialogFieldsAccordinglyToProductEdited(productModelPassedFromAdapter: ProductModel) {
-    binding.editProductName.setText(productModelPassedFromAdapter.name)
-    binding.editProductPrice.setText(productModelPassedFromAdapter.pricePerUnit.toString())
-    binding.editProductTax.setText(productModelPassedFromAdapter.tax.toString())
-    binding.editProductWaste.setText(productModelPassedFromAdapter.waste.toString())
-    binding.spinnerEditProduct.setText(productModelPassedFromAdapter.unit, false)
+  private fun setDialogFieldsAccordinglyToProductEdited(productPassedFromAdapter: Product) {
+    binding.editProductName.setText(productPassedFromAdapter.name)
+    binding.editProductPrice.setText(productPassedFromAdapter.pricePerUnit.toString())
+    binding.editProductTax.setText(productPassedFromAdapter.tax.toString())
+    binding.editProductWaste.setText(productPassedFromAdapter.waste.toString())
+    binding.spinnerEditProduct.setText(productPassedFromAdapter.unit, false)
   }
 
   override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

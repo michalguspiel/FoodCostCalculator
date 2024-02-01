@@ -7,9 +7,9 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.product.ProductRepository
 import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncluded
+import com.erdees.foodcostcalc.entities.Product
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -33,15 +33,15 @@ class EditProductFragmentViewModel(application: Application) : AndroidViewModel(
 
   }
   /**ProductModel Repository methods*/
-  fun deleteProduct(productModel: ProductModel) {
+  fun deleteProduct(product: Product) {
     viewModelScope.launch(Dispatchers.IO) {
-      productRepository.deleteProduct(productModel)
+      productRepository.deleteProduct(product)
     }
   }
 
-  fun editProduct(newProductModel: ProductModel) {
+  fun editProduct(newProduct: Product) {
     viewModelScope.launch(Dispatchers.IO) {
-      productRepository.editProduct(newProductModel)
+      productRepository.editProduct(newProduct)
     }
   }
 

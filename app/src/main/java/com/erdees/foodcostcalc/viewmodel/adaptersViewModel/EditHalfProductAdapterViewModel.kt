@@ -7,9 +7,9 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.entities.HalfProductIncludedInDish
+import com.erdees.foodcostcalc.entities.HalfProduct
+import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -34,9 +34,9 @@ class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel
     }
 
 
-  fun editHalfProducts(halfProductModel: HalfProductModel) {
+  fun editHalfProducts(halfProduct: HalfProduct) {
         viewModelScope.launch(Dispatchers.IO) {
-            halfProductRepository.editHalfProduct(halfProductModel)
+            halfProductRepository.editHalfProduct(halfProduct)
         }
     }
 
@@ -54,10 +54,10 @@ class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel
         )
 
 
-    fun editHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) {
+    fun editHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish) {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductIncludedInDishRepository
-                .editHalfProductIncludedInDish(halfProductIncludedInDishModel)
+                .editHalfProductIncludedInDish(halfProductIncludedInDish)
         }
     }
 

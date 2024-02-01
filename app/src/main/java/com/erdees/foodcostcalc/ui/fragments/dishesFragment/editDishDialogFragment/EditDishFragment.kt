@@ -1,6 +1,5 @@
 package com.erdees.foodcostcalc.ui.fragments.dishesFragment.editDishDialogFragment
 
-import android.app.AlertDialog
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -8,12 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentEditDishBinding
-import com.erdees.foodcostcalc.domain.model.dish.GrandDishModel
+import com.erdees.foodcostcalc.domain.model.dish.GrandDish
 import com.erdees.foodcostcalc.utils.ViewUtils.isNotEmptyNorJustDot
 
 class EditDishFragment : DialogFragment() {
@@ -31,7 +29,7 @@ class EditDishFragment : DialogFragment() {
         val view = binding.root
         val viewModel = ViewModelProvider(this).get(EditDishFragmentViewModel::class.java)
 
-        viewModel.getGrandDishById(grandDishModelPassedFromAdapter.dishModel.dishId)
+        viewModel.getGrandDishById(grandDishPassedFromAdapter.dish.dishId)
             .observe(viewLifecycleOwner) { grandDish ->
               setFields()
               recyclerFragmentRecyclerAdapter = EditDishFragmentRecyclerAdapter(
@@ -45,7 +43,7 @@ class EditDishFragment : DialogFragment() {
       binding.saveDishChangesButton.setOnClickListener {
             if (allFieldsAreLegit()) {
                 viewModel.saveDish(
-                    grandDishModelPassedFromAdapter.dishModel.dishId,
+                    grandDishPassedFromAdapter.dish.dishId,
                     binding.editDishName.text.toString(),
                     binding.editDishMargin.text.toString().toDouble(),
                     binding.editDishTax.text.toString().toDouble()
@@ -60,7 +58,7 @@ class EditDishFragment : DialogFragment() {
         }
 
         binding.deleteDishButton.setOnClickListener {
-                viewModel.deleteGrandDish(grandDishModelPassedFromAdapter)
+                viewModel.deleteGrandDish(grandDishPassedFromAdapter)
                 this.dismiss()
         }
         dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -68,9 +66,9 @@ class EditDishFragment : DialogFragment() {
     }
 
     private fun setFields() {
-        binding.editDishName.setText(grandDishModelPassedFromAdapter.dishModel.name)
-        binding.editDishMargin.setText(grandDishModelPassedFromAdapter.dishModel.marginPercent.toString())
-        binding.editDishTax.setText(grandDishModelPassedFromAdapter.dishModel.dishTax.toString())
+        binding.editDishName.setText(grandDishPassedFromAdapter.dish.name)
+        binding.editDishMargin.setText(grandDishPassedFromAdapter.dish.marginPercent.toString())
+        binding.editDishTax.setText(grandDishPassedFromAdapter.dish.dishTax.toString())
     }
 
     companion object {
@@ -78,7 +76,7 @@ class EditDishFragment : DialogFragment() {
             EditDishFragment()
 
         const val TAG = "EditDishFragment"
-        lateinit var grandDishModelPassedFromAdapter: GrandDishModel
+        lateinit var grandDishPassedFromAdapter: GrandDish
     }
 
     private fun allFieldsAreLegit(): Boolean {
