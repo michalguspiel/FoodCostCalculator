@@ -2,6 +2,9 @@ name: Quizzer-Android-CD-Prod
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 env:
   repository_name: FoodCostCalculator
   playstore_name: erdees
