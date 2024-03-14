@@ -18,6 +18,13 @@ jobs:
         with:
           distribution: 'adopt'
           java-version: '18'
+          
+      - name: Setup google services
+        run: |
+          echo "$GOOGLE_SERVICES" > ./app/google-services.json
+        shell: bash
+        env:
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
       - name: Enable Gradle Wrapper caching (optimization)
         uses: actions/cache@v4
