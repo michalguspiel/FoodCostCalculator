@@ -111,6 +111,11 @@ class DishesFragmentRecyclerAdapter(
         viewModel
           .getCertainHalfProductWithProductsIncluded(it.halfProductOwnerId)
           .observe(viewLifecycleOwner) { halfProductWithProductsIncluded ->
+            Log.i(TAG,"halfProductWithProductsIncluded: $halfProductWithProductsIncluded")
+            if(halfProductWithProductsIncluded == null){
+              // TEMPORARY FIX, JUST TO FIX BUGGED APPS
+              return@observe
+            }
             viewModel.addToTotalPrice(
               list[position].dishModel.dishId,
               halfProductWithProductsIncluded.pricePerUnit(),
@@ -211,6 +216,10 @@ class DishesFragmentRecyclerAdapter(
         .observe(
           viewLifecycleOwner
         ) {
+          if(it == null){
+            // TEMPORARY FIX, JUST TO FIX BUGGED APPS
+            return@observe
+          }
           productPriceTextView.text = Utils.formatPrice(
             UnitsUtils.calculatePrice(
               it.pricePerUnit(),
@@ -438,9 +447,11 @@ class DishesFragmentRecyclerAdapter(
 
   @SuppressLint("WrongConstant", "ShowToast", "SetTextI18n")
   override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-    if (holder.itemViewType == DISH_ITEM_TYPE) (holder as DishRecyclerViewHolder).bind()
-    else if (holder.itemViewType == DISH_AD_ITEM_TYPE) (holder as AdItemViewHolder).bind()
-    else (holder as LastItemViewHolder).bind()
+    when (holder.itemViewType) {
+        DISH_ITEM_TYPE -> (holder as DishRecyclerViewHolder).bind()
+        DISH_AD_ITEM_TYPE -> (holder as AdItemViewHolder).bind()
+        else -> (holder as LastItemViewHolder).bind()
+    }
   }
 
   private fun openDialog(dialog: DialogFragment) {
