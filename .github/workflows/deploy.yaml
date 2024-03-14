@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - main
+      - master
 env:
   repository_name: FoodCostCalculator
   playstore_name: erdees
@@ -16,10 +16,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: set up JDK 17
+      - name: set up JDK 18
         uses: actions/setup-java@v4
         with:
-          java-version: '17'
+          distribution: 'adopt'
+          java-version: '18'
 
       - name: Setup google services
         run: |
