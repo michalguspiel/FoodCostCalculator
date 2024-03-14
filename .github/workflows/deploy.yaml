@@ -64,7 +64,7 @@ jobs:
 
       - name: Build with Gradle
         working-directory: ./
-        run: ./gradlew --no-daemon bundleprodRelease -PversionCode=${{ steps.version_code.outputs.VERSION_CODE }} -PversionName=${{ steps.version_name.outputs.VERSION_NAME }}
+        run: ./gradlew --no-daemon bundleRelease -PversionCode=${{ steps.version_code.outputs.VERSION_CODE }} -PversionName=${{ steps.version_name.outputs.VERSION_NAME }}
 
       - name: Sign AAB
         uses: r0adkll/sign-android-release@v1
