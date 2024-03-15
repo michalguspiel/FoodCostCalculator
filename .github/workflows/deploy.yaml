@@ -70,7 +70,7 @@ jobs:
         uses: r0adkll/sign-android-release@v1
         id: prod_build
         with:
-          releaseDirectory: ./app/build/outputs/bundle/prodRelease
+          releaseDirectory: ./app/build/outputs/bundle/release/
           signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE_64 }}
           alias: ${{ secrets.ANDROID_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -83,6 +83,6 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT }}
           packageName: com.erdees.foodcostcalc
-          releaseFiles: ./app/build/outputs/bundle/prodRelease/app-prod-release.aab
+          releaseFiles: ./app/build/outputs/bundle/release/app-prod-release.aab
           track: internal
           status: completed
