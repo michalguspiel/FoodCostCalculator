@@ -83,6 +83,6 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT }}
           packageName: com.erdees.foodcostcalc
-          releaseFiles: ./app/build/outputs/bundle/release/app-prod-release.aab
+          releaseFiles: ./app/build/outputs/bundle/release/app-release.aab
           track: internal
           status: completed
