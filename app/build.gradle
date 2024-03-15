@@ -15,11 +15,6 @@ android {
     }
   }
 
-  lint {
-    baseline = file("lint-baseline.xml")
-  }
-
-
   defaultConfig {
     compileSdk = 34
     applicationId "com.erdees.foodcostcalc"
