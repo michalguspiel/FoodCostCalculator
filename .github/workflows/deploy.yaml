@@ -1,0 +1,88 @@
+name: Quizzer-Android-CD-Prod
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+env:
+  repository_name: FoodCostCalculator
+  playstore_name: erdees
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'adopt'
+          java-version: '17'
+
+      - name: Setup google services
+        run: |
+          echo "$GOOGLE_SERVICES" > ./app/google-services.json
+        shell: bash
+        env:
+          GOOGLE_SERVICES: ${{ secrets.GOOGLE_SERVICES_JSON }}
+
+      - name: Setup build tool version variable
+        shell: bash
+        run: |
+          BUILD_TOOL_VERSION=$(ls /usr/local/lib/android/sdk/build-tools/ | tail -n 1)
+          echo "BUILD_TOOL_VERSION=$BUILD_TOOL_VERSION" >> $GITHUB_ENV
+          echo Last build tool version is: $BUILD_TOOL_VERSION
+
+      - name: Enable Gradle Wrapper caching (optimization)
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Create version code
+        id: version_code
+        run: echo "versionCode=$((40 + $GITHUB_RUN_NUMBER))" >> $GITHUB_ENV
+
+      - name: Create version name
+        id: version_name
+        run: echo "versionName=$(date +'%Y%m%d')" >> $GITHUB_ENV
+
+      - uses: android-actions/setup-android@v2
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+
+      - name: Build with Gradle
+        working-directory: ./
+        run: ./gradlew --no-daemon bundleRelease -PversionCode=${{ env.versionCode }} -PversionName=${{ env.versionName }}
+
+      - name: Sign AAB
+        uses: r0adkll/sign-android-release@v1
+        id: prod_build
+        with:
+          releaseDirectory: ./app/build/outputs/bundle/release/
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE_64 }}
+          alias: ${{ secrets.ANDROID_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
+
+      - name: Release to internal testing
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT }}
+          packageName: com.erdees.foodcostcalc
+          releaseFiles: ./app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
