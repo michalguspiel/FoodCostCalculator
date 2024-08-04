@@ -3,65 +3,39 @@ package com.erdees.foodcostcalc.ui.fragments.dishesFragment.addProductToDishDial
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.dish.DishRepository
-import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
 import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
 import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedRepository
 import com.erdees.foodcostcalc.entities.Dish
-import com.erdees.foodcostcalc.entities.HalfProductIncludedInDish
 import com.erdees.foodcostcalc.entities.HalfProduct
-import com.erdees.foodcostcalc.entities.ProductIncluded
 import com.erdees.foodcostcalc.entities.Product
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils.changeUnitList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import java.util.*
 
 class AddProductToDishFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-  val readAllHalfProductData: LiveData<List<HalfProduct>>
-  val readAllProductData: LiveData<List<Product>>
-  val readAllDishData: LiveData<List<Dish>>
+  private val productDao = AppRoomDataBase.getDatabase(application).productDao()
+  private val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
+  private val dishDao = AppRoomDataBase.getDatabase(application).dishDao()
 
-  private val productRepository: ProductRepository
-  private val halfProductRepository: HalfProductRepository
-  private val dishRepository: DishRepository
-  private val productIncludedRepository: ProductIncludedRepository
-  private val halfProductIncludedInDishRepository: HalfProductIncludedInDishRepository
+  private val productRepository: ProductRepository = ProductRepository.getInstance(productDao)
+  private val halfProductRepository: HalfProductRepository = HalfProductRepository.getInstance(halfProductDao)
+  private val dishRepository: DishRepository = DishRepository.getInstance(dishDao)
 
   val sharedPreferences = SharedPreferences(application)
 
-  init {
-    val productDao = AppRoomDataBase.getDatabase(application).productDao()
-    val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
-    val dishDao = AppRoomDataBase.getDatabase(application).dishDao()
-    val productIncludedDao = AppRoomDataBase.getDatabase(application).productIncludedDao()
-    val halfProductIncludedInDishDao =
-      AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
-
-
-    halfProductRepository = HalfProductRepository.getInstance(halfProductDao)
-    productRepository = ProductRepository.getInstance(productDao)
-    dishRepository = DishRepository.getInstance(dishDao)
-    productIncludedRepository = ProductIncludedRepository.getInstance(productIncludedDao)
-    halfProductIncludedInDishRepository =
-      HalfProductIncludedInDishRepository.getInstance(halfProductIncludedInDishDao)
-
-    readAllHalfProductData = halfProductRepository.readAllData
-    readAllProductData = productRepository.readAllData
-    readAllDishData = dishRepository.readAllData
-  }
+  val readAllHalfProductData: LiveData<List<HalfProduct>> = halfProductRepository.readAllData
+  val readAllProductData: LiveData<List<Product>> = productRepository.readAllData
+  val readAllDishData: LiveData<List<Dish>> = dishRepository.readAllData
 
   private var metricCondition = true
   private var usaCondition = true
 
   fun updateUnitsConditions() {
+    // TODO, CAN WE JUST INITIALIZE VIEWMODEL WITH THIS?
     metricCondition = sharedPreferences.getValueBoolean(Constants.METRIC, true)
     usaCondition = sharedPreferences.getValueBoolean(Constants.IMPERIAL, false)
   }
@@ -120,52 +94,33 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
     }
   }
 
-  private fun addProductToDish(product: ProductIncluded) {
-    viewModelScope.launch(Dispatchers.IO) {
-      productIncludedRepository.addProductToDish(product)
-    }
-  }
-
   private fun addProductToDish(
     weight: Double
   ): Product {
+    // TODO FIX, THIS IS NOT WORKING
     val product = readAllProductData.value?.get(productPosition!!)
     val dish = readAllDishData.value?.get(dishPosition!!)
-    val productIncluded = ProductIncluded(
-      0,
-      product!!,
-      dish!!.dishId,
-      dish,
-      product.productId,
-      weight,
-      chosenUnit
-    )
-    addProductToDish(productIncluded)
-    return product
+//    val productIncluded = ProductIncluded(
+//      0,
+//      product!!,
+//      dish!!.dishId,
+//      dish,
+//      product.productId,
+//      weight,
+//      chosenUnit
+//    )
+//    return product
+    return product!!
   }
 
-  private fun addHalfProductIncludedInDish(halfProductIncludedInDish: HalfProductIncludedInDish) {
-    viewModelScope.launch(Dispatchers.IO) {
-      halfProductIncludedInDishRepository
-        .addHalfProductIncludedInDish(halfProductIncludedInDish)
-    }
-  }
 
   private fun addHalfProductIncludedInDish(weight: Double): HalfProduct {
+
+    // TODO FIX, THIS IS NOT WORKING
     val chosenDish = readAllDishData.value?.get(dishPosition!!)
     val halfProduct = readAllHalfProductData.value?.get(productPosition!!)
-    val halfProductIncludedInDish = HalfProductIncludedInDish(
-      0,
-      chosenDish!!,
-      chosenDish.dishId,
-      halfProduct!!,
-      halfProduct.halfProductId,
-      weight,
-      chosenUnit
-    )
-    addHalfProductIncludedInDish(halfProductIncludedInDish)
 
-    return halfProduct
+    return halfProduct!!
   }
 
   sealed class Result {

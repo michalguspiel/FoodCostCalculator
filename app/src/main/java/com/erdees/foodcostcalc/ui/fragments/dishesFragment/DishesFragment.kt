@@ -7,20 +7,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.databinding.FragmentDishesBinding
-import com.erdees.foodcostcalc.domain.model.dish.GrandDish
 import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.*
 
-// Get what to search for
-// Get grand dishes
-// Create a list of grand dishes with it's quantity
-// Pass that list to adapter
-
-
+// todo fix this one
 class DishesFragment : Fragment() {
   var callbackListener: CallbackListener? = null
-  private lateinit var fragmentRecyclerAdapter: DishesFragmentRecyclerAdapter
+//  private lateinit var fragmentRecyclerAdapter: DishesFragmentRecyclerAdapter
 
   private var _binding: FragmentDishesBinding? = null
   private val binding get() = _binding!!
@@ -36,39 +30,39 @@ class DishesFragment : Fragment() {
 
     setAdapterToRecyclerView(viewModel) { callbackListener?.callback() }
     var searchKey = ""
-    var grandDishes = listOf<GrandDish>()
+
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) {
       searchKey = it
-      setAdapter(grandDishes, searchKey)
+//      setAdapter(grandDishes, searchKey)
     }
-    viewModel.getGrandDishes().observe(viewLifecycleOwner) {
-      grandDishes = it
-      setAdapter(grandDishes, searchKey)
-    }
+//    viewModel.getGrandDishes().observe(viewLifecycleOwner) {
+//      grandDishes = it
+//      setAdapter(grandDishes, searchKey)
+//    }
     return view
   }
 
-  private fun setAdapter(grandDishes: List<GrandDish>, searchWord: String) {
-    fragmentRecyclerAdapter.setGrandDishList(
-      grandDishes.filter {
-        it.dish.name.lowercase(Locale.ROOT).contains(
-          searchWord.lowercase(Locale.ROOT)
-        )
-      })
-  }
+//  private fun setAdapter(grandDishes: List<GrandDish>, searchWord: String) {
+//    fragmentRecyclerAdapter.setGrandDishList(
+//      grandDishes.filter {
+//        it.dish.name.lowercase(Locale.ROOT).contains(
+//          searchWord.lowercase(Locale.ROOT)
+//        )
+//      })
+//  }
 
   private fun setAdapterToRecyclerView(
     viewModel: DishesFragmentViewModel,
     openCreateNewDishDialog: () -> Unit
   ) {
-    fragmentRecyclerAdapter = DishesFragmentRecyclerAdapter(
-      childFragmentManager,
-      viewModel,
-      viewLifecycleOwner,
-      requireActivity(),
-      openCreateNewDishDialog
-    )
-    binding.recyclerViewDishes.adapter = fragmentRecyclerAdapter
+//    fragmentRecyclerAdapter = DishesFragmentRecyclerAdapter(
+//      childFragmentManager,
+//      viewModel,
+//      viewLifecycleOwner,
+//      requireActivity(),
+//      openCreateNewDishDialog
+//    )
+//    binding.recyclerViewDishes.adapter = fragmentRecyclerAdapter
   }
 
   override fun onResume() {

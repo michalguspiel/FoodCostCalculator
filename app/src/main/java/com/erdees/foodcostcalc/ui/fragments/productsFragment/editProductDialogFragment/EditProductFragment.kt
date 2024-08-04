@@ -10,8 +10,6 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentEditProductBinding
-import com.erdees.foodcostcalc.entities.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.entities.ProductIncluded
 import com.erdees.foodcostcalc.entities.Product
 import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
@@ -69,22 +67,8 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
     /** empty lists which gets populated by every 'ProductIncluded' and
      * 'ProductIncludedInHalfProductModel' that has the same ID as edited product. */
-    var productIncludedList = listOf<ProductIncluded>()
-    var productIncludedInHalfProductList = listOf<ProductIncludedInHalfProduct>()
     setProductIdOfEditedProduct(productPassedFromAdapter)
     setDialogFieldsAccordinglyToProductEdited(productPassedFromAdapter)
-    if (productId != null) {
-      fragmentViewModel.getCertainProductsIncluded(productId!!).observe(
-        viewLifecycleOwner
-      ) { listOfProducts ->
-        productIncludedList = listOfProducts
-      }
-      fragmentViewModel.getCertainProductsIncludedInHalfProduct(productId!!).observe(
-          viewLifecycleOwner
-        ) { listOfProducts ->
-          productIncludedInHalfProductList = listOfProducts
-        }
-    }
 
     /** BUTTON LOGIC*/
     binding.saveChangesButton.setOnClickListener {
@@ -101,10 +85,6 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
           unit
         )
         fragmentViewModel.editProduct(productToChange)
-        changeEveryProductIncluded(productToChange, productIncludedList)
-        changeEveryProductIncludedInHalfProduct(
-          productToChange, productIncludedInHalfProductList
-        )
         this.dismiss()
       } else Toast.makeText(requireContext(), "Fields must not be empty!", Toast.LENGTH_SHORT)
         .show()
@@ -127,42 +107,6 @@ class EditProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
 
   private fun allFieldsAreLegit(): Boolean {
     return (!binding.editProductName.text.isNullOrBlank() && !binding.editProductPrice.text.isNullOrBlank() && binding.editProductPrice.text.toString() != "." && !binding.editProductTax.text.isNullOrBlank() && binding.editProductTax.text.toString() != "." && !binding.editProductWaste.text.isNullOrBlank() && binding.editProductWaste.text.toString() != ".")
-  }
-
-  private fun changeEveryProductIncluded(
-    productToChange: Product, listOfProductsToChange: List<ProductIncluded>
-  ) {
-    listOfProductsToChange.forEach {
-      fragmentViewModel.editProductsIncluded(
-        ProductIncluded(
-          it.productIncludedId,
-          productToChange,
-          it.dishOwnerId,
-          it.dish,
-          it.productOwnerId,
-          it.weight,
-          it.weightUnit
-        )
-      )
-    }
-  }
-
-  private fun changeEveryProductIncludedInHalfProduct(
-    productToChange: Product, listToChange: List<ProductIncludedInHalfProduct>
-  ) {
-    listToChange.forEach {
-      fragmentViewModel.editProductIncludedInHalfProduct(
-        ProductIncludedInHalfProduct(
-          it.productIncludedInHalfProductId,
-          productToChange,
-          it.halfProduct,
-          it.halfProductHostId,
-          it.weight,
-          it.weightUnit,
-          it.weightOfPiece
-        )
-      )
-    }
   }
 
   private fun setProductIdOfEditedProduct(productEdited: Product) {

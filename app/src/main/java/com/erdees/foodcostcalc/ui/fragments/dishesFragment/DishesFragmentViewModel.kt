@@ -3,18 +3,13 @@ package com.erdees.foodcostcalc.ui.fragments.dishesFragment
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
-import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
-import com.erdees.foodcostcalc.data.grandDish.GrandDishRepository
-import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedRepository
 import com.erdees.foodcostcalc.domain.model.dish.DishPriceData
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils
 
 class DishesFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
-  private val grandDishRepository: GrandDishRepository
-  private val halfProductWithProductsIncludedRepository: HalfProductWithProductsIncludedRepository
   private val searchEngineRepository = SearchEngineRepository.getInstance()
   val idToQuantityMap = mutableMapOf<Long, Int>()
   val expandedList = mutableListOf<Long>()
@@ -23,23 +18,7 @@ class DishesFragmentViewModel(application: Application) : AndroidViewModel(appli
     return expandedList.contains(dishModelId)
   }
 
-  init {
-    val halfProductWithProductsIncludedDao =
-      AppRoomDataBase.getDatabase(application).halfProductWithProductsIncludedDao()
-    val grandDishDao = AppRoomDataBase.getDatabase(application).grandDishDao()
-    grandDishRepository = GrandDishRepository.getInstance(grandDishDao)
-    halfProductWithProductsIncludedRepository =
-      HalfProductWithProductsIncludedRepository(halfProductWithProductsIncludedDao)
-  }
-
-  fun getGrandDishes() = grandDishRepository.getGrandDishes()
-
   fun getWhatToSearchFor() = searchEngineRepository.getWhatToSearchFor()
-
-  fun getCertainHalfProductWithProductsIncluded(halfProductId: Long) =
-    halfProductWithProductsIncludedRepository.getCertainHalfProductWithProductsIncluded(
-      halfProductId
-    )
 
   fun formattedPriceData(dishModelId: Long, amountOfServings: Int, context: Context): String {
     return Utils.formatPrice(getDishData(dishModelId).totalPrice * amountOfServings, context)

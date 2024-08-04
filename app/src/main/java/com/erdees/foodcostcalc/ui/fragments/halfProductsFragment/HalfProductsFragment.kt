@@ -8,11 +8,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncluded
 import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.CallbackListener
 import java.util.*
 
+// todo fix
 class HalfProductsFragment : Fragment() {
   var callbackListener: CallbackListener? = null
   private lateinit var recyclerView: RecyclerView
@@ -32,25 +32,21 @@ class HalfProductsFragment : Fragment() {
     setAdapterToRecyclerView(viewModel)
 
     var searchKeyWord = ""
-    var halfProducts = listOf<HalfProductWithProductsIncluded>()
+//    var halfProducts = listOf<HalfProductWithProductsIncluded>()
     viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
       searchKeyWord = searchWord
-      setAdapter(halfProducts, searchKeyWord)
-    }
-    viewModel.getHalfProductWithProductIncluded().observe(viewLifecycleOwner) { halfProduct ->
-      halfProducts = halfProduct
-      setAdapter(halfProducts, searchKeyWord)
+//      setAdapter(halfProducts, searchKeyWord)
     }
     return view
   }
 
-  private fun setAdapter(halfProducts: List<HalfProductWithProductsIncluded>, searchWord: String){
-    val data = halfProducts.filter {
-      it.halfProduct.name.lowercase(Locale.getDefault())
-        .contains(searchWord.lowercase(Locale.getDefault()))
-    } as ArrayList<HalfProductWithProductsIncluded>
-    adapter.setHalfProductsList(data)
-  }
+//  private fun setAdapter(halfProducts: List<HalfProductWithProductsIncluded>, searchWord: String) {
+//    val data = halfProducts.filter {
+//      it.halfProduct.name.lowercase(Locale.getDefault())
+//        .contains(searchWord.lowercase(Locale.getDefault()))
+//    } as ArrayList<HalfProductWithProductsIncluded>
+//    adapter.setHalfProductsList(data)
+//  }
 
   private fun setAdapterToRecyclerView(viewModel: HalfProductsFragmentViewModel) {
     adapter = HalfProductFragmentRecyclerAdapter(
