@@ -4,7 +4,7 @@ import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
-import com.erdees.foodcostcalc.domain.model.dish.DishPriceData
+import com.erdees.foodcostcalc.domain.model.DishPriceData
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils
 

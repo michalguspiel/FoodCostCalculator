@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.data.dbMigrations
+package com.erdees.foodcostcalc.data.db.migrations
 
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase

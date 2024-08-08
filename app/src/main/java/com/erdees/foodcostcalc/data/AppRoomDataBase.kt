@@ -4,16 +4,19 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.erdees.foodcostcalc.data.dbMigrations.Migration_1to2_RefactorDatabase
-import com.erdees.foodcostcalc.data.dish.DishDao
-import com.erdees.foodcostcalc.data.halfproduct.HalfProductDao
-import com.erdees.foodcostcalc.data.product.ProductDao
-import com.erdees.foodcostcalc.entities.Dish
-import com.erdees.foodcostcalc.entities.HalfProduct
-import com.erdees.foodcostcalc.entities.HalfProductDish
-import com.erdees.foodcostcalc.entities.Product
-import com.erdees.foodcostcalc.entities.ProductDish
-import com.erdees.foodcostcalc.entities.ProductHalfProduct
+import com.erdees.foodcostcalc.data.db.migrations.Migration_1to2_RefactorDatabase
+import com.erdees.foodcostcalc.data.db.dao.dish.DishDao
+import com.erdees.foodcostcalc.data.db.dao.dish.HalfProductDishDao
+import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
+import com.erdees.foodcostcalc.data.db.dao.halfproduct.HalfProductDao
+import com.erdees.foodcostcalc.data.db.dao.halfproduct.ProductHalfProductDao
+import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
+import com.erdees.foodcostcalc.data.model.Dish
+import com.erdees.foodcostcalc.data.model.HalfProduct
+import com.erdees.foodcostcalc.data.model.HalfProductDish
+import com.erdees.foodcostcalc.data.model.Product
+import com.erdees.foodcostcalc.data.model.ProductDish
+import com.erdees.foodcostcalc.data.model.ProductHalfProduct
 import java.io.File
 
 @Database(
@@ -32,9 +35,14 @@ abstract class AppRoomDataBase : RoomDatabase() {
   abstract fun productDao(): ProductDao
   abstract fun dishDao(): DishDao
   abstract fun halfProductDao(): HalfProductDao
+  abstract fun productDishDao(): ProductDishDao
+  abstract fun halfProductDishDao(): HalfProductDishDao
+  abstract fun productHalfProductDao(): ProductHalfProductDao
 
   /**Singleton of database.*/
   companion object {
+
+    private const val name = "product_database"
     @Volatile
     private var INSTANCE: AppRoomDataBase? = null
 
@@ -51,7 +59,7 @@ abstract class AppRoomDataBase : RoomDatabase() {
         val instance = Room.databaseBuilder(
           context.applicationContext,
           AppRoomDataBase::class.java,
-          "product_database"
+          name
         )
           .addMigrations(*migrations())
           .allowMainThreadQueries()
@@ -68,8 +76,9 @@ abstract class AppRoomDataBase : RoomDatabase() {
         val instance = Room.databaseBuilder(
           context.applicationContext,
           AppRoomDataBase::class.java,
-          "product_database"
+          name
         )
+          .addMigrations(*migrations())
           .createFromFile(file)
           .build()
         INSTANCE = instance

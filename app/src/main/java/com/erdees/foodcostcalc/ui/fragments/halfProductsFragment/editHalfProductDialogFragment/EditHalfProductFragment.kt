@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,20 +13,18 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.databinding.FragmentEditHalfProductBinding
-import com.erdees.foodcostcalc.entities.HalfProduct
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
-import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
-import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
 import com.erdees.foodcostcalc.utils.Utils.getUnits
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
-class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
+class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListener, KoinComponent {
 
   private var chosenUnit = ""
   private var unitList: MutableList<String> = mutableListOf()
 
-  private lateinit var sharedPreferences: SharedPreferences
+  private val sharedPreferences: Preferences by inject()
   private val spinnerId = 1
 
   private var _binding : FragmentEditHalfProductBinding? = null
@@ -80,8 +77,6 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
 //    binding.recyclerViewProductsInHalfProduct.adapter = recyclerViewAdapter
     binding.recyclerViewProductsInHalfProduct.layoutManager =
       LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-    sharedPreferences = SharedPreferences(requireContext())
-
     /**Button logic*/
     binding.saveHalfproductChangesButton.setOnClickListener {
       // todo implement

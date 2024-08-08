@@ -1,11 +1,9 @@
-package com.erdees.foodcostcalc.entities
+package com.erdees.foodcostcalc.data.model
 
 import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import com.erdees.foodcostcalc.utils.UnitsUtils
-import kotlin.time.times
 
 @Keep
 @Entity(tableName = "Product_HalfProduct")

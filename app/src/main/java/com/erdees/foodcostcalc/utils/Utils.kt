@@ -3,8 +3,8 @@ package com.erdees.foodcostcalc.utils
 import android.content.Context
 import android.content.res.Resources
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.data.PreferencesDatabaseImpl
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
+import com.erdees.foodcostcalc.data.PreferencesImpl
+import com.erdees.foodcostcalc.data.SharedPreferences
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -43,7 +43,7 @@ object Utils {
    * @return String
    */
   fun formatPrice(number: Double, context: Context): String {
-    val preferencesDatabase = PreferencesDatabaseImpl.getInstance(context)
+    val preferencesDatabase = PreferencesImpl.getInstance(context)
     val currencyCode = preferencesDatabase.currency?.currencyCode
     val currency = Currency.getInstance(currencyCode)
     currencyCode?.let {

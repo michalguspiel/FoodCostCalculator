@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.utils.diffutils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.erdees.foodcostcalc.entities.Product
+import com.erdees.foodcostcalc.data.model.Product
 
 class ProductDiffUtil(
   private val oldList : List<Product>,

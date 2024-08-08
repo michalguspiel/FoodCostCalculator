@@ -10,8 +10,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentEditProductBinding
-import com.erdees.foodcostcalc.entities.Product
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
+import com.erdees.foodcostcalc.data.model.Product
+import com.erdees.foodcostcalc.data.SharedPreferences
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
 import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
 import com.erdees.foodcostcalc.utils.Utils.getUnits

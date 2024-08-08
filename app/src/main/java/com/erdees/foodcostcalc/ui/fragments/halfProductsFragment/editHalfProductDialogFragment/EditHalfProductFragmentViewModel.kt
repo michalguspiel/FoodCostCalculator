@@ -1,13 +1,11 @@
 package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.editHalfProductDialogFragment
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
+import androidx.lifecycle.ViewModel
+import com.erdees.foodcostcalc.data.repository.HalfProductRepository
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class EditHalfProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
+class EditHalfProductFragmentViewModel : ViewModel(), KoinComponent {
 
-  private val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
-  private val halfProductRepository: HalfProductRepository =
-    HalfProductRepository.getInstance(halfProductDao)
+  private val halfProductRepository: HalfProductRepository by inject()
 }

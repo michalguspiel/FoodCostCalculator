@@ -29,9 +29,6 @@ class CreateDishFragment(private val parentView: View) : DialogFragment() {
         val thisView = binding.root
         val viewModel = ViewModelProvider(this).get(CreateDishFragmentViewModel::class.java)
 
-        viewModel.firebaseAnalytics = FirebaseAnalytics.getInstance(requireContext())
-        viewModel.updateMarginAndTax()
-
         binding.newDishEdittext.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) thisView.hideKeyboard()
         }

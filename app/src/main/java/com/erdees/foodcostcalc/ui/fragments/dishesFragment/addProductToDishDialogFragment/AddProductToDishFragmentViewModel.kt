@@ -4,16 +4,17 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.dish.DishRepository
-import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
-import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.entities.Dish
-import com.erdees.foodcostcalc.entities.HalfProduct
-import com.erdees.foodcostcalc.entities.Product
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
+import com.erdees.foodcostcalc.data.repository.DishRepository
+import com.erdees.foodcostcalc.data.repository.HalfProductRepository
+import com.erdees.foodcostcalc.data.repository.ProductRepository
+import com.erdees.foodcostcalc.data.model.Dish
+import com.erdees.foodcostcalc.data.model.HalfProduct
+import com.erdees.foodcostcalc.data.model.Product
+import com.erdees.foodcostcalc.data.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils.changeUnitList
+import kotlinx.coroutines.flow.Flow
 
 class AddProductToDishFragmentViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -27,8 +28,8 @@ class AddProductToDishFragmentViewModel(application: Application) : AndroidViewM
 
   val sharedPreferences = SharedPreferences(application)
 
-  val readAllHalfProductData: LiveData<List<HalfProduct>> = halfProductRepository.readAllData
-  val readAllProductData: LiveData<List<Product>> = productRepository.readAllData
+  val readAllHalfProductData: Flow<List<HalfPr>> = halfProductRepository.halfProducts
+  val readAllProductData: Flow<List<Product>> = productRepository.products
   val readAllDishData: LiveData<List<Dish>> = dishRepository.readAllData
 
   private var metricCondition = true

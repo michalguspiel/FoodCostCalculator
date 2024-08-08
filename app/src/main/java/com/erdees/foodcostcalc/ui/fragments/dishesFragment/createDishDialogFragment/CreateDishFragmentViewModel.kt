@@ -1,38 +1,27 @@
 package com.erdees.foodcostcalc.ui.fragments.dishesFragment.createDishDialogFragment
 
-import android.app.Application
 import android.os.Bundle
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.dish.DishRepository
-import com.erdees.foodcostcalc.entities.Dish
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
+import com.erdees.foodcostcalc.data.Preferences
+import com.erdees.foodcostcalc.data.model.Dish
+import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.utils.Constants
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class CreateDishFragmentViewModel(application: Application) : AndroidViewModel(application) {
+class CreateDishFragmentViewModel : ViewModel(), KoinComponent  {
 
-    private val dishRepository: DishRepository
+    private val dishRepository: DishRepository by inject()
+    private val  firebaseAnalytics: FirebaseAnalytics by inject()
 
-    lateinit var firebaseAnalytics: FirebaseAnalytics
+    private val sharedPreferences: Preferences by inject()
 
-    val sharedPreferences = SharedPreferences(application)
-
-    init {
-        val dishDao = AppRoomDataBase.getDatabase(application).dishDao()
-        dishRepository = DishRepository.getInstance(dishDao)
-    }
-
-    private var margin: String? = ""
-    private var tax: String? = ""
-
-    fun updateMarginAndTax() {
-        margin = sharedPreferences.getValueString(Constants.MARGIN)
-        tax = sharedPreferences.getValueString(Constants.TAX)
-    }
+    private var margin: String? = sharedPreferences.defaultMargin
+    private var tax: String? = sharedPreferences.defaultTax
 
     private fun addDish(dish: Dish) {
         viewModelScope.launch(Dispatchers.IO) {

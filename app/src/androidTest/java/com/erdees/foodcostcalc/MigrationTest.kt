@@ -5,7 +5,7 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.internal.runner.junit4.AndroidJUnit4ClassRunner
 import androidx.test.platform.app.InstrumentationRegistry
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.dbMigrations.Migration_1to2_RefactorDatabase
+import com.erdees.foodcostcalc.data.db.migrations.Migration_1to2_RefactorDatabase
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

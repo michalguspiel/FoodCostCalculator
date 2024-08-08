@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.domain.model.dish
+package com.erdees.foodcostcalc.domain.model
 
 import androidx.annotation.Keep
 

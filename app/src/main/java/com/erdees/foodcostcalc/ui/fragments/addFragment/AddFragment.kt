@@ -13,7 +13,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentAddBinding
 import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
+import com.erdees.foodcostcalc.data.SharedPreferences
 import com.erdees.foodcostcalc.utils.Constants.ADD_FRAGMENT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
 import com.erdees.foodcostcalc.utils.ViewUtils.isNotEmptyNorJustDot

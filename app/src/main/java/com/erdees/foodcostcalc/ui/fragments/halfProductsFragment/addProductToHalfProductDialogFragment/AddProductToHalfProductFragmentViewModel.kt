@@ -1,29 +1,25 @@
 package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHalfProductDialogFragment
 
-import android.app.Application
-
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
-import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.entities.HalfProduct
-import com.erdees.foodcostcalc.entities.Product
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
-import com.erdees.foodcostcalc.utils.Constants
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import com.erdees.foodcostcalc.data.Preferences
+import com.erdees.foodcostcalc.data.model.Product
+import com.erdees.foodcostcalc.data.model.joined.HalfProductWithProducts
+import com.erdees.foodcostcalc.data.repository.HalfProductRepository
+import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.utils.UnitsUtils
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class AddProductToHalfProductFragmentViewModel(application: Application) :
-  AndroidViewModel(application) {
+class AddProductToHalfProductFragmentViewModel : ViewModel(), KoinComponent {
 
-  private val productDao = AppRoomDataBase.getDatabase(application).productDao()
-  private val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
+  private val preferences : Preferences by inject()
+  private val productRepository: ProductRepository by inject()
+  private val halfProductRepository: HalfProductRepository by inject()
 
-  private val productRepository: ProductRepository = ProductRepository.getInstance(productDao)
-  private val halfProductRepository: HalfProductRepository = HalfProductRepository.getInstance(halfProductDao)
-
-  val readAllHalfProductData: LiveData<List<HalfProduct>> = halfProductRepository.readAllData
-  val readAllProductData: LiveData<List<Product>> = productRepository.readAllData
+  val halfProducts: LiveData<List<HalfProductWithProducts>> = halfProductRepository.halfProducts.asLiveData()
+  val products: LiveData<List<Product>> = productRepository.products.asLiveData()
 
   var isProductPiece: Boolean = false
   var isHalfProductPiece: Boolean = true
@@ -39,7 +35,7 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
 
   fun updateChosenHalfProductData(position: Int) {
     halfProductPosition = position
-    val thisHalfProduct = readAllHalfProductData.value!![halfProductPosition!!]
+    val thisHalfProduct = halfProducts.value!![halfProductPosition!!].halfProduct
     halfProductUnit = thisHalfProduct.halfProductUnit
     isHalfProductPiece = thisHalfProduct.halfProductUnit == "per piece"
     halfProductUnitType = UnitsUtils.getUnitType(thisHalfProduct.halfProductUnit)
@@ -48,12 +44,12 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
   fun updateChosenProductData(position: Int) {
     productPosition = position
     val chosenProduct =
-      readAllProductData.value?.get(position)
+      products.value?.get(position)
     unitType = UnitsUtils.getUnitType(
       chosenProduct?.unit
     )
     chosenProductName = chosenProduct!!.name
-    isProductPiece = readAllProductData.value!![productPosition!!].unit == "per piece"
+    isProductPiece = products.value!![productPosition!!].unit == "per piece"
   }
 
   fun getUnitType(): String {
@@ -76,26 +72,19 @@ class AddProductToHalfProductFragmentViewModel(application: Application) :
     chosenUnit = unit
   }
 
-  var metricCondition = true
-  var usaCondition = true
-
-  val sharedPreferences = SharedPreferences(application)
-
-  fun updateUnitsConditions() {
-    metricCondition = sharedPreferences.getValueBoolean(Constants.METRIC, true)
-    usaCondition = sharedPreferences.getValueBoolean(Constants.IMPERIAL, false)
-  }
+  var metricCondition = preferences.isMetricUsed
+  var imperialCondition = preferences.isImperialUsed
 
   fun addProductToHalfProduct(
     weight: Double,
     pieceWeight: Double
   ) {
     val chosenHalfProduct =
-      readAllHalfProductData.value?.get(
+      halfProducts.value?.get(
         halfProductPosition!!
       )
     val chosenProduct =
-      readAllProductData.value?.get(productPosition!!)
+      products.value?.get(productPosition!!)
 
     // todo fix
 //    addProductIncludedInHalfProduct(

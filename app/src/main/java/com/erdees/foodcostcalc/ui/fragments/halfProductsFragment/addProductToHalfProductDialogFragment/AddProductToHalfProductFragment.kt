@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.AddProductToHalfProductBinding
-import com.erdees.foodcostcalc.entities.HalfProduct
+import com.erdees.foodcostcalc.data.model.HalfProduct
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
 import com.erdees.foodcostcalc.utils.Constants.HALFPRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
@@ -53,17 +53,15 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
     }
     binding.weightForPiece.makeGone()
 
-    viewModel.updateUnitsConditions()
-
-    viewModel.readAllHalfProductData.observe(viewLifecycleOwner) { halfProducts ->
+    viewModel.halfProducts.observe(viewLifecycleOwner) { halfProducts ->
       halfProductAdapter =
-        ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProducts.map { it.name })
+        ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProducts.map { it.halfProduct.name })
       setHalfProductsSpinner()
       halfProductAdapter.notifyDataSetChanged()
       pickHalfProductIfPresent()
     }
 
-    viewModel.readAllProductData.observe(viewLifecycleOwner) { products ->
+    viewModel.products.observe(viewLifecycleOwner) { products ->
       Log.i(TAG,"readAllProductModelData $products")
       productsAdapter =
         ArrayAdapter(requireActivity(), R.layout.spinner_layout, products.map { it.name })
@@ -161,7 +159,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
   }
 
   private fun eitherOfSpinnersIsEmpty(): Boolean {
-    return (viewModel.readAllProductData.value.isNullOrEmpty() || viewModel.readAllHalfProductData.value.isNullOrEmpty())
+    return (viewModel.products.value.isNullOrEmpty() || viewModel.halfProducts.value.isNullOrEmpty())
   }
 
   private fun setTextField() {
@@ -179,7 +177,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
         unitList.changeUnitList(
           viewModel.getUnitType(),
           viewModel.metricCondition,
-          viewModel.usaCondition
+          viewModel.imperialCondition
         )
         setUnitsSpinner()
         unitAdapter.notifyDataSetChanged()

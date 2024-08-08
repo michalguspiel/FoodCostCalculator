@@ -7,10 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.erdees.foodcostcalc.databinding.FragmentProductsBinding
-import com.erdees.foodcostcalc.entities.Product
+import com.erdees.foodcostcalc.data.model.Product
 import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.CallbackListener
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 class ProductsFragment : Fragment() {
@@ -34,14 +37,10 @@ class ProductsFragment : Fragment() {
     )
     binding.recyclerViewProducts.adapter = adapter
 
-    //TODO NOT IN THIS REFACTOR: do not use nested .observe
-    viewModel.getWhatToSearchFor().observe(viewLifecycleOwner) { searchWord ->
-      viewModel.getProducts().observe(viewLifecycleOwner) { products ->
-        Log.i(TAG,"Get new products")
-        val list = products.filter {
-          it.name.lowercase(Locale.getDefault()).contains(searchWord.lowercase())
-        } as ArrayList<Product>
-        adapter.switchLists(list)
+    viewLifecycleOwner.lifecycleScope.launch {
+      viewModel.filteredProducts.collect { products ->
+        Log.i(TAG, "Get new products")
+        adapter.switchLists(products as ArrayList<Product>)
       }
     }
     return view

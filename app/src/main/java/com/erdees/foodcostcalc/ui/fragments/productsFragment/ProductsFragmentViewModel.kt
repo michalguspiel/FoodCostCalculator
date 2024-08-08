@@ -1,26 +1,29 @@
 package com.erdees.foodcostcalc.ui.fragments.productsFragment
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import com.erdees.foodcostcalc.data.AppRoomDataBase
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asFlow
+import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
-import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.entities.Product
+import kotlinx.coroutines.flow.combine
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
+import java.util.Locale
 
-class ProductsFragmentViewModel(application: Application) : AndroidViewModel(application) {
+class ProductsFragmentViewModel : ViewModel(), KoinComponent {
 
-    private val productRepository: ProductRepository
-    private val readAllProductData: LiveData<List<Product>>
-    private val searchEngineRepository: SearchEngineRepository = SearchEngineRepository.getInstance()
+  private val productRepository: ProductRepository by inject()
+  private val searchEngineRepository: SearchEngineRepository = SearchEngineRepository.getInstance()
 
-    init {
-        val productDao = AppRoomDataBase.getDatabase(application).productDao()
-        productRepository = ProductRepository.getInstance(productDao)
-        readAllProductData = productRepository.readAllData
+  private val products = productRepository.products
+
+  private val searchWord = searchEngineRepository.getWhatToSearchFor().asFlow()
+
+  val filteredProducts = combine(
+    products,
+    searchWord
+  ) { products, searchWord ->
+    products.filter {
+      it.name.lowercase(Locale.getDefault()).contains(searchWord.lowercase())
     }
-
-    fun getProducts() = productRepository.getProducts()
-
-    fun getWhatToSearchFor() = searchEngineRepository.getWhatToSearchFor()
+  }
 }

@@ -4,8 +4,8 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
-import com.erdees.foodcostcalc.entities.HalfProduct
+import com.erdees.foodcostcalc.data.repository.HalfProductRepository
+import com.erdees.foodcostcalc.data.model.HalfProduct
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

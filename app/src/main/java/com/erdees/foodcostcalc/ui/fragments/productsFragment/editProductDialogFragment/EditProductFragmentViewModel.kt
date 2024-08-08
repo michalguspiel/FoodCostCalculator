@@ -1,18 +1,17 @@
 package com.erdees.foodcostcalc.ui.fragments.productsFragment.editProductDialogFragment
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.entities.Product
+import com.erdees.foodcostcalc.data.model.Product
+import com.erdees.foodcostcalc.data.repository.ProductRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class EditProductFragmentViewModel(application: Application) : AndroidViewModel(application) {
+class EditProductFragmentViewModel : ViewModel(), KoinComponent {
 
-  private val productDao = AppRoomDataBase.getDatabase(application).productDao()
-  private val productRepository: ProductRepository = ProductRepository.getInstance(productDao)
+  private val productRepository: ProductRepository by inject()
 
   /**ProductModel Repository methods*/
   fun deleteProduct(product: Product) {

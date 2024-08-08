@@ -2,14 +2,14 @@ package com.erdees.foodcostcalc.ui.fragments.settingsFragment
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.erdees.foodcostcalc.data.PreferencesDatabaseImpl
+import com.erdees.foodcostcalc.data.PreferencesImpl
 
 enum class Result {
   SUCCESS, FAILED_TAX_MISSING, FAILED_MARGIN_MISSING, FAILED_UNIT_SYSTEM_MISSING
 }
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
 
-  private val preferencesDatabase = PreferencesDatabaseImpl.getInstance(application)
+  private val preferencesDatabase = PreferencesImpl.getInstance(application)
   fun getDefaultMargin(): String = preferencesDatabase.defaultMargin
   fun getDefaultTax(): String = preferencesDatabase.defaultTax
   fun getDefaultCurrency() = preferencesDatabase.currency
