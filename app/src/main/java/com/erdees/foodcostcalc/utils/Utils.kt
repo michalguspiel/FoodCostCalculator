@@ -3,8 +3,8 @@ package com.erdees.foodcostcalc.utils
 import android.content.Context
 import android.content.res.Resources
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.PreferencesImpl
-import com.erdees.foodcostcalc.data.SharedPreferences
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -74,12 +74,12 @@ object Utils {
   }
 
   /**Get units preferred by the user.*/
-  fun getUnits(resources: Resources, sharedPreferences: SharedPreferences): MutableList<String> {
+  fun getUnits(resources: Resources, sharedPreferences: Preferences): MutableList<String> {
     var chosenUnits = resources.getStringArray(R.array.piece)
-    if (sharedPreferences.getValueBoolean("metric", true)) {
+    if (sharedPreferences.metricUsed) {
       chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
     }
-    if (sharedPreferences.getValueBoolean("usa", false)) {
+    if (sharedPreferences.imperialUsed) {
       chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
     }
     return chosenUnits.toMutableList()
@@ -113,6 +113,31 @@ object Utils {
         }
       }
     }
+  }
+
+  /**First clears unitList then adds correct units,
+   *  every time data set changes this function is called.*/
+  fun generateUnitSet(
+    unitType: String?,
+    metricEnabled: Boolean,
+    imperialEnabled: Boolean
+  ): Set<String> {
+    val units = mutableSetOf<String>()
+    if (metricEnabled) {
+      when (unitType) {
+        "weight" -> units += setOf("kilogram", "gram")
+        "volume" -> units += setOf("milliliter", "liter")
+        "piece" -> units += "piece"
+      }
+    }
+    if (imperialEnabled) {
+      when (unitType) {
+        "weight" -> units += setOf("pound", "ounce")
+        "volume" -> units += arrayListOf("gallon", "fluid ounce")
+        "piece" -> units += "piece"
+      }
+    }
+    return units
   }
 
   fun getBasicRecipeAsPercentageOfTargetRecipe(

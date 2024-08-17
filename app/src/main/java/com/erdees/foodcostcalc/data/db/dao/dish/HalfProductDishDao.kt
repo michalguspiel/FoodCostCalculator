@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.erdees.foodcostcalc.data.model.HalfProductDish
+import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
 import kotlinx.coroutines.flow.Flow
 
 @Dao

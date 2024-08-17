@@ -6,26 +6,30 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.erdees.foodcostcalc.data.model.HalfProduct
-import com.erdees.foodcostcalc.data.model.joined.HalfProductWithProducts
+import com.erdees.foodcostcalc.data.model.HalfProductBase
+import com.erdees.foodcostcalc.data.model.joined.CompleteHalfProduct
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface HalfProductDao {
 
+  @Transaction
   @Query("SELECT * FROM HalfProduct ORDER BY name ASC")
-  fun getHalfProducts(): Flow<List<HalfProductWithProducts>>
+  fun getCompleteHalfProducts(): Flow<List<CompleteHalfProduct>>
+
+  @Query("SELECT * FROM HalfProduct ORDER BY name ASC")
+  fun getHalfProductBase(): Flow<List<HalfProductBase>>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun addHalfProduct(halfProduct: HalfProduct)
+  suspend fun addHalfProduct(halfProductBase: HalfProductBase)
 
   @Update
-  suspend fun editHalfProduct(halfProduct: HalfProduct)
+  suspend fun editHalfProduct(halfProductBase: HalfProductBase)
 
   @Query("DELETE FROM HalfProduct WHERE HalfProductId =:id")
   suspend fun deleteHalfProduct(id: Long)
 
-  @Query("SELECT * FROM Product_HalfProduct WHERE halfProductId = :id")
+  @Query("DELETE FROM Product_HalfProduct WHERE halfProductId = :id")
   suspend fun deleteProductHalfProduct(id: Long)
 
   @Transaction

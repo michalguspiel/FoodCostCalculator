@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.data
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.icu.util.Currency
 import com.erdees.foodcostcalc.utils.Constants
 import java.util.Locale
@@ -13,8 +12,8 @@ interface Preferences {
   var defaultCurrencyCode: String
   val currency: Currency?
 
-  var isMetricUsed: Boolean
-  var isImperialUsed: Boolean
+  var metricUsed: Boolean
+  var imperialUsed: Boolean
 }
 
 class PreferencesImpl(context: Context) : Preferences {
@@ -60,12 +59,12 @@ class PreferencesImpl(context: Context) : Preferences {
     }
   override val currency: Currency?
     get() = Currency.getInstance(defaultCurrencyCode)
-  override var isMetricUsed: Boolean
+  override var metricUsed: Boolean
     get() = sharedPreference.getValueBoolean(Constants.METRIC, true)
     set(value) {
       sharedPreference.save(Constants.METRIC, value)
     }
-  override var isImperialUsed: Boolean
+  override var imperialUsed: Boolean
     get() = sharedPreference.getValueBoolean(Constants.IMPERIAL, false)
     set(value) {
       sharedPreference.save(Constants.IMPERIAL, value)

@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
-import com.erdees.foodcostcalc.data.model.HalfProduct
+import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.utils.Constants
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -19,23 +19,23 @@ class CreateHalfProductFragmentViewModel : ViewModel(), KoinComponent {
     val preferences : Preferences by inject()
     private val firebaseAnalytics: FirebaseAnalytics by inject()
 
-    private fun sendDataAboutHalfProductCreated(halfProduct: HalfProduct) {
+    private fun sendDataAboutHalfProductCreated(halfProductBase: HalfProductBase) {
         val bundle = Bundle()
-        bundle.putString(FirebaseAnalytics.Param.VALUE, halfProduct.name)
+        bundle.putString(FirebaseAnalytics.Param.VALUE, halfProductBase.name)
         firebaseAnalytics.logEvent(Constants.HALF_PRODUCT_CREATED, bundle)
     }
 
     fun addHalfProduct(name: String, unit: String) {
-        val halfProduct = HalfProduct(0, name, unit)
-        with(halfProduct) {
+        val halfProductBase = HalfProductBase(0, name, unit)
+        with(halfProductBase) {
             addHalfProduct(this)
             sendDataAboutHalfProductCreated(this)
         }
     }
 
-    private fun addHalfProduct(halfProduct: HalfProduct) {
+    private fun addHalfProduct(halfProductBase: HalfProductBase) {
         viewModelScope.launch(Dispatchers.IO) {
-            halfProductRepository.addHalfProduct(halfProduct)
+            halfProductRepository.addHalfProduct(halfProductBase)
         }
     }
 }

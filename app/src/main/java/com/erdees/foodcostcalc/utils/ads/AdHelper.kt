@@ -21,7 +21,7 @@ class AdHelper(itemsSize: Int, private val adFrequency: Int) {
     val finalListSize = itemsSize + finalAmountOfAds
 
     fun itemsSizeWithAds(): Int {
-        return this.finalListSize + 1// +1 to include button as footer.
+        return this.finalListSize
     }
 
     fun adsBindedSoFar(position: Int): Int {

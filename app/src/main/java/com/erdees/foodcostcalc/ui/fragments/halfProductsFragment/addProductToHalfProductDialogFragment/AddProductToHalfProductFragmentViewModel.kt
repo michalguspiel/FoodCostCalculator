@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import com.erdees.foodcostcalc.data.Preferences
-import com.erdees.foodcostcalc.data.model.Product
-import com.erdees.foodcostcalc.data.model.joined.HalfProductWithProducts
+import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.joined.CompleteHalfProduct
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.utils.UnitsUtils
@@ -14,12 +14,13 @@ import org.koin.core.component.inject
 
 class AddProductToHalfProductFragmentViewModel : ViewModel(), KoinComponent {
 
-  private val preferences : Preferences by inject()
+  private val preferences: Preferences by inject()
   private val productRepository: ProductRepository by inject()
   private val halfProductRepository: HalfProductRepository by inject()
 
-  val halfProducts: LiveData<List<HalfProductWithProducts>> = halfProductRepository.halfProducts.asLiveData()
-  val products: LiveData<List<Product>> = productRepository.products.asLiveData()
+  val halfProducts: LiveData<List<CompleteHalfProduct>> =
+    halfProductRepository.completeHalfProducts.asLiveData()
+  val products: LiveData<List<ProductBase>> = productRepository.products.asLiveData()
 
   var isProductPiece: Boolean = false
   var isHalfProductPiece: Boolean = true
@@ -31,14 +32,14 @@ class AddProductToHalfProductFragmentViewModel : ViewModel(), KoinComponent {
   private var halfProductUnit = ""
   private var chosenProductName = ""
   private var halfProductUnitType = ""
-  private var unitType = ""
+  private var unitType: String? = null
 
   fun updateChosenHalfProductData(position: Int) {
     halfProductPosition = position
-    val thisHalfProduct = halfProducts.value!![halfProductPosition!!].halfProduct
+    val thisHalfProduct = halfProducts.value!![halfProductPosition!!].halfProductBase
     halfProductUnit = thisHalfProduct.halfProductUnit
     isHalfProductPiece = thisHalfProduct.halfProductUnit == "per piece"
-    halfProductUnitType = UnitsUtils.getUnitType(thisHalfProduct.halfProductUnit)
+    halfProductUnitType = UnitsUtils.getUnitType(thisHalfProduct.halfProductUnit) ?: ""
   }
 
   fun updateChosenProductData(position: Int) {
@@ -52,7 +53,7 @@ class AddProductToHalfProductFragmentViewModel : ViewModel(), KoinComponent {
     isProductPiece = products.value!![productPosition!!].unit == "per piece"
   }
 
-  fun getUnitType(): String {
+  fun getUnitType(): String? {
     return unitType
   }
 
@@ -72,8 +73,8 @@ class AddProductToHalfProductFragmentViewModel : ViewModel(), KoinComponent {
     chosenUnit = unit
   }
 
-  var metricCondition = preferences.isMetricUsed
-  var imperialCondition = preferences.isImperialUsed
+  var metricCondition = preferences.metricUsed
+  var imperialCondition = preferences.imperialUsed
 
   fun addProductToHalfProduct(
     weight: Double,

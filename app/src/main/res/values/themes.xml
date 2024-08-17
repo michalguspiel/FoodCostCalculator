@@ -10,15 +10,13 @@
         <item name="colorSecondary">@color/orange_500</item>
         <item name="colorSecondaryVariant">@color/orange_200</item>
         <item name="colorOnSecondary">@color/black</item>
-        <!-- Status bar color. -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
         <!-- Customize your theme here. -->
 
         <item name="boxStrokeColor">@color/orange_500</item>
         <item name="boxStrokeWidth">2dp</item>
 
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="windowActionBar">false</item>
+<!--        <item name="android:windowDrawsSystemBarBackgrounds">true</item>-->
+<!--        <item name="windowActionBar">false</item>-->
         <item name="windowNoTitle">true</item>
         <item name="android:listDivider">@color/gray_500</item>
 

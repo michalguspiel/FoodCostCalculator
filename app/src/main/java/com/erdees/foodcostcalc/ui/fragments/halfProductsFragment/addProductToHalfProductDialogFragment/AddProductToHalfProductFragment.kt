@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.AddProductToHalfProductBinding
-import com.erdees.foodcostcalc.data.model.HalfProduct
+import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
 import com.erdees.foodcostcalc.utils.Constants.HALFPRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
@@ -55,14 +55,17 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
 
     viewModel.halfProducts.observe(viewLifecycleOwner) { halfProducts ->
       halfProductAdapter =
-        ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProducts.map { it.halfProduct.name })
+        ArrayAdapter(
+          requireActivity(),
+          R.layout.spinner_layout,
+          halfProducts.map { it.halfProductBase.name })
       setHalfProductsSpinner()
       halfProductAdapter.notifyDataSetChanged()
       pickHalfProductIfPresent()
     }
 
     viewModel.products.observe(viewLifecycleOwner) { products ->
-      Log.i(TAG,"readAllProductModelData $products")
+      Log.i(TAG, "readAllProductModelData $products")
       productsAdapter =
         ArrayAdapter(requireActivity(), R.layout.spinner_layout, products.map { it.name })
       setProductsSpinner()
@@ -110,7 +113,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
   }
 
   private fun pickHalfProductIfPresent() {
-    val halfProductToSelect = passedHalfProduct ?: return
+    val halfProductToSelect = passedHalfProductBase ?: return
     val positionToSelect = halfProductAdapter.getPosition(halfProductToSelect.name)
     binding.halfProductSpinner.setSelection(positionToSelect)
   }
@@ -154,7 +157,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
     fun newInstance(): AddProductToHalfProductFragment =
       AddProductToHalfProductFragment()
 
-    var passedHalfProduct: HalfProduct? = null
+    var passedHalfProductBase: HalfProductBase? = null
     const val TAG = "AddProductToHalfProductFragment"
   }
 
@@ -175,7 +178,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
       1 -> {
         viewModel.updateChosenProductData(position)
         unitList.changeUnitList(
-          viewModel.getUnitType(),
+          viewModel.getUnitType() ?: "",
           viewModel.metricCondition,
           viewModel.imperialCondition
         )

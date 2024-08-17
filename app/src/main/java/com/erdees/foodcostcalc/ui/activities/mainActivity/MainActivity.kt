@@ -1,9 +1,7 @@
 package com.erdees.foodcostcalc.ui.activities.mainActivity
 
-import android.content.Intent
 import android.os.Bundle
 import android.os.PersistableBundle
-import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -16,23 +14,17 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.ActivityMainBinding
-import com.erdees.foodcostcalc.ui.activities.onlineDataActivity.OnlineDataActivity
-import com.erdees.foodcostcalc.ui.fragments.addFragment.AddFragment
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.DishesFragment
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.addProductToDishDialogFragment.AddProductToDishFragment
-import com.erdees.foodcostcalc.ui.fragments.dishesFragment.createDishDialogFragment.CreateDishFragment
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.HalfProductsFragment
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHalfProductDialogFragment.AddProductToHalfProductFragment
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.createHalfProductDialogFragment.CreateHalfProductFragment
-import com.erdees.foodcostcalc.ui.fragments.productsFragment.ProductsFragment
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SettingsFragment
+import com.erdees.foodcostcalc.ui.screens.createProduct.AddFragment
+import com.erdees.foodcostcalc.ui.screens.dishes.DishesFragment
+import com.erdees.foodcostcalc.ui.screens.products.ProductsFragment
 import com.erdees.foodcostcalc.utils.CallbackListener
 import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard
 import com.erdees.foodcostcalc.utils.ViewUtils.makeGone
 import com.erdees.foodcostcalc.utils.ViewUtils.makeVisible
 import com.erdees.foodcostcalc.utils.ViewUtils.uncheckAllItems
 import com.google.android.gms.ads.MobileAds
-import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
   private lateinit var viewBinding: ActivityMainBinding
@@ -43,7 +35,6 @@ class MainActivity : AppCompatActivity() {
   private val productsFragment = ProductsFragment.newInstance()
   private val dishesFragment = DishesFragment.newInstance()
   private val addFragment = AddFragment.newInstance()
-  private val settingsFragment = SettingsFragment.newInstance()
   private val halfProductsFragment = HalfProductsFragment.newInstance()
 
   /**Hide everything on toolbar but side menu button. */
@@ -61,12 +52,6 @@ class MainActivity : AppCompatActivity() {
     viewBinding.content.customToolbar.searchButton.makeVisible()
     viewBinding.content.customToolbar.searchTextField.makeVisible()
     viewBinding.content.customToolbar.searchTextField.hint = getString(R.string.search_by_name)
-  }
-
-  fun openAdd() {
-    replaceFragment(addFragment, AddFragment.TAG)
-    viewBinding.content.navigationView.uncheckAllItems()
-    hideSearchToolbar()
   }
 
   fun setToolBarTitle(text: String) {
@@ -95,7 +80,7 @@ class MainActivity : AppCompatActivity() {
         super.onBackPressed()
         viewBinding.content.customToolbar.searchBack.performClick()
         when (supportFragmentManager.fragments.last()) { // to setup correct toolbar
-          addFragment, settingsFragment -> {
+          addFragment -> {
             hideSearchToolbar()
             viewBinding.content.navigationView.uncheckAllItems()
           }
@@ -151,16 +136,6 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     viewBinding = ActivityMainBinding.inflate(layoutInflater)
 
-    productsFragment.callbackListener = object : CallbackListener {
-      override fun callback() {
-        openAdd()
-      }
-    }
-    dishesFragment.callbackListener = object : CallbackListener {
-      override fun callback() {
-        openDialog(CreateDishFragment(viewBinding.drawerLayout))
-      }
-    }
     halfProductsFragment.callbackListener = object : CallbackListener {
       override fun callback() {
         openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))
@@ -202,69 +177,6 @@ class MainActivity : AppCompatActivity() {
     toggle = ActionBarDrawerToggle(this, viewBinding.drawerLayout, 0, 0)
     viewBinding.drawerLayout.addDrawerListener(toggle)
 
-    val sideNavigationClickListener =
-      NavigationView.OnNavigationItemSelectedListener { item: MenuItem ->
-        when (item.itemId) {
-          R.id.nav_add_product -> {
-            openAdd()
-          }
-
-          R.id.nav_create_new_dish -> {
-            openDialog(CreateDishFragment(viewBinding.drawerLayout))
-          }
-
-          R.id.nav_add_product_to_dish -> {
-            AddProductToDishFragment.dishPassedFromAdapter = null
-            openDialog(AddProductToDishFragment())
-          }
-
-          R.id.nav_personalize -> {
-            replaceFragment(settingsFragment, SettingsFragment.TAG)
-            viewBinding.content.navigationView.uncheckAllItems()
-            hideSearchToolbar()
-          }
-
-          R.id.nav_create_half_product -> {
-            openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))
-          }
-
-          R.id.nav_add_product_to_half_product -> {
-            AddProductToHalfProductFragment.passedHalfProduct = null
-            openDialog(AddProductToHalfProductFragment())
-          }
-
-          R.id.nav_online_data -> {
-            val intent = Intent(this, OnlineDataActivity::class.java)
-            startActivity(intent, savedInstanceState)
-          }
-        }
-        viewBinding.drawerLayout.closeDrawer(GravityCompat.START)
-        return@OnNavigationItemSelectedListener true
-      }
-
-    /**Bottom Navigation menu */
-    viewBinding.content.navigationView.setOnItemSelectedListener { item ->
-        when (item.itemId) {
-          R.id.navigation_products -> {
-            replaceFragment(productsFragment, ProductsFragment.TAG)
-            setSearchToolbar()
-          }
-
-          R.id.navigation_dishes -> {
-            replaceFragment(dishesFragment, DishesFragment.TAG)
-            setSearchToolbar()
-          }
-
-          R.id.navigation_half_products -> {
-            replaceFragment(halfProductsFragment, HalfProductsFragment.TAG)
-            setSearchToolbar()
-          }
-        }
-      return@setOnItemSelectedListener true
-      }
-    replaceFragment(productsFragment, ProductsFragment.TAG)
-
-    viewBinding.navView.setNavigationItemSelectedListener(sideNavigationClickListener)
   }
 
   override fun onPostCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {

@@ -6,8 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.erdees.foodcostcalc.data.model.ProductHalfProduct
-import kotlinx.coroutines.flow.Flow
+import com.erdees.foodcostcalc.data.model.associations.ProductHalfProduct
 
 @Dao
 interface ProductHalfProductDao {
