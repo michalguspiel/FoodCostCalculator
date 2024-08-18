@@ -7,11 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
-import com.erdees.foodcostcalc.domain.model.DishDomain
-import com.erdees.foodcostcalc.domain.model.DishPriceData
+import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -19,11 +20,15 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,6 +42,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.erdees.foodcostcalc.domain.model.Item
+import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
 enum class SelectedTab {
@@ -44,6 +51,7 @@ enum class SelectedTab {
   ADD_HALF_PRODUCT
 }
 
+//TODO: String resources.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddItemToDishScreen(dishId: Long, dishName: String) {
@@ -57,70 +65,102 @@ fun AddItemToDishScreen(dishId: Long, dishName: String) {
   val units by viewModel.units.collectAsState()
   val selectedUnit by viewModel.selectedUnit.collectAsState()
   val quantity by viewModel.quantity.collectAsState()
+  val screenState by viewModel.screenState.collectAsState()
+  val snackbarHostState = remember { SnackbarHostState() }
 
-  Scaffold(topBar = {
-    TopAppBar(title = {
-      Text(text = dishName)
-    })
-  }) { paddingValues ->
-    Column(
-      Modifier
-        .padding(paddingValues)
-    ) {
-
-      // Tabs
-      Row {
-        Tab(
-          modifier = Modifier.weight(1f),
-          selected = selectedTab == SelectedTab.ADD_PRODUCT,
-          onClick = { viewModel.selectTab(SelectedTab.ADD_PRODUCT) },
-          text = { Text(text = "Add Product") },
-          selectedContentColor = MaterialTheme.colorScheme.primary,
-          unselectedContentColor = MaterialTheme.colorScheme.onSurface
-        )
-
-        Tab(
-          modifier = Modifier.weight(1f),
-          selected = selectedTab == SelectedTab.ADD_HALF_PRODUCT,
-          onClick = { viewModel.selectTab(SelectedTab.ADD_HALF_PRODUCT) }, text = {
-            Text(text = "Add Half Product")
-          },
-          selectedContentColor = MaterialTheme.colorScheme.primary,
-          unselectedContentColor = MaterialTheme.colorScheme.onSurface
-        )
+  LaunchedEffect(screenState) {
+    when (screenState) {
+      is ScreenState.Success -> {
+        snackbarHostState.showSnackbar("Item added.", duration = SnackbarDuration.Short)
+        viewModel.resetScreenState()
       }
-      HorizontalDivider()
 
-      // Fields
-      val items = if (selectedTab == SelectedTab.ADD_PRODUCT) products else halfProducts
+      else -> {}
+    }
+  }
 
-      Column(
-        verticalArrangement = Arrangement.SpaceBetween,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-          .fillMaxSize()
-          .padding(vertical = 24.dp)
-          .padding(horizontal = 12.dp)
-      ) {
-        Fields(
+  Scaffold(
+    snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+    topBar = {
+      TopAppBar(title = {
+        Text(text = dishName)
+      })
+    }) { paddingValues ->
+    Box(Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
+      Column(Modifier) {
+
+        // Tabs
+        Row {
+          Tab(
+            modifier = Modifier.weight(1f),
+            selected = selectedTab == SelectedTab.ADD_PRODUCT,
+            onClick = { viewModel.selectTab(SelectedTab.ADD_PRODUCT) },
+            text = { Text(text = "Add Product") },
+            selectedContentColor = MaterialTheme.colorScheme.primary,
+            unselectedContentColor = MaterialTheme.colorScheme.onSurface
+          )
+
+          Tab(
+            modifier = Modifier.weight(1f),
+            selected = selectedTab == SelectedTab.ADD_HALF_PRODUCT,
+            onClick = { viewModel.selectTab(SelectedTab.ADD_HALF_PRODUCT) }, text = {
+              Text(text = "Add Half Product")
+            },
+            selectedContentColor = MaterialTheme.colorScheme.primary,
+            unselectedContentColor = MaterialTheme.colorScheme.onSurface
+          )
+        }
+        HorizontalDivider()
+
+        // Fields
+        val items = if (selectedTab == SelectedTab.ADD_PRODUCT) products else halfProducts
+
+        Column(
+          verticalArrangement = Arrangement.SpaceBetween,
+          horizontalAlignment = Alignment.CenterHorizontally,
           modifier = Modifier
-            .fillMaxWidth(),
-          items = items,
-          units = units,
-          selectedItem = selectedItem,
-          selectedUnit = selectedUnit,
-          selectedTab = selectedTab,
-          quantity = quantity,
-          selectItem = { viewModel.selectItem(it) },
-          selectUnit = { viewModel.selectUnit(it) },
-          setQuantity = { viewModel.setQuantity(it) }
-        )
+            .fillMaxSize()
+            .padding(vertical = 24.dp)
+            .padding(horizontal = 12.dp)
+        ) {
+          Fields(
+            modifier = Modifier
+              .fillMaxWidth(),
+            items = items,
+            units = units,
+            selectedItem = selectedItem,
+            selectedUnit = selectedUnit,
+            selectedTab = selectedTab,
+            quantity = quantity,
+            selectItem = { viewModel.selectItem(it) },
+            selectUnit = { viewModel.selectUnit(it) },
+            setQuantity = { viewModel.setQuantity(it) }
+          )
 
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-          Button(onClick = { viewModel.addItem(dishId) }) {
-            Text(text = "Add")
+          Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Button(onClick = { viewModel.addItem(dishId) }) {
+              Text(text = "Add")
+            }
           }
         }
+      } // Column
+
+      when (screenState) {
+        is ScreenState.Loading -> ScreenLoadingOverlay()
+        is ScreenState.Error -> {
+          AlertDialog(
+            onDismissRequest = { viewModel.resetScreenState() },
+            title = { Text("Error") },
+            text = { Text("Something went wrong") },
+            confirmButton = {
+              Button(onClick = { viewModel.resetScreenState() }) {
+                Text("OK")
+              }
+            }
+          )
+        }
+
+        else -> {}
       }
     }
   }

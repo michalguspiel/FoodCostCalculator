@@ -20,10 +20,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.DishCardViewBinding
 import com.erdees.foodcostcalc.databinding.ListviewDishRowBinding
-import com.erdees.foodcostcalc.domain.model.DishDomain
-import com.erdees.foodcostcalc.domain.model.UsedHalfProductDomain
-import com.erdees.foodcostcalc.domain.model.UsedProductDomain
-import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.domain.model.dish.DishDomain
+import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Constants.DISH_AD_ITEM_TYPE
 import com.erdees.foodcostcalc.utils.Constants.DISH_ITEM_TYPE

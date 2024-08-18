@@ -2,9 +2,7 @@ package com.erdees.foodcostcalc.utils.diffutils
 
 import androidx.recyclerview.widget.DiffUtil
 import com.erdees.foodcostcalc.data.model.ProductBase
-import com.erdees.foodcostcalc.domain.model.DishDomain
-import com.erdees.foodcostcalc.domain.model.UsedHalfProductDomain
-import com.erdees.foodcostcalc.domain.model.UsedProductDomain
+import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 
 class ProductDiffUtil(
     private val oldList : List<ProductBase>,

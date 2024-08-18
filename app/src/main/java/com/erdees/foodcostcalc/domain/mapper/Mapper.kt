@@ -7,11 +7,11 @@ import com.erdees.foodcostcalc.data.model.joined.HalfProductUsedInDish
 import com.erdees.foodcostcalc.data.model.joined.CompleteHalfProduct
 import com.erdees.foodcostcalc.data.model.joined.ProductAndProductDish
 import com.erdees.foodcostcalc.data.model.joined.ProductUsedInHalfProduct
-import com.erdees.foodcostcalc.domain.model.DishDomain
-import com.erdees.foodcostcalc.domain.model.HalfProductDomain
-import com.erdees.foodcostcalc.domain.model.ProductDomain
-import com.erdees.foodcostcalc.domain.model.UsedHalfProductDomain
-import com.erdees.foodcostcalc.domain.model.UsedProductDomain
+import com.erdees.foodcostcalc.domain.model.dish.DishDomain
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 
 object Mapper {
   // TODO fix

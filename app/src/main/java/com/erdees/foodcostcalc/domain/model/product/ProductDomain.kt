@@ -1,6 +1,7 @@
-package com.erdees.foodcostcalc.domain.model
+package com.erdees.foodcostcalc.domain.model.product
 
 import androidx.annotation.Keep
+import com.erdees.foodcostcalc.domain.model.Item
 import java.text.DecimalFormat
 
 @Keep

@@ -1,4 +1,7 @@
-package com.erdees.foodcostcalc.domain.model
+package com.erdees.foodcostcalc.domain.model.dish
+
+import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 
 
 data class DishDomain(
