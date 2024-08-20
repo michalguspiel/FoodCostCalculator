@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -310,10 +311,13 @@ fun UnitField(
         readOnly = true,
         singleLine = true,
         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+        colors = ExposedDropdownMenuDefaults.textFieldColors(focusedPlaceholderColor = Color.Transparent),
       )
 
-      DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+      DropdownMenu(
+        modifier = Modifier.exposedDropdownSize(true),
+        expanded = expanded,
+        onDismissRequest = { expanded = false }) {
         units.forEach { unit ->
           DropdownMenuItem(onClick = {
             selectUnit(unit)

@@ -244,12 +244,12 @@ fun EditQuantityDialog(
     Column(
       Modifier
         .background(
-          MaterialTheme.colorScheme.background,
+          MaterialTheme.colorScheme.surface,
           shape = RoundedCornerShape(28.dp)
         )
         .padding(24.dp)
     ) {
-      Text(text = "Edit quantity", style = MaterialTheme.typography.displayMedium)
+      Text(text = "Edit quantity", style = MaterialTheme.typography.displaySmall)
       Spacer(modifier = Modifier.size(16.dp))
       OutlinedTextField(
         value = editableQuantity,
