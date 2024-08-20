@@ -6,7 +6,9 @@ import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.utils.Format.df
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class HalfProductDomain(
   override val id: Long,
   override val name: String,

@@ -5,6 +5,7 @@ plugins {
   id 'com.google.devtools.ksp'
   id 'androidx.room'
   id 'kotlinx-serialization'
+  id 'kotlin-parcelize'
   id("org.jetbrains.kotlin.plugin.compose") version "2.0.10" // this version matches your Kotlin version
 }
 
@@ -136,6 +137,8 @@ dependencies {
   implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
   implementation("io.insert-koin:koin-android:3.5.6")
+
+  implementation 'io.github.chargemap.android:compose-numberpicker:0.0.1'
 
   testImplementation 'junit:junit:4.13.2'
 

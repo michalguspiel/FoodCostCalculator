@@ -1,9 +1,10 @@
 package com.erdees.foodcostcalc.ui.navigation
 
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import kotlinx.serialization.Serializable
 
-// Todo, name as string resource
+// Todo, name as string resource, icon optional
 @Serializable
 sealed class FCCScreen(val name: String, val iconResourceId: Int) {
   /**Bottom nav*/
@@ -37,6 +38,9 @@ sealed class FCCScreen(val name: String, val iconResourceId: Int) {
   @Serializable
   data class AddItemsToDish(val dishId: Long, val dishName: String) :
     FCCScreen("Add Items to Dish", R.drawable.ic_grocery)
+
+  @Serializable
+  data class EditDish(val dishDomain: DishDomain) : FCCScreen("Edit Dish", R.drawable.ic_grocery)
 
   @Serializable
   data object CreateDish : FCCScreen("Add Dish", R.drawable.ic_serving_dish)

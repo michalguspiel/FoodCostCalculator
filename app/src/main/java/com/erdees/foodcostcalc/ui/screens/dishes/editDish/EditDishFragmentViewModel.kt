@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDishDialogFragment
+package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -16,7 +16,7 @@ class EditDishFragmentViewModel : ViewModel(), KoinComponent {
   fun saveDish(dishId: Long, dishName: String, dishMargin: Double, dishTax: Double) {
     val dish = DishBase(dishId, dishName, dishMargin, dishTax)
     viewModelScope.launch(Dispatchers.IO) {
-      dishRepository.editDish(dish)
+      dishRepository.updateDish(dish)
     }
   }
 

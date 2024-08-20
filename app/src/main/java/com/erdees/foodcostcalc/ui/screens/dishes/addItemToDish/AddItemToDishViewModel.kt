@@ -69,7 +69,7 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
     updateUnitList()
   }
 
-  private var _selectedItem = MutableStateFlow(
+  private var _selectedItem: MutableStateFlow<Item?> = MutableStateFlow(
     when (selectedTab.value) {
       SelectedTab.ADD_PRODUCT -> products.value.firstOrNull()
       SelectedTab.ADD_HALF_PRODUCT -> halfProducts.value.firstOrNull()

@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDishDialogFragment
+package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

@@ -39,6 +39,7 @@ interface DishDao {
   @Query("SELECT * FROM DISHES WHERE dishId = :dishId ")
   suspend fun getCompleteDishByID(dishId: Long): CompleteDish
 
+  // todo, this is unnecessary, this should be done by foreign keys
   @Transaction
   suspend fun deleteDishWithRelations(dishId: Long) {
     deleteDish(dishId)

@@ -44,7 +44,8 @@ import com.google.android.play.core.review.ReviewManagerFactory
 class DishesFragmentRecyclerAdapter(
   private val viewModel: DishesFragmentViewModel,
   private val activity: Activity,
-  private val navigateToAddItemsToDish: ((Long, String) -> Unit)
+  private val navigateToAddItemsToDish: ((Long, String) -> Unit),
+  private val navigateToEditDish: ((DishDomain) -> Unit)
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
   var list: List<DishDomain> = listOf()
@@ -107,20 +108,17 @@ class DishesFragmentRecyclerAdapter(
       ))
       viewBinding.dishTaxTvInAdapter.text = activity.getString(
         R.string.dish_x_tax, String.format(
-          list[position].dishTax.toString()
+          list[position].taxPercent.toString()
         )
       )
     }
 
     private fun setButtons(position: Int) {
-      // TODO: Implement this method
-//      viewBinding.editButtonInDishAdapter.setOnClickListener {
-//        positionOfListAdapterToUpdate = position
-//        openDialog(EditDishFragment())
-//        EditDishFragment = list[position]
-//      }
+      viewBinding.editButtonInDishAdapter.setOnClickListener {
+        positionOfListAdapterToUpdate = position
+        navigateToEditDish(list[position])
+      }
       viewBinding.addProductToDishButton.setOnClickListener {
-        Log.i(TAG, "opening dialog of $position ${list[position].name} ")
         positionOfListAdapterToUpdate = position
         navigateToAddItemsToDish(list[position].dishId, list[position].name)
       }
@@ -167,7 +165,7 @@ class DishesFragmentRecyclerAdapter(
       servings: Int
     ) {
       view.productNameInDishRow.text =
-        product.product.name
+        product.item.name
       view.productWeightInDishRow.text =
         Utils.formatPriceOrWeight(product.quantity * servings)
       view.productPriceInDishRow.text = Utils.formatPrice(product.totalPrice * servings, activity)
@@ -189,7 +187,7 @@ class DishesFragmentRecyclerAdapter(
       servings: Int
     ) {
       view.productNameInDishRow.text =
-        halfProduct.halfProductDomain.name
+        halfProduct.item.name
       view.productWeightInDishRow.text =
         (halfProduct.quantity * servings).toString()
       view.productWeightUnitInDishRow.text =

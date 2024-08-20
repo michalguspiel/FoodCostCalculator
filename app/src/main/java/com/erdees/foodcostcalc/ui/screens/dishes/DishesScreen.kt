@@ -43,6 +43,11 @@ fun DishesScreen(navController: NavController, modifier: Modifier = Modifier) {
           Log.i("DishesScreen", "Navigate to AddItemToDishScreen")
           navController.navigate(FCCScreen.AddItemsToDish(dishId, dishName))
         }
+      this.dishesScreenFragmentContainerView.getFragment<DishesFragment?>()?.navigateToEditDishScreen =
+        { dish ->
+          Log.i("DishesScreen", "Navigate to EditDishScreen")
+          navController.navigate(FCCScreen.EditDish(dish))
+        }
     }
   }
 }

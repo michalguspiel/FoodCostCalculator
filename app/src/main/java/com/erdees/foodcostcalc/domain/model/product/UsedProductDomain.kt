@@ -1,30 +1,32 @@
 package com.erdees.foodcostcalc.domain.model.product
 
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.UsedItem
+import com.erdees.foodcostcalc.utils.Format
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
-import java.text.DecimalFormat
+import kotlinx.serialization.Serializable
 
 /**
  * Can be used in dish or half-product
  * */
+@Serializable
 data class UsedProductDomain(
-  val product: ProductDomain,
-  val quantity : Double,
-  val quantityUnit: String,
+  override val id: Long,
+  override val ownerId: Long,
+  override val item: ProductDomain,
+  override val quantity : Double,
+  override val quantityUnit: String,
   val weightPiece: Double?
-){
+): UsedItem {
   val totalPrice = calculatePrice(
-    product.pricePerUnit,
+    item.pricePerUnit,
     quantity,
-    product.unit,
+    item.unit,
     quantityUnit,
   )
 
-  val df = DecimalFormat("#.##")
-
-  val formattedTotalPrice: String = df.format(totalPrice)
+  val formattedTotalPrice: String = Format.df.format(totalPrice)
 
   override fun toString(): String {
-    return "${product.name}, quantity: $quantity, total price: $formattedTotalPrice"
+    return "${item.name}, quantity: $quantity, total price: $formattedTotalPrice"
   }
 }

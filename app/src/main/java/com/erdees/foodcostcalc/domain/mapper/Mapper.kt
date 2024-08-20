@@ -1,7 +1,10 @@
 package com.erdees.foodcostcalc.domain.mapper
 
+import com.erdees.foodcostcalc.data.model.DishBase
 import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
+import com.erdees.foodcostcalc.data.model.associations.ProductDish
 import com.erdees.foodcostcalc.data.model.joined.CompleteDish
 import com.erdees.foodcostcalc.data.model.joined.HalfProductUsedInDish
 import com.erdees.foodcostcalc.data.model.joined.CompleteHalfProduct
@@ -20,7 +23,7 @@ object Mapper {
       dishId = dish.dishId,
       name = dish.name,
       marginPercent = dish.marginPercent,
-      dishTax = dish.dishTax,
+      taxPercent = dish.dishTax,
       products = products.map { it.toUsedProductDomain() },
       halfProducts = halfProducts.map { it.toUsedHalfProductDomain()  }
     )
@@ -46,23 +49,11 @@ object Mapper {
     )
   }
 
-
-  fun ProductBase.toUsedProductDomain(
-    quantity: Double,
-    quantityUnit: String,
-    weightPiece: Double?
-  ): UsedProductDomain {
-    return UsedProductDomain(
-      product = toProductDomain(),
-      quantity = quantity,
-      quantityUnit = quantityUnit,
-      weightPiece = weightPiece
-    )
-  }
-
   fun ProductAndProductDish.toUsedProductDomain(): UsedProductDomain {
     return UsedProductDomain(
-      product = product.toProductDomain(),
+      id = productDish.productDishId,
+      ownerId = productDish.dishId,
+      item = product.toProductDomain(),
       quantity = productDish.quantity,
       quantityUnit = productDish.quantityUnit,
       weightPiece = null
@@ -71,7 +62,9 @@ object Mapper {
 
   fun ProductUsedInHalfProduct.toUsedProductDomain(): UsedProductDomain {
     return UsedProductDomain(
-      product = product.toProductDomain(),
+      id = productHalfProduct.productHalfProductId,
+      ownerId = productHalfProduct.halfProductId,
+      item = product.toProductDomain(),
       quantity = productHalfProduct.quantity,
       quantityUnit = productHalfProduct.quantityUnit,
       weightPiece = productHalfProduct.weightPiece
@@ -90,9 +83,40 @@ object Mapper {
 
   fun HalfProductUsedInDish.toUsedHalfProductDomain(): UsedHalfProductDomain {
     return UsedHalfProductDomain(
-      halfProductDomain = halfProductsWithProductsBase.toHalfProductDomain(),
+      id = halfProductDish.halfProductDishId,
+      ownerId = halfProductDish.dishId,
+      item = halfProductsWithProductsBase.toHalfProductDomain(),
       quantity = halfProductDish.quantity,
       quantityUnit = halfProductDish.quantityUnit
+    )
+  }
+
+  fun UsedHalfProductDomain.toHalfProductDish() : HalfProductDish {
+    return HalfProductDish(
+      halfProductDishId = id,
+      halfProductId = item.id,
+      dishId = ownerId,
+      quantity = quantity,
+      quantityUnit = quantityUnit
+    )
+  }
+
+  fun UsedProductDomain.toProductDish() : ProductDish {
+    return ProductDish(
+      productDishId = id,
+      productId = item.id,
+      dishId = ownerId,
+      quantity = quantity,
+      quantityUnit = quantityUnit
+    )
+  }
+
+  fun DishDomain.toDishBase() : DishBase {
+    return DishBase(
+      dishId = dishId,
+      name = name,
+      marginPercent = marginPercent,
+      dishTax = taxPercent
     )
   }
 }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -37,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -44,6 +46,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
+import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
 enum class SelectedTab {
@@ -183,11 +186,7 @@ fun Fields(
   val itemFieldLabel = if (selectedTab == SelectedTab.ADD_PRODUCT) "Product" else "Half Product"
   Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
     Column {
-      Text(
-        text = itemFieldLabel,
-        style = MaterialTheme.typography.labelLarge,
-        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-      )
+      FieldLabel(text = itemFieldLabel, modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
       ItemField(
         items = items,
         selectedItem = selectedItem,
@@ -197,11 +196,7 @@ fun Fields(
     }
 
     Column {
-      Text(
-        text = "Quantity",
-        style = MaterialTheme.typography.labelLarge,
-        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-      )
+      FieldLabel(text = "Quantity", modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
       QuantityField(
         quantity = quantity,
         modifier = Modifier.fillMaxWidth(),
@@ -209,11 +204,7 @@ fun Fields(
       )
     }
     Column {
-      Text(
-        text = "Unit",
-        style = MaterialTheme.typography.labelLarge,
-        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-      )
+      FieldLabel(text = "Unit", modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
       UnitField(units = units, selectedUnit = selectedUnit, selectUnit = selectUnit)
     }
   }
@@ -289,7 +280,8 @@ fun QuantityField(
     modifier = modifier,
     textStyle = LocalTextStyle.current.copy(
       textAlign = TextAlign.End
-    )
+    ),
+    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
   )
 }
 

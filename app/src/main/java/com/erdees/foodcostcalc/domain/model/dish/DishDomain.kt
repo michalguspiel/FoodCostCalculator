@@ -1,35 +1,31 @@
 package com.erdees.foodcostcalc.domain.model.dish
 
+import android.util.Log
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import kotlinx.serialization.Serializable
 
 
+@Serializable
 data class DishDomain(
   val dishId: Long,
   val name: String,
   val marginPercent: Double,
-  val dishTax: Double,
+  val taxPercent: Double,
   val products: List<UsedProductDomain>,
   val halfProducts: List<UsedHalfProductDomain>
 ) {
-  val totalPrice: Double =
+  val foodCost: Double =
     products.sumOf { it.totalPrice } + halfProducts.sumOf { it.totalPrice }
 
-  val margin: Double
-    get() = totalPrice * marginPercent / 100
-
-  val tax: Double
-    get() = totalPrice * dishTax / 100
-
-  val priceWithMarginAndTax: Double
+  val totalPrice: Double
     get() {
-      val priceWithMargin = totalPrice * margin / 100
-      val amountOfTax = priceWithMargin * tax / 100
+      val priceWithMargin = foodCost * marginPercent / 100
+      val amountOfTax = priceWithMargin * taxPercent / 100
       return priceWithMargin + amountOfTax
     }
 
   fun finalPricePerServing(amountOfServings: Int): Double {
-    return priceWithMarginAndTax * amountOfServings
+    return totalPrice * amountOfServings
   }
-
 }

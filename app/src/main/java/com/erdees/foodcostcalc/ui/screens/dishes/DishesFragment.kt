@@ -9,11 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.erdees.foodcostcalc.databinding.FragmentDishesBinding
+import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import kotlinx.coroutines.launch
 
 class DishesFragment : Fragment() {
 
   var navigateToAddItemToDishScreen: ((Long, String) -> Unit) = { _, _ -> }
+  var navigateToEditDishScreen: (DishDomain) -> Unit = { _ -> }
 
   private lateinit var fragmentRecyclerAdapter: DishesFragmentRecyclerAdapter
 
@@ -30,9 +32,15 @@ class DishesFragment : Fragment() {
     val view = binding.root
     val viewModel = ViewModelProvider(this)[DishesFragmentViewModel::class.java]
 
-    setAdapterToRecyclerView(viewModel) { id, name ->
-      navigateToAddItemToDishScreen(id, name)
-    }
+    setAdapterToRecyclerView(
+      viewModel,
+      navigateToAddItemToDishScreen = { id, name ->
+        navigateToAddItemToDishScreen(id, name)
+      },
+      navigateToEditDishScreen = { dish ->
+        navigateToEditDishScreen(dish)
+      }
+    )
 
     lifecycleScope.launch {
       viewModel.dishes.collect {
@@ -45,12 +53,14 @@ class DishesFragment : Fragment() {
 
   private fun setAdapterToRecyclerView(
     viewModel: DishesFragmentViewModel,
-    navigateToAddItemToDishScreen: ((Long, String) -> Unit)
+    navigateToAddItemToDishScreen: ((Long, String) -> Unit),
+    navigateToEditDishScreen: (DishDomain) -> Unit = { _ -> }
   ) {
     fragmentRecyclerAdapter = DishesFragmentRecyclerAdapter(
-      viewModel,
-      requireActivity()
-    ) { id, name -> navigateToAddItemToDishScreen(id, name) }
+      viewModel = viewModel,
+      activity = requireActivity(),
+      navigateToAddItemsToDish = { id, name -> navigateToAddItemToDishScreen(id, name) },
+      navigateToEditDish = { dish -> navigateToEditDishScreen(dish) })
     binding.recyclerViewDishes.adapter = fragmentRecyclerAdapter
   }
 
