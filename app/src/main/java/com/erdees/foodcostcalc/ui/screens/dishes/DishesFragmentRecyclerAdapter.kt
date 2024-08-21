@@ -71,15 +71,11 @@ class DishesFragmentRecyclerAdapter(
   inner class DishRecyclerViewHolder(private val viewBinding: DishCardViewBinding) :
     RecyclerView.ViewHolder(viewBinding.root) {
 
-    private fun setPriceData(amountOfServings: Int, dishModelId: Long) {
-      Log.i(TAG, "Setting price data for dish $dishModelId with: $amountOfServings servings")
+    private fun setPriceData(amountOfServings: Int, dishDomain: DishDomain) {
       viewBinding.totalPriceDishCardView.text =
-        viewModel.formattedPriceData(dishModelId, amountOfServings, activity)
-      viewBinding.totalPriceWithMarginDishCardView.text = viewModel.formattedTotalPriceData(
-        dishModelId,
-        amountOfServings,
-        activity
-      )
+        viewModel.formattedPriceData(dishDomain, amountOfServings, activity)
+      viewBinding.totalPriceWithMarginDishCardView.text =
+        viewModel.formattedTotalPriceData(dishDomain, amountOfServings, activity)
     }
 
     private fun setHowManyServingsTV(i: Int) {
@@ -292,7 +288,7 @@ class DishesFragmentRecyclerAdapter(
       }
       setPriceData(
         getAmountOfServings(positionIncludedAdsBinded),
-        list[positionIncludedAdsBinded].dishId
+        list[positionIncludedAdsBinded]
       )
       setHowManyServingsTV(positionIncludedAdsBinded)
       setIngredientList(positionIncludedAdsBinded)

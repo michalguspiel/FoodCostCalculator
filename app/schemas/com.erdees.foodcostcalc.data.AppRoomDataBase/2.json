@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "b2a984ac926a000e4de3c96085d711b2",
+    "identityHash": "16e60a80fc4731d8d1d4c80e9ed0fdeb",
     "entities": [
       {
         "tableName": "products",
@@ -126,7 +126,7 @@
       },
       {
         "tableName": "Product_Dish",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`productDishId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `productId` INTEGER NOT NULL, `dishId` INTEGER NOT NULL, `quantity` REAL NOT NULL, `quantityUnit` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`productDishId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `productId` INTEGER NOT NULL, `dishId` INTEGER NOT NULL, `quantity` REAL NOT NULL, `quantityUnit` TEXT NOT NULL, FOREIGN KEY(`productId`) REFERENCES `products`(`productId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`dishId`) REFERENCES `dishes`(`dishId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "productDishId",
@@ -176,7 +176,30 @@
             "createSql": "CREATE INDEX IF NOT EXISTS `index_Product_Dish_productId` ON `${TABLE_NAME}` (`productId`)"
           }
         ],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "products",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "productId"
+            ],
+            "referencedColumns": [
+              "productId"
+            ]
+          },
+          {
+            "table": "dishes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dishId"
+            ],
+            "referencedColumns": [
+              "dishId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "Product_HalfProduct",
@@ -276,7 +299,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b2a984ac926a000e4de3c96085d711b2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '16e60a80fc4731d8d1d4c80e9ed0fdeb')"
     ]
   }
 }

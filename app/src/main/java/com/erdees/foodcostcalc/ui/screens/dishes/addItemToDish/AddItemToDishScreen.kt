@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
@@ -18,6 +19,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -44,9 +47,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
@@ -58,7 +63,7 @@ enum class SelectedTab {
 //TODO: String resources.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddItemToDishScreen(dishId: Long, dishName: String) {
+fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: String) {
 
   val viewModel: AddItemToDishViewModel = viewModel()
 
@@ -88,6 +93,10 @@ fun AddItemToDishScreen(dishId: Long, dishName: String) {
     topBar = {
       TopAppBar(title = {
         Text(text = dishName)
+      }, navigationIcon = {
+        IconButton(onClick = { navController.popBackStack() }) {
+          Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+        }
       })
     }) { paddingValues ->
     Box(Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
@@ -142,9 +151,7 @@ fun AddItemToDishScreen(dishId: Long, dishName: String) {
           )
 
           Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-            Button(onClick = { viewModel.addItem(dishId) }) {
-              Text(text = "Add")
-            }
+            FCCPrimaryButton(onClick = { viewModel.addItem(dishId) }, text = "Add")
           }
         }
       } // Column

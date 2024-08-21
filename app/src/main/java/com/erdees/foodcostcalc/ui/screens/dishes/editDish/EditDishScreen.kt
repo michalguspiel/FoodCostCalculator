@@ -17,12 +17,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Divider
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.Delete
 import androidx.compose.material.icons.sharp.Edit
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -51,7 +52,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.chargemap.compose.numberpicker.NumberPicker
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
@@ -103,13 +103,17 @@ fun EditDishScreen(dishDomain: DishDomain, navController: NavController) {
           IconButton(onClick = { viewModel.deleteDish(dishDomain.dishId) }) {
             Icon(imageVector = Icons.Sharp.Delete, contentDescription = "Remove dish")
           }
+        },
+        navigationIcon = {
+          IconButton(onClick = { navController.popBackStack() }) {
+            Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+          }
         }
       )
     }
   ) { paddingValues ->
 
     Box(modifier = Modifier.padding(paddingValues)) {
-
       Column {
         LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
           items(usedItems, key = { item -> item.id }) { item ->
@@ -118,7 +122,10 @@ fun EditDishScreen(dishDomain: DishDomain, navController: NavController) {
               onRemove = viewModel::removeItem,
               onEdit = { viewModel.setInteraction(EditDishScreenInteraction.EditItem(it)) }
             )
-            Divider(color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f), thickness = 1.dp)
+            HorizontalDivider(
+              color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+              thickness = 1.dp
+            )
           }
         }
 
@@ -168,34 +175,19 @@ fun EditDishScreen(dishDomain: DishDomain, navController: NavController) {
         is ScreenState.Interaction -> {
           when ((screenState as ScreenState.Interaction).interaction) {
             EditDishScreenInteraction.EditTax -> {
-              BasicAlertDialog(onDismissRequest = viewModel::resetScreenState) {
-                NumberPicker(
-                  dividersColor = MaterialTheme.colorScheme.primary,
-                  modifier = Modifier.background(
-                    MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(12.dp)
-                  ),
-                  value = modifiedDishDomain?.taxPercent?.toInt() ?: 0,
-                  onValueChange = viewModel::updateDishTax,
-                  range = 0..100,
-                  textStyle = MaterialTheme.typography.bodyMedium
-                )
-              }
+              EditTaxDialog(
+                tax = modifiedDishDomain?.taxPercent ?: dishDomain.taxPercent,
+                onSave = viewModel::updateDishTax,
+                onDismiss = viewModel::resetScreenState
+              )
             }
 
             EditDishScreenInteraction.EditMargin -> {
               BasicAlertDialog(onDismissRequest = viewModel::resetScreenState) {
-                // TODO MAKE TEXTFIELD INSTEAD OF NUMBERPICKER
-                NumberPicker(
-                  dividersColor = MaterialTheme.colorScheme.primary,
-                  modifier = Modifier.background(
-                    MaterialTheme.colorScheme.surface,
-                    shape = RoundedCornerShape(12.dp)
-                  ),
-                  value = modifiedDishDomain?.marginPercent?.toInt() ?: 0,
-                  onValueChange = viewModel::updateDishMargin,
-                  range = 100..2000,
-                  textStyle = MaterialTheme.typography.bodyMedium
+                EditMarginDialog(
+                  margin = modifiedDishDomain?.marginPercent ?: dishDomain.marginPercent,
+                  onSave = viewModel::updateDishMargin,
+                  onDismiss = viewModel::resetScreenState
                 )
               }
             }
@@ -216,6 +208,98 @@ fun EditDishScreen(dishDomain: DishDomain, navController: NavController) {
 
         is ScreenState.Idle -> {
           // TODO
+        }
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditTaxDialog(
+  tax: Double,
+  modifier: Modifier = Modifier,
+  onSave: (Double?) -> Unit,
+  onDismiss: () -> Unit
+) {
+
+  var editableTax by remember {
+    mutableStateOf(tax.toString())
+  }
+
+  BasicAlertDialog(
+    modifier = modifier,
+    onDismissRequest = { onDismiss() },
+  ) {
+    Column(
+      Modifier
+        .background(
+          MaterialTheme.colorScheme.surface,
+          shape = RoundedCornerShape(28.dp)
+        )
+        .padding(24.dp)
+    ) {
+      Text(text = "Edit tax", style = MaterialTheme.typography.displaySmall)
+      Spacer(modifier = Modifier.size(16.dp))
+      OutlinedTextField(
+        value = editableTax,
+        onValueChange = { value ->
+          editableTax = editableTax.onNumericValueChange(value)
+        },
+        singleLine = true,
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+      )
+      Spacer(modifier = Modifier.size(24.dp))
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        FCCTextButton(text = "Save") {
+          onSave(editableTax.toDoubleOrNull())
+        }
+      }
+    }
+  }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditMarginDialog(
+  margin: Double,
+  modifier: Modifier = Modifier,
+  onSave: (Double?) -> Unit,
+  onDismiss: () -> Unit
+) {
+
+  var editableMargin by remember {
+    mutableStateOf(margin.toString())
+  }
+
+  BasicAlertDialog(
+    modifier = modifier,
+    onDismissRequest = { onDismiss() },
+  ) {
+    Column(
+      Modifier
+        .background(
+          MaterialTheme.colorScheme.surface,
+          shape = RoundedCornerShape(28.dp)
+        )
+        .padding(24.dp)
+    ) {
+      Text(text = "Edit margin", style = MaterialTheme.typography.displaySmall)
+      Spacer(modifier = Modifier.size(16.dp))
+      OutlinedTextField(
+        value = editableMargin,
+        onValueChange = { value ->
+          editableMargin = editableMargin.onNumericValueChange(value)
+        },
+        singleLine = true,
+        maxLines = 1,
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+      )
+      Spacer(modifier = Modifier.size(24.dp))
+      Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        FCCTextButton(text = "Save") {
+          onSave(editableMargin.toDoubleOrNull())
         }
       }
     }

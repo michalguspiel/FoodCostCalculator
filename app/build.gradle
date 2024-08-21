@@ -138,8 +138,6 @@ dependencies {
 
   implementation("io.insert-koin:koin-android:3.5.6")
 
-  implementation 'io.github.chargemap.android:compose-numberpicker:0.0.1'
-
   testImplementation 'junit:junit:4.13.2'
 
   androidTestImplementation "androidx.test:runner:$androidXTestVersion"

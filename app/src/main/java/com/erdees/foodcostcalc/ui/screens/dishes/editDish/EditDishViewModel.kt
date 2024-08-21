@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
 import com.erdees.foodcostcalc.domain.model.InteractionType
@@ -74,12 +73,22 @@ class EditDishViewModel : ViewModel(), KoinComponent {
     resetScreenState()
   }
 
-  fun updateDishTax(value: Int) {
-    _dish.value = _dish.value?.copy(taxPercent = value.toDouble())
+  fun updateDishTax(value: Double?) {
+    if (value == null) {
+      resetScreenState()
+      return
+    }
+    _dish.value = _dish.value?.copy(taxPercent = value)
+    resetScreenState()
   }
 
-  fun updateDishMargin(value: Int) {
-    _dish.value = _dish.value?.copy(marginPercent = value.toDouble())
+  fun updateDishMargin(value: Double?) {
+    if (value == null) {
+      resetScreenState()
+      return
+    }
+    _dish.value = _dish.value?.copy(marginPercent = value)
+    resetScreenState()
   }
 
   private var originalProducts: List<UsedProductDomain> = listOf()

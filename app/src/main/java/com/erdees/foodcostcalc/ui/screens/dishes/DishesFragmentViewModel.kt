@@ -48,21 +48,18 @@ class DishesFragmentViewModel : ViewModel(), KoinComponent {
     return expandedList.contains(dishModelId)
   }
 
-  fun formattedPriceData(dishModelId: Long, amountOfServings: Int, context: Context): String {
-//    return Utils.formatPrice(getDishData(dishModelId).totalPrice * amountOfServings, context)
-    return ""
+  fun formattedPriceData(dishDomain: DishDomain, amountOfServings: Int, context: Context): String {
+    return Utils.formatPrice(dishDomain.foodCost * amountOfServings, context)
   }
 
-  fun formattedTotalPriceData(dishModelId: Long, amountOfServings: Int, context: Context): String {
-//    val dishData = getDishData(dishModelId)
-//    return formattedTotalPriceData(
-//      dishData.totalPrice,
-//      dishData.margin,
-//      dishData.tax,
-//      amountOfServings,
-//      context
-//    )
-    return ""
+  fun formattedTotalPriceData(dishDomain: DishDomain, amountOfServings: Int, context: Context): String {
+    return formattedTotalPriceData(
+      dishDomain.foodCost,
+      dishDomain.marginPercent,
+      dishDomain.taxPercent,
+      amountOfServings,
+      context
+    )
   }
 
   private fun formattedTotalPriceData(

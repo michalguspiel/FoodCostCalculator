@@ -53,7 +53,7 @@ fun FCCNavigation(
     }
     composable<FCCScreen.AddItemsToDish> { backStackEntry ->
       val addItemsToDish: FCCScreen.AddItemsToDish = backStackEntry.toRoute()
-      AddItemToDishScreen(dishId = addItemsToDish.dishId, dishName = addItemsToDish.dishName)
+      AddItemToDishScreen(navController = navController,dishId = addItemsToDish.dishId, dishName = addItemsToDish.dishName)
     }
 
     composable<FCCScreen.EditDish>(
@@ -67,7 +67,7 @@ fun FCCNavigation(
       CreateProductScreen()
     }
     composable<FCCScreen.CreateDish> {
-      CreateDishScreen()
+      CreateDishScreen(navController = navController)
     }
   }
 }
