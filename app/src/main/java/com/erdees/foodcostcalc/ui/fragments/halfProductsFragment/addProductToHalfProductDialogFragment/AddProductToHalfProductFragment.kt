@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.AddProductToHalfProductBinding
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
+import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
 import com.erdees.foodcostcalc.utils.Constants.HALFPRODUCT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_SPINNER_ID
@@ -53,18 +53,19 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
     }
     binding.weightForPiece.makeGone()
 
-    viewModel.updateUnitsConditions()
-
-    viewModel.readAllHalfProductModelData.observe(viewLifecycleOwner) { halfProducts ->
+    viewModel.halfProducts.observe(viewLifecycleOwner) { halfProducts ->
       halfProductAdapter =
-        ArrayAdapter(requireActivity(), R.layout.spinner_layout, halfProducts.map { it.name })
+        ArrayAdapter(
+          requireActivity(),
+          R.layout.spinner_layout,
+          halfProducts.map { it.halfProductBase.name })
       setHalfProductsSpinner()
       halfProductAdapter.notifyDataSetChanged()
       pickHalfProductIfPresent()
     }
 
-    viewModel.readAllProductModelData.observe(viewLifecycleOwner) { products ->
-      Log.i(TAG,"readAllProductModelData $products")
+    viewModel.products.observe(viewLifecycleOwner) { products ->
+      Log.i(TAG, "readAllProductModelData $products")
       productsAdapter =
         ArrayAdapter(requireActivity(), R.layout.spinner_layout, products.map { it.name })
       setProductsSpinner()
@@ -112,7 +113,7 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
   }
 
   private fun pickHalfProductIfPresent() {
-    val halfProductToSelect = passedHalfProduct ?: return
+    val halfProductToSelect = passedHalfProductBase ?: return
     val positionToSelect = halfProductAdapter.getPosition(halfProductToSelect.name)
     binding.halfProductSpinner.setSelection(positionToSelect)
   }
@@ -156,12 +157,12 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
     fun newInstance(): AddProductToHalfProductFragment =
       AddProductToHalfProductFragment()
 
-    var passedHalfProduct: HalfProductModel? = null
+    var passedHalfProductBase: HalfProductBase? = null
     const val TAG = "AddProductToHalfProductFragment"
   }
 
   private fun eitherOfSpinnersIsEmpty(): Boolean {
-    return (viewModel.readAllProductModelData.value.isNullOrEmpty() || viewModel.readAllHalfProductModelData.value.isNullOrEmpty())
+    return (viewModel.products.value.isNullOrEmpty() || viewModel.halfProducts.value.isNullOrEmpty())
   }
 
   private fun setTextField() {
@@ -177,9 +178,9 @@ class AddProductToHalfProductFragment : DialogFragment(), AdapterView.OnItemSele
       1 -> {
         viewModel.updateChosenProductData(position)
         unitList.changeUnitList(
-          viewModel.getUnitType(),
+          viewModel.getUnitType() ?: "",
           viewModel.metricCondition,
-          viewModel.usaCondition
+          viewModel.imperialCondition
         )
         setUnitsSpinner()
         unitAdapter.notifyDataSetChanged()

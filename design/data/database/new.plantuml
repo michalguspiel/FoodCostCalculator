@@ -1,0 +1,80 @@
+@startuml
+
+entity "Product" as p {
+    *product_id : number <<generated>>
+    --
+    *name : text
+    *pricePerUnit : number
+    *tax : number
+    *waste : number
+    *unit : text
+}
+
+entity "Product_HalfProduct" as php {
+    *product_half_product_id : number <<generated>>
+    --
+    *product_id : number 
+    *half_product_id : number 
+    *weightPiece: number?
+    *quantity : number?
+    *quantity_unit : text
+}
+
+entity "HalfProduct" as hp {
+    *half_product_id : number <<generated>>
+    --
+    *name : text
+    *halfProductUnit : text
+}
+
+entity "Product_Dish" as pd{
+    *product_dish_id : number <<generated>>
+    --
+    *product_id : number
+    *dish_id :  number
+    *quantity : Double
+    *quantity_unit : text
+}
+
+entity "HalfProduct_Dish" as hpd {
+    *half_product_dish_id :  number <<generated>>
+    --
+    *half_product_id :  number
+    *dish_id :  number
+    *quantity : Double
+    *quantity_unit : text
+}
+
+entity "Dish" as d {
+    *dish_id : number <<generated>>
+    --
+    *name : text
+    *marginPercent : number
+    *dishTax : number
+}
+
+entity Product_ProductDish <<View>> {
+    *product : Product
+    *productDish: Product_Dish
+}
+entity Product_ProductHalfProduct <<View>>  {
+    *product : Product
+    *productHalfProduct: Product_HalfProduct
+}
+entity HalfProduct_Product_ProductHalfProduct <<View>>  {
+    *halfProduct : HalfProduct
+    *productProductHalfProduct: Product_ProductHalfProduct
+}
+
+entity HalfProductDish_HalfProduct_Product_ProductHalfProduct <<View>> {
+    *halfProduct : HalfProductDish
+    *HalfProductProductProductHalfProduct: HalfProduct_Product_ProductHalfProduct
+}
+
+entity CompleteDish <<View>> {
+    *dish : Dish
+    *products : Product_ProductDish[]
+    *halfProducts : HalfProductDish_HalfProduct_Product_ProductHalfProduct[]
+}
+
+@enduml

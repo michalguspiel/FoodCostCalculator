@@ -1,71 +1,20 @@
 package com.erdees.foodcostcalc.viewmodel.adaptersViewModel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishRepository
-import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
-import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
+import com.erdees.foodcostcalc.data.model.HalfProductBase
+import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class EditHalfProductAdapterViewModel(application: Application):AndroidViewModel(application) {
+class EditHalfProductAdapterViewModel : ViewModel(), KoinComponent {
+  private val halfProductRepository: HalfProductRepository by inject()
 
-    val halfProductRepository: HalfProductRepository
-    val halfProductIncludedInDishRepository: HalfProductIncludedInDishRepository
-    val productIncludedInHalfProductRepository: ProductIncludedInHalfProductRepository
-
-    init {
-        val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
-        val halfProductIncludedInDishDao =
-            AppRoomDataBase.getDatabase(application).halfProductIncludedInDishDao()
-        val productIncludedInHalfProductDao =
-            AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
-
-        halfProductRepository = HalfProductRepository.getInstance(halfProductDao)
-        halfProductIncludedInDishRepository =
-            HalfProductIncludedInDishRepository.getInstance(halfProductIncludedInDishDao)
-        productIncludedInHalfProductRepository =
-            ProductIncludedInHalfProductRepository.getInstance(productIncludedInHalfProductDao)
-    }
-
-
-  fun editHalfProducts(halfProductModel: HalfProductModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            halfProductRepository.editHalfProduct(halfProductModel)
-        }
-    }
-
-    fun editProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) {
-        viewModelScope.launch(Dispatchers.IO) {
-            productIncludedInHalfProductRepository.editProductIncludedInHalfProduct(
-                productIncludedInHalfProduct
-            )
-        }
-    }
-
-    fun getHalfProductsIncludedInDishFromDishByHalfProduct(productId: Long) =
-        halfProductIncludedInDishRepository.getHalfProductsIncludedInDishFromDishByHalfProduct(
-            productId
-        )
-
-
-    fun editHalfProductIncludedInDish(halfProductIncludedInDishModel: HalfProductIncludedInDishModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            halfProductIncludedInDishRepository
-                .editHalfProductIncludedInDish(halfProductIncludedInDishModel)
-        }
-    }
-
-  fun deleteProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) {
+  fun editHalfProducts(halfProductBase: HalfProductBase) {
     viewModelScope.launch(Dispatchers.IO) {
-      productIncludedInHalfProductRepository.deleteProductIncludedInHalfProduct(
-        productIncludedInHalfProduct
-      )
+      halfProductRepository.editHalfProduct(halfProductBase)
     }
   }
 }

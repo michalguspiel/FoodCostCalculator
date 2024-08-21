@@ -31,7 +31,7 @@ class CreateHalfProductFragment(private val parentView: View) : DialogFragment()
     private var unitList: MutableList<String> = mutableListOf()
 
     override fun onResume() {
-        unitList = getUnits(resources, viewModel.sharedPreferences)
+        unitList = getUnits(resources, viewModel.preferences)
         setUnitSpinner()
         super.onResume()
     }
@@ -39,7 +39,6 @@ class CreateHalfProductFragment(private val parentView: View) : DialogFragment()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this)[CreateHalfProductFragmentViewModel::class.java]
-        viewModel.updateFirebase()
     }
 
     override fun onCreateView(
@@ -53,7 +52,7 @@ class CreateHalfProductFragment(private val parentView: View) : DialogFragment()
         binding.newHalfProductEdittext.setOnFocusChangeListener { _, hasFocus ->
             if (!hasFocus) view.hideKeyboard()
         }
-        unitList = getUnits(resources, viewModel.sharedPreferences)
+        unitList = getUnits(resources, viewModel.preferences)
         chosenUnit = unitList.first()
 
         binding.createHalfProductBtn.setOnClickListener {

@@ -51,12 +51,12 @@
         android:padding="8dp"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/delete_product_in_dish_button"
+        app:layout_constraintEnd_toStartOf="@+id/delete_product_within_button"
         app:layout_constraintStart_toEndOf="@id/product_weight_edittext"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/delete_product_in_dish_button"
+        android:id="@+id/delete_product_within_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

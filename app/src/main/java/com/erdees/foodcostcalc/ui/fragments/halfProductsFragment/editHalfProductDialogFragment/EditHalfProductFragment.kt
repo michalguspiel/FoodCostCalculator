@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.util.Log
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,21 +13,18 @@ import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.databinding.FragmentEditHalfProductBinding
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductWithProductsIncludedModel
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
-import com.erdees.foodcostcalc.utils.UnitsUtils.filterVol
-import com.erdees.foodcostcalc.utils.UnitsUtils.filterWeight
 import com.erdees.foodcostcalc.utils.Utils.getUnits
-import com.erdees.foodcostcalc.viewmodel.adaptersViewModel.EditHalfProductAdapterViewModel
+import org.koin.android.ext.android.inject
+import org.koin.core.component.KoinComponent
 
-class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListener {
+class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListener, KoinComponent {
 
   private var chosenUnit = ""
   private var unitList: MutableList<String> = mutableListOf()
 
-  private lateinit var sharedPreferences: SharedPreferences
+  private val sharedPreferences: Preferences by inject()
   private val spinnerId = 1
 
   private var _binding : FragmentEditHalfProductBinding? = null
@@ -37,25 +33,26 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
   override fun onResume() {
     unitList = getUnits(resources, sharedPreferences)
     Log.i(TAG, unitList.joinToString { it })
-    unitList = when (halfProductPassedFromAdapter.halfProductModel.halfProductUnit) {
-      "per piece" -> mutableListOf("per piece")
-      "per kilogram" -> unitList.filterWeight()
-      "per liter" -> unitList.filterVol()
-      "per pound" -> unitList.filterWeight()
-      "per gallon" -> unitList.filterVol()
-      else -> mutableListOf("error!")
-    }
+//    unitList = when (halfProductPassedFromAdapter.halfProduct.halfProductUnit) {
+//      "per piece" -> mutableListOf("per piece")
+//      "per kilogram" -> unitList.filterWeight()
+//      "per liter" -> unitList.filterVol()
+//      "per pound" -> unitList.filterWeight()
+//      "per gallon" -> unitList.filterVol()
+//      else -> mutableListOf("error!")
+//    }
 
     Log.i(TAG, unitList.joinToString { it })
     /**Spinner adapter*/
     val unitSpinnerAdapter =
       ArrayAdapter(requireContext(), R.layout.dropdown_item, unitList)
     with(binding.editHalfProductSpinner) {
-      setAdapter(unitSpinnerAdapter)
-      setText(halfProductPassedFromAdapter.halfProductModel.halfProductUnit, false)
-      onItemClickListener = this@EditHalfProductFragment
-      id = spinnerId
-      gravity = Gravity.CENTER
+      // todo fix it
+//      setAdapter(unitSpinnerAdapter)
+//      setText(halfProductPassedFromAdapter.halfProduct.halfProductUnit, false)
+//      onItemClickListener = this@EditHalfProductFragment
+//      id = spinnerId
+//      gravity = Gravity.CENTER
     }
 
     super.onResume()
@@ -70,46 +67,35 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
     _binding = FragmentEditHalfProductBinding.inflate(inflater,container,false)
     /** initialize ui with viewmodel*/
     val viewModel = ViewModelProvider(this).get(EditHalfProductFragmentViewModel::class.java)
-    val recyclerViewAdapter =
-      EditHalfProductAdapter(
-        activity = requireActivity(), viewModel =
-        ViewModelProvider(this).get(
-          EditHalfProductAdapterViewModel::class.java
-        )
-      )
-    binding.recyclerViewProductsInHalfProduct.adapter = recyclerViewAdapter
+//    val recyclerViewAdapter =
+//      EditHalfProductAdapter(
+//        activity = requireActivity(), viewModel =
+//        ViewModelProvider(this).get(
+//          EditHalfProductAdapterViewModel::class.java
+//        )
+//      )
+//    binding.recyclerViewProductsInHalfProduct.adapter = recyclerViewAdapter
     binding.recyclerViewProductsInHalfProduct.layoutManager =
       LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-    sharedPreferences = SharedPreferences(requireContext())
-
-    /** Observe data from viewmodel */
-    viewModel.getHalfProductWithProductIncluded()
-      .observe(viewLifecycleOwner) {
-        binding.editHalfProductName.setText(halfProductPassedFromAdapter.halfProductModel.name)
-        viewModel
-          .getProductsIncludedFromHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
-          .observe(viewLifecycleOwner) { eachProduct ->
-            recyclerViewAdapter.switchLists(eachProduct)
-          }
-      }
-
     /**Button logic*/
     binding.saveHalfproductChangesButton.setOnClickListener {
-      if (chosenUnit.isEmpty()) {
-        chosenUnit = halfProductPassedFromAdapter.halfProductModel.halfProductUnit
-      }
-      recyclerViewAdapter.save(
-        HalfProductModel(
-          halfProductPassedFromAdapter.halfProductModel.halfProductId,
-          binding.editHalfProductName.text.toString(),
-          chosenUnit // chosen unit from spinner
-        ), viewLifecycleOwner
-      )
+      // todo implement
+//      if (chosenUnit.isEmpty()) {
+//        chosenUnit = halfProductPassedFromAdapter.halfProduct.halfProductUnit
+//      }
+//      recyclerViewAdapter.save(
+//        HalfProduct(
+//          halfProductPassedFromAdapter.halfProduct.halfProductId,
+//          binding.editHalfProductName.text.toString(),
+//          chosenUnit // chosen unit from spinner
+//        ), viewLifecycleOwner
+//      )
       this.dismiss()
     }
 
-    binding.deleteDishButton.setOnClickListener {
-      viewModel.deleteHalfProduct(halfProductPassedFromAdapter.halfProductModel.halfProductId)
+    binding.deleteButton.setOnClickListener {
+//      TODO
+//      viewModel.deleteHalfProduct(halfProductPassedFromAdapter.halfProduct.halfProductId)
       this.dismiss()
     }
 
@@ -123,7 +109,7 @@ class EditHalfProductFragment : DialogFragment(), AdapterView.OnItemClickListene
       EditHalfProductFragment()
 
     const val TAG = "EditHalfProductFragment"
-    lateinit var halfProductPassedFromAdapter: HalfProductWithProductsIncludedModel
+//    lateinit var halfProductPassedFromAdapter: HalfProductWithProductsIncluded
   }
 
   override fun onItemClick(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {

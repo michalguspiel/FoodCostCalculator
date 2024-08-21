@@ -10,7 +10,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.DialogFragment
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.ui.fragments.addFragment.AddFragment
+import com.erdees.foodcostcalc.ui.screens.createProduct.AddFragment
 import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHalfProductDialogFragment.AddProductToHalfProductFragment
 
 class InformationDialogFragment : DialogFragment() {

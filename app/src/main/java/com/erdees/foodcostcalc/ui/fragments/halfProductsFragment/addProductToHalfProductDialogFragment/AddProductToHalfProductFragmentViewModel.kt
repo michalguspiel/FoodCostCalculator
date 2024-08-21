@@ -1,135 +1,103 @@
 package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHalfProductDialogFragment
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
-import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.data.halfproduct.HalfProductRepository
-import com.erdees.foodcostcalc.data.product.ProductRepository
-import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductRepository
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
-import com.erdees.foodcostcalc.ui.fragments.settingsFragment.SharedPreferences
-import com.erdees.foodcostcalc.utils.Constants
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.asLiveData
+import com.erdees.foodcostcalc.data.Preferences
+import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.joined.CompleteHalfProduct
+import com.erdees.foodcostcalc.data.repository.HalfProductRepository
+import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.utils.UnitsUtils
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
-class AddProductToHalfProductFragmentViewModel(application: Application) :
-    AndroidViewModel(application) {
+class AddProductToHalfProductFragmentViewModel : ViewModel(), KoinComponent {
 
-    val readAllHalfProductModelData: LiveData<List<HalfProductModel>>
-    val readAllProductModelData: LiveData<List<ProductModel>>
+  private val preferences: Preferences by inject()
+  private val productRepository: ProductRepository by inject()
+  private val halfProductRepository: HalfProductRepository by inject()
 
-    private val productRepository: ProductRepository
-    private val halfProductRepository: HalfProductRepository
-    private val productIncludedInHalfProductRepository: ProductIncludedInHalfProductRepository
+  val halfProducts: LiveData<List<CompleteHalfProduct>> =
+    halfProductRepository.completeHalfProducts.asLiveData()
+  val products: LiveData<List<ProductBase>> = productRepository.products.asLiveData()
 
-    init {
-        val productDao = AppRoomDataBase.getDatabase(application).productDao()
-        val halfProductDao = AppRoomDataBase.getDatabase(application).halfProductDao()
-        val productIncludedInHalfProductDao =
-            AppRoomDataBase.getDatabase(application).productIncludedInHalfProductDao()
+  var isProductPiece: Boolean = false
+  var isHalfProductPiece: Boolean = true
 
-        halfProductRepository = HalfProductRepository.getInstance(halfProductDao)
-        productRepository = ProductRepository.getInstance(productDao)
-        productIncludedInHalfProductRepository =
-            ProductIncludedInHalfProductRepository((productIncludedInHalfProductDao))
-        readAllHalfProductModelData = halfProductRepository.readAllData
-        readAllProductModelData = productRepository.readAllData
-    }
+  private var productPosition: Int? = null
+  private var halfProductPosition: Int? = null
 
-    var isProductPiece: Boolean = false
-    var isHalfProductPiece: Boolean = true
+  private var chosenUnit: String = ""
+  private var halfProductUnit = ""
+  private var chosenProductName = ""
+  private var halfProductUnitType = ""
+  private var unitType: String? = null
 
-    private var productPosition: Int? = null
-    private var halfProductPosition: Int? = null
+  fun updateChosenHalfProductData(position: Int) {
+    halfProductPosition = position
+    val thisHalfProduct = halfProducts.value!![halfProductPosition!!].halfProductBase
+    halfProductUnit = thisHalfProduct.halfProductUnit
+    isHalfProductPiece = thisHalfProduct.halfProductUnit == "per piece"
+    halfProductUnitType = UnitsUtils.getUnitType(thisHalfProduct.halfProductUnit) ?: ""
+  }
 
-    private var chosenUnit: String = ""
-    private var halfProductUnit = ""
-    private var chosenProductName = ""
-    private var halfProductUnitType = ""
-    private var unitType = ""
+  fun updateChosenProductData(position: Int) {
+    productPosition = position
+    val chosenProduct =
+      products.value?.get(position)
+    unitType = UnitsUtils.getUnitType(
+      chosenProduct?.unit
+    )
+    chosenProductName = chosenProduct!!.name
+    isProductPiece = products.value!![productPosition!!].unit == "per piece"
+  }
 
-    fun updateChosenHalfProductData(position: Int) {
-        halfProductPosition = position
-        val thisHalfProduct = readAllHalfProductModelData.value!![halfProductPosition!!]
-        halfProductUnit = thisHalfProduct.halfProductUnit
-        isHalfProductPiece = thisHalfProduct.halfProductUnit == "per piece"
-        halfProductUnitType = UnitsUtils.getUnitType(thisHalfProduct.halfProductUnit)
-    }
+  fun getUnitType(): String? {
+    return unitType
+  }
 
-    fun updateChosenProductData(position: Int) {
-        productPosition = position
-        val chosenProduct =
-            readAllProductModelData.value?.get(position)
-        unitType = UnitsUtils.getUnitType(
-            chosenProduct?.unit
-        )
-        chosenProductName = chosenProduct!!.name
-        isProductPiece = readAllProductModelData.value!![productPosition!!].unit == "per piece"
-    }
+  fun getHalfProductUnit(): String {
+    return halfProductUnit
+  }
 
-    fun getUnitType(): String {
-        return unitType
-    }
+  fun getHalfProductUnitType(): String {
+    return halfProductUnitType
+  }
 
-    fun getHalfProductUnit(): String {
-        return halfProductUnit
-    }
+  fun getChosenProductName(): String {
+    return chosenProductName
+  }
 
-    fun getHalfProductUnitType(): String {
-        return halfProductUnitType
-    }
+  fun setUnit(unit: String) {
+    chosenUnit = unit
+  }
 
-    fun getChosenProductName(): String {
-        return chosenProductName
-    }
+  var metricCondition = preferences.metricUsed
+  var imperialCondition = preferences.imperialUsed
 
-    fun setUnit(unit: String) {
-        chosenUnit = unit
-    }
+  fun addProductToHalfProduct(
+    weight: Double,
+    pieceWeight: Double
+  ) {
+    val chosenHalfProduct =
+      halfProducts.value?.get(
+        halfProductPosition!!
+      )
+    val chosenProduct =
+      products.value?.get(productPosition!!)
 
-    var metricCondition = true
-    var usaCondition = true
-
-    val sharedPreferences = SharedPreferences(application)
-
-    fun updateUnitsConditions() {
-        metricCondition = sharedPreferences.getValueBoolean(Constants.METRIC, true)
-        usaCondition = sharedPreferences.getValueBoolean(Constants.IMPERIAL, false)
-    }
-
-    fun addProductToHalfProduct(
-        weight: Double,
-        pieceWeight: Double
-    ) {
-        val chosenHalfProduct =
-            readAllHalfProductModelData.value?.get(
-                halfProductPosition!!
-            )
-        val chosenProduct =
-            readAllProductModelData.value?.get(productPosition!!)
-        addProductIncludedInHalfProduct(
-            ProductIncludedInHalfProduct(
-                0,
-                chosenProduct!!,
-                chosenHalfProduct!!,
-                chosenHalfProduct.halfProductId,
-                weight,
-                chosenUnit,
-                pieceWeight
-            )
-        )
-    }
-
-    private fun addProductIncludedInHalfProduct(productIncludedInHalfProduct: ProductIncludedInHalfProduct) {
-        viewModelScope.launch(Dispatchers.IO) {
-            productIncludedInHalfProductRepository.addProductIncludedInHalfProduct(
-                productIncludedInHalfProduct
-            )
-        }
-    }
+    // todo fix
+//    addProductIncludedInHalfProduct(
+//      ProductIncludedInHalfProduct(
+//        0,
+//        chosenProduct!!,
+//        chosenHalfProduct!!,
+//        chosenHalfProduct.halfProductId,
+//        weight,
+//        chosenUnit,
+//        pieceWeight
+//      )
+//    )
+  }
 }
