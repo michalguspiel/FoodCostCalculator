@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.editHalfProductDialogFragment
+package com.erdees.foodcostcalc.ui.screens.halfProducts.halfProductsFragment.editHalfProductDialogFragment
 
 import android.annotation.SuppressLint
 import android.graphics.Color

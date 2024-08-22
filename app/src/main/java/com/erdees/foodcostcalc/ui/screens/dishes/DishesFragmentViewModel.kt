@@ -90,22 +90,6 @@ class DishesFragmentViewModel : ViewModel(), KoinComponent {
     return (priceWithMargin + amountOfTax) * amountOfServings
   }
 
-  fun addToTotalPrice(
-    dishModelId: Long, pricePerUnit: Double,
-    weight: Double,
-    halfProductUnit: String,
-    halfProductHostUnit: String
-  ) {
-//    val dish = getDishData(dishModelId)
-//    val dishNewTotalPrice = dish.totalPrice + totalPriceOfHalfProduct(
-//      pricePerUnit,
-//      weight,
-//      halfProductUnit,
-//      halfProductHostUnit
-//    )
-//    setDishData(dishModelId, dishNewTotalPrice, dish.margin, dish.tax)
-  }
-
   private fun totalPriceOfHalfProduct(
     pricePerUnit: Double,
     weight: Double,

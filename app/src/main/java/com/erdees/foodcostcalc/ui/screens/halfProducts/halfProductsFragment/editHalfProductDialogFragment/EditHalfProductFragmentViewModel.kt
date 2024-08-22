@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.editHalfProductDialogFragment
+package com.erdees.foodcostcalc.ui.screens.halfProducts.halfProductsFragment.editHalfProductDialogFragment
 
 import androidx.lifecycle.ViewModel
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository

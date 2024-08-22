@@ -14,9 +14,8 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.ActivityMainBinding
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.HalfProductsFragment
-import com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.createHalfProductDialogFragment.CreateHalfProductFragment
-import com.erdees.foodcostcalc.ui.screens.createProduct.AddFragment
+import com.erdees.foodcostcalc.ui.screens.halfProducts.halfProductsFragment.HalfProductsFragment
+import com.erdees.foodcostcalc.ui.screens.products.createProduct.AddFragment
 import com.erdees.foodcostcalc.ui.screens.dishes.DishesFragment
 import com.erdees.foodcostcalc.ui.screens.products.ProductsFragment
 import com.erdees.foodcostcalc.utils.CallbackListener
@@ -135,12 +134,6 @@ class MainActivity : AppCompatActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     viewBinding = ActivityMainBinding.inflate(layoutInflater)
-
-    halfProductsFragment.callbackListener = object : CallbackListener {
-      override fun callback() {
-        openDialog(CreateHalfProductFragment(viewBinding.drawerLayout))
-      }
-    }
 
     val view = viewBinding.root
     setContentView(view)

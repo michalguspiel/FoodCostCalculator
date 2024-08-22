@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment.addProductToHalfProductDialogFragment
+package com.erdees.foodcostcalc.ui.screens.halfProducts.halfProductsFragment.addProductToHalfProductDialogFragment
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

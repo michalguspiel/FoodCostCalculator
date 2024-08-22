@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.createProduct
+package com.erdees.foodcostcalc.ui.screens.products.createProduct
 
 import android.content.res.Resources
 import android.os.Bundle

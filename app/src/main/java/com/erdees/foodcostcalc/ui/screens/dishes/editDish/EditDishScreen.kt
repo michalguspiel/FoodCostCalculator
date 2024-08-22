@@ -58,7 +58,7 @@ import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.composables.DetailItem
-import com.erdees.foodcostcalc.ui.composables.ErrorDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton

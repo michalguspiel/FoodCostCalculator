@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.composables
+package com.erdees.foodcostcalc.ui.composables.dialogs
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button

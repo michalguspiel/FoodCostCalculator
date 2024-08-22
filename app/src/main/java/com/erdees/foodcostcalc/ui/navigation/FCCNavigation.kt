@@ -11,11 +11,12 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.dish.DishDomainNavType
-import com.erdees.foodcostcalc.ui.screens.createProduct.CreateProductScreen
+import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.DishesScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDish.CreateDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishScreen
+import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
 import kotlin.reflect.typeOf
@@ -36,7 +37,7 @@ fun FCCNavigation(
       ProductsScreen(navController = navController)
     }
     composable<FCCScreen.HalfProducts> {
-      /* TODO: Implement HalfProducts screen UI */
+      HalfProductsScreen(navController = navController)
     }
     composable<FCCScreen.Dishes> {
       DishesScreen(navController = navController)

@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.createProduct
+package com.erdees.foodcostcalc.ui.screens.products.createProduct
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
