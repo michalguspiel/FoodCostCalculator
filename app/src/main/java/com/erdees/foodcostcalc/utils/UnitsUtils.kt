@@ -56,7 +56,7 @@ object UnitsUtils {
         "volume"
       }
 
-      "piece" -> "piece"
+      "per piece" -> "piece"
 
       else -> null
     }

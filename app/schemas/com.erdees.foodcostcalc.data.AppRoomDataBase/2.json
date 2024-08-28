@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "16e60a80fc4731d8d1d4c80e9ed0fdeb",
+    "identityHash": "6eb9bf6c1be12a7e1937ffc793560347",
     "entities": [
       {
         "tableName": "products",
@@ -203,7 +203,7 @@
       },
       {
         "tableName": "Product_HalfProduct",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`productHalfProductId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `productId` INTEGER NOT NULL, `halfProductId` INTEGER NOT NULL, `quantity` REAL NOT NULL, `quantityUnit` TEXT NOT NULL, `weightPiece` REAL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`productHalfProductId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `productId` INTEGER NOT NULL, `halfProductId` INTEGER NOT NULL, `quantity` REAL NOT NULL, `quantityUnit` TEXT NOT NULL, `weightPiece` REAL, FOREIGN KEY(`productId`) REFERENCES `products`(`productId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`halfProductId`) REFERENCES `HalfProduct`(`halfProductId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "productHalfProductId",
@@ -249,7 +249,30 @@
           ]
         },
         "indices": [],
-        "foreignKeys": []
+        "foreignKeys": [
+          {
+            "table": "products",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "productId"
+            ],
+            "referencedColumns": [
+              "productId"
+            ]
+          },
+          {
+            "table": "HalfProduct",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "halfProductId"
+            ],
+            "referencedColumns": [
+              "halfProductId"
+            ]
+          }
+        ]
       },
       {
         "tableName": "HalfProduct_Dish",
@@ -299,7 +322,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '16e60a80fc4731d8d1d4c80e9ed0fdeb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6eb9bf6c1be12a7e1937ffc793560347')"
     ]
   }
 }

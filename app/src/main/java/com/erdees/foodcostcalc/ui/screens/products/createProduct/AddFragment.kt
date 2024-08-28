@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.products.createProduct
 
 import android.os.Bundle
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.FragmentAddBinding
-import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.ui.dialogFragments.informationDialogFragment.InformationDialogFragment
 import com.erdees.foodcostcalc.utils.Constants.ADD_FRAGMENT_SPINNER_ID
 import com.erdees.foodcostcalc.utils.ViewUtils.hideKeyboard

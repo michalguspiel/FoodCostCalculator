@@ -35,7 +35,7 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
   private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
   val screenState: StateFlow<ScreenState> = _screenState
 
-  fun resetScreenState(){
+  fun resetScreenState() {
     _screenState.value = ScreenState.Idle
   }
 
@@ -80,8 +80,8 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
   fun selectItem(item: Item?) {
     _selectedItem.value = item
     when (item) {
-      is ProductDomain -> setProductUnitType(products.value.indexOf(item))
-      is HalfProductDomain -> setHalfProductUnitType(halfProducts.value.indexOf(item))
+      is ProductDomain -> setProductUnitType(item)
+      is HalfProductDomain -> setHalfProductUnitType(item)
       else -> {
         unitType = ""
       }
@@ -121,16 +121,12 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
     _selectedUnit.value = _units.value.firstOrNull() ?: ""
   }
 
-  private fun setProductUnitType(position: Int) {
-    unitType = UnitsUtils.getUnitType(
-      products.value.getOrNull(position)?.unit
-    )
+  private fun setProductUnitType(productDomain: ProductDomain) {
+    unitType = UnitsUtils.getUnitType(productDomain.unit)
   }
 
-  private fun setHalfProductUnitType(position: Int) {
-    unitType = UnitsUtils.getUnitType(
-      halfProducts.value.getOrNull(position)?.halfProductUnit
-    )
+  private fun setHalfProductUnitType(halfProductDomain: HalfProductDomain) {
+    unitType = UnitsUtils.getUnitType(halfProductDomain.halfProductUnit)
   }
 
   fun addItem(dishId: Long) {

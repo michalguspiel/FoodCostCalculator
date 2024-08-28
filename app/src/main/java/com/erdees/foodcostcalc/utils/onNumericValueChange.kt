@@ -13,10 +13,10 @@ fun onNumericValueChange(newValue: String, stateFlow: MutableStateFlow<String>) 
   }
 }
 
-fun String.onNumericValueChange(newValue: String): String {
+fun onNumericValueChange(oldValue: String, newValue: String): String {
   return if (newValue.isEmpty()) newValue
   else when (newValue.toDoubleOrNull()) {
-    null -> this
+    null -> oldValue
     else -> newValue
   }
 }

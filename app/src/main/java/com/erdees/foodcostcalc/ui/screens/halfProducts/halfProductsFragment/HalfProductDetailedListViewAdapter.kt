@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.fragments.halfProductsFragment
+package com.erdees.foodcostcalc.ui.screens.halfProducts.halfProductsFragment
 
 import android.annotation.SuppressLint
 import android.app.Activity
@@ -20,14 +20,14 @@ import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
 class HalfProductDetailedListViewAdapter(
   private val context: Activity,
   private val halfProductDomain: HalfProductDomain,
-  private val list: List<UsedProductDomain>,
   private val quantity: Double,
   private val totalWeightOfMainRecipe: Double
 ) : ArrayAdapter<UsedProductDomain>(
   context,
   R.layout.listview_dish_row,
-  list
+  halfProductDomain.products
 ) {
+  val list = halfProductDomain.products
   private var _binding: ListviewDishRowBinding? = null
   private val binding: ListviewDishRowBinding get() = _binding!!
 

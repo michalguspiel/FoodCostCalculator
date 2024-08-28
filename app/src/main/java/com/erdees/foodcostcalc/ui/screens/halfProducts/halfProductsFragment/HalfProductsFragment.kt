@@ -9,11 +9,14 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.utils.CallbackListener
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import kotlinx.coroutines.launch
 
 class HalfProductsFragment : Fragment() {
-  var callbackListener: CallbackListener? = null
+
+  var navigateToAddItemsToHalfProductScreen: (HalfProductDomain) -> Unit = {}
+  var navigateToEditHalfProductScreen: (HalfProductDomain) -> Unit = {}
+
   private lateinit var recyclerView: RecyclerView
   private lateinit var adapter: HalfProductFragmentRecyclerAdapter
 
@@ -40,14 +43,11 @@ class HalfProductsFragment : Fragment() {
 
   private fun setAdapterToRecyclerView(viewModel: HalfProductsFragmentViewModel) {
     adapter = HalfProductFragmentRecyclerAdapter(
-      requireActivity(),
-      viewModel
+      activity = requireActivity(),
+      viewModel = viewModel,
+      navigateToAddItemsToHalfProductScreen = { navigateToAddItemsToHalfProductScreen(it) },
+      navigateToEditHalfProductScreen = { navigateToEditHalfProductScreen(it) }
     )
     recyclerView.adapter = adapter
-  }
-
-  companion object {
-    fun newInstance(): HalfProductsFragment = HalfProductsFragment()
-    const val TAG = "HalfProductsFragment"
   }
 }

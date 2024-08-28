@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts.halfProductsFragment
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
@@ -22,7 +23,6 @@ class HalfProductsFragmentViewModel : ViewModel(), KoinComponent {
   private val searchEngineRepository: SearchEngineRepository = SearchEngineRepository.getInstance()
   private val halfProductRepository: HalfProductRepository by inject()
 
-
   private val searchedKey = searchEngineRepository.getWhatToSearchFor().asFlow().stateIn(
     viewModelScope,
     SharingStarted.Lazily, ""
@@ -40,6 +40,8 @@ class HalfProductsFragmentViewModel : ViewModel(), KoinComponent {
     combine(searchedKey, _halfProducts) { key, halfProducts ->
       halfProducts.filter {
         it.name.lowercase().contains(key.lowercase())
+      }.also {
+        Log.i("HalfProductsViewModel",it.toString())
       }
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
@@ -50,6 +52,4 @@ class HalfProductsFragmentViewModel : ViewModel(), KoinComponent {
   fun determineIfCardIsExpanded(id: Long): Boolean {
     return expandedList.contains(id)
   }
-
-  fun getWhatToSearchFor() = searchEngineRepository.getWhatToSearchFor()
 }
