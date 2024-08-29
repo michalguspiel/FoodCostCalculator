@@ -19,25 +19,27 @@ data class HalfProductDomain(
 
   val totalQuantity =
     if (halfProductUnit == "per piece") 1.0
-    else products.map {
-      UnitsUtils.computeWeightAndVolumeToSameUnit(
+    else products.sumOf {
+      if (it.quantityUnit == "piece") it.weightPiece ?: it.quantity
+      else UnitsUtils.computeWeightAndVolumeToSameUnit(
         halfProductUnit,
         it.quantityUnit,
         it.quantity
       )
-    }.sum()
+    }
 
   val formattedPrice: String = df.format(totalPrice)
 
-  fun pricePerUnit(): Double {
-    val totalPrice = products.sumOf { it.totalPrice }
-    return when (halfProductUnit) {
-      "per piece" -> totalPrice
-      else -> totalPrice / totalQuantity
+  val pricePerUnit: Double
+    get() {
+      val totalPrice = products.sumOf { it.totalPrice }
+      return when (halfProductUnit) {
+        "per piece" -> totalPrice
+        else -> totalPrice / totalQuantity
+      }
     }
-  }
 
-  fun formattedPricePerUnit(context: Context): String = Utils.formatPrice(pricePerUnit(), context)
+  fun formattedPricePerUnit(context: Context): String = Utils.formatPrice(pricePerUnit, context)
 
   fun formattedPricePerRecipe(context: Context): String = Utils.formatPrice(totalPrice, context)
 }

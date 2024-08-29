@@ -85,6 +85,19 @@ object Utils {
     return chosenUnits.toMutableList()
   }
 
+  /**Get units preferred by the user.*/
+  fun getUnitsSet(resources: Resources, sharedPreferences: Preferences): Set<String> {
+    var chosenUnits = resources.getStringArray(R.array.piece)
+    if (sharedPreferences.metricUsed) {
+      chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
+    }
+    if (sharedPreferences.imperialUsed) {
+      chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
+    }
+    return chosenUnits.toSet()
+  }
+
+
   /**First clears unitList then adds correct units,
    *  every time data set changes this function is called.*/
   fun ArrayList<String>.changeUnitList(

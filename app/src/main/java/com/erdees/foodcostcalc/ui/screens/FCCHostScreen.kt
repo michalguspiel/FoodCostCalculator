@@ -43,19 +43,20 @@ fun FCCHostScreen(modifier: Modifier = Modifier) {
               selectedIndicatorColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.5f)
             ),
             selected =
-              currentDestination == item::class.qualifiedName
-            ,
+            currentDestination == item::class.qualifiedName,
             onClick = {
-              if(currentDestination != item::class.qualifiedName) {
+              if (currentDestination != item::class.qualifiedName) {
                 navController.navigate(item)
               }
             },
             icon = {
-              Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(id = item.iconResourceId),
-                contentDescription = "" // todo content description
-              )
+              item.iconResourceId?.let {
+                Icon(
+                  modifier = Modifier.size(24.dp),
+                  painter = painterResource(id = item.iconResourceId),
+                  contentDescription = "" // todo content description
+                )
+              }
             },
             label = { Text(text = item.name, style = MaterialTheme.typography.labelMedium) })
         }

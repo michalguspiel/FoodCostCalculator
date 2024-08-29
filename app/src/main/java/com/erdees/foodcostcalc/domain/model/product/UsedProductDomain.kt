@@ -24,6 +24,10 @@ data class UsedProductDomain(
     quantityUnit,
   )
 
+  val totalWeightForPiece = weightPiece?.let{
+    it * quantity
+  }
+
   val formattedTotalPrice: String = Format.df.format(totalPrice)
 
   override fun toString(): String {

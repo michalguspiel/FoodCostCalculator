@@ -20,9 +20,9 @@ import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsFragment
 
 @Composable
-fun DishesScreen(navController: NavController, modifier: Modifier = Modifier) {
+fun DishesScreen(navController: NavController) {
   Scaffold(
-    modifier = modifier,
+    modifier = Modifier,
     floatingActionButton = {
       FloatingActionButton(
         onClick = {

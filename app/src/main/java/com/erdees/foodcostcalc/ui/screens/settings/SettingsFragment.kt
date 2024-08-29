@@ -15,7 +15,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.SettingsBinding
-import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
 import com.erdees.foodcostcalc.utils.Constants
 
 class SettingsFragment : Fragment(), AdapterView.OnItemClickListener {

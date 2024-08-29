@@ -16,7 +16,18 @@ data class DishDomain(
   val halfProducts: List<UsedHalfProductDomain>
 ) {
   val foodCost: Double =
-    products.sumOf { it.totalPrice } + halfProducts.sumOf { it.totalPrice }
+    products.sumOf {
+      it.totalPrice.also { totalPrice ->
+        Log.i("DishDomain", "Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
+      }
+    } + halfProducts.sumOf {
+      it.totalPrice.also { totalPrice ->
+        Log.i(
+          "DishDomain",
+          "Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice"
+        )
+      }
+    }
 
   val totalPrice: Double
     get() {

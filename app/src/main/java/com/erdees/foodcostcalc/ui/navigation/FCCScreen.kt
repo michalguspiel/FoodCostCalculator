@@ -2,11 +2,12 @@ package com.erdees.foodcostcalc.ui.navigation
 
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import kotlinx.serialization.Serializable
 
 // Todo, name as string resource, icon optional
 @Serializable
-sealed class FCCScreen(val name: String, val iconResourceId: Int) {
+sealed class FCCScreen(val name: String, val iconResourceId: Int? = null) {
   /**Bottom nav*/
   @Serializable
   data object Products : FCCScreen("Products", R.drawable.ic_apple_1_)
@@ -19,11 +20,7 @@ sealed class FCCScreen(val name: String, val iconResourceId: Int) {
 
   /** Rest */
   @Serializable
-  data object CreateProduct : FCCScreen("Create Product", R.drawable.ic_add)
-
-  @Serializable
-  data object CreateHalfProduct :
-    FCCScreen("Create Half Product", R.drawable.ic_croissant)
+  data object CreateProduct : FCCScreen("Create Product")
 
   @Serializable
   data object Settings : FCCScreen("Settings", R.drawable.ic_settings)
@@ -32,18 +29,22 @@ sealed class FCCScreen(val name: String, val iconResourceId: Int) {
   data object OnlineData : FCCScreen("Online Data", R.drawable.ic_browser)
 
   @Serializable
-  data object AddProductToHalfProduct :
-    FCCScreen("Add Half Product", R.drawable.ic_bread)
+  data class AddItemToHalfProduct(val halfProductDomain: HalfProductDomain) :
+    FCCScreen("Add Half Product")
 
   @Serializable
   data class AddItemsToDish(val dishId: Long, val dishName: String) :
-    FCCScreen("Add Items to Dish", R.drawable.ic_grocery)
+    FCCScreen("Add Items to Dish")
 
   @Serializable
-  data class EditDish(val dishDomain: DishDomain) : FCCScreen("Edit Dish", R.drawable.ic_grocery)
+  data class EditDish(val dishDomain: DishDomain) : FCCScreen("Edit Dish")
 
   @Serializable
-  data object CreateDish : FCCScreen("Add Dish", R.drawable.ic_serving_dish)
+  data object CreateDish : FCCScreen("Add Dish")
+
+  @Serializable
+  data class EditHalfProduct(val halfProductDomain: HalfProductDomain) :
+    FCCScreen("Edit Half Product")
 
   companion object {
     val bottomNavigationScreens = listOf(Products, HalfProducts, Dishes, Settings)

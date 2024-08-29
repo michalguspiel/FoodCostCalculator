@@ -13,7 +13,7 @@ import androidx.core.content.ContextCompat
 import com.bumptech.glide.Glide
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.data.AppRoomDataBase
-import com.erdees.foodcostcalc.ui.activities.mainActivity.MainActivity
+import com.erdees.foodcostcalc.ui.FCCActivity
 import com.erdees.foodcostcalc.ui.activities.onlineDataActivity.googleDrive.DriveServiceHelper
 import com.erdees.foodcostcalc.utils.ViewUtils.makeGone
 import com.erdees.foodcostcalc.utils.ViewUtils.makeVisible
@@ -215,7 +215,7 @@ class OnlineDataActivity : AppCompatActivity() {
         AppRoomDataBase.recreateDatabaseFromFile(applicationContext, file) // TO OPEN DATABASE
         val mainActivity = Intent(
             applicationContext,
-            MainActivity::class.java
+            FCCActivity::class.java
         )  // NOW RESTARTING ACTIVITY SO DATABASE IS REFRESHED
         mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP) //so by pressing back btn user doesn't come back to this activity
         alertDialog.dismiss()
