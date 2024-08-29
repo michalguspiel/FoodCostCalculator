@@ -9,25 +9,44 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun FCCPrimaryButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-  Button(modifier = modifier,
-    onClick = { onClick() }) {
-    Text(text = text,style = MaterialTheme.typography.labelLarge)
-  }
+fun FCCPrimaryButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+    Button(modifier = modifier,
+        enabled = enabled,
+        onClick = { onClick() }) {
+        Text(text = text, style = MaterialTheme.typography.labelLarge)
+    }
 }
 
 @Composable
-fun FCCTextButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-  TextButton(modifier = modifier,
-    onClick = { onClick() }) {
-    Text(text = text)
-  }
+fun FCCTextButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+    TextButton(
+        modifier = modifier,
+        enabled = enabled,
+        onClick = { onClick() }) {
+        Text(text = text)
+    }
 }
 
 @Composable
-fun FCCOutlinedButton(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
-  OutlinedButton(modifier = modifier,
-    onClick = { onClick() }) {
-    Text(text = text)
-  }
+fun FCCOutlinedButton(
+    text: String,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    onClick: () -> Unit
+) {
+    OutlinedButton(modifier = modifier,
+        enabled = enabled,
+        onClick = { onClick() }) {
+        Text(text = text)
+    }
 }
