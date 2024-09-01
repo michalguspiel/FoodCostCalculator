@@ -13,28 +13,19 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HalfProductDao {
 
-  @Transaction
-  @Query("SELECT * FROM HalfProduct ORDER BY name ASC")
-  fun getCompleteHalfProducts(): Flow<List<CompleteHalfProduct>>
+    @Transaction
+    @Query("SELECT * FROM HalfProduct ORDER BY name ASC")
+    fun getCompleteHalfProducts(): Flow<List<CompleteHalfProduct>>
 
-  @Query("SELECT * FROM HalfProduct ORDER BY name ASC")
-  fun getHalfProductBase(): Flow<List<HalfProductBase>>
+    @Query("SELECT * FROM HalfProduct ORDER BY name ASC")
+    fun getHalfProductBase(): Flow<List<HalfProductBase>>
 
-  @Insert(onConflict = OnConflictStrategy.REPLACE)
-  suspend fun addHalfProduct(halfProductBase: HalfProductBase)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun addHalfProduct(halfProductBase: HalfProductBase)
 
-  @Update
-  suspend fun editHalfProduct(halfProductBase: HalfProductBase)
+    @Update
+    suspend fun editHalfProduct(halfProductBase: HalfProductBase)
 
-  @Query("DELETE FROM HalfProduct WHERE HalfProductId =:id")
-  suspend fun deleteHalfProduct(id: Long)
-
-  @Query("DELETE FROM Product_HalfProduct WHERE halfProductId = :id")
-  suspend fun deleteProductHalfProduct(id: Long)
-
-  @Transaction
-  suspend fun deleteHalfProductWithRelations(id: Long) {
-    deleteHalfProduct(id)
-    deleteProductHalfProduct(id)
-  }
+    @Query("DELETE FROM HalfProduct WHERE HalfProductId =:id")
+    suspend fun deleteHalfProduct(id: Long)
 }

@@ -11,15 +11,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductDao {
-  @Query("SELECT * from products ORDER BY product_name ASC")
-  fun getProducts(): Flow<List<ProductBase>>
+    @Query("SELECT * from products ORDER BY product_name ASC")
+    fun getProducts(): Flow<List<ProductBase>>
 
-  @Insert(onConflict = OnConflictStrategy.ABORT)
-  suspend fun addProduct(product: ProductBase)
+    @Insert(onConflict = OnConflictStrategy.ABORT)
+    suspend fun addProduct(product: ProductBase)
 
-  @Update
-  suspend fun editProduct(newProduct: ProductBase)
+    @Update
+    suspend fun editProduct(newProduct: ProductBase)
 
-  @Delete
-  suspend fun deleteProduct(product: ProductBase)
+    @Delete
+    suspend fun deleteProduct(product: ProductBase)
 }

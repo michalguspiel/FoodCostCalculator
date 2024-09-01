@@ -33,8 +33,7 @@ class HalfProductRepositoryImpl : HalfProductRepository, KoinComponent {
     override val completeHalfProducts: Flow<List<CompleteHalfProduct>> =
         halfProductDao.getCompleteHalfProducts()
 
-    override val halfProducts: Flow<List<HalfProductBase>> =
-        halfProductDao.getHalfProductBase()
+    override val halfProducts: Flow<List<HalfProductBase>> = halfProductDao.getHalfProductBase()
 
     override suspend fun addHalfProduct(halfProductBase: HalfProductBase) =
         halfProductDao.addHalfProduct(halfProductBase)
@@ -50,7 +49,7 @@ class HalfProductRepositoryImpl : HalfProductRepository, KoinComponent {
         halfProductDao.editHalfProduct(halfProductBase)
 
     override suspend fun deleteHalfProduct(id: Long) {
-        halfProductDao.deleteHalfProductWithRelations(id)
+        halfProductDao.deleteHalfProduct(id)
     }
 
     override suspend fun deleteProductHalfProduct(productHalfProduct: ProductHalfProduct) {
