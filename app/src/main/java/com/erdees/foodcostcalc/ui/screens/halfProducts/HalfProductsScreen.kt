@@ -154,18 +154,11 @@ fun CreateHalfProductDialog(
                         )
                     )
                 }
-
-                Column {
-                    FieldLabel(
-                        text = "Unit",
-                        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-                    )
-                    UnitField(
-                        units = units,
-                        selectedUnit = selectedUnit,
-                        selectUnit = { selectedUnit = it }
-                    )
-                }
+                UnitField(
+                    units = units,
+                    selectedUnit = selectedUnit,
+                    selectUnit = { selectedUnit = it }
+                )
             }
 
             Spacer(modifier = Modifier.size(24.dp))

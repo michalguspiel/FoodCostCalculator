@@ -1,13 +1,13 @@
 package com.erdees.foodcostcalc.utils.diffutils
 
 import androidx.recyclerview.widget.DiffUtil
-import com.erdees.foodcostcalc.data.model.ProductBase
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 
 class ProductDiffUtil(
-  private val oldList: List<ProductBase>,
-  private val newList: List<ProductBase>
+  private val oldList: List<ProductDomain>,
+  private val newList: List<ProductDomain>
 ) : DiffUtil.Callback() {
   override fun getOldListSize(): Int {
     return oldList.size
@@ -18,7 +18,7 @@ class ProductDiffUtil(
   }
 
   override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
-    return oldList[oldItemPosition].productId == newList[newItemPosition].productId
+    return oldList[oldItemPosition].id == newList[newItemPosition].id
   }
 
   override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean {
