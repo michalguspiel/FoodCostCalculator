@@ -9,11 +9,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.erdees.foodcostcalc.data.model.ProductBase
 import com.erdees.foodcostcalc.databinding.FragmentProductsBinding
-import com.erdees.foodcostcalc.utils.CallbackListener
 import kotlinx.coroutines.launch
 
 class ProductsFragment : Fragment() {
-  var callbackListener: CallbackListener? = null
 
   private var _binding: FragmentProductsBinding? = null
   private val binding get() = _binding!!
@@ -29,7 +27,7 @@ class ProductsFragment : Fragment() {
     binding.recyclerViewProducts.setHasFixedSize(true)
     val adapter = ProductsFragmentRecyclerAdapter(
       requireActivity(),
-      TAG, childFragmentManager, navigateToAdd = { callbackListener?.callback() }
+      childFragmentManager
     )
     binding.recyclerViewProducts.adapter = adapter
 
@@ -42,7 +40,6 @@ class ProductsFragment : Fragment() {
   }
 
   companion object {
-    fun newInstance(): ProductsFragment = ProductsFragment()
     const val TAG = "ProductsFragment"
   }
 }
