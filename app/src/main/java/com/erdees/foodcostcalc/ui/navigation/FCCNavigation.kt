@@ -27,72 +27,72 @@ import kotlin.reflect.typeOf
 
 @Composable
 fun FCCNavigation(
-  paddingValues: PaddingValues,
-  modifier: Modifier = Modifier,
-  navController: NavHostController = rememberNavController(),
+    paddingValues: PaddingValues,
+    modifier: Modifier = Modifier,
+    navController: NavHostController = rememberNavController(),
 ) {
 
-  NavHost(
-    navController = navController,
-    startDestination = FCCScreen.Products,
-    modifier = modifier.padding(paddingValues)
-  ) {
-    composable<FCCScreen.Products> {
-      ProductsScreen(navController = navController)
-    }
-    composable<FCCScreen.HalfProducts> {
-      HalfProductsScreen(navController = navController)
-    }
-    composable<FCCScreen.Dishes> {
-      DishesScreen(navController = navController)
-    }
-    composable<FCCScreen.Settings> {
-      SettingsScreen(navController = navController)
-    }
-    composable<FCCScreen.OnlineData> {
-      /* TODO: Implement OnlineData screen UI */
-    }
-
-    composable<FCCScreen.AddItemToHalfProduct>(
-      typeMap = mapOf(typeOf<HalfProductDomain>() to HalfProductDomainNavType)
-    ) { backStackEntry ->
-      val addItemToHalfProduct: FCCScreen.AddItemToHalfProduct = backStackEntry.toRoute()
-      AddItemToHalfProductScreen(
+    NavHost(
         navController = navController,
-        halfProductDomain = addItemToHalfProduct.halfProductDomain
-      )
-    }
-    composable<FCCScreen.AddItemsToDish> { backStackEntry ->
-      val addItemsToDish: FCCScreen.AddItemsToDish = backStackEntry.toRoute()
-      AddItemToDishScreen(
-        navController = navController,
-        dishId = addItemsToDish.dishId,
-        dishName = addItemsToDish.dishName
-      )
-    }
+        startDestination = FCCScreen.Products,
+        modifier = modifier.padding(paddingValues)
+    ) {
+        composable<FCCScreen.Products> {
+            ProductsScreen(navController = navController)
+        }
+        composable<FCCScreen.HalfProducts> {
+            HalfProductsScreen(navController = navController)
+        }
+        composable<FCCScreen.Dishes> {
+            DishesScreen(navController = navController)
+        }
+        composable<FCCScreen.Settings> {
+            SettingsScreen(navController = navController)
+        }
+        composable<FCCScreen.OnlineData> {
+            /* TODO: Implement OnlineData screen UI */
+        }
 
-    composable<FCCScreen.EditDish>(
-      typeMap = mapOf(typeOf<DishDomain>() to DishDomainNavType)
-    ) { backStackEntry ->
-      val editDish: FCCScreen.EditDish = backStackEntry.toRoute()
-      EditDishScreen(providedDishDomain = editDish.dishDomain, navController = navController)
-    }
+        composable<FCCScreen.AddItemToHalfProduct>(
+            typeMap = mapOf(typeOf<HalfProductDomain>() to HalfProductDomainNavType)
+        ) { backStackEntry ->
+            val addItemToHalfProduct: FCCScreen.AddItemToHalfProduct = backStackEntry.toRoute()
+            AddItemToHalfProductScreen(
+                navController = navController,
+                halfProductDomain = addItemToHalfProduct.halfProductDomain
+            )
+        }
+        composable<FCCScreen.AddItemsToDish> { backStackEntry ->
+            val addItemsToDish: FCCScreen.AddItemsToDish = backStackEntry.toRoute()
+            AddItemToDishScreen(
+                navController = navController,
+                dishId = addItemsToDish.dishId,
+                dishName = addItemsToDish.dishName
+            )
+        }
 
-    composable<FCCScreen.EditHalfProduct>(
-      typeMap = mapOf(typeOf<HalfProductDomain>() to HalfProductDomainNavType)
-    ) { backStackEntry ->
-      val editHalfProduct: FCCScreen.EditHalfProduct = backStackEntry.toRoute()
-      EditHalfProductScreen(
-        navController = navController,
-        providedHalfProduct = editHalfProduct.halfProductDomain
-      )
-    }
+        composable<FCCScreen.EditDish>(
+            typeMap = mapOf(typeOf<DishDomain>() to DishDomainNavType)
+        ) { backStackEntry ->
+            val editDish: FCCScreen.EditDish = backStackEntry.toRoute()
+            EditDishScreen(providedDishDomain = editDish.dishDomain, navController = navController)
+        }
 
-    composable<FCCScreen.CreateProduct> {
-      CreateProductScreen()
+        composable<FCCScreen.EditHalfProduct>(
+            typeMap = mapOf(typeOf<HalfProductDomain>() to HalfProductDomainNavType)
+        ) { backStackEntry ->
+            val editHalfProduct: FCCScreen.EditHalfProduct = backStackEntry.toRoute()
+            EditHalfProductScreen(
+                navController = navController,
+                providedHalfProduct = editHalfProduct.halfProductDomain
+            )
+        }
+
+        composable<FCCScreen.CreateProduct> {
+            CreateProductScreen(navController = navController)
+        }
+        composable<FCCScreen.CreateDish> {
+            CreateDishScreen(navController = navController)
+        }
     }
-    composable<FCCScreen.CreateDish> {
-      CreateDishScreen(navController = navController)
-    }
-  }
 }

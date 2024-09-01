@@ -154,51 +154,6 @@ fun QuantityField(
   )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun UnitField(
-  units: Set<String>,
-  selectedUnit: String,
-  modifier: Modifier = Modifier,
-  selectUnit: (String) -> Unit
-) {
-  var expanded by remember { mutableStateOf(false) }
-
-  Box(modifier = modifier) {
-    ExposedDropdownMenuBox(
-      expanded = expanded,
-      onExpandedChange = { expanded = it },
-    ) {
-
-      TextField(
-        modifier = Modifier
-          .fillMaxWidth()
-          .menuAnchor(),
-        value = selectedUnit,
-        onValueChange = {},
-        readOnly = true,
-        singleLine = true,
-        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-        colors = ExposedDropdownMenuDefaults.textFieldColors(focusedPlaceholderColor = Color.Transparent),
-      )
-
-      DropdownMenu(
-        modifier = Modifier.exposedDropdownSize(true),
-        expanded = expanded,
-        onDismissRequest = { expanded = false }) {
-        units.forEach { unit ->
-          DropdownMenuItem(onClick = {
-            selectUnit(unit)
-            expanded = false
-          }, text = {
-            Text(unit)
-          })
-        }
-      }
-    }
-  }
-}
-
 
 @Preview
 @Composable

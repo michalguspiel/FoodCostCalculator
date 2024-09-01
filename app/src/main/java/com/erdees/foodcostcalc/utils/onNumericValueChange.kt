@@ -20,3 +20,11 @@ fun onNumericValueChange(oldValue: String, newValue: String): String {
     else -> newValue
   }
 }
+
+fun onIntegerValueChange(oldValue: String, newValue: String): String {
+  return if (newValue.isEmpty()) newValue
+  else when (newValue.toIntOrNull()) {
+    null -> oldValue
+    else -> newValue
+  }
+}
