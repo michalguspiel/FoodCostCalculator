@@ -5,13 +5,11 @@ import android.app.Activity
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.data.model.ProductBase
 import com.erdees.foodcostcalc.databinding.ListProductBinding
-import com.erdees.foodcostcalc.ui.screens.products.editProductDialogFragment.EditProductFragment
+import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.utils.Constants.ADMOB_PRODUCTS_RV_AD_UNIT_ID
 import com.erdees.foodcostcalc.utils.Constants.PRODUCTS_AD_FREQUENCY
 import com.erdees.foodcostcalc.utils.Constants.PRODUCT_AD_ITEM_TYPE
@@ -29,10 +27,10 @@ import com.google.android.gms.ads.nativead.NativeAdView
 
 class ProductsFragmentRecyclerAdapter(
     val activity: Activity,
-    private val fragmentManager: FragmentManager,
+    val onNavigateToEditProduct: (ProductDomain) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var list: List<ProductBase> = listOf()
+    private var list: List<ProductDomain> = listOf()
 
     private var adCase = AdHelper(list.size, PRODUCTS_AD_FREQUENCY)
 
@@ -42,7 +40,7 @@ class ProductsFragmentRecyclerAdapter(
 
     private var currentNativeAd: NativeAd? = null
 
-    fun switchLists(passedList: List<ProductBase>) {
+    fun switchLists(passedList: List<ProductDomain>) {
         Log.i(ProductsFragment.TAG, "Switching lists")
         val diffUtil = ProductDiffUtil(oldList = this.list, newList = passedList)
         val diffResult = DiffUtil.calculateDiff(diffUtil)
@@ -84,8 +82,7 @@ class ProductsFragmentRecyclerAdapter(
                     )
                 }."
             viewBinding.editButton.setOnClickListener {
-                EditProductFragment().show(fragmentManager, EditProductFragment.TAG)
-                EditProductFragment.productPassedFromAdapter = list[positionIncludedAdsBinded]
+                onNavigateToEditProduct(list[positionIncludedAdsBinded])
             }
         }
     }

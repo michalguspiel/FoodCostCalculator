@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.products
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
@@ -33,6 +34,13 @@ fun ProductsScreen(navController: NavController) {
         AndroidViewBinding(
             CompProductsBinding::inflate,
             modifier = Modifier.padding(paddingValues)
-        )
+        ){
+            this.productsScreenFragmentContainerView.getFragment<ProductsFragment?>()?.onNavigateToEditProduct =
+                { product ->
+                    Log.i("DishesScreen", "Navigate to AddItemToDishScreen")
+                    navController.navigate(FCCScreen.EditProduct(product))
+                }
+        }
+
     }
 }

@@ -13,6 +13,8 @@ import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.dish.DishDomainNavType
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomainNavType
+import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.product.ProductDomainNavType
 import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.DishesScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScreen
@@ -22,6 +24,7 @@ import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.addItemToHalfProduct.AddItemToHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
+import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
 import kotlin.reflect.typeOf
 
@@ -93,6 +96,16 @@ fun FCCNavigation(
         }
         composable<FCCScreen.CreateDish> {
             CreateDishScreen(navController = navController)
+        }
+
+        composable<FCCScreen.EditProduct>(
+            typeMap = mapOf(typeOf<ProductDomain>() to ProductDomainNavType)
+        ) { backStackEntry ->
+            val editProduct: FCCScreen.EditProduct = backStackEntry.toRoute()
+            EditProductScreen(
+                providedProduct = editProduct.productDomain,
+                navController = navController
+            )
         }
     }
 }

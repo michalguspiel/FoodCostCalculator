@@ -8,10 +8,10 @@ import androidx.compose.ui.Modifier
 
 @Composable
 fun ErrorDialog(
+  modifier: Modifier = Modifier,
   title: String = "Error",
   content: String = "Something went wrong",
   confirmButtonText: String = "OK",
-  modifier: Modifier = Modifier,
   onDismiss: () -> Unit
 ) {
   AlertDialog(
