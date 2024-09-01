@@ -11,7 +11,7 @@ import com.erdees.foodcostcalc.data.model.ProductBase
 @Keep
 @Entity(
   tableName = "Product_Dish",
-  indices = [Index("productId")],
+  indices = [Index("productId"), Index("dishId")],
   foreignKeys = [
     ForeignKey(
       entity = ProductBase::class,

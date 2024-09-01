@@ -4,14 +4,15 @@ import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Ignore
+import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.erdees.foodcostcalc.data.model.DishBase
 import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.data.model.ProductBase
 
 @Keep
 @Entity(
   tableName = "Product_HalfProduct",
+  indices = [Index("productId"), Index("halfProductId")],
   foreignKeys = [
     ForeignKey(
       entity = ProductBase::class,

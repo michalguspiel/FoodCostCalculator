@@ -21,15 +21,6 @@ interface HalfProductDishDao {
   @Update
   suspend fun updateHalfProductDish(halfProductDish: HalfProductDish)
 
-  @Query("DELETE FROM HalfProduct_Dish WHERE halfProductDishId = :id")
-  suspend fun delete(id: Long)
-
   @Delete
   suspend fun delete(halfProductDish: HalfProductDish)
-
-  @Query("DELETE FROM HalfProduct_Dish WHERE dishId = :id")
-  suspend fun deleteByDishId(id: Long)
-
-  @Query("DELETE FROM HalfProduct_Dish WHERE halfProductId = :id")
-  suspend fun deleteByHalfProductId(id: Long)
 }

@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "6eb9bf6c1be12a7e1937ffc793560347",
+    "identityHash": "b111ccb3f132d660893d3bf039d4d4bb",
     "entities": [
       {
         "tableName": "products",
@@ -174,6 +174,15 @@
             ],
             "orders": [],
             "createSql": "CREATE INDEX IF NOT EXISTS `index_Product_Dish_productId` ON `${TABLE_NAME}` (`productId`)"
+          },
+          {
+            "name": "index_Product_Dish_dishId",
+            "unique": false,
+            "columnNames": [
+              "dishId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Product_Dish_dishId` ON `${TABLE_NAME}` (`dishId`)"
           }
         ],
         "foreignKeys": [
@@ -248,7 +257,26 @@
             "productHalfProductId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_Product_HalfProduct_productId",
+            "unique": false,
+            "columnNames": [
+              "productId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Product_HalfProduct_productId` ON `${TABLE_NAME}` (`productId`)"
+          },
+          {
+            "name": "index_Product_HalfProduct_halfProductId",
+            "unique": false,
+            "columnNames": [
+              "halfProductId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Product_HalfProduct_halfProductId` ON `${TABLE_NAME}` (`halfProductId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "products",
@@ -276,7 +304,7 @@
       },
       {
         "tableName": "HalfProduct_Dish",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`halfProductDishId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `halfProductId` INTEGER NOT NULL, `dishId` INTEGER NOT NULL, `quantity` REAL NOT NULL, `quantityUnit` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`halfProductDishId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `halfProductId` INTEGER NOT NULL, `dishId` INTEGER NOT NULL, `quantity` REAL NOT NULL, `quantityUnit` TEXT NOT NULL, FOREIGN KEY(`halfProductId`) REFERENCES `HalfProduct`(`halfProductId`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`dishId`) REFERENCES `dishes`(`dishId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "halfProductDishId",
@@ -315,14 +343,56 @@
             "halfProductDishId"
           ]
         },
-        "indices": [],
-        "foreignKeys": []
+        "indices": [
+          {
+            "name": "index_HalfProduct_Dish_halfProductId",
+            "unique": false,
+            "columnNames": [
+              "halfProductId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_HalfProduct_Dish_halfProductId` ON `${TABLE_NAME}` (`halfProductId`)"
+          },
+          {
+            "name": "index_HalfProduct_Dish_dishId",
+            "unique": false,
+            "columnNames": [
+              "dishId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_HalfProduct_Dish_dishId` ON `${TABLE_NAME}` (`dishId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "HalfProduct",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "halfProductId"
+            ],
+            "referencedColumns": [
+              "halfProductId"
+            ]
+          },
+          {
+            "table": "dishes",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "dishId"
+            ],
+            "referencedColumns": [
+              "dishId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6eb9bf6c1be12a7e1937ffc793560347')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b111ccb3f132d660893d3bf039d4d4bb')"
     ]
   }
 }
