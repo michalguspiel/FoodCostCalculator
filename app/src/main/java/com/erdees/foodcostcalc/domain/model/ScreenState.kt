@@ -1,13 +1,15 @@
 package com.erdees.foodcostcalc.domain.model
 
 
-
 sealed class InteractionType {
     data object EditTax : InteractionType()
     data object EditMargin : InteractionType()
     data object EditTotalPrice : InteractionType()
     data object EditName : InteractionType()
     data class EditItem(val usedItem: UsedItem) : InteractionType()
+
+    data object CalculateWaste : InteractionType()
+    data object CalculatePiecePrice : InteractionType()
 }
 
 sealed class ScreenState {
