@@ -71,7 +71,8 @@ fun AddItemFields(
             )
         }
         UnitField(units = units, selectedUnit = selectedUnit, selectUnit = selectUnit)
-        
+
+
         extraField()
     }
 }
