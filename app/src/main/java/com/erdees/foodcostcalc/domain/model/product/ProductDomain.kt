@@ -2,8 +2,8 @@ package com.erdees.foodcostcalc.domain.model.product
 
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.domain.model.Item
-import com.erdees.foodcostcalc.utils.Format
 import kotlinx.serialization.Serializable
+import java.text.DecimalFormat
 
 @Keep
 @Serializable
@@ -18,7 +18,7 @@ data class ProductDomain(
   val priceAfterWasteAndTax =
     pricePerUnit + pricePerUnit * (waste / 100) + pricePerUnit * (tax / 100)
 
-  val formattedBruttoPrice: String = Format.df.format(priceAfterWasteAndTax)
+  private val formattedBruttoPrice: String = DecimalFormat("#.##").format(priceAfterWasteAndTax)
 
   override fun toString(): String {
     return "$name, price $unit netto: $pricePerUnit.\nPrice $unit with foodcost: $formattedBruttoPrice."

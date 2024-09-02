@@ -3,7 +3,6 @@ package com.erdees.foodcostcalc.domain.model.halfProduct
 import android.content.Context
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
-import com.erdees.foodcostcalc.utils.Format.df
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.serialization.Serializable
@@ -27,8 +26,6 @@ data class HalfProductDomain(
         it.quantity
       )
     }
-
-  val formattedPrice: String = df.format(totalPrice)
 
   val pricePerUnit: Double
     get() {
