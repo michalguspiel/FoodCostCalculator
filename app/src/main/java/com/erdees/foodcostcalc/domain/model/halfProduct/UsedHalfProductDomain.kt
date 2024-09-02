@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.domain.model.halfProduct
 
 import com.erdees.foodcostcalc.domain.model.UsedItem
-import com.erdees.foodcostcalc.utils.Format
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import kotlinx.serialization.Serializable
 
@@ -19,7 +18,4 @@ data class UsedHalfProductDomain(
     item.halfProductUnit,
     quantityUnit
   )
-
-  val formattedPrice: String = Format.df.format(totalPrice)
-
 }

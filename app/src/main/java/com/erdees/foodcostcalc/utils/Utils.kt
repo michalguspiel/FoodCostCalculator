@@ -13,10 +13,6 @@ import java.util.Locale
 
 object Utils {
 
-  fun CharSequence.isNotBlankNorJustDot(): Boolean {
-    return this.isNotBlank() && this.toString() != "."
-  }
-
   /**Because some devices format number with commas which causes errors.*/
   fun formatResultAndCheckCommas(number: Double): String {
     val df = DecimalFormat("#.##")
@@ -74,18 +70,6 @@ object Utils {
   }
 
   /**Get units preferred by the user.*/
-  fun getUnits(resources: Resources, sharedPreferences: Preferences): MutableList<String> {
-    var chosenUnits = resources.getStringArray(R.array.piece)
-    if (sharedPreferences.metricUsed) {
-      chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
-    }
-    if (sharedPreferences.imperialUsed) {
-      chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
-    }
-    return chosenUnits.toMutableList()
-  }
-
-  /**Get units preferred by the user.*/
   fun getUnitsSet(resources: Resources, sharedPreferences: Preferences): Set<String> {
     var chosenUnits = resources.getStringArray(R.array.piece)
     if (sharedPreferences.metricUsed) {
@@ -97,36 +81,6 @@ object Utils {
     return chosenUnits.toSet()
   }
 
-
-  /**First clears unitList then adds correct units,
-   *  every time data set changes this function is called.*/
-  fun ArrayList<String>.changeUnitList(
-    unitType: String,
-    metricAsBoolean: Boolean,
-    usaAsBoolean: Boolean
-  ) {
-    clear()
-    if (metricAsBoolean) {
-      when (unitType) {
-        "weight" -> this += arrayListOf("kilogram", "gram")
-        "volume" -> this += arrayListOf("milliliter", "liter")
-        else -> {
-          this.clear()
-          this += "piece"
-        }
-      }
-    }
-    if (usaAsBoolean) {
-      when (unitType) {
-        "weight" -> this += arrayListOf("pound", "ounce")
-        "volume" -> this += arrayListOf("gallon", "fluid ounce")
-        else -> {
-          clear()
-          this += "piece"
-        }
-      }
-    }
-  }
 
   /**First clears unitList then adds correct units,
    *  every time data set changes this function is called.*/

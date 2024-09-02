@@ -1,17 +1,8 @@
 package com.erdees.foodcostcalc.utils
 
 object Constants {
-    const val LAST_ITEM_TYPE = 0
     const val DISH_ITEM_TYPE = 1
     const val PRODUCT_ITEM_TYPE = 1
-
-    const val ADD_FRAGMENT_SPINNER_ID = 1
-
-    const val PRODUCT_SPINNER_ID = 1
-    const val DISH_SPINNER_ID = 2
-    const val HALFPRODUCT_SPINNER_ID = 2
-    const val UNIT_SPINNER_ID = 3
-    const val CURRENCIES_SPINNER_ID = 4
 
     const val DISH_CREATED = "dish_created"
     const val HALF_PRODUCT_CREATED = "half_product_created"
@@ -26,7 +17,6 @@ object Constants {
     const val PRODUCTS_AD_FREQUENCY = 4
     const val HALF_PRODUCTS_AD_FREQUENCY = 3
     const val DISHES_AD_FREQUENCY = 3
-
 
     const val PRODUCT_AD_ITEM_TYPE = 522
     const val HALF_PRODUCT_AD_ITEM_TYPE = 523
@@ -46,8 +36,6 @@ object Constants {
     const val TAX = "tax"
     const val PREFERRED_CURRENCY_CODE = "preferred_currency"
 
-
     const val BASIC_MARGIN = 100
     const val BASIC_TAX = 23
-
 }

@@ -20,10 +20,6 @@ class AdHelper(itemsSize: Int, private val adFrequency: Int) {
 
     val finalListSize = itemsSize + finalAmountOfAds
 
-    fun itemsSizeWithAds(): Int {
-        return this.finalListSize
-    }
-
     fun adsBindedSoFar(position: Int): Int {
         if (position > finalListSize) throw NullPointerException()
         return (position) / adFrequency
@@ -131,7 +127,4 @@ class AdHelper(itemsSize: Int, private val adFrequency: Int) {
             }
         }
     }
-
-
-
 }
