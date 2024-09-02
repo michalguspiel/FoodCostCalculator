@@ -34,144 +34,142 @@ import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
 @Composable
 fun AddItemFields(
-  items: List<Item>,
-  units: Set<String>,
-  quantity: String,
-  selectedTab: SelectedTab,
-  selectedItem: Item?,
-  selectedUnit: String,
-  modifier: Modifier = Modifier,
-  selectItem: (Item) -> Unit,
-  selectUnit: (String) -> Unit,
-  setQuantity: (String) -> Unit,
-  extraField : @Composable () -> Unit = {}
+    items: List<Item>,
+    units: Set<String>,
+    quantity: String,
+    selectedTab: SelectedTab,
+    selectedItem: Item?,
+    selectedUnit: String,
+    modifier: Modifier = Modifier,
+    selectItem: (Item) -> Unit,
+    selectUnit: (String) -> Unit,
+    setQuantity: (String) -> Unit,
+    extraField: @Composable () -> Unit = {}
 ) {
 
-  val itemFieldLabel = if (selectedTab == SelectedTab.ADD_PRODUCT) "Product" else "Half Product"
-  Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
-    Column {
-      FieldLabel(
-        text = itemFieldLabel,
-        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
-      )
-      ItemField(
-        items = items,
-        selectedItem = selectedItem,
-        selectItem = selectItem,
-        selectedTab = selectedTab
-      )
-    }
+    val itemFieldLabel = if (selectedTab == SelectedTab.ADD_PRODUCT) "Product" else "Half Product"
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Column {
+            FieldLabel(
+                text = itemFieldLabel,
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+            )
+            ItemField(
+                items = items,
+                selectedItem = selectedItem,
+                selectItem = selectItem,
+                selectedTab = selectedTab
+            )
+        }
 
-    Column {
-      FieldLabel(text = "Quantity", modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
-      QuantityField(
-        quantity = quantity,
-        modifier = Modifier.fillMaxWidth(),
-        setQuantity = setQuantity
-      )
-    }
-    Column {
-      FieldLabel(text = "Unit", modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
-      UnitField(units = units, selectedUnit = selectedUnit, selectUnit = selectUnit)
-    }
+        Column {
+            FieldLabel(text = "Quantity", modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
+            QuantityField(
+                quantity = quantity,
+                modifier = Modifier.fillMaxWidth(),
+                setQuantity = setQuantity
+            )
+        }
+        UnitField(units = units, selectedUnit = selectedUnit, selectUnit = selectUnit)
 
-    extraField()
-  }
+
+        extraField()
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ItemField(
-  items: List<Item>,
-  selectedItem: Item?,
-  selectedTab: SelectedTab,
-  modifier: Modifier = Modifier,
-  selectItem: (Item) -> Unit
+    items: List<Item>,
+    selectedItem: Item?,
+    selectedTab: SelectedTab,
+    modifier: Modifier = Modifier,
+    selectItem: (Item) -> Unit
 ) {
-  var expanded by remember { mutableStateOf(false) }
+    var expanded by remember { mutableStateOf(false) }
 
-  val optionalHint =
-    if (selectedTab == SelectedTab.ADD_PRODUCT) "Select a product" else "Select half product"
+    val optionalHint =
+        if (selectedTab == SelectedTab.ADD_PRODUCT) "Select a product" else "Select half product"
 
-  Box(modifier = modifier) {
-    ExposedDropdownMenuBox(
-      modifier = Modifier,
-      expanded = expanded,
-      onExpandedChange = { expanded = it },
-    ) {
+    Box(modifier = modifier) {
+        ExposedDropdownMenuBox(
+            modifier = Modifier,
+            expanded = expanded,
+            onExpandedChange = { expanded = it },
+        ) {
 
-      TextField(
-        // The `menuAnchor` modifier must be passed to the text field to handle
-        // expanding/collapsing the menu on click. A read-only text field has
-        // the anchor type `PrimaryNotEditable`.
-        modifier = Modifier
-          .fillMaxWidth()
-          .menuAnchor(),
-        value = selectedItem?.name ?: optionalHint,
-        onValueChange = {},
-        readOnly = true,
-        singleLine = true,
-        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-      )
+            TextField(
+                // The `menuAnchor` modifier must be passed to the text field to handle
+                // expanding/collapsing the menu on click. A read-only text field has
+                // the anchor type `PrimaryNotEditable`.
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                value = selectedItem?.name ?: optionalHint,
+                onValueChange = {},
+                readOnly = true,
+                singleLine = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            )
 
-      DropdownMenu(
-        modifier = Modifier
-          .exposedDropdownSize(true),
-        expanded = expanded,
-        onDismissRequest = { expanded = false }) {
-        items.forEach { product ->
-          DropdownMenuItem(
-            onClick = {
-              selectItem(product)
-              expanded = false
-            },
-            text = { Text(text = product.name) }
-          )
+            DropdownMenu(
+                modifier = Modifier
+                    .exposedDropdownSize(true),
+                expanded = expanded,
+                onDismissRequest = { expanded = false }) {
+                items.forEach { product ->
+                    DropdownMenuItem(
+                        onClick = {
+                            selectItem(product)
+                            expanded = false
+                        },
+                        text = { Text(text = product.name) }
+                    )
+                }
+            }
         }
-      }
     }
-  }
 }
 
 @Composable
 fun QuantityField(
-  quantity: String,
-  modifier: Modifier = Modifier,
-  setQuantity: (String) -> Unit
+    quantity: String,
+    modifier: Modifier = Modifier,
+    setQuantity: (String) -> Unit
 ) {
-  OutlinedTextField(
-    value = quantity,
-    singleLine = true,
-    onValueChange = { newValue ->
-      setQuantity(newValue)
-    },
-    modifier = modifier,
-    textStyle = LocalTextStyle.current.copy(
-      textAlign = TextAlign.End
-    ),
-    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-  )
+    OutlinedTextField(
+        value = quantity,
+        singleLine = true,
+        onValueChange = { newValue ->
+            setQuantity(newValue)
+        },
+        modifier = modifier,
+        textStyle = LocalTextStyle.current.copy(
+            textAlign = TextAlign.End
+        ),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+    )
 }
 
 
 @Preview
 @Composable
 private fun PreviewFields() {
-  FCCTheme {
-    Box(Modifier.background(Color.Gray)) {
-      AddItemFields(
-        items = listOf(),
-        units = setOf("kg", "g"),
-        quantity = "1",
-        selectedTab = SelectedTab.ADD_PRODUCT,
-        selectedItem = null,
-        selectedUnit = "kg",
-        selectItem = {},
-        selectUnit = {},
-        setQuantity = {}
-      )
+    FCCTheme {
+        Box(Modifier.background(Color.Gray)) {
+            AddItemFields(
+                items = listOf(),
+                units = setOf("kg", "g"),
+                quantity = "1",
+                selectedTab = SelectedTab.ADD_PRODUCT,
+                selectedItem = null,
+                selectedUnit = "kg",
+                selectItem = {},
+                selectUnit = {},
+                setQuantity = {}
+            )
+        }
     }
-  }
 }
 
