@@ -15,10 +15,10 @@ import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 
 object Mapper {
-    // TODO fix
     fun CompleteDish.toDishDomain(): DishDomain {
         return DishDomain(
             dishId = dish.dishId,
@@ -37,6 +37,44 @@ object Mapper {
             pricePerUnit = pricePerUnit,
             tax = tax,
             waste = waste,
+            unit = unit
+        )
+    }
+
+    fun ProductDomain.toProductBase(): ProductBase {
+        return ProductBase(
+            productId = id,
+            name = name,
+            pricePerUnit = pricePerUnit,
+            tax = tax,
+            waste = waste,
+            unit = unit
+        )
+    }
+
+    fun ProductDomain.toEditableProductDomain(): EditableProductDomain {
+        return EditableProductDomain(
+            id = id,
+            name = name,
+            pricePerUnit = pricePerUnit.toString(),
+            tax = tax.toString(),
+            waste = waste.toString(),
+            unit = unit
+        )
+    }
+
+    /**
+     * Maps EditableProductDomain to ProductBase
+     * @return ProductBase
+     * @throws NumberFormatException if any of the values in EditableProductDomain cannot be converted to Double
+     * */
+    fun EditableProductDomain.toProductBase(): ProductBase {
+        return ProductBase(
+            productId = id,
+            name = name,
+            pricePerUnit = pricePerUnit.toDouble(),
+            tax = tax.toDouble(),
+            waste = waste.toDouble(),
             unit = unit
         )
     }
