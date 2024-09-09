@@ -1,6 +1,17 @@
 package com.erdees.foodcostcalc.utils
 
 object Constants {
+
+    object Ads {
+        const val PRODUCTS_AD_FREQUENCY = 4
+        const val HALF_PRODUCTS_AD_FREQUENCY = 3
+        const val DISHES_AD_FREQUENCY = 3
+
+        const val ADMOB_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110"
+        const val ADMOB_PRODUCTS_AD_UNIT_ID = "ca-app-pub-5093191239349402/7646868536"
+        const val ADMOB_DISHES_AD_UNIT_ID = "ca-app-pub-5093191239349402/9127239654"
+        const val ADMOB_HALF_PRODUCTS_AD_UNIT_ID = "ca-app-pub-5093191239349402/9594143514"
+    }
     const val DISH_ITEM_TYPE = 1
     const val PRODUCT_ITEM_TYPE = 1
 

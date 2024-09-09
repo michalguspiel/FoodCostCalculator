@@ -41,7 +41,8 @@ android {
       minifyEnabled true
       shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-      // IN ORDER TO RUN RELEASE : signingConfig signingConfigs.debug
+      // IN ORDER TO RUN RELEASE :
+       signingConfig signingConfigs.debug
     }
   }
   compileOptions {
@@ -65,6 +66,10 @@ android {
   sourceSets {
     // Adds exported schema location as test app assets.
     androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+  }
+
+  testOptions {
+    unitTests.returnDefaultValues = true
   }
 
 }
@@ -128,11 +133,11 @@ dependencies {
   implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1'
 
   //FIREBASE ANALYTICS
-  implementation platform('com.google.firebase:firebase-bom:30.1.0')
+  implementation platform('com.google.firebase:firebase-bom:33.2.0')
   implementation("com.google.firebase:firebase-analytics-ktx")
 
   //GOOGLE ADS
-  implementation 'com.google.android.gms:play-services-ads:22.6.0'
+  implementation 'com.google.android.gms:play-services-ads:23.3.0'
   //ERROR HANDLE
   implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
@@ -143,4 +148,12 @@ dependencies {
   androidTestImplementation "androidx.test:runner:$androidXTestVersion"
   androidTestImplementation "androidx.test:rules:$androidXTestVersion"
   androidTestImplementation "androidx.room:room-testing:$room_version"
+
+  def mockkVersion = "1.13.12"
+  testImplementation "io.mockk:mockk:${mockkVersion}"
+
+  def kotestVersion = "5.9.0"
+  testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+
+
 }

@@ -6,7 +6,7 @@
     <string name="tax">Tax %</string>
     <string name="waste">Waste %</string>
     <string name="compose">Add product to your dish</string>
-    <string name ="cancel">Cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="are_you_sure">Are You sure?</string>
@@ -45,6 +45,7 @@
     <string name="search_button">search button</string>
     <string name="open_side_menu_button">open side menu button</string>
     <string name="search_by_name">Search…</string>
+    <string name="search_bar">search bar</string>
     <string name="cancel_search">cancel search</string>
     <string name="dish_tax">dish tax</string>
     <string name="products">Products</string>
@@ -117,5 +118,11 @@
     <string name="default_currency">Default currency</string>
     <string name="app_info_template">App Version: %1$s\nDeveloper: %2$s</string>
     <string name="settings">Settings</string>
+
+
+    <!-- PRODUCTS FEATURE -->
+
+    <string name="product_netto_price">Price %1$s netto: %2$s.</string>
+    <string name="product_foodcost_price">Price %1$s with foodcost: %2$s.</string>
 
 </resources>
