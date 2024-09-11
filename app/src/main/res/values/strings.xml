@@ -120,9 +120,22 @@
     <string name="settings">Settings</string>
 
 
+    <!-- COMMON -->
+
+    <string name="edit_quantity">Edit quantity</string>
+
     <!-- PRODUCTS FEATURE -->
 
     <string name="product_netto_price">Price %1$s netto: %2$s.</string>
     <string name="product_foodcost_price">Price %1$s with foodcost: %2$s.</string>
+
+    <!-- HALF PRODUCTS FEATURE -->
+
+    <string name="price_per_unit">Price %1$s:</string>
+    <string name="price_per_recipe">Price per recipe:</string>
+    <string name="recipe_per_quantity">Recipe per %1$s %2$s of product.</string>
+
+    <!-- DISHES FEATURE -->
+
 
 </resources>

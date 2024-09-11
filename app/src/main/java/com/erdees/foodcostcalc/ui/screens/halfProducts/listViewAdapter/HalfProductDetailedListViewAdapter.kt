@@ -1,7 +1,8 @@
-package com.erdees.foodcostcalc.ui.screens.halfProducts.halfProductsFragment
+package com.erdees.foodcostcalc.ui.screens.halfProducts.listViewAdapter
 
 import android.annotation.SuppressLint
-import android.app.Activity
+import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
@@ -18,10 +19,9 @@ import com.erdees.foodcostcalc.utils.Utils.getIngredientForHundredPercentOfRecip
 import com.erdees.foodcostcalc.utils.Utils.getPriceForHundredPercentOfRecipe
 
 class HalfProductDetailedListViewAdapter(
-  private val context: Activity,
+  private val context: Context,
   private val halfProductDomain: HalfProductDomain,
   private val quantity: Double,
-  private val totalWeightOfMainRecipe: Double
 ) : ArrayAdapter<UsedProductDomain>(
   context,
   R.layout.listview_dish_row,
@@ -33,11 +33,11 @@ class HalfProductDetailedListViewAdapter(
 
   @SuppressLint("ViewHolder")
   override fun getView(position: Int, view: View?, parent: ViewGroup): View {
-    val inflater = context.layoutInflater
+    val inflater = LayoutInflater.from(context)
     _binding = ListviewDishRowBinding.inflate(inflater, parent, false)
 
     val quantityPercent =
-      getBasicRecipeAsPercentageOfTargetRecipe(quantity, totalWeightOfMainRecipe)
+      getBasicRecipeAsPercentageOfTargetRecipe(quantity, halfProductDomain.totalQuantity)
     val weightIncludedQuantity = getIngredientForHundredPercentOfRecipe(
       list[position].quantity,
       quantityPercent

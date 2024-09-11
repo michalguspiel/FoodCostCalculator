@@ -62,8 +62,8 @@ fun ProductsScreen(navController: NavController) {
                     .padding(horizontal = 8.dp),
                 contentPadding = PaddingValues(top = (36 + 8 + 8).dp)
             ) {
-                items(adItems) { product ->
-                    when (product) {
+                items(adItems) { item ->
+                    when (item) {
                         is Ad -> {
                             Ad(
                                 adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
@@ -73,7 +73,7 @@ fun ProductsScreen(navController: NavController) {
 
                         is ProductDomain -> {
                             ProductItem(
-                                productDomain = product,
+                                productDomain = item,
                                 navController = navController,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             )
