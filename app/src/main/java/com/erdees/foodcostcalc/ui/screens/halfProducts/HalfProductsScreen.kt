@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.widget.LinearLayout
 import androidx.compose.foundation.background
@@ -47,9 +46,9 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.databinding.HalfProductCardViewBinding
 import com.erdees.foodcostcalc.domain.model.Ad
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
-import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.SearchField
@@ -113,8 +112,11 @@ fun HalfProductsScreen(navController: NavController) {
                         is HalfProductDomain -> {
                             key(item) {
                                 val itemPresentationState =
-                                    viewModel.itemsPresentationState.collectAsState().value[item.id]
-                                        ?: ItemPresentationState()
+                                    viewModel
+                                        .listPresentationStateHandler
+                                        .itemsPresentationState
+                                        .collectAsState()
+                                        .value[item.id] ?: ItemPresentationState()
                                 HalfProductItem(
                                     halfProductDomain = item,
                                     navController = navController,
@@ -123,12 +125,12 @@ fun HalfProductsScreen(navController: NavController) {
                                     modifier = Modifier
                                         .padding(vertical = 8.dp),
                                     onExpandToggle = {
-                                        viewModel.onExpandToggle(item)
+                                        viewModel.listPresentationStateHandler.onExpandToggle(item)
                                     },
                                     onChangeQuantityDialogOpened = {
                                         viewModel.updateScreenState(
                                             ScreenState.Interaction(
-                                                InteractionType.EditQuantity(item)
+                                                InteractionType.EditQuantity(item.id)
                                             )
                                         )
                                     }
@@ -177,10 +179,13 @@ fun HalfProductsScreen(navController: NavController) {
                     }
 
                     is InteractionType.EditQuantity -> {
-                        val halfProductDomain = interactionType.halfProductDomain
+                        val itemId = interactionType.itemId
                         val itemPresentationState =
-                            viewModel.itemsPresentationState.collectAsState().value[halfProductDomain.id]
-                                ?: ItemPresentationState()
+                            viewModel
+                                .listPresentationStateHandler
+                                .itemsPresentationState
+                                .collectAsState()
+                                .value[itemId] ?: ItemPresentationState()
                         val editableQuantity =
                             remember { mutableStateOf(itemPresentationState.quantity.toString()) }
                         ValueEditDialog(
@@ -192,8 +197,8 @@ fun HalfProductsScreen(navController: NavController) {
                                     onNumericValueChange(editableQuantity.value, newValue)
                             },
                             onSave = {
-                                viewModel.updatePresentationQuantity(
-                                    halfProductDomain, editableQuantity.value
+                                viewModel.listPresentationStateHandler.updatePresentationQuantity(
+                                    itemId, editableQuantity.value
                                 )
                             }, onDismiss = {
                                 viewModel.resetScreenState()

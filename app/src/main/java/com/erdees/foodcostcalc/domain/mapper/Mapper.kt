@@ -21,7 +21,7 @@ import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 object Mapper {
     fun CompleteDish.toDishDomain(): DishDomain {
         return DishDomain(
-            dishId = dish.dishId,
+            id = dish.dishId,
             name = dish.name,
             marginPercent = dish.marginPercent,
             taxPercent = dish.dishTax,
@@ -171,7 +171,7 @@ object Mapper {
 
     fun DishDomain.toDishBase(): DishBase {
         return DishBase(
-            dishId = dishId,
+            dishId = id,
             name = name,
             marginPercent = marginPercent,
             dishTax = taxPercent

@@ -86,7 +86,7 @@
     <string name="you_must_pick_product">You must pick a product.</string>
     <string name="select_product">Select product</string>
     <string name="select_dish">Select dish</string>
-    <string name="serving_amount">Serving amount</string>
+
 
     <string name="product_added">%1$s added!</string>
     <string name="okay">Okay</string>
@@ -136,6 +136,8 @@
     <string name="recipe_per_quantity">Recipe per %1$s %2$s of product.</string>
 
     <!-- DISHES FEATURE -->
+
+    <string name="serving_amount">Edit displayed servings</string>
 
 
 </resources>

@@ -1,22 +1,20 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts
 
 import android.os.Bundle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
-import com.erdees.foodcostcalc.domain.model.Item
-import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
+import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
+import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
 import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -29,26 +27,13 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Locale
 
-class HalfProductsScreenViewModel : ViewModel(), KoinComponent {
+class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
     private val halfProductRepository: HalfProductRepository by inject()
     val preferences: Preferences by inject()
     private val firebaseAnalytics: FirebaseAnalytics by inject()
 
-    private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
-    val screenState: StateFlow<ScreenState> = _screenState
-
-    fun updateScreenState(screenState: ScreenState) {
-        _screenState.value = screenState
-    }
-
-    fun resetScreenState() {
-        _screenState.value = ScreenState.Idle
-    }
-
-    private val _itemPresentationState: MutableStateFlow<Map<Long, ItemPresentationState>> =
-        MutableStateFlow(emptyMap())
-    val itemsPresentationState: StateFlow<Map<Long, ItemPresentationState>> = _itemPresentationState
+    val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
 
     private val halfProducts: StateFlow<List<HalfProductDomain>> =
         halfProductRepository.completeHalfProducts.map { halfProducts ->
@@ -59,8 +44,9 @@ class HalfProductsScreenViewModel : ViewModel(), KoinComponent {
                 // If it's in the map and not in the list, it means it was deleted.
                 // Therefore, it should be removed from itemPresentationState map. To be done in 3.1
 
-                _itemPresentationState.value =
+                listPresentationStateHandler.updatePresentationState(
                     halfProductsDomain.associate { it.id to ItemPresentationState() }
+                )
             }
         }.stateIn(
             scope = viewModelScope,
@@ -68,20 +54,13 @@ class HalfProductsScreenViewModel : ViewModel(), KoinComponent {
             initialValue = emptyList()
         )
 
-    private var _searchKey: MutableStateFlow<String> = MutableStateFlow("")
-    val searchKey: StateFlow<String> = _searchKey
-
-    fun updateSearchKey(searchKey: String) {
-        _searchKey.value = searchKey
-    }
-
     @OptIn(FlowPreview::class)
     private val filteredHalfProducts = combine(
         halfProducts,
         searchKey.debounce(500).onStart { emit("") }
-    ) { halfProducts, searchWord ->
+    ) { halfProducts, searchKey ->
         halfProducts.filter {
-            it.name.lowercase(Locale.getDefault()).contains(searchWord.lowercase())
+            it.name.lowercase(Locale.getDefault()).contains(searchKey.lowercase())
         }
     }.stateIn(
         scope = viewModelScope,
@@ -120,26 +99,5 @@ class HalfProductsScreenViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductRepository.addHalfProduct(halfProductBase)
         }
-    }
-
-    fun onExpandToggle(item: Item) {
-        var itemPresentationState = itemsPresentationState.value[item.id] ?: ItemPresentationState()
-        itemPresentationState =
-            itemPresentationState.copy(isExpanded = !itemPresentationState.isExpanded)
-        val mutableMap = _itemPresentationState.value.toMutableMap()
-        mutableMap[item.id] = itemPresentationState
-        _itemPresentationState.value = mutableMap
-    }
-
-    fun updatePresentationQuantity(item: Item, newQuantity: String) {
-        val quantity = newQuantity.toDoubleOrNull() ?: return
-        var itemPresentationState = itemsPresentationState.value[item.id] ?: ItemPresentationState()
-        itemPresentationState = itemPresentationState.copy(quantity = quantity)
-        val mutableMap = _itemPresentationState.value.toMutableMap()
-        mutableMap[item.id] = itemPresentationState
-        _itemPresentationState.value = mutableMap
-
-        // Close dialog after quantity is updated
-        resetScreenState()
     }
 }

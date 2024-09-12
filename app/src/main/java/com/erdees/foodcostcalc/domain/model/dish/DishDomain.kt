@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.domain.model.dish
 
 import android.util.Log
+import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import kotlinx.serialization.Serializable
@@ -8,13 +9,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DishDomain(
-  val dishId: Long,
-  val name: String,
+  override val id: Long,
+  override val name: String,
   val marginPercent: Double,
   val taxPercent: Double,
   val products: List<UsedProductDomain>,
   val halfProducts: List<UsedHalfProductDomain>
-) {
+) : Item {
   val foodCost: Double =
     products.sumOf {
       it.totalPrice.also { totalPrice ->

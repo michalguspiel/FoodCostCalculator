@@ -1,7 +1,5 @@
 package com.erdees.foodcostcalc.domain.model
 
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
-
 
 sealed class InteractionType {
     data object EditTax : InteractionType()
@@ -9,7 +7,7 @@ sealed class InteractionType {
     data object EditTotalPrice : InteractionType()
     data object EditName : InteractionType()
     data class EditItem(val usedItem: UsedItem) : InteractionType()
-    data class EditQuantity(val halfProductDomain: HalfProductDomain) : InteractionType()
+    data class EditQuantity(val itemId: Long) : InteractionType()
 
     data object CalculateWaste : InteractionType()
     data object CalculatePiecePrice : InteractionType()
