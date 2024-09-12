@@ -72,7 +72,7 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
         filteredHalfProducts.map { halfProducts ->
             ListAdsInjectorManager(
                 halfProducts,
-                Constants.Ads.PRODUCTS_AD_FREQUENCY
+                Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
             ).listInjectedWithAds
         }.stateIn(
             scope = viewModelScope,

@@ -92,7 +92,7 @@ fun DishesScreen(navController: NavController) {
                         is Ad -> {
                             Ad(
                                 adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
-                                else Constants.Ads.ADMOB_HALF_PRODUCTS_AD_UNIT_ID
+                                else Constants.Ads.ADMOB_DISHES_AD_UNIT_ID
                             )
                         }
 
