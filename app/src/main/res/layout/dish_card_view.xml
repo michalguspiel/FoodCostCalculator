@@ -112,8 +112,6 @@
     android:id="@+id/ingredient_list"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layoutAnimation="@anim/layout_animation"
-    android:animateLayoutChanges="true"
     android:layout_margin="4dp"
     android:orientation="vertical"
     android:visibility="gone">

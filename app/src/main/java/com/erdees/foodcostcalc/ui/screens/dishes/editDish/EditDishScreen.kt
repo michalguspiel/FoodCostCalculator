@@ -104,7 +104,7 @@ fun EditDishScreen(providedDishDomain: DishDomain, navController: NavController)
                         })
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.deleteDish(providedDishDomain.dishId) }) {
+                    IconButton(onClick = { viewModel.deleteDish(providedDishDomain.id) }) {
                         Icon(imageVector = Icons.Sharp.Delete, contentDescription = "Remove dish")
                     }
                 },

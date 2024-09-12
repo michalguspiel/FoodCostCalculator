@@ -1,14 +1,19 @@
 package com.erdees.foodcostcalc.ui.screens.products
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.repository.ProductRepository
-import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
+import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -17,8 +22,6 @@ import java.util.Locale
 class ProductsFragmentViewModel : ViewModel(), KoinComponent {
 
     private val productRepository: ProductRepository by inject()
-    private val searchEngineRepository: SearchEngineRepository =
-        SearchEngineRepository.getInstance()
 
     private val products =
         productRepository.products.map { products ->
@@ -29,18 +32,36 @@ class ProductsFragmentViewModel : ViewModel(), KoinComponent {
             initialValue = emptyList()
         )
 
-    private val searchWord = searchEngineRepository.getWhatToSearchFor().asFlow().stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = ""
-    )
+    private var _searchKey: MutableStateFlow<String> = MutableStateFlow("")
+    val searchKey: StateFlow<String> = _searchKey
 
-    val filteredProducts = combine(
+    fun updateSearchKey(searchKey: String) {
+        _searchKey.value = searchKey
+    }
+
+    @OptIn(FlowPreview::class)
+    private val filteredProducts = combine(
         products,
-        searchWord
+        searchKey.debounce(500).onStart { emit("") }
     ) { products, searchWord ->
         products.filter {
             it.name.lowercase(Locale.getDefault()).contains(searchWord.lowercase())
         }
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = emptyList()
+    )
+
+    val filteredProductsInjectedWithAds =
+        filteredProducts.map {
+            ListAdsInjectorManager(
+                it,
+                Constants.Ads.PRODUCTS_AD_FREQUENCY
+            ).listInjectedWithAds
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = listOf()
+        )
 }

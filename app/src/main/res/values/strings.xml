@@ -6,7 +6,7 @@
     <string name="tax">Tax %</string>
     <string name="waste">Waste %</string>
     <string name="compose">Add product to your dish</string>
-    <string name ="cancel">Cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="are_you_sure">Are You sure?</string>
@@ -45,6 +45,7 @@
     <string name="search_button">search button</string>
     <string name="open_side_menu_button">open side menu button</string>
     <string name="search_by_name">Search…</string>
+    <string name="search_bar">search bar</string>
     <string name="cancel_search">cancel search</string>
     <string name="dish_tax">dish tax</string>
     <string name="products">Products</string>
@@ -85,7 +86,7 @@
     <string name="you_must_pick_product">You must pick a product.</string>
     <string name="select_product">Select product</string>
     <string name="select_dish">Select dish</string>
-    <string name="serving_amount">Serving amount</string>
+
 
     <string name="product_added">%1$s added!</string>
     <string name="okay">Okay</string>
@@ -117,5 +118,26 @@
     <string name="default_currency">Default currency</string>
     <string name="app_info_template">App Version: %1$s\nDeveloper: %2$s</string>
     <string name="settings">Settings</string>
+
+
+    <!-- COMMON -->
+
+    <string name="edit_quantity">Edit quantity</string>
+
+    <!-- PRODUCTS FEATURE -->
+
+    <string name="product_netto_price">Price %1$s netto: %2$s.</string>
+    <string name="product_foodcost_price">Price %1$s with foodcost: %2$s.</string>
+
+    <!-- HALF PRODUCTS FEATURE -->
+
+    <string name="price_per_unit">Price %1$s:</string>
+    <string name="price_per_recipe">Price per recipe:</string>
+    <string name="recipe_per_quantity">Recipe per %1$s %2$s of product.</string>
+
+    <!-- DISHES FEATURE -->
+
+    <string name="serving_amount">Edit displayed servings</string>
+
 
 </resources>

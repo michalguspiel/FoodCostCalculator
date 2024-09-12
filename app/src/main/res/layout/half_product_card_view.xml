@@ -83,8 +83,6 @@
             android:layout_height="wrap_content"
             android:divider="@color/gray_200"
             android:dividerHeight="1dp"
-            android:animateLayoutChanges="true"
-            android:layoutAnimation="@anim/layout_animation"
             android:layout_margin="4dp" />
 
     </LinearLayout>
@@ -108,7 +106,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Price per recipe:"
+            android:text="@string/price_per_recipe"
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -137,29 +135,14 @@
         >
 
         <TextView
-            android:id="@+id/price_half_product_card_view"
+            android:id="@+id/price_per_unit_text_view"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="Price "
             android:textColor="#000000"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"/>
-
-        <TextView
-            android:id="@+id/unit_to_populate_half_product_card_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text=""
-            android:textColor="#000000"
-            android:textSize="16sp"
-            app:layout_constraintStart_toEndOf="@id/price_half_product_card_view"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-
-
 
         <TextView
             android:id="@+id/price_of_half_product_per_unit"

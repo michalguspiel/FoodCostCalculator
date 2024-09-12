@@ -1,101 +1,67 @@
 package com.erdees.foodcostcalc.ui.screens.dishes
 
-import android.content.Context
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.repository.DishRepository
-import com.erdees.foodcostcalc.data.searchengine.SearchEngineRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
+import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
-import com.erdees.foodcostcalc.utils.UnitsUtils
-import com.erdees.foodcostcalc.utils.Utils
+import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
+import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
+import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class DishesFragmentViewModel : ViewModel(), KoinComponent {
+class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
 
-  private val dishRepository: DishRepository by inject()
-  private val searchEngineRepository = SearchEngineRepository.getInstance()
+    private val dishRepository: DishRepository by inject()
+    val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
 
-  private val searchedKey = searchEngineRepository.getWhatToSearchFor().asFlow().stateIn(
-    viewModelScope,
-    SharingStarted.Lazily, ""
-  )
-
-  private val _dishes = dishRepository.dishes.map { it.map { it.toDishDomain() } }.stateIn(
-    viewModelScope,
-    SharingStarted.Lazily,
-    emptyList()
-  )
-
-  val dishes: StateFlow<List<DishDomain>> = combine(searchedKey, _dishes) { key, dishes ->
-    dishes.filter {
-      it.name.lowercase().contains(key.lowercase())
-    }
-  }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-
-
-  val idToQuantityMap = mutableMapOf<Long, Int>()
-  val expandedList = mutableListOf<Long>()
-
-  fun determineIfDishIsExpanded(dishModelId: Long): Boolean {
-    return expandedList.contains(dishModelId)
-  }
-
-  fun formattedPriceData(dishDomain: DishDomain, amountOfServings: Int, context: Context): String {
-    return Utils.formatPrice(dishDomain.foodCost * amountOfServings, context)
-  }
-
-  fun formattedTotalPriceData(dishDomain: DishDomain, amountOfServings: Int, context: Context): String {
-    return formattedTotalPriceData(
-      dishDomain.foodCost,
-      dishDomain.marginPercent,
-      dishDomain.taxPercent,
-      amountOfServings,
-      context
+    private val dishes = dishRepository.dishes.map { dishes ->
+        dishes.map { dish -> dish.toDishDomain() }.also { dishesDomain ->
+            // Initialize presentation state for each item
+            // Perhaps a nice improvement would be to check if the item is already in the map
+            // and only initialize it if it's not
+            // If it's in the map and not in the list, it means it was deleted.
+            // Therefore, it should be removed from itemPresentationState map. To be done in 3.1
+            listPresentationStateHandler.updatePresentationState(
+                dishesDomain.associate { it.id to ItemPresentationState() }
+            )
+        }
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        emptyList()
     )
-  }
 
-  private fun formattedTotalPriceData(
-    totalPrice: Double,
-    dishMargin: Double,
-    dishTax: Double,
-    amountOfServings: Int,
-    context: Context
-  ): String {
-    return Utils.formatPrice(
-      priceAfterMarginAndTax(
-        totalPrice,
-        dishMargin,
-        dishTax,
-        amountOfServings
-      ), context
-    )
-  }
+    @OptIn(FlowPreview::class)
+    private val filteredDishes: StateFlow<List<DishDomain>> =
+        combine(
+            dishes,
+            searchKey.debounce(500).onStart { emit("") }
+        ) { dishes, searchKey ->
+            dishes.filter {
+                it.name.lowercase().contains(searchKey.lowercase())
+            }
+        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-  private fun priceAfterMarginAndTax(
-    totalPrice: Double,
-    margin: Double,
-    tax: Double,
-    amountOfServings: Int
-  ): Double {
-    val priceWithMargin = totalPrice * margin / 100
-    val amountOfTax = priceWithMargin * tax / 100
-    return (priceWithMargin + amountOfTax) * amountOfServings
-  }
-
-  private fun totalPriceOfHalfProduct(
-    pricePerUnit: Double,
-    weight: Double,
-    halfProductUnit: String,
-    halfProductHostUnit: String
-  ): Double {
-    return UnitsUtils.calculatePrice(pricePerUnit, weight, halfProductUnit, halfProductHostUnit)
-  }
+    val filteredDishesInjectedWithAds =
+        filteredDishes.map { dishes ->
+            ListAdsInjectorManager(
+                dishes,
+                Constants.Ads.DISHES_AD_FREQUENCY
+            ).listInjectedWithAds
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = listOf()
+        )
 }

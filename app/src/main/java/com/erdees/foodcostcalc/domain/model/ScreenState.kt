@@ -7,9 +7,11 @@ sealed class InteractionType {
     data object EditTotalPrice : InteractionType()
     data object EditName : InteractionType()
     data class EditItem(val usedItem: UsedItem) : InteractionType()
+    data class EditQuantity(val itemId: Long) : InteractionType()
 
     data object CalculateWaste : InteractionType()
     data object CalculatePiecePrice : InteractionType()
+    data object CreateHalfProduct : InteractionType()
 }
 
 sealed class ScreenState {
