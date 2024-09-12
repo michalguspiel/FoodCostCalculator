@@ -45,8 +45,7 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 @Composable
 fun EditProductScreen(
     providedProduct: ProductDomain,
-    navController: NavController,
-    modifier: Modifier = Modifier
+    navController: NavController
 ) {
     val viewModel: EditProductViewModel = viewModel()
     val screenState by viewModel.screenState.collectAsState()
@@ -67,6 +66,7 @@ fun EditProductScreen(
                     "Success, popping backstack \n" +
                             "Previous backstack entry: ${navController.previousBackStackEntry?.destination?.route} \n"
                 )
+                viewModel.resetScreenState()
                 navController.popBackStack()
             }
 

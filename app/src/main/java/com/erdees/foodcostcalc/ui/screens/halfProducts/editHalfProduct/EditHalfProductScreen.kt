@@ -69,6 +69,7 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
                     "Success, popping backstack \n" +
                             "Previous backstack entry: ${navController.previousBackStackEntry?.destination?.route} \n"
                 )
+                viewModel.resetScreenState()
                 navController.popBackStack()
             }
 

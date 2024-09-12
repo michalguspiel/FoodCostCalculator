@@ -86,6 +86,7 @@ fun EditDishScreen(providedDishDomain: DishDomain, navController: NavController)
                     "Success, popping backstack \n" +
                             "Previous backstack entry: ${navController.previousBackStackEntry?.destination?.route} \n"
                 )
+                viewModel.resetScreenState()
                 navController.popBackStack()
             }
 
