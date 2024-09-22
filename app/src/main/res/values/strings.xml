@@ -3,7 +3,7 @@
     <string name="add_stuff">Add product to your list</string>
     <string name="name">Product name</string>
     <string name="price">Price</string>
-    <string name="tax">Tax %</string>
+    <string name="tax_percent">Tax %</string>
     <string name="waste">Waste %</string>
     <string name="compose">Add product to your dish</string>
     <string name="cancel">Cancel</string>
@@ -54,7 +54,6 @@
     <string name="create_a_new_dish">Create a new dish</string>
     <string name="add_products_to_your_dish">Add products to your dish</string>
     <string name="personalize">Settings</string>
-    <string name="total_price">Total Price:</string>
     <string name="final_price_with_margin_and_tax">Final price with margin and tax:</string>
     <string name="calculate_price_per_piece">Calculate price per piece</string>
     <string name="box_price">Box price</string>
@@ -119,25 +118,44 @@
     <string name="app_info_template">App Version: %1$s\nDeveloper: %2$s</string>
     <string name="settings">Settings</string>
 
+    <string name="ad_attribution">Ad</string>
 
     <!-- COMMON -->
 
     <string name="edit_quantity">Edit quantity</string>
+
+    <string name="edit">Edit</string>
+    <string name="add_items">Add Items</string>
+
+    <string name="expanded">Expanded</string>
+    <string name="collapsed">Collapsed</string>
+
+    <string name="margin">Margin</string>
+    <string name="tax">Tax</string>
 
     <!-- PRODUCTS FEATURE -->
 
     <string name="product_netto_price">Price %1$s netto: %2$s.</string>
     <string name="product_foodcost_price">Price %1$s with foodcost: %2$s.</string>
 
+    <string name="netto_price">Net price %1$s</string>
+    <string name="total_price">Total price %1$s</string>
+
     <!-- HALF PRODUCTS FEATURE -->
 
-    <string name="price_per_unit">Price %1$s:</string>
-    <string name="price_per_recipe">Price per recipe:</string>
+    <string name="price_per_unit">Price %1$s</string>
+    <string name="price_per_recipe">Price per recipe</string>
     <string name="recipe_per_quantity">Recipe per %1$s %2$s of product.</string>
 
     <!-- DISHES FEATURE -->
 
-    <string name="serving_amount">Edit displayed servings</string>
+    <string name="edit_displayed_servings">Edit displayed servings</string>
+    <string name="portions">Portions</string>
+    <string name="margin_value">%1$s \%%</string>
+    <string name="tax_value">%1$s \%%</string>
+    <string name="food_cost">Food cost</string>
+    <string name="final_price">Final price</string>
+    <string name="app_icon">app icon</string>
 
 
 </resources>

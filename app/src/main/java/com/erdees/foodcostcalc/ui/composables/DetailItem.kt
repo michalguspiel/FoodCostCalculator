@@ -23,7 +23,7 @@ fun DetailItem(
   divider: Boolean = true
 ) {
   Column(
-    modifier = modifier.padding(horizontal = 12.dp)
+    modifier = modifier
   ) {
     Text(text = label, style = MaterialTheme.typography.labelSmall)
     Spacer(modifier = Modifier.size(2.dp))

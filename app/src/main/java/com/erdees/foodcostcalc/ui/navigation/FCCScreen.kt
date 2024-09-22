@@ -8,26 +8,29 @@ import kotlinx.serialization.Serializable
 
 // Todo, name as string resource, icon optional
 @Serializable
-sealed class FCCScreen(val name: String, val iconResourceId: Int? = null) {
+sealed class FCCScreen(
+    val name: String,
+    val iconResourceId: Int? = null,
+) {
     /**Bottom nav*/
     @Serializable
-    data object Products : FCCScreen("Products", R.drawable.ic_apple_1_)
+    data object Products : FCCScreen("Products", R.drawable.products)
 
     @Serializable
-    data object HalfProducts : FCCScreen("Half Products", R.drawable.ic_jam)
+    data object HalfProducts : FCCScreen("Half Products", R.drawable.half_products)
 
     @Serializable
-    data object Dishes : FCCScreen("Dishes", R.drawable.ic_food)
+    data object Dishes : FCCScreen("Dishes", R.drawable.dishes)
 
     /** Rest */
     @Serializable
     data object CreateProduct : FCCScreen("Create Product")
 
     @Serializable
-    data object Settings : FCCScreen("Settings", R.drawable.ic_settings)
+    data object Settings : FCCScreen("Settings", R.drawable.settings)
 
     @Serializable
-    data object OnlineData : FCCScreen("Online Data", R.drawable.ic_browser)
+    data object OnlineData : FCCScreen("Online Data", R.drawable.online)
 
     @Serializable
     data class AddItemToHalfProduct(val halfProductDomain: HalfProductDomain) :

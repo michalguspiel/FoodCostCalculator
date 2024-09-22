@@ -46,7 +46,7 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
-import com.erdees.foodcostcalc.ui.composables.AddItemFields
+import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel

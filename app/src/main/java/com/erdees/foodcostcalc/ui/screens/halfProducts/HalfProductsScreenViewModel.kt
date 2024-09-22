@@ -45,7 +45,7 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
                 // Therefore, it should be removed from itemPresentationState map. To be done in 3.1
 
                 listPresentationStateHandler.updatePresentationState(
-                    halfProductsDomain.associate { it.id to ItemPresentationState() }
+                    halfProductsDomain.associate { it.id to ItemPresentationState(quantity = it.totalQuantity) }
                 )
             }
         }.stateIn(
