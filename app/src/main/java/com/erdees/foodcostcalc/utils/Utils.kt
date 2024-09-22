@@ -13,116 +13,97 @@ import java.util.Locale
 
 object Utils {
 
-  /**Because some devices format number with commas which causes errors.*/
-  fun formatResultAndCheckCommas(number: Double): String {
-    val df = DecimalFormat("#.##")
-    df.roundingMode = RoundingMode.CEILING
-    val formattedResult = df.format(number)
-    var formattedResultCheck = ""
-    for (eachChar in formattedResult) {
-      formattedResultCheck += if (eachChar == ',') '.'
-      else eachChar
+    /**Because some devices format number with commas which causes errors.*/
+    fun formatResultAndCheckCommas(number: Double): String {
+        val df = DecimalFormat("#.##")
+        df.roundingMode = RoundingMode.CEILING
+        val formattedResult = df.format(number)
+        var formattedResultCheck = ""
+        for (eachChar in formattedResult) {
+            formattedResultCheck += if (eachChar == ',') '.'
+            else eachChar
+        }
+        return formattedResultCheck
     }
-    return formattedResultCheck
-  }
 
-  fun formatPriceOrWeight(number: Double): String {
-    val df = DecimalFormat("#.##")
-    return df.format(number)
-  }
+    fun formatPriceOrWeight(number: Double): String {
+        val df = DecimalFormat("#.##")
+        return df.format(number)
+    }
 
-  /**
-   * Formats price to currency.
-   *
-   * This function is used in the whole project to get number formatted to currency.
-   * @param number Double
-   * @return String
-   */
-  fun formatPrice(number: Double, context: Context): String {
-    val preferencesDatabase = PreferencesImpl.getInstance(context)
-    val currencyCode = preferencesDatabase.currency?.currencyCode
-    val currency = Currency.getInstance(currencyCode)
-    currencyCode?.let {
-        getLocaleForCurrency(currencyCode)?.let {currencyLocale ->
-        val format = NumberFormat.getCurrencyInstance(currencyLocale)
+    /**
+     * Formats price to currency.
+     *
+     * This function is used in the whole project to get number formatted to currency.
+     * @param number Double
+     * @return String
+     */
+    fun formatPrice(number: Double, context: Context): String {
+        val preferencesDatabase = PreferencesImpl.getInstance(context)
+        val currencyCode = preferencesDatabase.currency?.currencyCode
+        val currency = Currency.getInstance(currencyCode)
+        currencyCode?.let {
+            getLocaleForCurrency(currencyCode)?.let { currencyLocale ->
+                val format = NumberFormat.getCurrencyInstance(currencyLocale)
+                format.currency = currency
+                return format.format(number)
+            }
+        }
+        val format = NumberFormat.getCurrencyInstance()
         format.currency = currency
         return format.format(number)
-      }
     }
-    val format = NumberFormat.getCurrencyInstance()
-    format.currency = currency
-    return format.format(number)
-  }
 
-  private fun getLocaleForCurrency(currencyCode: String): Locale? {
-    val availableLocales = Locale.getAvailableLocales()
-    for (locale in availableLocales) {
-      try {
-        val currency = Currency.getInstance(locale)
-        if (currency.currencyCode == currencyCode) {
-          return locale
+    private fun getLocaleForCurrency(currencyCode: String): Locale? {
+        val availableLocales = Locale.getAvailableLocales()
+        for (locale in availableLocales) {
+            try {
+                val currency = Currency.getInstance(locale)
+                if (currency.currencyCode == currencyCode) {
+                    return locale
+                }
+            } catch (e: Exception) {
+                // Ignore exceptions caused by unsupported locales
+            }
         }
-      } catch (e: Exception) {
-        // Ignore exceptions caused by unsupported locales
-      }
+        return null
     }
-    return null
-  }
 
-  /**Get units preferred by the user.*/
-  fun getUnitsSet(resources: Resources, sharedPreferences: Preferences): Set<String> {
-    var chosenUnits = resources.getStringArray(R.array.piece)
-    if (sharedPreferences.metricUsed) {
-      chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
+    /**Get units preferred by the user.*/
+    fun getUnitsSet(resources: Resources, sharedPreferences: Preferences): Set<String> {
+        var chosenUnits = resources.getStringArray(R.array.piece)
+        if (sharedPreferences.metricUsed) {
+            chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
+        }
+        if (sharedPreferences.imperialUsed) {
+            chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
+        }
+        return chosenUnits.toSet()
     }
-    if (sharedPreferences.imperialUsed) {
-      chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
+
+
+    /**First clears unitList then adds correct units,
+     *  every time data set changes this function is called.*/
+    fun generateUnitSet(
+        unitType: String?,
+        metricEnabled: Boolean,
+        imperialEnabled: Boolean
+    ): Set<String> {
+        val units = mutableSetOf<String>()
+        if (metricEnabled) {
+            when (unitType) {
+                "weight" -> units += setOf("kilogram", "gram")
+                "volume" -> units += setOf("milliliter", "liter")
+                "piece" -> units += "piece"
+            }
+        }
+        if (imperialEnabled) {
+            when (unitType) {
+                "weight" -> units += setOf("pound", "ounce")
+                "volume" -> units += arrayListOf("gallon", "fluid ounce")
+                "piece" -> units += "piece"
+            }
+        }
+        return units
     }
-    return chosenUnits.toSet()
-  }
-
-
-  /**First clears unitList then adds correct units,
-   *  every time data set changes this function is called.*/
-  fun generateUnitSet(
-    unitType: String?,
-    metricEnabled: Boolean,
-    imperialEnabled: Boolean
-  ): Set<String> {
-    val units = mutableSetOf<String>()
-    if (metricEnabled) {
-      when (unitType) {
-        "weight" -> units += setOf("kilogram", "gram")
-        "volume" -> units += setOf("milliliter", "liter")
-        "piece" -> units += "piece"
-      }
-    }
-    if (imperialEnabled) {
-      when (unitType) {
-        "weight" -> units += setOf("pound", "ounce")
-        "volume" -> units += arrayListOf("gallon", "fluid ounce")
-        "piece" -> units += "piece"
-      }
-    }
-    return units
-  }
-
-  fun getBasicRecipeAsPercentageOfTargetRecipe(
-    targetQuantity: Double,
-    entryQuantity: Double
-  ): Double {
-    return entryQuantity * 100 / targetQuantity
-  }
-
-  fun getIngredientForHundredPercentOfRecipe(
-    entryQuantity: Double,
-    basicRecipeAsPercentOfFinalRecipe: Double
-  ): Double {
-    return entryQuantity * 100 / basicRecipeAsPercentOfFinalRecipe
-  }
-
-  fun getPriceForHundredPercentOfRecipe(entryPrice: Double, recipePercentage: Double): Double {
-    return entryPrice * 100 / recipePercentage
-  }
-
 }

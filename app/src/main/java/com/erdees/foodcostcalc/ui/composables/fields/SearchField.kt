@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.composables
+package com.erdees.foodcostcalc.ui.composables.fields
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background

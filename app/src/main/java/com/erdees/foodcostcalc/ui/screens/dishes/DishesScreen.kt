@@ -1,17 +1,23 @@
 package com.erdees.foodcostcalc.ui.screens.dishes
 
 import android.content.Context
-import android.view.LayoutInflater
-import android.view.View
-import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -24,37 +30,39 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidViewBinding
-import androidx.core.content.ContextCompat
-import androidx.core.view.isGone
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.databinding.DishCardViewBinding
-import com.erdees.foodcostcalc.databinding.ListviewDishRowBinding
 import com.erdees.foodcostcalc.domain.model.Ad
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
-import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ad
+import com.erdees.foodcostcalc.ui.composables.DetailItem
+import com.erdees.foodcostcalc.ui.composables.ExpandedIcon
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
-import com.erdees.foodcostcalc.ui.composables.SearchField
 import com.erdees.foodcostcalc.ui.composables.animations.SearchFieldTransition
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCAnimatedFAB
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
+import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
+import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDivider
+import com.erdees.foodcostcalc.ui.composables.fields.SearchField
 import com.erdees.foodcostcalc.ui.composables.rememberNestedScrollConnection
+import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
+import com.erdees.foodcostcalc.ui.composables.rows.IngredientRow
+import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.UnitsUtils
-import com.erdees.foodcostcalc.utils.Utils
-import com.erdees.foodcostcalc.utils.ViewUtils.makeGone
-import com.erdees.foodcostcalc.utils.ViewUtils.makeVisible
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 
 @Composable
@@ -67,18 +75,13 @@ fun DishesScreen(navController: NavController) {
     val screenState by viewModel.screenState.collectAsState()
     val adItems by viewModel.filteredDishesInjectedWithAds.collectAsState()
 
-    Scaffold(
-        modifier = Modifier,
-        floatingActionButton = {
-            FCCAnimatedFAB(isVisible = isVisible.value) {
-                navController.navigate(FCCScreen.CreateDish)
-            }
+    Scaffold(modifier = Modifier, floatingActionButton = {
+        FCCAnimatedFAB(isVisible = isVisible.value) {
+            navController.navigate(FCCScreen.CreateDish)
         }
-    ) { paddingValues ->
+    }) { paddingValues ->
         Box(
-            contentAlignment = Alignment.TopCenter,
-            modifier = Modifier
-                .padding(paddingValues)
+            contentAlignment = Alignment.TopCenter, modifier = Modifier.padding(paddingValues)
         ) {
 
             LazyColumn(
@@ -91,24 +94,19 @@ fun DishesScreen(navController: NavController) {
                     when (item) {
                         is Ad -> {
                             Ad(
+                                modifier = Modifier.padding(vertical = 8.dp),
                                 adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
                                 else Constants.Ads.ADMOB_DISHES_AD_UNIT_ID
                             )
                         }
 
                         is DishDomain -> {
-                            key(item) {
+                            key(item.id) {
                                 val itemPresentationState =
-                                    viewModel
-                                        .listPresentationStateHandler
-                                        .itemsPresentationState
-                                        .collectAsState()
-                                        .value[item.id] ?: ItemPresentationState()
-                                DishItem(
-                                    modifier = Modifier
-                                        .padding(vertical = 8.dp),
+                                    viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState().value[item.id]
+                                        ?: ItemPresentationState()
+                                DishItem(modifier = Modifier.padding(vertical = 8.dp),
                                     dishDomain = item,
-                                    navController = navController,
                                     isExpanded = itemPresentationState.isExpanded,
                                     servings = itemPresentationState.quantity,
                                     onExpandToggle = {
@@ -120,8 +118,17 @@ fun DishesScreen(navController: NavController) {
                                                 InteractionType.EditQuantity(item.id)
                                             )
                                         )
-                                    }
-                                )
+                                    },
+                                    onAddItemsClicked = {
+                                        navController.navigate(
+                                            FCCScreen.AddItemsToDish(
+                                                item.id, item.name
+                                            )
+                                        )
+                                    },
+                                    onEditClicked = {
+                                        navController.navigate(FCCScreen.EditDish(item))
+                                    })
                             }
                         }
                     }
@@ -153,19 +160,14 @@ fun DishesScreen(navController: NavController) {
                         is InteractionType.EditQuantity -> {
                             val itemId = interactionType.itemId
                             val itemPresentationState =
-                                viewModel
-                                    .listPresentationStateHandler
-                                    .itemsPresentationState
-                                    .collectAsState()
-                                    .value[itemId] ?: ItemPresentationState()
-                            val editableQuantity =
-                                remember {
-                                    mutableStateOf(
-                                        itemPresentationState.quantity.toInt().toString()
-                                    )
-                                }
-                            ValueEditDialog(
-                                title = stringResource(id = R.string.serving_amount),
+                                viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState().value[itemId]
+                                    ?: ItemPresentationState()
+                            val editableQuantity = remember {
+                                mutableStateOf(
+                                    itemPresentationState.quantity.toInt().toString()
+                                )
+                            }
+                            ValueEditDialog(title = stringResource(id = R.string.edit_displayed_servings),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 value = editableQuantity.value,
                                 updateValue = { newValue ->
@@ -176,7 +178,8 @@ fun DishesScreen(navController: NavController) {
                                     viewModel.listPresentationStateHandler.updatePresentationQuantity(
                                         itemId, editableQuantity.value
                                     )
-                                }, onDismiss = {
+                                },
+                                onDismiss = {
                                     viewModel.resetScreenState()
                                 })
                         }
@@ -192,155 +195,180 @@ fun DishesScreen(navController: NavController) {
 }
 
 @Composable
-fun DishItem(
+private fun DishItem(
     dishDomain: DishDomain,
-    navController: NavController,
     isExpanded: Boolean,
     servings: Double,
     modifier: Modifier = Modifier,
     onExpandToggle: () -> Unit,
-    onChangeServingsClicked: () -> Unit
+    onChangeServingsClicked: () -> Unit,
+    onAddItemsClicked: () -> Unit,
+    onEditClicked: () -> Unit
 ) {
     val context = LocalContext.current
-    AndroidViewBinding(
-        modifier = modifier,
-        factory = DishCardViewBinding::inflate,
-        onReset = {},
-        onRelease = {},
-        update = {
-            this.dishNameInAdapter.text = dishDomain.name
-            this.dishMarginTvInAdapter.text = (context.getString(
-                R.string.dish_x_margin, String.format(
-                    dishDomain.marginPercent.toString()
-                )
-            ))
-            this.dishTaxTvInAdapter.text = context.getString(
-                R.string.dish_x_tax, String.format(
-                    dishDomain.taxPercent.toString()
-                )
-            )
-            this.totalPriceDishCardView.text =
-                Utils.formatPrice(dishDomain.foodCost * servings, context)
-            this.totalPriceWithMarginDishCardView.text =
-                Utils.formatPrice(dishDomain.totalPrice * servings, context)
 
-            this.howManyServingsTextView.text = if (servings == 1.0) {
-                context.getString(R.string.data_per_serving)
-            } else {
-                context.getString(R.string.data_per_x_servings, servings.toInt().toString())
-            }
+    Card(
+        modifier
+            .fillMaxWidth()
+            .clickable { onExpandToggle() }, content = {
+            Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
+                TitleRow(dishDomain, isExpanded)
 
-            this.howManyServingsTextView.setOnClickListener {
-                onChangeServingsClicked()
-            }
+                DishDetails(dishDomain, onChangeServingsClicked, servings)
 
-            this.editButtonInDishAdapter.setOnClickListener {
-                navController.navigate(
-                    FCCScreen.EditDish(dishDomain)
-                )
-            }
-            this.addProductToDishButton.setOnClickListener {
-                navController.navigate(
-                    FCCScreen.AddItemsToDish(dishId = dishDomain.id, dishName = dishDomain.name)
-                )
-            }
+                Spacer(modifier = Modifier.height(6.dp))
 
-            this.linearLayoutDishCard.setOnClickListener {
-                onExpandToggle()
-            }
+                if (isExpanded) {
+                    Ingredients(dishDomain, servings, context)
+                }
 
-            if (isExpanded) {
-                this.showDishCardElements(dishDomain, servings.toInt(), context)
-            } else {
-                this.hideDishCardElements()
+                PriceSummary(dishDomain = dishDomain, servings = servings.toInt())
+
+                FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
+
+                ButtonRow(primaryButton = {
+                    FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClicked() }
+                }, secondaryButton = {
+                    FCCTextButton(text = stringResource(id = R.string.edit)) { onEditClicked() }
+                })
             }
         })
 }
 
-private fun DishCardViewBinding.showDishCardElements(
+@Composable
+private fun TitleRow(
     dishDomain: DishDomain,
-    servings: Int,
-    context: Context
+    isExpanded: Boolean
 ) {
-    this.ingredientList.makeVisible()
-    this.howManyServingsTextView.makeVisible()
-    setIngredientList(dishDomain, servings, context)
-}
-
-private fun DishCardViewBinding.hideDishCardElements() {
-    this.ingredientList.makeGone()
-    this.howManyServingsTextView.makeGone()
-}
-
-private fun DishCardViewBinding.setIngredientList(
-    dishDomain: DishDomain,
-    servings: Int,
-    context: Context
-) {
-    if (this.ingredientList.isGone) return
-    this.ingredientList.removeAllViews()
-    val ingredients = (dishDomain.products + dishDomain.halfProducts)
-    ingredients.forEachIndexed { index, ingredient ->
-        val row = ListviewDishRowBinding.inflate(LayoutInflater.from(context))
-        when (ingredient) {
-            is UsedHalfProductDomain -> {
-                setRowAsHalfProduct(row, ingredient, servings, context)
-            }
-
-            is UsedProductDomain -> setRowAsProduct(ingredient, row, servings, context)
-        }
-        this.ingredientList.addView(
-            row.root
-        )
-        if (index < ingredients.size - 1) {
-            val divider = View(context)
-            divider.setBackgroundColor(ContextCompat.getColor(context, R.color.gray_200))
-            divider.layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                1
-            )
-            this.ingredientList.addView(
-                divider
-            )
-        }
+    Row(
+        Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.Top
+    ) {
+        Text(text = dishDomain.name, style = MaterialTheme.typography.titleLarge)
+        ExpandedIcon(isExpanded = isExpanded)
     }
 }
 
-private fun setRowAsProduct(
-    product: UsedProductDomain,
-    view: ListviewDishRowBinding,
-    servings: Int,
-    context: Context
+@Composable
+private fun DishDetails(
+    dishDomain: DishDomain,
+    onChangeServingsClicked: () -> Unit,
+    servings: Double
 ) {
-    view.productNameInDishRow.text =
-        product.item.name
-    view.productWeightInDishRow.text =
-        Utils.formatPriceOrWeight(product.quantity * servings)
-    view.productPriceInDishRow.text = Utils.formatPrice(product.totalPrice * servings, context)
-    view.productWeightUnitInDishRow.text =
-        UnitsUtils.getUnitAbbreviation(product.quantityUnit)
+    Row(Modifier, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+        DetailItem(
+            divider = false,
+            label = stringResource(id = R.string.margin),
+            value = stringResource(
+                id = R.string.margin_value, dishDomain.marginPercent.toString()
+            )
+        )
+        DetailItem(
+            divider = false,
+            label = stringResource(id = R.string.tax),
+            value = stringResource(
+                id = R.string.tax_value, dishDomain.taxPercent.toString()
+            )
+        )
+        DetailItem(
+            modifier = Modifier.clickable { onChangeServingsClicked() },
+            divider = false,
+            label = stringResource(id = R.string.portions),
+            value = servings.toInt().toString()
+        )
+    }
 }
 
-private fun setRowAsHalfProduct(
-    view: ListviewDishRowBinding,
-    halfProduct: UsedHalfProductDomain,
-    servings: Int,
+@Composable
+private fun Ingredients(
+    dishDomain: DishDomain,
+    servings: Double,
     context: Context
 ) {
-    view.productNameInDishRow.text =
-        halfProduct.item.name
-    view.productWeightInDishRow.text =
-        (halfProduct.quantity * servings).toString()
-    view.productWeightUnitInDishRow.text =
-        UnitsUtils.getUnitAbbreviation(halfProduct.quantityUnit)
-    setHalfProductRowPrice(servings, halfProduct, view.productPriceInDishRow, context)
+    Column(
+        Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        (dishDomain.products + dishDomain.halfProducts).forEach {
+            IngredientRow(
+                modifier = Modifier.padding(bottom = 4.dp),
+                description = it.item.name,
+                quantity = it.formatQuantityForTargetServing(servings),
+                price = it.formattedTotalPricePerServing(context, servings),
+                style = MaterialTheme.typography.bodyMedium
+            )
+            FCCSecondaryHorizontalDivider()
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+    }
 }
 
-private fun setHalfProductRowPrice(
-    servings: Int,
-    halfProduct: UsedHalfProductDomain,
-    productPriceTextView: TextView,
-    context: Context
-) {
-    productPriceTextView.text = Utils.formatPrice(halfProduct.totalPrice * servings, context)
+@Composable
+private fun PriceSummary(dishDomain: DishDomain, servings: Int, modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    Column {
+        PriceRow(
+            description = stringResource(id = R.string.food_cost),
+            price = dishDomain.formattedTotalPricePerServing(context, servings)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        PriceRow(
+            description = stringResource(id = R.string.final_price),
+            price = dishDomain.formattedTotalPricePerServing(context, servings)
+        )
+    }
+}
+
+@Preview
+@Composable
+fun DishItemPreview() {
+    FCCTheme {
+        Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            DishItem(dishDomain = DishDomain(
+                id = 1,
+                name = "Burger",
+                marginPercent = 320.0,
+                taxPercent = 23.0,
+                halfProducts = emptyList(),
+                products = listOf(
+                    UsedProductDomain(
+                        1,
+                        2,
+                        ProductDomain(1, "Bun", 2.0, 0.5, 5.0, "kg"),
+                        1.0,
+                        "pcs",
+                        1.0,
+                    ), UsedProductDomain(
+                        1,
+                        2,
+                        ProductDomain(2, "Meat Patty", 15.0, 0.5, 5.0, "kg"),
+                        100.0,
+                        "g",
+                        null,
+                    )
+                )
+            ),
+                servings = 1.0,
+                isExpanded = true,
+                onExpandToggle = { },
+                onChangeServingsClicked = { },
+                onAddItemsClicked = { }) {}
+
+            DishItem(dishDomain = DishDomain(
+                id = 1,
+                name = "Salmon with chips",
+                marginPercent = 320.0,
+                taxPercent = 23.0,
+                halfProducts = emptyList(),
+                products = listOf()
+            ),
+                servings = 1.0,
+                isExpanded = false,
+                onExpandToggle = { },
+                onChangeServingsClicked = { },
+                onAddItemsClicked = { }) {}
+        }
+    }
 }

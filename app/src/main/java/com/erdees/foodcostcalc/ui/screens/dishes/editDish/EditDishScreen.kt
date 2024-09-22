@@ -264,6 +264,7 @@ fun DishDetails(
                 label = "Margin",
                 value = "${dishDomain.marginPercent}%",
                 modifier = Modifier
+                    .padding(horizontal = 12.dp)
                     .weight(1f)
                     .clickable {
                         onMarginClick()
@@ -273,6 +274,7 @@ fun DishDetails(
                 label = "Tax",
                 value = "${dishDomain.taxPercent}%",
                 modifier = Modifier
+                    .padding(horizontal = 12.dp)
                     .weight(1f)
                     .clickable {
                         onTaxClick()
@@ -286,12 +288,16 @@ fun DishDetails(
             DetailItem(
                 label = "Food cost",
                 value = Utils.formatPrice(dishDomain.foodCost, context),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .weight(1f)
             )
             DetailItem(
                 label = "Total cost",
                 value = Utils.formatPrice(dishDomain.totalPrice, context),
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .weight(1f)
             )
         }
     }

@@ -43,7 +43,7 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.ui.composables.FCCTextField
+import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
