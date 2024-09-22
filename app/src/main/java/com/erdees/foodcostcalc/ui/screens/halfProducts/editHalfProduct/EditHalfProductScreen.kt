@@ -205,13 +205,21 @@ fun HalfProductDetails(
     Row(modifier) {
         DetailItem(
             label = "Price per recipe",
-            value = halfProductDomain.formattedPricePerRecipe(context,1.0),
-            modifier = Modifier.padding(horizontal = 12.dp).weight(1f)
+            value = halfProductDomain.formattedSingleRecipePrice(context),
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .weight(1f)
         )
         DetailItem(
             label = "Price ${halfProductDomain.halfProductUnit}",
-            value = halfProductDomain.formattedPricePerUnit(context),
-            modifier = Modifier.padding(horizontal = 12.dp).weight(1f)
+            value = halfProductDomain.formattedPricePresentedRecipe(
+                halfProductDomain.totalQuantity,
+                1.0,
+                context
+            ),
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .weight(1f)
         )
     }
 }

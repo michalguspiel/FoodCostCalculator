@@ -1,8 +1,10 @@
 package com.erdees.foodcostcalc.domain.model.product
 
+import android.content.Context
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
+import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.serialization.Serializable
 
 /**
@@ -19,13 +21,19 @@ data class UsedProductDomain(
     val weightPiece: Double?
 ) : UsedItem {
     override val totalPrice = calculatePrice(
-        item.pricePerUnit,
+        item.priceAfterWasteAndTax,
         quantity,
         item.unit,
         quantityUnit,
     )
 
-    val totalWeightForPiece = weightPiece?.let {
-        it * quantity
+    fun formattedTotalPriceForTargetQuantity(
+        baseQuantity: Double,
+        targetQuantity: Double,
+        context: Context
+    ): String {
+        val percentageOfBaseQuantity = targetQuantity * 100 / baseQuantity
+        val adjustedPrice = totalPrice * (percentageOfBaseQuantity / 100)
+        return Utils.formatPrice(adjustedPrice, context)
     }
 }

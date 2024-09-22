@@ -303,7 +303,11 @@ private fun Ingredients(
                     baseQuantity = halfProductDomain.totalQuantity,
                     targetQuantity = quantity
                 ),
-                price = it.formattedTotalPricePerServing(context, quantity),
+                price = it.formattedTotalPriceForTargetQuantity(
+                    context = context,
+                    targetQuantity = quantity,
+                    baseQuantity = halfProductDomain.totalQuantity
+                ),
                 style = MaterialTheme.typography.bodyMedium
             )
             FCCSecondaryHorizontalDivider()
@@ -320,7 +324,11 @@ private fun PriceSummary(
 ) {
     PriceRow(
         description = stringResource(id = R.string.price_per_recipe),
-        price = halfProductDomain.formattedPricePerRecipe(context, quantity)
+        price = halfProductDomain.formattedPricePresentedRecipe(
+            targetQuantity = quantity,
+            baseQuantity = halfProductDomain.totalQuantity,
+            context = context
+        )
     )
     Spacer(modifier = Modifier.height(4.dp))
     PriceRow(
