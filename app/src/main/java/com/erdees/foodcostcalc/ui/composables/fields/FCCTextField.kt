@@ -21,7 +21,7 @@ fun FCCTextField(
     Column {
         FieldLabel(
             text = title,
-            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+            modifier = Modifier.padding(bottom = 4.dp)
         )
         OutlinedTextField(
             modifier = modifier.fillMaxWidth(),

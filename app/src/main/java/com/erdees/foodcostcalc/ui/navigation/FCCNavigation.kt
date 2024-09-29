@@ -23,6 +23,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.addItemToHalfProduct.AddItemToHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfProductScreen
+import com.erdees.foodcostcalc.ui.screens.onlineBackup.DataBackupScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
 import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
@@ -52,8 +53,8 @@ fun FCCNavigation(
         composable<FCCScreen.Settings> {
             SettingsScreen(navController = navController)
         }
-        composable<FCCScreen.OnlineData> {
-            /* TODO: Implement OnlineData screen UI */
+        composable<FCCScreen.DataBackup> {
+            DataBackupScreen(navController = navController)
         }
 
         composable<FCCScreen.AddItemToHalfProduct>(

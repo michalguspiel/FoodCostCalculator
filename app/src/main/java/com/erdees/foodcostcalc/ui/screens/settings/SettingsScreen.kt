@@ -5,16 +5,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -33,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -40,17 +47,23 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
+import com.erdees.foodcostcalc.domain.model.settings.UserSettings
+import com.erdees.foodcostcalc.ui.composables.NavigationListItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
+import com.erdees.foodcostcalc.ui.composables.Section
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
+import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
+import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
+import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(navController: NavController) {
 
@@ -63,10 +76,15 @@ fun SettingsScreen(navController: NavController) {
 
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val settingsSaved = stringResource(id = R.string.settings_saved)
+
     LaunchedEffect(screenState) {
         when (screenState) {
             is ScreenState.Success -> {
-                snackbarHostState.showSnackbar("Settings saved", duration = SnackbarDuration.Short)
+                snackbarHostState.showSnackbar(
+                    message = settingsSaved,
+                    duration = SnackbarDuration.Short
+                )
                 viewModel.resetScreenState()
             }
 
@@ -74,11 +92,46 @@ fun SettingsScreen(navController: NavController) {
         }
     }
 
+    SettingsScreenContent(
+        snackbarHostState,
+        navController,
+        settings,
+        currencies,
+        saveButtonEnabled,
+        screenState,
+        updateDefaultMargin = viewModel::updateDefaultMargin,
+        updateDefaultTax = viewModel::updateDefaultTax,
+        updateMetricUsed = viewModel::updateMetricUsed,
+        updateImperialUsed = viewModel::updateImperialUsed,
+        updateDefaultCurrencyCode = viewModel::updateDefaultCurrencyCode,
+        saveSettings = viewModel::saveSettings,
+        resetScreenState = viewModel::resetScreenState
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun SettingsScreenContent(
+    snackbarHostState: SnackbarHostState,
+    navController: NavController,
+    settings: UserSettings,
+    currencies: Set<Currency>,
+    saveButtonEnabled: Boolean,
+    screenState: ScreenState,
+    updateDefaultTax: (String) -> Unit,
+    updateDefaultMargin: (String) -> Unit,
+    updateMetricUsed: (Boolean) -> Unit,
+    updateImperialUsed: (Boolean) -> Unit,
+    updateDefaultCurrencyCode: (Currency) -> Unit,
+    saveSettings: () -> Unit,
+    resetScreenState: () -> Unit
+) {
+    val scrollState = rememberScrollState()
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(text = "Settings") },
+                title = { Text(text = stringResource(id = R.string.settings)) },
                 navigationIcon = {
                     FCCTopAppBarNavIconButton(navController = navController)
                 }
@@ -88,90 +141,32 @@ fun SettingsScreen(navController: NavController) {
         Box(modifier = Modifier.padding(paddingValues)) {
 
             Column(
-                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(vertical = 24.dp)
-                    .padding(horizontal = 12.dp)
+                    .verticalScroll(scrollState)
             ) {
 
-                Column(
-                    Modifier
-                        .fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    FCCTextField(
-                        title = stringResource(id = R.string.default_dish_tax),
-                        value = settings.defaultTax,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        )
-                    ) {
-                        viewModel.updateDefaultTax(it)
-                    }
+                Defaults(
+                    settings,
+                    currencies,
+                    saveButtonEnabled,
+                    updateDefaultMargin = updateDefaultMargin,
+                    updateDefaultTax = updateDefaultTax,
+                    updateMetricUsed = updateMetricUsed,
+                    updateImperialUsed = updateImperialUsed,
+                    updateDefaultCurrencyCode = updateDefaultCurrencyCode,
+                    saveSettings = saveSettings
+                )
 
-                    FCCTextField(
-                        title = stringResource(id = R.string.default_dish_margin),
-                        value = settings.defaultMargin,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        )
-                    ) {
-                        viewModel.updateDefaultMargin(it)
-                    }
+                Spacer(modifier = Modifier.height(8.dp))
 
-
-                    FieldLabel(text = stringResource(id = R.string.units_section))
-
-                    CheckBoxField(
-                        title = stringResource(id = R.string.use_metric_units),
-                        value = settings.metricUsed,
-                        onValueChange = viewModel::updateMetricUsed
-                    )
-
-                    CheckBoxField(
-                        title = stringResource(id = R.string.use_us_units),
-                        value = settings.imperialUsed,
-                        onValueChange = viewModel::updateImperialUsed
-                    )
-
-
-                    Column {
-                        FieldLabel(text = stringResource(id = R.string.default_currency))
-                        CurrenciesDropDown(
-                            currencies = currencies,
-                            selectedCurrency = settings.currency,
-                            selectCurrency = viewModel::updateDefaultCurrencyCode
-                        )
-                    }
+                OnlineDataBackup {
+                    navController.navigate(FCCScreen.DataBackup)
                 }
 
-
-                Row(
-                    Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Bottom
-                ) {
-                    Text(
-                        stringResource(
-                            id = R.string.app_info_template,
-                            BuildConfig.VERSION_NAME,
-                            "Michał Guśpiel"
-                        ),
-                        style = MaterialTheme.typography.labelSmall
-                    )
-
-
-                    FCCPrimaryButton(
-                        text = stringResource(id = R.string.save),
-                        enabled = saveButtonEnabled
-                    ) {
-                        viewModel.saveSettings()
-                    }
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                AppInformation()
             }
 
 
@@ -185,11 +180,142 @@ fun SettingsScreen(navController: NavController) {
 
                 is ScreenState.Error -> {
                     ErrorDialog {
-                        viewModel.resetScreenState()
+                        resetScreenState()
                     }
                 }
 
                 else -> {}
+            }
+        }
+    }
+}
+
+@Composable
+private fun AppInformation(modifier: Modifier = Modifier) {
+    Section(modifier) {
+        SectionLabel(
+            text = stringResource(id = R.string.about),
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            FieldLabel(text = stringResource(id = R.string.app_version))
+            Text(text = BuildConfig.VERSION_NAME)
+        }
+
+        Spacer(Modifier.height(4.dp))
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            FieldLabel(text = stringResource(id = R.string.build_number))
+            Text(text = BuildConfig.VERSION_CODE.toString())
+        }
+
+        Spacer(Modifier.height(4.dp))
+
+
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            FieldLabel(text = stringResource(id = R.string.developer))
+            Text(text = stringResource(id = R.string.dev_signature))
+        }
+
+    }
+}
+
+@Composable
+private fun OnlineDataBackup(
+    modifier: Modifier = Modifier,
+    onNavigateToOnlineDataBackup: () -> Unit
+) {
+    Section(modifier) {
+        SectionLabel(text = "Data", Modifier.padding(bottom = 4.dp))
+        NavigationListItem(
+            title = stringResource(id = R.string.data_backup),
+            icon = {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.online),
+                    contentDescription = stringResource(id = R.string.data_backup)
+                )
+            }) {
+            onNavigateToOnlineDataBackup()
+        }
+    }
+}
+
+@Composable
+private fun Defaults(
+    settings: UserSettings,
+    currencies: Set<Currency>,
+    saveButtonEnabled: Boolean,
+    modifier: Modifier = Modifier,
+    updateDefaultTax: (String) -> Unit,
+    updateDefaultMargin: (String) -> Unit,
+    updateMetricUsed: (Boolean) -> Unit,
+    updateImperialUsed: (Boolean) -> Unit,
+    updateDefaultCurrencyCode: (Currency) -> Unit,
+    saveSettings: () -> Unit
+) {
+    Section(modifier) {
+        SectionLabel(text = "Your defaults", Modifier.padding(bottom = 4.dp))
+        FCCTextField(
+            title = stringResource(id = R.string.default_dish_tax),
+            value = settings.defaultTax,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            )
+        ) {
+            updateDefaultTax(it)
+        }
+
+        FCCTextField(
+            title = stringResource(id = R.string.default_dish_margin),
+            value = settings.defaultMargin,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            )
+        ) {
+            updateDefaultMargin(it)
+        }
+
+
+        FieldLabel(text = stringResource(id = R.string.units_section))
+
+        CheckBoxField(
+            title = stringResource(id = R.string.use_metric_units),
+            value = settings.metricUsed,
+            onValueChange = { updateMetricUsed(it) }
+        )
+
+        CheckBoxField(
+            title = stringResource(id = R.string.use_us_units),
+            value = settings.imperialUsed,
+            onValueChange = { updateImperialUsed(it) }
+        )
+
+
+        Column {
+            FieldLabel(text = stringResource(id = R.string.default_currency))
+            CurrenciesDropDown(
+                currencies = currencies,
+                selectedCurrency = settings.currency,
+                selectCurrency = { updateDefaultCurrencyCode(it) }
+            )
+        }
+
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            horizontalArrangement = Arrangement.End,
+            verticalAlignment = Alignment.Bottom
+        ) {
+            FCCPrimaryButton(
+                text = stringResource(id = R.string.save),
+                enabled = saveButtonEnabled
+            ) {
+                saveSettings()
             }
         }
     }
@@ -270,6 +396,60 @@ fun CurrenciesDropDown(
                     })
                 }
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewSettingsScreenContent() {
+    FCCTheme {
+        SettingsScreenContent(
+            snackbarHostState = SnackbarHostState(),
+            navController = rememberNavController(),
+            settings = UserSettings(
+                defaultMargin = "10",
+                defaultTax = "10",
+                currency = Currency.getInstance("USD"),
+                metricUsed = true,
+                imperialUsed = false
+            ),
+            currencies = Currency.getAvailableCurrencies(),
+            saveButtonEnabled = true,
+            screenState = ScreenState.Idle,
+            updateDefaultMargin = {},
+            updateDefaultTax = {},
+            updateMetricUsed = {},
+            updateImperialUsed = {},
+            updateDefaultCurrencyCode = {},
+            saveSettings = {},
+            resetScreenState = {}
+        )
+    }
+}
+
+
+@Preview
+@Composable
+fun PreviewDefaults() {
+    FCCTheme {
+        Defaults(
+            settings = UserSettings(
+                defaultMargin = "10",
+                defaultTax = "10",
+                currency = Currency.getInstance("USD"),
+                metricUsed = true,
+                imperialUsed = false
+            ),
+            currencies = Currency.getAvailableCurrencies(),
+            saveButtonEnabled = true,
+            updateDefaultTax = {},
+            updateDefaultMargin = {},
+            updateMetricUsed = {},
+            updateImperialUsed = {},
+            updateDefaultCurrencyCode = {},
+        ) {
+
         }
     }
 }

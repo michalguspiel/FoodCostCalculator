@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.data
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -20,74 +21,78 @@ import com.erdees.foodcostcalc.data.model.associations.ProductHalfProduct
 import java.io.File
 
 @Database(
-  entities = [
-    ProductBase::class,
-    DishBase::class,
-    HalfProductBase::class,
+    entities = [
+        ProductBase::class,
+        DishBase::class,
+        HalfProductBase::class,
 
-    ProductDish::class,
-    ProductHalfProduct::class,
-    HalfProductDish::class,
-  ],
-  version = 2, exportSchema = true,
-  views = [],
+        ProductDish::class,
+        ProductHalfProduct::class,
+        HalfProductDish::class,
+    ],
+    version = 2, exportSchema = true,
+    views = [],
 
-  )
+    )
 abstract class AppRoomDataBase : RoomDatabase() {
 
-  abstract fun productDao(): ProductDao
-  abstract fun dishDao(): DishDao
-  abstract fun halfProductDao(): HalfProductDao
-  abstract fun productDishDao(): ProductDishDao
-  abstract fun halfProductDishDao(): HalfProductDishDao
-  abstract fun productHalfProductDao(): ProductHalfProductDao
+    abstract fun productDao(): ProductDao
+    abstract fun dishDao(): DishDao
+    abstract fun halfProductDao(): HalfProductDao
+    abstract fun productDishDao(): ProductDishDao
+    abstract fun halfProductDishDao(): HalfProductDishDao
+    abstract fun productHalfProductDao(): ProductHalfProductDao
 
-  /**Singleton of database.*/
-  companion object {
+    /**Singleton of database.*/
+    companion object {
 
-    private const val name = "product_database"
+        const val NAME = "product_database"
 
-    @Volatile
-    private var INSTANCE: AppRoomDataBase? = null
+        @Volatile
+        private var INSTANCE: AppRoomDataBase? = null
 
-    private fun migrations() = arrayOf(
-      Migration_1to2_RefactorDatabase(),
-    )
-
-    fun getDatabase(context: Context): AppRoomDataBase {
-      val tempInstance = INSTANCE
-      if (tempInstance != null) {
-        return tempInstance
-      }
-      synchronized(this) {
-        val instance = Room.databaseBuilder(
-          context.applicationContext,
-          AppRoomDataBase::class.java,
-          name
+        private fun migrations() = arrayOf(
+            Migration_1to2_RefactorDatabase(),
         )
-          .addMigrations(*migrations())
-          .allowMainThreadQueries()
-          .build()
-        INSTANCE = instance
-        return instance
-      }
-    }
 
-    fun recreateDatabaseFromFile(context: Context, file: File) {
-      INSTANCE?.close()
-      INSTANCE = null
-      synchronized(this) {
-        val instance = Room.databaseBuilder(
-          context.applicationContext,
-          AppRoomDataBase::class.java,
-          name
-        )
-          .addMigrations(*migrations())
-          .createFromFile(file)
-          .build()
-        INSTANCE = instance
-      }
-    }
+        fun getDatabase(context: Context): AppRoomDataBase {
+            val tempInstance = INSTANCE
+            if (tempInstance != null) {
+                return tempInstance
+            }
+            synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AppRoomDataBase::class.java,
+                    NAME
+                )
+                    .addMigrations(*migrations())
+                    .build()
+                INSTANCE = instance
+                return instance
+            }
+        }
 
-  }
+        fun recreateDatabaseFromFile(context: Context, file: File, callback: Callback) {
+            destroyInstance()
+            synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AppRoomDataBase::class.java,
+                    NAME
+                )
+                    .addMigrations(*migrations())
+                    .addCallback(callback)
+                    .createFromFile(file)
+                    .build()
+                instance.openHelper.writableDatabase // Forces an Open
+                INSTANCE = instance
+            }
+        }
+
+        fun destroyInstance(){
+            INSTANCE?.close()
+            INSTANCE = null
+        }
+    }
 }

@@ -173,9 +173,9 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
 
 
             when (screenState) {
-                ScreenState.Success -> {}
+                is ScreenState.Success -> {}
                 is ScreenState.Error -> {}
-                ScreenState.Loading -> {
+                is ScreenState.Loading -> {
                     ScreenLoadingOverlay()
                 }
 
@@ -234,7 +234,7 @@ fun CalculateWasteDialog(
         modifier = modifier,
         title = "Count waste",
         onDismiss = { onDismiss() },
-        onSave = { onSave(totalQuantity.toDoubleOrNull(), wasteQuantity.toDoubleOrNull()) }) {
+        onPrimaryButtonClicked = { onSave(totalQuantity.toDoubleOrNull(), wasteQuantity.toDoubleOrNull()) }) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
             FCCTextField(
@@ -281,7 +281,7 @@ fun CalculatePiecePriceDialog(
         modifier = modifier,
         title = "Count waste",
         onDismiss = { onDismiss() },
-        onSave = { onSave(boxPrice.toDoubleOrNull(), quantityInBox.toIntOrNull()) }) {
+        onPrimaryButtonClicked = { onSave(boxPrice.toDoubleOrNull(), quantityInBox.toIntOrNull()) }) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
             FCCTextField(

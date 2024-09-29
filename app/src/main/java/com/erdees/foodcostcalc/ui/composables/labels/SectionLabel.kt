@@ -6,10 +6,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun FieldLabel(text: String, modifier: Modifier = Modifier) {
-  Text(
-    text = text,
-    style = MaterialTheme.typography.labelSmall,
-    modifier = modifier
-  )
+fun SectionLabel(text: String, modifier: Modifier = Modifier) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.labelLarge,
+        modifier = modifier
+    )
 }

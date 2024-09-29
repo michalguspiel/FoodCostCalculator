@@ -82,7 +82,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
 
     /** Saves settings to preferences. */
     fun saveSettings() {
-        _screenState.value = ScreenState.Loading
+        _screenState.value = ScreenState.Loading()
         viewModelScope.launch {
             preferences.defaultMargin = _settingsModel.value.defaultMargin
             preferences.defaultTax = _settingsModel.value.defaultTax
@@ -90,7 +90,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
             preferences.metricUsed = _settingsModel.value.metricUsed
             preferences.imperialUsed = _settingsModel.value.imperialUsed
         }
-        _screenState.value = ScreenState.Success
+        _screenState.value = ScreenState.Success()
     }
 
     val saveButtonEnabled = _settingsModel.map {

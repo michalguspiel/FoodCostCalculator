@@ -131,11 +131,11 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
             weightPiece = pieceQuantity
         )
 
-        _screenState.value = ScreenState.Loading
+        _screenState.value = ScreenState.Loading()
         viewModelScope.launch {
             try {
                 halfProductRepository.addProductHalfProduct(productHalfProduct)
-                _screenState.value = ScreenState.Success
+                _screenState.value = ScreenState.Success()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
