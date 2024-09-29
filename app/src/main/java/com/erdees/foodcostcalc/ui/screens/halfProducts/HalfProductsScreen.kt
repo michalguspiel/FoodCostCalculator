@@ -159,7 +159,7 @@ fun HalfProductsScreen(navController: NavController) {
 
         when (screenState) {
 
-            ScreenState.Loading -> {
+            is ScreenState.Loading -> {
                 ScreenLoadingOverlay()
             }
 

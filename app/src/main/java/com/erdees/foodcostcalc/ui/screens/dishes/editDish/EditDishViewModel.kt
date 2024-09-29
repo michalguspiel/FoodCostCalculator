@@ -177,11 +177,11 @@ class EditDishViewModel : ViewModel(), KoinComponent {
     }
 
     fun deleteDish(dishId: Long) {
-        _screenState.value = ScreenState.Loading
+        _screenState.value = ScreenState.Loading()
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 dishRepository.deleteDish(dishId)
-                _screenState.value = ScreenState.Success
+                _screenState.value = ScreenState.Success()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
@@ -211,7 +211,7 @@ class EditDishViewModel : ViewModel(), KoinComponent {
      */
     fun saveDish() {
         val dish = dish.value ?: return
-        _screenState.value = ScreenState.Loading
+        _screenState.value = ScreenState.Loading()
         viewModelScope.launch(Dispatchers.Default) {
 
             val editedProducts =
@@ -239,7 +239,7 @@ class EditDishViewModel : ViewModel(), KoinComponent {
 
                     dishRepository.updateDish(this@EditDishViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
                 }
-                _screenState.value = ScreenState.Success
+                _screenState.value = ScreenState.Success()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }

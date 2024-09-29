@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import com.erdees.foodcostcalc.ui.screens.FCCHostScreen
@@ -15,6 +16,7 @@ class FCCActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.i("FCCActivity", "onCreate")
 
         CoroutineScope(Dispatchers.IO).launch {
             val testDevices = listOf(

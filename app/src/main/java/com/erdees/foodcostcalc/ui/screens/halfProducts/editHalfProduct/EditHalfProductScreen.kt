@@ -143,7 +143,7 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
             }
 
             when (screenState) {
-                ScreenState.Loading -> {
+                is ScreenState.Loading -> {
                     ScreenLoadingOverlay()
                 }
 
@@ -153,7 +153,7 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
                     }
                 }
 
-                ScreenState.Success -> {
+                is ScreenState.Success -> {
                     // TODO()
                 }
 

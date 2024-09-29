@@ -24,8 +24,9 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 fun FCCDialog(
     title: String,
     modifier: Modifier = Modifier,
+    primaryButtonText: String = "Save",
     onDismiss: () -> Unit,
-    onSave: () -> Unit,
+    onPrimaryButtonClicked: () -> Unit,
     content: @Composable () -> Unit
 ) {
     BasicAlertDialog(
@@ -47,8 +48,8 @@ fun FCCDialog(
 
             Spacer(modifier = Modifier.size(24.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                FCCTextButton(text = "Save") {
-                    onSave()
+                FCCTextButton(text = primaryButtonText) {
+                    onPrimaryButtonClicked()
                 }
             }
         }
