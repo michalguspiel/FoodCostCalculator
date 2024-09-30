@@ -1,0 +1,43 @@
+@startuml
+
+entity "Product" as p {
+    *product_id : number
+    *name : text
+    *pricePerUnit : number
+    *tax : number
+    *waste : number
+    *unit : text
+}
+
+entity "UsedProduct" as up {
+    *product : Product
+    *quantity: number,
+    *quantityUnit: text
+    *weightPiece: Double?
+}
+
+entity "HalfProduct" as hp {
+    *half_product_id : number
+    *name : text
+    *halfProductUnit : text
+    *products : Product[]
+}
+
+entity "UsedHalfProduct" as uhp {
+    *halfProduct : HalfProduct
+    *quantity: number
+    *quantityUnit: text
+}
+
+entity "Dish" as d {
+    *dish_id : number
+    *name : text
+    *marginPercent : number
+    *dishTax : number
+    *products : Product[]
+    *halfProducts : HalfProduct[]
+    --
+    +totalCost : number
+}
+
+@enduml

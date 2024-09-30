@@ -3,10 +3,10 @@
     <string name="add_stuff">Add product to your list</string>
     <string name="name">Product name</string>
     <string name="price">Price</string>
-    <string name="tax">Tax %</string>
+    <string name="tax_percent">Tax %</string>
     <string name="waste">Waste %</string>
     <string name="compose">Add product to your dish</string>
-    <string name ="cancel">Cancel</string>
+    <string name="cancel">Cancel</string>
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="are_you_sure">Are You sure?</string>
@@ -45,20 +45,16 @@
     <string name="search_button">search button</string>
     <string name="open_side_menu_button">open side menu button</string>
     <string name="search_by_name">Search…</string>
+    <string name="search_bar">search bar</string>
     <string name="cancel_search">cancel search</string>
     <string name="dish_tax">dish tax</string>
-    <string name="products">Products</string>
-    <string name="dishes">Dishes</string>
     <string name="add_product">Add product</string>
     <string name="create_a_new_dish">Create a new dish</string>
     <string name="add_products_to_your_dish">Add products to your dish</string>
-    <string name="personalize">Settings</string>
-    <string name="total_price">Total Price:</string>
     <string name="final_price_with_margin_and_tax">Final price with margin and tax:</string>
     <string name="calculate_price_per_piece">Calculate price per piece</string>
     <string name="box_price">Box price</string>
     <string name="quantity">Quantity</string>
-    <string name="half_products">Half products</string>
     <string name="got_it">Got it!</string>
     <string name="half_product">Half product</string>
     <string name="half_product_name">Half product name</string>
@@ -85,10 +81,9 @@
     <string name="you_must_pick_product">You must pick a product.</string>
     <string name="select_product">Select product</string>
     <string name="select_dish">Select dish</string>
-    <string name="serving_amount">Serving amount</string>
+
 
     <string name="product_added">%1$s added!</string>
-    <string name="okay">Okay</string>
     <string name="successful_creation_message">%1$s created successfully!</string>
     <string name="cannot_make_nameless_dish">Cannot make nameless dish!</string>
     <string name="cannot_make_nameless_half_product">"Cannot make nameless half product!"</string>
@@ -109,13 +104,89 @@
     <string name="settings_failed_margin_missing">Default margin missing.</string>
     <string name="settings_failed_units_missing">At least one unit system must be checked.</string>
 
-    <string name="default_dish_tax">Default dish tax</string>
+    <string name="default_dish_tax">Default dish tax %</string>
     <string name="default_dish_tax_hint">Tax %</string>
-    <string name="default_dish_margin">Default dish margin</string>
+    <string name="default_dish_margin">Default dish margin %</string>
     <string name="default_dish_margin_hint">Margin %</string>
     <string name="units_section">Units</string>
     <string name="default_currency">Default currency</string>
     <string name="app_info_template">App Version: %1$s\nDeveloper: %2$s</string>
+
+    <string name="ad_attribution">Ad</string>
+
+    <!-- Navigation -->
+    <string name="products">Products</string>
+    <string name="half_products">Half Products</string>
+    <string name="dishes">Dishes</string>
+
+    <!-- COMMON -->
+
+    <string name="edit_quantity">Edit quantity</string>
+
+    <string name="edit">Edit</string>
+    <string name="add_items">Add Items</string>
+
+    <string name="expanded">Expanded</string>
+    <string name="collapsed">Collapsed</string>
+
+    <string name="margin">Margin</string>
+    <string name="tax">Tax</string>
+
+    <string name="okay">Okay</string>
+    <string name="success">Success</string>
+    <string name="error">Error</string>
+
+    <!-- PRODUCTS FEATURE -->
+
+    <string name="product_netto_price">Price %1$s netto: %2$s.</string>
+    <string name="product_foodcost_price">Price %1$s with foodcost: %2$s.</string>
+
+    <string name="netto_price">Net price %1$s</string>
+    <string name="total_price">Total price %1$s</string>
+
+    <!-- HALF PRODUCTS FEATURE -->
+
+    <string name="price_per_unit">Price %1$s</string>
+    <string name="price_per_recipe">Price per recipe</string>
+    <string name="recipe_per_quantity">Recipe per %1$s %2$s of product.</string>
+
+    <!-- DISHES FEATURE -->
+
+    <string name="edit_displayed_servings">Edit displayed servings</string>
+    <string name="portions">Portions</string>
+    <string name="margin_value">%1$s \%%</string>
+    <string name="tax_value">%1$s \%%</string>
+    <string name="food_cost">Food cost</string>
+    <string name="final_price">Final price</string>
+    <string name="app_icon">app icon</string>
+
+    <!-- SETTINGS -->
     <string name="settings">Settings</string>
+    <string name="about">About</string>
+    <string name="developer">Developer</string>
+    <string name="dev_signature">Michał Guśpiel</string>
+    <string name="app_version">Version</string>
+    <string name="build_number">Build Number</string>
+    <string name="settings_saved">Settings saved!</string>
+
+    <!-- DATA BACKUP -->
+    <string name="db_loading_in_progress">Database loading in progress.\nDo not close application.</string>
+    <string name="db_saving_in_progress">Database saving in progress.\nDo not close application.</string>
+    <string name="operation_in_progress">Operation in progress.\nDo not close application.</string>
+    <string name="db_loaded_successfully">Database loaded successfully!</string>
+    <string name="db_saved_successfully">Database saved successfully!</string>
+    <string name="operation_successful">Operation successful!</string>
+
+    <string name="data_backup">Data Backup</string>
+    <string name="save_database">Save Database</string>
+    <string name="data_backup_save">Save</string>
+    <string name="disclaimer_save_db">Saving the database will replace your previous backup. This operation is destructive and cannot be rolled back.</string>
+    <string name="load_database">Load Database</string>
+    <string name="load">Load</string>
+    <string name="disclaimer_load_db">Loading the database will replace your current data with the remote backup. This operation is destructive and cannot be rolled back.</string>
+    <string name="disclaimer_sign_in">Please sign in with your Google account to store the backup in your Google Drive.</string>
+    <string name="sign_in">Sign in</string>
+    <string name="sign_field_title">Google Account</string>
+    <string name="sign_out">Sign out</string>
 
 </resources>

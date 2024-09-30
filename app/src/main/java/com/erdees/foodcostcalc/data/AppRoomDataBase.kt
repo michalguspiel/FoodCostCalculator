@@ -1,49 +1,60 @@
 package com.erdees.foodcostcalc.data
 
 import android.content.Context
+import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import com.erdees.foodcostcalc.data.dish.DishDao
-import com.erdees.foodcostcalc.data.grandDish.GrandDishDao
-import com.erdees.foodcostcalc.data.halfProductIncludedInDish.HalfProductIncludedInDishDao
-import com.erdees.foodcostcalc.data.halfProductWithProductsIncluded.HalfProductWithProductsIncludedDao
-import com.erdees.foodcostcalc.data.halfproduct.HalfProductDao
-import com.erdees.foodcostcalc.data.product.ProductDao
-import com.erdees.foodcostcalc.data.productIncluded.ProductIncludedDao
-import com.erdees.foodcostcalc.data.productIncludedInHalfProduct.ProductIncludedInHalfProductDao
-import com.erdees.foodcostcalc.domain.model.dish.DishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductIncludedInDishModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductModel
-import com.erdees.foodcostcalc.domain.model.halfProduct.ProductIncludedInHalfProduct
-import com.erdees.foodcostcalc.domain.model.product.ProductIncluded
-import com.erdees.foodcostcalc.domain.model.product.ProductModel
+import com.erdees.foodcostcalc.data.db.dao.dish.DishDao
+import com.erdees.foodcostcalc.data.db.dao.dish.HalfProductDishDao
+import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
+import com.erdees.foodcostcalc.data.db.dao.halfproduct.HalfProductDao
+import com.erdees.foodcostcalc.data.db.dao.halfproduct.ProductHalfProductDao
+import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
+import com.erdees.foodcostcalc.data.db.migrations.Migration_1to2_RefactorDatabase
+import com.erdees.foodcostcalc.data.model.DishBase
+import com.erdees.foodcostcalc.data.model.HalfProductBase
+import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
+import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.associations.ProductDish
+import com.erdees.foodcostcalc.data.model.associations.ProductHalfProduct
 import java.io.File
 
 @Database(
     entities = [
-        ProductModel::class, DishModel::class,
-        ProductIncluded::class,
-        HalfProductModel::class,
-        ProductIncludedInHalfProduct::class,
-        HalfProductIncludedInDishModel::class,
-    ], version = 1, exportSchema = true
-)
+        ProductBase::class,
+        DishBase::class,
+        HalfProductBase::class,
+
+        ProductDish::class,
+        ProductHalfProduct::class,
+        HalfProductDish::class,
+    ],
+    version = 2, exportSchema = true,
+    views = [],
+
+    )
 abstract class AppRoomDataBase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
     abstract fun dishDao(): DishDao
     abstract fun halfProductDao(): HalfProductDao
-    abstract fun productIncludedInHalfProductDao(): ProductIncludedInHalfProductDao
-    abstract fun halfProductWithProductsIncludedDao(): HalfProductWithProductsIncludedDao
-    abstract fun halfProductIncludedInDishDao() : HalfProductIncludedInDishDao
-    abstract fun productIncludedDao() : ProductIncludedDao
-    abstract fun grandDishDao() : GrandDishDao
+    abstract fun productDishDao(): ProductDishDao
+    abstract fun halfProductDishDao(): HalfProductDishDao
+    abstract fun productHalfProductDao(): ProductHalfProductDao
 
     /**Singleton of database.*/
     companion object {
+
+        const val NAME = "product_database"
+
         @Volatile
         private var INSTANCE: AppRoomDataBase? = null
+
+        private fun migrations() = arrayOf(
+            Migration_1to2_RefactorDatabase(),
+        )
+
         fun getDatabase(context: Context): AppRoomDataBase {
             val tempInstance = INSTANCE
             if (tempInstance != null) {
@@ -53,23 +64,35 @@ abstract class AppRoomDataBase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AppRoomDataBase::class.java,
-                    "product_database"
-                ).allowMainThreadQueries()
+                    NAME
+                )
+                    .addMigrations(*migrations())
                     .build()
                 INSTANCE = instance
                 return instance
             }
         }
-        fun recreateDatabaseFromFile(context: Context, file : File){
-            INSTANCE?.close()
-            INSTANCE = null
-            synchronized(this){
-            val instance = Room.databaseBuilder(context.applicationContext,AppRoomDataBase::class.java,"product_database")
-                .createFromFile(file)
-                .build()
-            INSTANCE = instance
-        }
+
+        fun recreateDatabaseFromFile(context: Context, file: File, callback: Callback) {
+            destroyInstance()
+            synchronized(this) {
+                val instance = Room.databaseBuilder(
+                    context.applicationContext,
+                    AppRoomDataBase::class.java,
+                    NAME
+                )
+                    .addMigrations(*migrations())
+                    .addCallback(callback)
+                    .createFromFile(file)
+                    .build()
+                instance.openHelper.writableDatabase // Forces an Open
+                INSTANCE = instance
+            }
         }
 
+        fun destroyInstance(){
+            INSTANCE?.close()
+            INSTANCE = null
+        }
     }
 }

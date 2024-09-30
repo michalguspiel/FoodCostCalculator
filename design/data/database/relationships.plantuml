@@ -1,0 +1,32 @@
+@startuml
+
+entity "ProductBase" as p
+entity "Product_HalfProduct" as php
+entity "HalfProductBase" as hp
+entity "Product_Dish" as pd
+entity "HalfProduct_Dish" as hpd
+entity "DishBase" as d
+
+entity "ProductUsedInDish" as puid <<View>>
+entity "ProductUsedInHalfProduct" as puihp <<View>>
+entity "CompleteHalfProduct" as chp <<View>>
+entity "HalfProductUsedInDish" as hpdchp <<View>>
+entity "CompleteDish" as cd <<View>>
+
+puid --|> p 
+puid --|> pd 
+
+puihp --|> p 
+puihp --|> php 
+
+chp --|> hp 
+chp --|> puihp 
+
+hpdchp --|> hpd 
+hpdchp --|> chp 
+
+cd --|> d 
+cd --|> puid 
+cd --|> hpdchp 
+
+@enduml
