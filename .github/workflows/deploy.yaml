@@ -1,4 +1,4 @@
-name: Quizzer-Android-CD-Prod
+name: Release to internal testing
 
 on:
   workflow_dispatch:
