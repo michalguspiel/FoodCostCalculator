@@ -35,12 +35,14 @@ android {
         }
     }
 
+    def keystoreFile = file("demo.keystore")
+
     signingConfigs {
         create("demo") {
             keyAlias localProperties.getProperty("keyAlias")
             keyPassword localProperties.getProperty("keyPassword")
-            storeFile file("demo.keystore")
             storePassword localProperties.getProperty("storePassword")
+            storeFile keystoreFile
         }
     }
 
@@ -64,12 +66,20 @@ android {
 
         create("demo") {
             initWith(release)
-            signingConfig signingConfigs.demo
+            if (keystoreFile.exists()) {
+                signingConfig signingConfigs.demo
+            } else {
+                signingConfig signingConfigs.debug
+            }
         }
 
         create("signedDebug") {
             initWith(debug)
-            signingConfig signingConfigs.demo
+            if (keystoreFile.exists()) {
+                signingConfig signingConfigs.demo
+            } else {
+                signingConfig signingConfigs.debug
+            }
         }
     }
     compileOptions {
