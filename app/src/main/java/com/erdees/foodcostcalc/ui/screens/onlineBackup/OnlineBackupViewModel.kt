@@ -11,9 +11,12 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.domain.model.FCCUser
 import com.erdees.foodcostcalc.domain.model.Operation
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.errors.DownloadFailure
 import com.erdees.foodcostcalc.domain.model.errors.DrivePermissionFailure
+import com.erdees.foodcostcalc.domain.model.errors.DriveQueryFailure
+import com.erdees.foodcostcalc.domain.model.errors.DriveSetupFailure
 import com.erdees.foodcostcalc.domain.model.errors.FailedToSignOut
-import com.erdees.foodcostcalc.domain.model.errors.NoFileError
+import com.erdees.foodcostcalc.domain.model.errors.NoDatabaseFileError
 import com.erdees.foodcostcalc.domain.model.errors.SavingDatabaseFailure
 import com.erdees.foodcostcalc.ui.MyApplication
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -133,14 +136,14 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
     private suspend fun loadFileFromDrive(context: Context) {
         val file = File(context.getExternalFilesDir(null), AppRoomDataBase.NAME)
         val driveServiceHelper = driveServiceHelper ?: run {
-            handleFailure(SavingDatabaseFailure, null)
+            handleFailure(DriveSetupFailure, null)
             return
         }
         val result = driveServiceHelper.queryFiles()
 
         val files = result.getOrNull()
         if (files == null) {
-            handleFailure(NoFileError, null)
+            handleFailure(NoDatabaseFileError, null)
             return
         }
 
@@ -153,7 +156,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
         file: File
     ) {
         if (fileList.files.isEmpty()) {
-            handleFailure(NoFileError, null)
+            handleFailure(NoDatabaseFileError, null)
             return
         }
         val database = fileList.files.first()
@@ -161,7 +164,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
         val result = downloadFile(file, database.id)
         when {
             result.isSuccess -> swapDatabaseFiles(file, context)
-            result.isFailure -> handleFailure(NoFileError, null)
+            result.isFailure -> handleFailure(DownloadFailure, null)
         }
     }
 
@@ -202,12 +205,12 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
 
     private suspend fun upsertDatabaseInDrive(context: Context) {
         val driveServiceHelper = driveServiceHelper ?: run {
-            handleFailure(SavingDatabaseFailure, null)
+            handleFailure(DriveSetupFailure, null)
             return
         }
         val result = driveServiceHelper.queryFiles()
         if (result.isFailure) {
-            handleFailure(SavingDatabaseFailure, null)
+            handleFailure(DriveQueryFailure, null)
             return
         }
 
