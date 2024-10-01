@@ -23,3 +23,7 @@
 -dontwarn org.apache.commons.**
 -keep class org.apache.http.** { *; }
 -dontwarn org.apache.http.**
+
+-keep class com.google.** { *; }
+-keep class com.google.api.client.googleapis.** { *; }
+-keep class com.google.api.services.drive.** { *; }

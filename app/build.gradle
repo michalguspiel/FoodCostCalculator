@@ -1,156 +1,179 @@
 plugins {
-  id 'com.android.application'
-  id 'kotlin-android'
-  id 'com.google.gms.google-services'
-  id 'com.google.devtools.ksp'
-  id 'androidx.room'
-  id 'kotlinx-serialization'
-  id 'kotlin-parcelize'
-  id("org.jetbrains.kotlin.plugin.compose") version "2.0.10" // this version matches your Kotlin version
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'com.google.gms.google-services'
+    id 'com.google.devtools.ksp'
+    id 'androidx.room'
+    id 'kotlinx-serialization'
+    id 'kotlin-parcelize'
+    id("org.jetbrains.kotlin.plugin.compose") version "2.0.10"
+    // this version matches your Kotlin version
 }
 
 android {
-  buildFeatures {
-    viewBinding true
-    compose true
-  }
+    def localProperties = new Properties()
+    localProperties.load(project.rootProject.file('local.properties').newDataInputStream())
 
-  composeOptions {
-    kotlinCompilerExtensionVersion = "1.5.15"
-  }
-
-  packagingOptions {
-    resources {
-      excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/license.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/notice.txt', 'META-INF/ASL2.0']
+    buildFeatures {
+        viewBinding true
+        compose true
     }
-  }
 
-  defaultConfig {
-    compileSdk = 35
-    applicationId "com.erdees.foodcostcalc"
-    minSdkVersion 24
-    targetSdkVersion 34
-    versionCode version_code.toInteger()
-    versionName version_name
-    multiDexEnabled true
-    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-  }
-
-  buildTypes {
-    release {
-      minifyEnabled true
-      shrinkResources true
-      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.15"
     }
-  }
-  compileOptions {
-    sourceCompatibility JavaVersion.VERSION_17
-    targetCompatibility JavaVersion.VERSION_17
-  }
-  kotlinOptions {
-    jvmTarget = '17'
-  }
-  configurations {
-    all {
-      exclude module: 'httpclient'
+
+    packagingOptions {
+        resources {
+            excludes += ['META-INF/DEPENDENCIES', 'META-INF/LICENSE', 'META-INF/LICENSE.txt', 'META-INF/license.txt', 'META-INF/NOTICE', 'META-INF/NOTICE.txt', 'META-INF/notice.txt', 'META-INF/ASL2.0']
+        }
     }
-  }
-  namespace 'com.erdees.foodcostcalc'
 
-  room {
-    schemaDirectory "$projectDir/schemas"
-  }
+    signingConfigs {
+        create("demo") {
+            keyAlias localProperties.getProperty("keyAlias")
+            keyPassword localProperties.getProperty("keyPassword")
+            storeFile file("demo.keystore")
+            storePassword localProperties.getProperty("storePassword")
+        }
+    }
 
-  sourceSets {
-    // Adds exported schema location as test app assets.
-    androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
-  }
+    defaultConfig {
+        compileSdk = 35
+        applicationId "com.erdees.foodcostcalc"
+        minSdkVersion 24
+        targetSdkVersion 34
+        versionCode version_code.toInteger()
+        versionName version_name
+        multiDexEnabled true
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
 
-  testOptions {
-    unitTests.returnDefaultValues = true
-  }
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+
+        create("demo") {
+            initWith(release)
+            signingConfig signingConfigs.demo
+        }
+
+        create("signedDebug") {
+            initWith(debug)
+            signingConfig signingConfigs.demo
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+    configurations {
+        all {
+            exclude module: 'httpclient'
+        }
+    }
+    namespace 'com.erdees.foodcostcalc'
+
+    room {
+        schemaDirectory "$projectDir/schemas"
+    }
+
+    sourceSets {
+        // Adds exported schema location as test app assets.
+        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
 
 }
 
 dependencies {
 
 
-  // Compose
-  def composeBom = platform('androidx.compose:compose-bom:2024.09.02')
+    // Compose
+    def composeBom = platform('androidx.compose:compose-bom:2024.09.02')
 
-  implementation composeBom
-  androidTestImplementation composeBom
+    implementation composeBom
+    androidTestImplementation composeBom
 
-  implementation 'androidx.compose.material3:material3'
-  implementation 'androidx.compose.material:material-icons-core'
-  implementation 'androidx.lifecycle:lifecycle-viewmodel-compose'
-  implementation 'androidx.activity:activity-compose'
-  implementation "androidx.navigation:navigation-compose:2.8.0-beta07"
-  implementation 'androidx.compose.ui:ui-viewbinding'
-  implementation("io.coil-kt:coil-compose:2.7.0")
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.material:material-icons-core'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-compose'
+    implementation 'androidx.activity:activity-compose'
+    implementation "androidx.navigation:navigation-compose:2.8.0-beta07"
+    implementation 'androidx.compose.ui:ui-viewbinding'
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
-  // Android Studio Preview support
-  implementation 'androidx.compose.ui:ui-tooling-preview'
-  debugImplementation 'androidx.compose.ui:ui-tooling'
+    // Android Studio Preview support
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
 
-  // UI Tests
-  androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
-  debugImplementation 'androidx.compose.ui:ui-test-manifest'
+    // UI Tests
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
 
-  implementation 'androidx.appcompat:appcompat:1.7.0'
-  implementation 'com.google.android.material:material:1.12.0'
-  implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'com.google.android.material:material:1.12.0'
+    implementation 'androidx.core:core-ktx:1.13.1'
 
-  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
-  implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-  implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3"
-  implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
-  // Room components
-  implementation "androidx.room:room-runtime:$room_version"
-  ksp "androidx.room:room-compiler:$room_version"
-  implementation "androidx.room:room-ktx:$room_version"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3"
+    implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    // Room components
+    implementation "androidx.room:room-runtime:$room_version"
+    ksp "androidx.room:room-compiler:$room_version"
+    implementation "androidx.room:room-ktx:$room_version"
 
-  //Glide
-  implementation 'com.github.bumptech.glide:glide:4.9.0'
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
 
-  implementation 'com.google.android.play:review:2.0.1'
-  implementation 'com.google.android.play:review-ktx:2.0.1'
+    implementation 'com.google.android.play:review:2.0.1'
+    implementation 'com.google.android.play:review-ktx:2.0.1'
 
-  //SEARCHABLE SPINNER
-  implementation 'com.github.DonMat:searchablespinner:v1.0.1'
+    //SEARCHABLE SPINNER
+    implementation 'com.github.DonMat:searchablespinner:v1.0.1'
 
-  // GOOGLE DRIVE API
-  implementation 'com.google.android.gms:play-services-drive:17.0.0'
-  implementation "com.google.android.gms:play-services-auth:21.2.0"
-  implementation 'com.google.http-client:google-http-client-gson:1.44.2'
-  implementation('com.google.api-client:google-api-client-android:1.26.0')
-  implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0')
+    // GOOGLE DRIVE API
+    implementation 'com.google.android.gms:play-services-drive:17.0.0'
+    implementation "com.google.android.gms:play-services-auth:21.2.0"
+    implementation 'com.google.http-client:google-http-client-gson:1.44.2'
+    implementation('com.google.api-client:google-api-client-android:1.26.0')
+    implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0')
 
-  implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1'
 
-  //FIREBASE ANALYTICS
-  implementation platform('com.google.firebase:firebase-bom:33.2.0')
-  implementation("com.google.firebase:firebase-analytics-ktx")
+    //FIREBASE ANALYTICS
+    implementation platform('com.google.firebase:firebase-bom:33.2.0')
+    implementation("com.google.firebase:firebase-analytics-ktx")
 
-  //GOOGLE ADS
-  implementation 'com.google.android.gms:play-services-ads:23.3.0'
-  //ERROR HANDLE
-  implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+    //GOOGLE ADS
+    implementation 'com.google.android.gms:play-services-ads:23.3.0'
+    //ERROR HANDLE
+    implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
-  implementation("io.insert-koin:koin-android:3.5.6")
+    implementation("io.insert-koin:koin-android:3.5.6")
 
-  testImplementation 'junit:junit:4.13.2'
+    testImplementation 'junit:junit:4.13.2'
 
-  androidTestImplementation "androidx.test:runner:$androidXTestVersion"
-  androidTestImplementation "androidx.test:rules:$androidXTestVersion"
-  androidTestImplementation "androidx.room:room-testing:$room_version"
+    androidTestImplementation "androidx.test:runner:$androidXTestVersion"
+    androidTestImplementation "androidx.test:rules:$androidXTestVersion"
+    androidTestImplementation "androidx.room:room-testing:$room_version"
 
-  def mockkVersion = "1.13.12"
-  testImplementation "io.mockk:mockk:${mockkVersion}"
+    def mockkVersion = "1.13.12"
+    testImplementation "io.mockk:mockk:${mockkVersion}"
 
-  def kotestVersion = "5.9.0"
-  testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
+    def kotestVersion = "5.9.0"
+    testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
 
 
 }
