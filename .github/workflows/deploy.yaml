@@ -71,7 +71,7 @@ jobs:
         id: prod_build
         with:
           releaseDirectory: ./app/build/outputs/bundle/release/
-          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE_64 }}
+          signingKeyBase64: ${{ secrets.ANDROID_KEYSTORE_BASE_64_NEW }}
           alias: ${{ secrets.ANDROID_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
           keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
