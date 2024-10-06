@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
@@ -13,7 +14,6 @@ import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.Utils.formatResultAndCheckCommas
 import com.erdees.foodcostcalc.utils.onNumericValueChange
-import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +29,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
 
     private val productRepository: ProductRepository by inject()
     private val preferences: Preferences by inject()
-    private val firebaseAnalytics: FirebaseAnalytics by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> get() = _screenState
@@ -129,12 +129,15 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
 
     private fun sendDataAboutProduct(product: ProductBase) {
         val bundle = Bundle()
-        bundle.putString(Constants.PRODUCT_NAME, product.name)
-        bundle.putString(Constants.PRODUCT_TAX, product.tax.toString())
-        bundle.putString(Constants.PRODUCT_WASTE, product.waste.toString())
-        bundle.putString(Constants.PRODUCT_UNIT, product.unit)
-        bundle.putString(Constants.PRODUCT_PRICE_PER_UNIT, product.pricePerUnit.toString())
-        firebaseAnalytics.logEvent(Constants.PRODUCT_CREATED, bundle)
+        bundle.putString(Constants.Analytics.PRODUCT_NAME, product.name)
+        bundle.putString(Constants.Analytics.PRODUCT_TAX, product.tax.toString())
+        bundle.putString(Constants.Analytics.PRODUCT_WASTE, product.waste.toString())
+        bundle.putString(Constants.Analytics.PRODUCT_UNIT, product.unit)
+        bundle.putString(
+            Constants.Analytics.PRODUCT_PRICE_PER_UNIT,
+            product.pricePerUnit.toString()
+        )
+        analyticsRepository.logEvent(Constants.Analytics.PRODUCT_CREATED, bundle)
     }
 
     fun onCalculateWaste() {

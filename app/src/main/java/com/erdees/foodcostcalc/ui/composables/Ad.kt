@@ -21,13 +21,12 @@ import com.google.android.gms.ads.LoadAdError
 import com.google.android.gms.ads.VideoOptions
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdOptions
-import com.google.firebase.analytics.FirebaseAnalytics
-import org.koin.java.KoinJavaComponent.inject
 
 @Composable
 fun Ad(
     adUnitId: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onAdFailedToLoad: () -> Unit
 ) {
     var currentNativeAd: NativeAd? = null
     val context = LocalContext.current
@@ -82,18 +81,13 @@ fun Ad(
             }
             .withNativeAdOptions(adOptions)
             .withAdListener(object : AdListener() {
-                val firebaseAnalytics: FirebaseAnalytics by inject(FirebaseAnalytics::class.java)
                 override fun onAdImpression() {
                     Log.i("Ad", "Ad impression")
                     super.onAdImpression()
                 }
 
                 override fun onAdFailedToLoad(p0: LoadAdError) {
-                    firebaseAnalytics.logEvent("ad_failed_to_load", null)
-                    Log.i(
-                        "Ad",
-                        "Failed to load ad: ${p0.message}, ${p0.code}"
-                    )
+                    onAdFailedToLoad()
                     super.onAdFailedToLoad(p0)
                 }
             }).build()

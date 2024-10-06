@@ -96,7 +96,8 @@ fun DishesScreen(navController: NavController) {
                             Ad(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
-                                else Constants.Ads.ADMOB_DISHES_AD_UNIT_ID
+                                else Constants.Ads.ADMOB_DISHES_AD_UNIT_ID,
+                                onAdFailedToLoad = viewModel::onAdFailedToLoad
                             )
                         }
 
@@ -308,7 +309,7 @@ private fun Ingredients(
 @Composable
 private fun PriceSummary(dishDomain: DishDomain, servings: Int, modifier: Modifier = Modifier) {
     val context = LocalContext.current
-    Column {
+    Column(modifier) {
         PriceRow(
             description = stringResource(id = R.string.food_cost),
             price = dishDomain.formattedTotalPricePerServing(context, servings)

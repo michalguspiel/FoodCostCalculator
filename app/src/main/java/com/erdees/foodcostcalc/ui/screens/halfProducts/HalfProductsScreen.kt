@@ -107,7 +107,8 @@ fun HalfProductsScreen(navController: NavController) {
                             Ad(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
-                                else Constants.Ads.ADMOB_HALF_PRODUCTS_AD_UNIT_ID
+                                else Constants.Ads.ADMOB_HALF_PRODUCTS_AD_UNIT_ID,
+                                onAdFailedToLoad = viewModel::onAdFailedToLoad
                             )
                         }
 

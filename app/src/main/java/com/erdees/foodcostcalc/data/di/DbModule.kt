@@ -9,22 +9,17 @@ import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.ProductHalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
-import com.google.firebase.analytics.FirebaseAnalytics
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
 val dbModule = module {
+    single<Preferences> { PreferencesImpl(androidApplication()) }
+    single<AppRoomDataBase> { AppRoomDataBase.getDatabase(androidApplication()) }
 
-  //TODO Move Firebase Analytics elsewhere
-  single<FirebaseAnalytics> { FirebaseAnalytics.getInstance(androidApplication()) }
-
-  single<Preferences> { PreferencesImpl(androidApplication()) }
-  single<AppRoomDataBase> { AppRoomDataBase.getDatabase(androidApplication()) }
-
-  single<ProductDao> { get<AppRoomDataBase>().productDao() }
-  single<HalfProductDao> { get<AppRoomDataBase>().halfProductDao() }
-  single<DishDao> { get<AppRoomDataBase>().dishDao() }
-  single<ProductDishDao> { get<AppRoomDataBase>().productDishDao() }
-  single<HalfProductDishDao> { get<AppRoomDataBase>().halfProductDishDao() }
-  single<ProductHalfProductDao> { get<AppRoomDataBase>().productHalfProductDao() }
+    single<ProductDao> { get<AppRoomDataBase>().productDao() }
+    single<HalfProductDao> { get<AppRoomDataBase>().halfProductDao() }
+    single<DishDao> { get<AppRoomDataBase>().dishDao() }
+    single<ProductDishDao> { get<AppRoomDataBase>().productDishDao() }
+    single<HalfProductDishDao> { get<AppRoomDataBase>().halfProductDishDao() }
+    single<ProductHalfProductDao> { get<AppRoomDataBase>().productHalfProductDao() }
 }
