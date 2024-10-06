@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.ui.screens.products
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.utils.Constants
@@ -22,6 +23,7 @@ import java.util.Locale
 class ProductsFragmentViewModel : ViewModel(), KoinComponent {
 
     private val productRepository: ProductRepository by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     private val products =
         productRepository.products.map { products ->
@@ -64,4 +66,8 @@ class ProductsFragmentViewModel : ViewModel(), KoinComponent {
             started = SharingStarted.Lazily,
             initialValue = listOf()
         )
+
+    fun onAdFailedToLoad() {
+        analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)
+    }
 }

@@ -177,7 +177,9 @@ dependencies {
     //ERROR HANDLE
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
-    implementation("io.insert-koin:koin-android:3.5.6")
+    def koin_version = "3.5.6"
+    implementation("io.insert-koin:koin-android:$koin_version")
+    implementation "io.insert-koin:koin-androidx-compose:$koin_version"
 
     testImplementation 'junit:junit:4.13.2'
 

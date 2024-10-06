@@ -2,12 +2,14 @@ package com.erdees.foodcostcalc.ui.screens.onlineBackup
 
 import android.app.Activity
 import android.content.Context
+import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.erdees.foodcostcalc.data.AppRoomDataBase
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.domain.model.FCCUser
 import com.erdees.foodcostcalc.domain.model.Operation
 import com.erdees.foodcostcalc.domain.model.ScreenState
@@ -19,6 +21,7 @@ import com.erdees.foodcostcalc.domain.model.errors.FailedToSignOut
 import com.erdees.foodcostcalc.domain.model.errors.NoDatabaseFileError
 import com.erdees.foodcostcalc.domain.model.errors.SavingDatabaseFailure
 import com.erdees.foodcostcalc.ui.MyApplication
+import com.erdees.foodcostcalc.utils.Constants
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
@@ -35,6 +38,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -47,6 +51,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
 
     private var googleDriveService: Drive? = null
     private var driveServiceHelper: DriveServiceHelper? = null
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -84,6 +89,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
     }
 
     fun loadDatabase(context: Context) {
+        analyticsRepository.logEvent(Constants.Analytics.LOAD_DATABASE, null)
         if (accountDoesNotHaveGooglePermissions()) {
             handleFailure(DrivePermissionFailure, null)
             return
@@ -97,6 +103,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
     }
 
     fun saveDatabase(context: Context) {
+        analyticsRepository.logEvent(Constants.Analytics.SAVE_DATABASE, null)
         if (accountDoesNotHaveGooglePermissions()) {
             handleFailure(DrivePermissionFailure, null)
             return
@@ -276,6 +283,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
      * Updates screen state to success.
      * */
     private fun handleSuccess(context: Context, operation: Operation) {
+        analyticsRepository.logEvent(Constants.Analytics.DATABASE_OPERATION_SUCCESS, null)
         AppRoomDataBase.destroyInstance()
         (context as MyApplication).restartKoin()
         _screenState.value = ScreenState.Success(operation)
@@ -285,7 +293,12 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
      * Logs failure, changes the screen state to error, and if context is not null, destroys database and restarts Koin.
      * */
     private fun handleFailure(error: Error, context: Context?) {
-        Log.i(TAG, "handleFailure: ${error.message}")
+        val bundle = Bundle()
+        bundle.putString(
+            Constants.Analytics.DATABASE_OPERATION_ERROR,
+            error.message ?: error.javaClass.simpleName
+        )
+        analyticsRepository.logEvent(Constants.Analytics.DATABASE_OPERATION_FAILURE, bundle)
         context?.let {
             AppRoomDataBase.destroyInstance()
             (context as MyApplication).restartKoin()

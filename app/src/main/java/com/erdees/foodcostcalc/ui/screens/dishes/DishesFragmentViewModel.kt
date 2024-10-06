@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.dishes
 
 import androidx.lifecycle.viewModelScope
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
@@ -23,6 +24,7 @@ import org.koin.core.component.inject
 class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
 
     private val dishRepository: DishRepository by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
     val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
 
     private val dishes = dishRepository.dishes.map { dishes ->
@@ -64,4 +66,8 @@ class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
             started = SharingStarted.Lazily,
             initialValue = listOf()
         )
+
+    fun onAdFailedToLoad() {
+        analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)
+    }
 }

@@ -1,18 +1,17 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts
 
-import android.os.Bundle
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.HalfProductBase
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
-import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
+import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
-import com.google.firebase.analytics.FirebaseAnalytics
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,8 +29,8 @@ import java.util.Locale
 class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
     private val halfProductRepository: HalfProductRepository by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
     val preferences: Preferences by inject()
-    private val firebaseAnalytics: FirebaseAnalytics by inject()
 
     val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
 
@@ -80,17 +79,11 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
             initialValue = listOf()
         )
 
-    private fun sendDataAboutHalfProductCreated(halfProductBase: HalfProductBase) {
-        val bundle = Bundle()
-        bundle.putString(FirebaseAnalytics.Param.VALUE, halfProductBase.name)
-        firebaseAnalytics.logEvent(Constants.HALF_PRODUCT_CREATED, bundle)
-    }
-
     fun addHalfProduct(name: String, unit: String) {
         val halfProductBase = HalfProductBase(0, name, unit)
         with(halfProductBase) {
             addHalfProduct(this)
-            sendDataAboutHalfProductCreated(this)
+            analyticsRepository.logEvent(Constants.Analytics.HALF_PRODUCT_CREATED, null)
         }
         resetScreenState()
     }
@@ -99,5 +92,9 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductRepository.addHalfProduct(halfProductBase)
         }
+    }
+
+    fun onAdFailedToLoad() {
+        analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)
     }
 }

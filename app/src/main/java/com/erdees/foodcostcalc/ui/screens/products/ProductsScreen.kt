@@ -34,13 +34,13 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Ad
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ad
-import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
-import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
-import com.erdees.foodcostcalc.ui.composables.fields.SearchField
 import com.erdees.foodcostcalc.ui.composables.animations.SearchFieldTransition
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCAnimatedFAB
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
+import com.erdees.foodcostcalc.ui.composables.fields.SearchField
 import com.erdees.foodcostcalc.ui.composables.rememberNestedScrollConnection
+import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
@@ -81,7 +81,8 @@ fun ProductsScreen(navController: NavController) {
                             Ad(
                                 modifier = Modifier.padding(vertical = 8.dp),
                                 adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
-                                else Constants.Ads.ADMOB_PRODUCTS_AD_UNIT_ID
+                                else Constants.Ads.ADMOB_PRODUCTS_AD_UNIT_ID,
+                                onAdFailedToLoad = viewModel::onAdFailedToLoad
                             )
                         }
 
