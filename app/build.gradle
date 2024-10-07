@@ -55,6 +55,7 @@ android {
         versionName version_name
         multiDexEnabled true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        ndk.debugSymbolLevel = 'FULL'
     }
 
     buildTypes {
