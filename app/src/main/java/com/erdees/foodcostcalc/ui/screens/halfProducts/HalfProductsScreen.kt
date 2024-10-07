@@ -87,7 +87,10 @@ fun HalfProductsScreen(navController: NavController) {
     val screenState by viewModel.screenState.collectAsState()
 
     Scaffold(modifier = Modifier, floatingActionButton = {
-        FCCAnimatedFAB(isVisible = isVisible.value) {
+        FCCAnimatedFAB(
+            isVisible = isVisible.value,
+            contentDescription = stringResource(id = R.string.content_description_create_half_product)
+        ) {
             viewModel.updateScreenState(ScreenState.Interaction(InteractionType.CreateHalfProduct))
         }
     }) { paddingValues ->

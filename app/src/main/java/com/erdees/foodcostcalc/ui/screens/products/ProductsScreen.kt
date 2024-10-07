@@ -58,7 +58,10 @@ fun ProductsScreen(navController: NavController) {
     Scaffold(
         modifier = Modifier,
         floatingActionButton = {
-            FCCAnimatedFAB(isVisible = isVisible.value) {
+            FCCAnimatedFAB(
+                isVisible = isVisible.value,
+                contentDescription = stringResource(id = R.string.content_description_create_product)
+            ) {
                 navController.navigate(FCCScreen.CreateProduct)
             }
         }

@@ -76,7 +76,10 @@ fun DishesScreen(navController: NavController) {
     val adItems by viewModel.filteredDishesInjectedWithAds.collectAsState()
 
     Scaffold(modifier = Modifier, floatingActionButton = {
-        FCCAnimatedFAB(isVisible = isVisible.value) {
+        FCCAnimatedFAB(
+            isVisible = isVisible.value,
+            contentDescription = stringResource(id = R.string.content_description_create_dish)
+        ) {
             navController.navigate(FCCScreen.CreateDish)
         }
     }) { paddingValues ->
