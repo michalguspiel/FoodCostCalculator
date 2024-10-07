@@ -143,12 +143,14 @@
 
     <string name="netto_price">Net price %1$s</string>
     <string name="total_price">Total price %1$s</string>
+    <string name="content_description_create_product">Create product</string>
 
     <!-- HALF PRODUCTS FEATURE -->
 
     <string name="price_per_unit">Price %1$s</string>
     <string name="price_per_recipe">Price per recipe</string>
     <string name="recipe_per_quantity">Recipe per %1$s %2$s of product.</string>
+    <string name="content_description_create_half_product">Create half product</string>
 
     <!-- DISHES FEATURE -->
 
@@ -159,6 +161,7 @@
     <string name="food_cost">Food cost</string>
     <string name="final_price">Final price</string>
     <string name="app_icon">app icon</string>
+    <string name="content_description_create_dish">Create dish</string>
 
     <!-- SETTINGS -->
     <string name="settings">Settings</string>

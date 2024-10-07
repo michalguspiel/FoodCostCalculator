@@ -68,13 +68,13 @@ fun FCCOutlinedButton(
 
 @Composable
 fun FCCTopAppBarNavIconButton(navController: NavController, modifier: Modifier = Modifier) {
-    IconButton(onClick = { navController.popBackStack() }) {
+    IconButton(modifier = modifier, onClick = { navController.popBackStack() }) {
         Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
     }
 }
 
 @Composable
-fun FCCAnimatedFAB(isVisible: Boolean, onClick: () -> Unit) {
+fun FCCAnimatedFAB(isVisible: Boolean, contentDescription: String, onClick: () -> Unit) {
     AnimatedVisibility(
         visible = isVisible,
         enter = slideInHorizontally(initialOffsetX = { it * 2 }) + fadeIn(
@@ -92,7 +92,7 @@ fun FCCAnimatedFAB(isVisible: Boolean, onClick: () -> Unit) {
             },
             shape = CircleShape,
         ) {
-            Icon(Icons.Filled.Add, "Large floating action button")
+            Icon(Icons.Filled.Add, contentDescription)
         }
     }
 }
