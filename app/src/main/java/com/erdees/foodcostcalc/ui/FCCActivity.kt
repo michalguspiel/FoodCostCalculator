@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.erdees.foodcostcalc.ui.screens.FCCHostScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.google.android.gms.ads.MobileAds
@@ -16,6 +17,7 @@ class FCCActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         Log.i("FCCActivity", "onCreate")
 
         CoroutineScope(Dispatchers.IO).launch {
