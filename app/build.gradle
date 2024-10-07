@@ -160,6 +160,9 @@ dependencies {
     //SEARCHABLE SPINNER
     implementation 'com.github.DonMat:searchablespinner:v1.0.1'
 
+    //SPLASH SCREEN
+    implementation 'androidx.core:core-splashscreen:1.0.1'
+
     // GOOGLE DRIVE API
     implementation 'com.google.android.gms:play-services-drive:17.0.0'
     implementation "com.google.android.gms:play-services-auth:21.2.0"
