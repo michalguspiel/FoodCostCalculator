@@ -22,11 +22,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -51,10 +54,7 @@ fun CreateDishScreen(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
+    var textFieldLoaded by remember { mutableStateOf(false) }
 
     LaunchedEffect(addedDish) {
         addedDish?.let {
@@ -101,7 +101,14 @@ fun CreateDishScreen(navController: NavController) {
                     OutlinedTextField(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .focusRequester(focusRequester),
+                            .focusRequester(focusRequester)
+                            .onGloballyPositioned {
+                                if (!textFieldLoaded) {
+                                    focusRequester.requestFocus()
+                                    // Prevent the focusRequester from being called again
+                                    textFieldLoaded = true
+                                }
+                            },
                         value = dishName,
                         singleLine = true,
                         maxLines = 1,
