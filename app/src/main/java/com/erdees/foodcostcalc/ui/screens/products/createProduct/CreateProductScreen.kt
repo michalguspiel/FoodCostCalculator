@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -69,15 +70,11 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
     val snackbarHostState = remember { SnackbarHostState() }
 
     val focusRequester = remember { FocusRequester() }
-    // Inside the CreateProductScreen Composable function
+    var textFieldLoaded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     LaunchedEffect(Unit) {
         viewModel.getUnits(context.resources)
-    }
-
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
     }
 
     LaunchedEffect(screenState) {
@@ -121,7 +118,15 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     FCCTextField(
-                        modifier = Modifier.focusRequester(focusRequester),
+                        modifier = Modifier
+                            .focusRequester(focusRequester)
+                            .onGloballyPositioned {
+                                if (!textFieldLoaded) {
+                                    focusRequester.requestFocus()
+                                    // Prevent the focusRequester from being called again
+                                    textFieldLoaded = true
+                                }
+                            },
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Text,
                             capitalization = KeyboardCapitalization.Words,
@@ -234,7 +239,12 @@ fun CalculateWasteDialog(
         modifier = modifier,
         title = "Count waste",
         onDismiss = { onDismiss() },
-        onPrimaryButtonClicked = { onSave(totalQuantity.toDoubleOrNull(), wasteQuantity.toDoubleOrNull()) }) {
+        onPrimaryButtonClicked = {
+            onSave(
+                totalQuantity.toDoubleOrNull(),
+                wasteQuantity.toDoubleOrNull()
+            )
+        }) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
             FCCTextField(
@@ -281,7 +291,12 @@ fun CalculatePiecePriceDialog(
         modifier = modifier,
         title = "Count waste",
         onDismiss = { onDismiss() },
-        onPrimaryButtonClicked = { onSave(boxPrice.toDoubleOrNull(), quantityInBox.toIntOrNull()) }) {
+        onPrimaryButtonClicked = {
+            onSave(
+                boxPrice.toDoubleOrNull(),
+                quantityInBox.toIntOrNull()
+            )
+        }) {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
             FCCTextField(
