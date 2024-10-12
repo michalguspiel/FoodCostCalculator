@@ -72,6 +72,7 @@ import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.UnitsUtils.getPerUnitAbbreviation
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
@@ -309,7 +310,7 @@ private fun Ingredients(
                         baseQuantity = halfProductDomain.totalQuantity,
                         targetQuantity = quantity
                     ),
-                    it.quantityUnit
+                    UnitsUtils.getUnitAbbreviation(unit = it.quantityUnit)
                 ),
                 price = it.formattedTotalPriceForTargetQuantity(
                     context = context,
