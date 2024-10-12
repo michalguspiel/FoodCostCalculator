@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.data
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -12,10 +11,11 @@ import com.erdees.foodcostcalc.data.db.dao.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.ProductHalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
 import com.erdees.foodcostcalc.data.db.migrations.Migration_1to2_RefactorDatabase
+import com.erdees.foodcostcalc.data.db.migrations.Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist
 import com.erdees.foodcostcalc.data.model.DishBase
 import com.erdees.foodcostcalc.data.model.HalfProductBase
-import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
 import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductHalfProduct
 import java.io.File
@@ -30,7 +30,7 @@ import java.io.File
         ProductHalfProduct::class,
         HalfProductDish::class,
     ],
-    version = 2, exportSchema = true,
+    version = 3, exportSchema = true,
     views = [],
 
     )
@@ -53,6 +53,7 @@ abstract class AppRoomDataBase : RoomDatabase() {
 
         private fun migrations() = arrayOf(
             Migration_1to2_RefactorDatabase(),
+            Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist()
         )
 
         fun getDatabase(context: Context): AppRoomDataBase {
@@ -90,7 +91,7 @@ abstract class AppRoomDataBase : RoomDatabase() {
             }
         }
 
-        fun destroyInstance(){
+        fun destroyInstance() {
             INSTANCE?.close()
             INSTANCE = null
         }

@@ -12,10 +12,6 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DishDao {
-
-    @Query("SELECT * FROM dishes ORDER BY dish_name ASC")
-    fun getDishes(): Flow<List<DishBase>>
-
     @Transaction
     @Query("SELECT * FROM DISHES ORDER BY DISH_NAME ASC")
     fun getCompleteDishes(): Flow<List<CompleteDish>>
@@ -28,14 +24,4 @@ interface DishDao {
 
     @Query("DELETE FROM dishes WHERE dishId =:id")
     suspend fun deleteDish(id: Long)
-
-    @Query("DELETE FROM HalfProduct_Dish WHERE dishId = :id")
-    suspend fun deleteHalfProductDish(id: Long)
-
-    @Query("DELETE FROM Product_Dish WHERE dishId = :id")
-    suspend fun deleteProductDish(id: Long)
-
-    @Transaction
-    @Query("SELECT * FROM DISHES WHERE dishId = :dishId ")
-    suspend fun getCompleteDishByID(dishId: Long): CompleteDish
 }
