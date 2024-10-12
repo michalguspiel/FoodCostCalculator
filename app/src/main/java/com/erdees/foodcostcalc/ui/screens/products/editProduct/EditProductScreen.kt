@@ -26,20 +26,22 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
-import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
+import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,12 +89,20 @@ fun EditProductScreen(
                 },
                 actions = {
                     IconButton(onClick = { viewModel.deleteProduct(providedProduct) }) {
-                        Icon(imageVector = Icons.Sharp.Delete, contentDescription = "Remove dish")
+                        Icon(
+                            imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
+                                id = R.string.content_description_remove_product
+                            )
+                        )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
+                                id = R.string.back
+                            )
+                        )
                     }
                 }
             )
@@ -116,13 +126,13 @@ fun EditProductScreen(
                 ) {
 
                     Text(
-                        text = "Values ${providedProduct.unit}",
+                        text = stringResource(id = R.string.values_per_unit, providedProduct.unit),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
 
                     FCCTextField(
-                        title = "Price",
+                        title = stringResource(id = R.string.price),
                         value = product?.pricePerUnit.toString(),
                         onValueChange = viewModel::updatePrice,
                         keyboardOptions = KeyboardOptions(
@@ -132,7 +142,7 @@ fun EditProductScreen(
                     )
 
                     FCCTextField(
-                        title = "Tax %",
+                        title = stringResource(id = R.string.tax_percent),
                         value = product?.tax.toString(),
                         onValueChange = viewModel::updateTax,
                         keyboardOptions = KeyboardOptions(
@@ -142,7 +152,7 @@ fun EditProductScreen(
                     )
 
                     FCCTextField(
-                        title = "% of waste",
+                        title = stringResource(id = R.string.percent_of_waste),
                         value = product?.waste.toString(),
                         onValueChange = viewModel::updateWaste,
                         keyboardOptions = KeyboardOptions(
@@ -158,7 +168,7 @@ fun EditProductScreen(
                         onClick = {
                             viewModel.save()
                         },
-                        text = "Save"
+                        text = stringResource(id = R.string.save)
                     )
                 }
             }
@@ -169,7 +179,7 @@ fun EditProductScreen(
                     when ((screenState as ScreenState.Interaction).interaction) {
                         InteractionType.EditName -> {
                             ValueEditDialog(
-                                title = "Edit name",
+                                title = stringResource(id = R.string.edit_name),
                                 value = editableName,
                                 saveButtonEnabled = saveNameButtonEnabled,
                                 updateValue = viewModel::updateName,

@@ -18,7 +18,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 
 
@@ -34,7 +36,7 @@ fun UnitField(
 
     Column(modifier = modifier) {
         FieldLabel(
-            text = "Unit",
+            text = stringResource(id = R.string.unit),
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
         )
         Box {

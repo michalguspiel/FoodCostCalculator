@@ -27,12 +27,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.utils.onNumericValueChange
@@ -51,6 +53,7 @@ fun CreateDishScreen(navController: NavController) {
     val snackbarHostState = remember { SnackbarHostState() }
 
     val focusRequester = remember { FocusRequester() }
+    val itemAddedText = stringResource(id = R.string.item_added)
 
     LaunchedEffect(Unit) {
         focusRequester.requestFocus()
@@ -58,17 +61,21 @@ fun CreateDishScreen(navController: NavController) {
 
     LaunchedEffect(addedDish) {
         addedDish?.let {
-            snackbarHostState.showSnackbar("${it.name} added!")
+            snackbarHostState.showSnackbar(itemAddedText)
             viewModel.resetAddedDish()
         }
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Create dish") },
+            TopAppBar(title = { Text(text = stringResource(id = R.string.create_dish)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
+                                id = R.string.back
+                            )
+                        )
                     }
                 })
         },
@@ -95,7 +102,7 @@ fun CreateDishScreen(navController: NavController) {
 
                 Column {
                     FieldLabel(
-                        text = "Name",
+                        text = stringResource(id = R.string.name),
                         modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                     )
                     OutlinedTextField(
@@ -117,7 +124,7 @@ fun CreateDishScreen(navController: NavController) {
 
                 Column {
                     FieldLabel(
-                        text = "Margin",
+                        text = stringResource(id = R.string.margin),
                         modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                     )
                     OutlinedTextField(
@@ -137,7 +144,7 @@ fun CreateDishScreen(navController: NavController) {
 
                 Column {
                     FieldLabel(
-                        text = "Tax",
+                        text = stringResource(id = R.string.tax),
                         modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                     )
                     OutlinedTextField(
@@ -161,7 +168,7 @@ fun CreateDishScreen(navController: NavController) {
                     onClick = {
                         viewModel.addDish()
                     },
-                    text = "Add"
+                    text = stringResource(id = R.string.add)
                 )
             }
         }

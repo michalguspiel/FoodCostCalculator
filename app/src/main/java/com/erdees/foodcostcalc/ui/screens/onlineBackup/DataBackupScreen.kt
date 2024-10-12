@@ -195,9 +195,9 @@ fun DataBackupScreen(navController: NavController) {
         is ScreenState.Error -> {
             val error = (screenState as ScreenState.Error).error
             ErrorDialog(
-                title = "Error",
+                title = stringResource(id = R.string.error),
                 onDismiss = viewModel::resetScreenState,
-                content = error.message ?: "Something went wrong",
+                content = error.message ?: stringResource(id = R.string.something_went_wrong),
             )
         }
 

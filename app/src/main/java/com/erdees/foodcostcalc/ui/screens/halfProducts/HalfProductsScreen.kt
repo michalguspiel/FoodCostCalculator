@@ -53,22 +53,22 @@ import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.ExpandedIcon
-import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
-import com.erdees.foodcostcalc.ui.composables.rows.IngredientRow
-import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
-import com.erdees.foodcostcalc.ui.composables.fields.SearchField
-import com.erdees.foodcostcalc.ui.composables.fields.UnitField
 import com.erdees.foodcostcalc.ui.composables.animations.SearchFieldTransition
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCAnimatedFAB
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
+import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDivider
+import com.erdees.foodcostcalc.ui.composables.fields.SearchField
+import com.erdees.foodcostcalc.ui.composables.fields.UnitField
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.ui.composables.rememberNestedScrollConnection
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
+import com.erdees.foodcostcalc.ui.composables.rows.IngredientRow
+import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
@@ -369,14 +369,18 @@ fun CreateHalfProductDialog(
                 )
                 .padding(24.dp)
         ) {
-            Text(text = "Create half product", style = MaterialTheme.typography.titleLarge)
+            Text(
+                text = stringResource(id = R.string.create_half_product),
+                style = MaterialTheme.typography.titleLarge
+            )
             Spacer(modifier = Modifier.size(16.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
                 Column {
                     FieldLabel(
-                        text = "Name", modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+                        text = stringResource(id = R.string.name),
+                        modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
                     )
                     OutlinedTextField(
                         value = name, onValueChange = { value ->
@@ -394,7 +398,7 @@ fun CreateHalfProductDialog(
 
             Spacer(modifier = Modifier.size(24.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                FCCTextButton(text = "Save") {
+                FCCTextButton(text = stringResource(id = R.string.save)) {
                     onSave(name, selectedUnit)
                 }
             }

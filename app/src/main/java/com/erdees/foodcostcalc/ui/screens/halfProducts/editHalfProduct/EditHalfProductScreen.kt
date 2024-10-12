@@ -31,11 +31,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
@@ -91,12 +93,20 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
                     IconButton(onClick = {
                         viewModel.deleteHalfProduct(providedHalfProduct.id)
                     }) {
-                        Icon(imageVector = Icons.Sharp.Delete, contentDescription = "Remove dish")
+                        Icon(
+                            imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
+                                id = R.string.content_description_remove_half_product
+                            )
+                        )
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
+                                id = R.string.back
+                            )
+                        )
                     }
                 }
             )
@@ -136,7 +146,7 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
                         .fillMaxWidth()
                         .padding(bottom = 16.dp, end = 16.dp)
                 ) {
-                    FCCPrimaryButton(text = "Save") {
+                    FCCPrimaryButton(text = stringResource(id = R.string.save)) {
                         viewModel.saveHalfProduct()
                     }
                 }
@@ -153,15 +163,13 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
                     }
                 }
 
-                is ScreenState.Success -> {
-                    // TODO()
-                }
+                is ScreenState.Success -> {}
 
                 is ScreenState.Interaction -> {
                     when ((screenState as ScreenState.Interaction).interaction) {
                         is InteractionType.EditItem -> {
                             ValueEditDialog(
-                                title = "Edit quantity",
+                                title = stringResource(id = R.string.edit_quantity),
                                 value = editableQuantity,
                                 modifier = Modifier,
                                 updateValue = viewModel::setEditableQuantity,
@@ -173,7 +181,7 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
 
                         InteractionType.EditName -> {
                             ValueEditDialog(
-                                title = "Edit name",
+                                title = stringResource(id = R.string.edit_name),
                                 value = editableName,
                                 updateValue = viewModel::updateName,
                                 onSave = viewModel::saveName,
@@ -204,14 +212,14 @@ fun HalfProductDetails(
     val context = LocalContext.current
     Row(modifier) {
         DetailItem(
-            label = "Price per recipe",
+            label = stringResource(id = R.string.price_per_recipe),
             value = halfProductDomain.formattedSingleRecipePrice(context),
             modifier = Modifier
                 .padding(horizontal = 12.dp)
                 .weight(1f)
         )
         DetailItem(
-            label = "Price ${halfProductDomain.halfProductUnit}",
+            label = stringResource(id = R.string.price_per_unit, halfProductDomain.halfProductUnit),
             value = halfProductDomain.formattedPricePresentedRecipe(
                 halfProductDomain.totalQuantity,
                 1.0,

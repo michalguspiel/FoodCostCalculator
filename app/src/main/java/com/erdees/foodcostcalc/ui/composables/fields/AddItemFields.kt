@@ -23,10 +23,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.SelectedTab
@@ -47,7 +49,10 @@ fun AddItemFields(
     extraField: @Composable () -> Unit = {}
 ) {
 
-    val itemFieldLabel = if (selectedTab == SelectedTab.ADD_PRODUCT) "Product" else "Half Product"
+    val itemFieldLabel =
+        if (selectedTab == SelectedTab.ADD_PRODUCT) stringResource(id = R.string.product)
+        else stringResource(id = R.string.half_product)
+
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(8.dp)) {
         Column {
             FieldLabel(
@@ -63,7 +68,10 @@ fun AddItemFields(
         }
 
         Column {
-            FieldLabel(text = "Quantity", modifier = Modifier.padding(start = 8.dp, bottom = 8.dp))
+            FieldLabel(
+                text = stringResource(id = R.string.quantity),
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
+            )
             QuantityField(
                 quantity = quantity,
                 modifier = Modifier.fillMaxWidth(),
@@ -89,7 +97,8 @@ fun ItemField(
     var expanded by remember { mutableStateOf(false) }
 
     val optionalHint =
-        if (selectedTab == SelectedTab.ADD_PRODUCT) "Select a product" else "Select half product"
+        if (selectedTab == SelectedTab.ADD_PRODUCT) stringResource(id = R.string.select_product)
+        else stringResource(id = R.string.select_half_product)
 
     Box(modifier = modifier) {
         ExposedDropdownMenuBox(

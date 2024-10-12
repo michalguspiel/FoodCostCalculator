@@ -30,9 +30,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
@@ -43,7 +45,6 @@ enum class SelectedTab {
     ADD_HALF_PRODUCT
 }
 
-//TODO: String resources.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: String) {
@@ -61,10 +62,12 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
     val screenState by viewModel.screenState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val itemAddedText = stringResource(id = R.string.item_added)
+
     LaunchedEffect(screenState) {
         when (screenState) {
             is ScreenState.Success -> {
-                snackbarHostState.showSnackbar("Item added.", duration = SnackbarDuration.Short)
+                snackbarHostState.showSnackbar(itemAddedText, duration = SnackbarDuration.Short)
                 viewModel.resetScreenState()
             }
 
@@ -79,7 +82,10 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
                 Text(text = dishName)
             }, navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+                    Icon(
+                        Icons.AutoMirrored.Sharp.ArrowBack,
+                        contentDescription = stringResource(id = R.string.back)
+                    )
                 }
             })
         }) { paddingValues ->
@@ -92,7 +98,7 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
                         modifier = Modifier.weight(1f),
                         selected = selectedTab == SelectedTab.ADD_PRODUCT,
                         onClick = { viewModel.selectTab(SelectedTab.ADD_PRODUCT) },
-                        text = { Text(text = "Add Product") },
+                        text = { Text(text = stringResource(id = R.string.add_product)) },
                         selectedContentColor = MaterialTheme.colorScheme.primary,
                         unselectedContentColor = MaterialTheme.colorScheme.onSurface
                     )
@@ -101,7 +107,7 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
                         modifier = Modifier.weight(1f),
                         selected = selectedTab == SelectedTab.ADD_HALF_PRODUCT,
                         onClick = { viewModel.selectTab(SelectedTab.ADD_HALF_PRODUCT) }, text = {
-                            Text(text = "Add Half Product")
+                            Text(text = stringResource(id = R.string.add_half_product))
                         },
                         selectedContentColor = MaterialTheme.colorScheme.primary,
                         unselectedContentColor = MaterialTheme.colorScheme.onSurface
@@ -137,7 +143,7 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                         FCCPrimaryButton(
                             onClick = { viewModel.addItem(dishId) },
-                            text = "Add",
+                            text = stringResource(id = R.string.add),
                             enabled = addButtonEnabled
                         )
                     }
@@ -149,11 +155,11 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
                 is ScreenState.Error -> {
                     AlertDialog(
                         onDismissRequest = { viewModel.resetScreenState() },
-                        title = { Text("Error") },
-                        text = { Text("Something went wrong") },
+                        title = { Text(stringResource(id = R.string.error)) },
+                        text = { Text(stringResource(R.string.something_went_wrong)) },
                         confirmButton = {
                             Button(onClick = { viewModel.resetScreenState() }) {
-                                Text("OK")
+                                Text(stringResource(id = R.string.okay))
                             }
                         }
                     )
