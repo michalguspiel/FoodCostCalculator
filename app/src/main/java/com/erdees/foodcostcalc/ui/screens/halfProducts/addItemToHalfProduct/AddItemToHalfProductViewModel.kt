@@ -76,10 +76,10 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
         _selectedUnit.value = unit
     }
 
-    private var halfProductUnitType: String? = null
+    private var halfProductUnitType: UnitsUtils.UnitType? = null
 
     /** Represents type of the unit such as weight, volume or simply a piece of a product.*/
-    private var unitType: String? = null
+    private var unitType: UnitsUtils.UnitType? = null
 
     private fun updateUnitList() {
         _units.value = Utils.generateUnitSet(
@@ -91,7 +91,7 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
     }
 
     fun initializeWith(halfProductDomain: HalfProductDomain) {
-        halfProductUnitType = UnitsUtils.getUnitType(halfProductDomain.halfProductUnit) ?: ""
+        halfProductUnitType = UnitsUtils.getUnitType(halfProductDomain.halfProductUnit)
     }
 
     fun selectProduct(product: ProductDomain?) {
@@ -143,6 +143,6 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
     }
 
     fun pieceQuantityNeeded(): Boolean {
-        return selectedProduct.value?.unit == "per piece" && halfProductUnitType != "piece"
+        return selectedProduct.value?.unit == "per piece" && halfProductUnitType != UnitsUtils.UnitType.PIECE
     }
 }

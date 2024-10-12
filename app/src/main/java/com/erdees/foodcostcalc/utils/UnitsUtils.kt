@@ -4,31 +4,36 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.erdees.foodcostcalc.R
 
-// TODO REFACTOR FUNCTIONS THAT RETURN STRINGS TO BE COMPOSABLE AND RETURN STRING RESOURCE
 object UnitsUtils {
 
-    fun getPerUnitAbbreviation(unit: String): String = when (unit) {
-        "per piece" -> "pce"
-        "per kilogram" -> "kg"
-        "per gram" -> "g"
-        "per pound" -> "lb"
-        "per ounce" -> "oz"
-        "per liter" -> "l"
-        "per milliliter" -> "ml"
-        "per gallon" -> "gal"
-        else -> "fl oz"
+    @Composable
+    fun getPerUnitAbbreviation(unit: String): String {
+        return when (unit) {
+            "per piece" -> stringResource(R.string.abbreviation_per_piece)
+            "per kilogram" -> stringResource(R.string.abbreviation_per_kilogram)
+            "per gram" -> stringResource(R.string.abbreviation_per_gram)
+            "per pound" -> stringResource(R.string.abbreviation_per_pound)
+            "per ounce" -> stringResource(R.string.abbreviation_per_ounce)
+            "per liter" -> stringResource(R.string.abbreviation_per_liter)
+            "per milliliter" -> stringResource(R.string.abbreviation_per_milliliter)
+            "per gallon" -> stringResource(R.string.abbreviation_per_gallon)
+            else -> stringResource(R.string.abbreviation_default)
+        }
     }
 
-    fun getUnitAbbreviation(unit: String): String = when (unit) {
-        "piece" -> "pce"
-        "kilogram" -> "kg"
-        "gram" -> "g"
-        "pound" -> "lb"
-        "ounce" -> "oz"
-        "liter" -> "l"
-        "milliliter" -> "ml"
-        "gallon" -> "gal"
-        else -> "fl oz"
+    @Composable
+    fun getUnitAbbreviation(unit: String): String {
+        return when (unit) {
+            "piece" -> stringResource(R.string.abbreviation_piece)
+            "kilogram" -> stringResource(R.string.abbreviation_kilogram)
+            "gram" -> stringResource(R.string.abbreviation_gram)
+            "pound" -> stringResource(R.string.abbreviation_pound)
+            "ounce" -> stringResource(R.string.abbreviation_ounce)
+            "liter" -> stringResource(R.string.abbreviation_liter)
+            "milliliter" -> stringResource(R.string.abbreviation_milliliter)
+            "gallon" -> stringResource(R.string.abbreviation_gallon)
+            else -> stringResource(R.string.abbreviation_default)
+        }
     }
 
     @Composable
@@ -46,17 +51,23 @@ object UnitsUtils {
     }
 
 
-    fun getUnitType(string: String?): String? {
+    enum class UnitType {
+        WEIGHT,
+        VOLUME,
+        PIECE
+    }
+
+    fun getUnitType(string: String?): UnitType? {
         return when (string) {
             "per kilogram", "per pound" -> {
-                "weight"
+                UnitType.WEIGHT
             }
 
             "per liter", "per gallon" -> {
-                "volume"
+                UnitType.VOLUME
             }
 
-            "per piece" -> "piece"
+            "per piece" -> UnitType.PIECE
 
             else -> null
         }

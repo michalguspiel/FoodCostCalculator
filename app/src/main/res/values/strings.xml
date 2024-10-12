@@ -97,6 +97,40 @@
 
     <string name="ad_attribution">Ad</string>
 
+    <!-- Utils -->
+
+    <string name="description_per_kilogram">Piece weight as kilogram</string>
+    <string name="description_per_gram">Piece weight as gram</string>
+    <string name="description_per_pound">Piece weight as pound</string>
+    <string name="description_per_ounce">Piece weight as ounce</string>
+    <string name="description_per_liter">Piece volume as liter</string>
+    <string name="description_per_milliliter">Piece volume as ml</string>
+    <string name="description_per_gallon">Piece volume as gallon</string>
+    <string name="description_default">Piece volume as fl ounce</string>
+
+    <string name="abbreviation_per_piece">pce</string>
+    <string name="abbreviation_per_kilogram">kg</string>
+    <string name="abbreviation_per_gram">g</string>
+    <string name="abbreviation_per_pound">lb</string>
+    <string name="abbreviation_per_ounce">oz</string>
+    <string name="abbreviation_per_liter">l</string>
+    <string name="abbreviation_per_milliliter">ml</string>
+    <string name="abbreviation_per_gallon">gal</string>
+    <string name="abbreviation_default">fl oz</string>
+
+    <string name="abbreviation_piece">pce</string>
+    <string name="abbreviation_kilogram">kg</string>
+    <string name="abbreviation_gram">g</string>
+    <string name="abbreviation_pound">lb</string>
+    <string name="abbreviation_ounce">oz</string>
+    <string name="abbreviation_liter">l</string>
+    <string name="abbreviation_milliliter">ml</string>
+    <string name="abbreviation_gallon">gal</string>
+
+    <string name="weight">weight</string>
+    <string name="volume">volume</string>
+    <string name="piece">piece</string>
+
     <!-- Navigation -->
     <string name="products">Products</string>
     <string name="half_products">Half Products</string>
@@ -135,6 +169,8 @@
     <string name="add">Add</string>
     <string name="name">Name</string>
 
+    <string name="formatted_quantity">%1$s %2$s</string>
+
     <!-- PRODUCTS FEATURE -->
 
     <string name="product_netto_price">Price %1$s netto: %2$s.</string>
@@ -167,15 +203,6 @@
     <string name="content_description_create_half_product">Create half product</string>
     <string name="tip">Tip</string>
     <string name="half_product_tip_content">To get the most accurate results, use the same unit as the half product. If you mix weight and volume, products will be converted to the half product unit using the density of water at 4°C.</string>
-
-    <string name="description_per_kilogram">Piece weight as kilogram</string>
-    <string name="description_per_gram">Piece weight as gram</string>
-    <string name="description_per_pound">Piece weight as pound</string>
-    <string name="description_per_ounce">Piece weight as ounce</string>
-    <string name="description_per_liter">Piece volume as liter</string>
-    <string name="description_per_milliliter">Piece volume as ml</string>
-    <string name="description_per_gallon">Piece volume as gallon</string>
-    <string name="description_default">Piece volume as fl ounce</string>
 
     <string name="content_description_half_product_tip">half product tip</string>
     <string name="content_description_remove_half_product">remove half product</string>

@@ -303,9 +303,13 @@ private fun Ingredients(
             IngredientRow(
                 modifier = Modifier.padding(bottom = 4.dp),
                 description = it.item.name,
-                quantity = it.formatQuantityForTargetServing(
-                    baseQuantity = halfProductDomain.totalQuantity,
-                    targetQuantity = quantity
+                quantity = stringResource(
+                    id = R.string.formatted_quantity,
+                    it.formatQuantityForTargetServing(
+                        baseQuantity = halfProductDomain.totalQuantity,
+                        targetQuantity = quantity
+                    ),
+                    it.quantityUnit
                 ),
                 price = it.formattedTotalPriceForTargetQuantity(
                     context = context,

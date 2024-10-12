@@ -18,11 +18,7 @@ interface UsedItem {
         Utils.formatPrice(totalPrice * amountOfServings, context)
 
     fun formatQuantityForTargetServing(servings: Double): String =
-        "${DecimalFormat("#.##").format(quantity * servings)} ${
-            UnitsUtils.getUnitAbbreviation(
-                quantityUnit
-            )
-        }"
+        DecimalFormat("#.##").format(quantity * servings)
 
     fun formatQuantityForTargetServing(
         baseQuantity: Double,
@@ -30,10 +26,6 @@ interface UsedItem {
     ): String {
         val percentageOfBaseQuantity = targetQuantity * 100 / baseQuantity
         val adjustedQuantity = quantity * (percentageOfBaseQuantity / 100)
-        return "${DecimalFormat("#.##").format(adjustedQuantity)} ${
-            UnitsUtils.getUnitAbbreviation(
-                quantityUnit
-            )
-        }"
+        return DecimalFormat("#.##").format(adjustedQuantity)
     }
 }
