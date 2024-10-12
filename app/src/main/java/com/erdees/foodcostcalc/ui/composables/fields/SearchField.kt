@@ -60,7 +60,7 @@ fun SearchField(
                 focusManager.clearFocus()
                 onValueChange("")
             }) {
-                Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+                Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(id = R.string.back))
             }
         }
 

@@ -32,6 +32,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -39,15 +40,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
-import com.erdees.foodcostcalc.ui.composables.fields.UnitField
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDialog
+import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
+import com.erdees.foodcostcalc.ui.composables.fields.UnitField
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 
@@ -73,6 +75,8 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
     var textFieldLoaded by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
+    val itemAddedText = stringResource(id = R.string.item_added)
+
     LaunchedEffect(Unit) {
         viewModel.getUnits(context.resources)
     }
@@ -80,7 +84,7 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
     LaunchedEffect(screenState) {
         when (screenState) {
             is ScreenState.Success -> {
-                snackbarHostState.showSnackbar("Item added.", duration = SnackbarDuration.Short)
+                snackbarHostState.showSnackbar(itemAddedText, duration = SnackbarDuration.Short)
                 viewModel.resetScreenState()
             }
 
@@ -94,7 +98,7 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text(text = "Create Product") },
+                title = { Text(text = stringResource(id = R.string.create_product)) },
                 navigationIcon = {
                     FCCTopAppBarNavIconButton(navController = navController)
                 }
@@ -132,11 +136,11 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
                             capitalization = KeyboardCapitalization.Words,
                             imeAction = ImeAction.Next
                         ),
-                        title = "Product name",
+                        title = stringResource(id = R.string.product_name),
                         value = productName,
                         onValueChange = { viewModel.updateProductName(it) })
                     FCCTextField(
-                        title = "Price",
+                        title = stringResource(id = R.string.price),
                         value = productPrice,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -144,7 +148,7 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
                         ),
                         onValueChange = { viewModel.updateProductPrice(it) })
                     FCCTextField(
-                        title = "Tax %",
+                        title = stringResource(id = R.string.tax_percent),
                         value = productTax,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -152,7 +156,7 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
                         ),
                         onValueChange = { viewModel.updateProductTax(it) })
                     FCCTextField(
-                        title = "% of waste",
+                        title = stringResource(id = R.string.percent_of_waste),
                         value = productWaste,
                         keyboardOptions = KeyboardOptions(
                             keyboardType = KeyboardType.Number,
@@ -237,7 +241,7 @@ fun CalculateWasteDialog(
 
     FCCDialog(
         modifier = modifier,
-        title = "Count waste",
+        title = stringResource(id = R.string.count_waste),
         onDismiss = { onDismiss() },
         onPrimaryButtonClicked = {
             onSave(
@@ -248,7 +252,7 @@ fun CalculateWasteDialog(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
             FCCTextField(
-                title = "Quantity before processing",
+                title = stringResource(id = R.string.quantity_before_processing),
                 value = totalQuantity,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -259,7 +263,7 @@ fun CalculateWasteDialog(
             }
 
             FCCTextField(
-                title = "Waste quantity",
+                title = stringResource(id = R.string.waste_quantity),
                 value = wasteQuantity,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -289,7 +293,7 @@ fun CalculatePiecePriceDialog(
 
     FCCDialog(
         modifier = modifier,
-        title = "Count waste",
+        title = stringResource(id = R.string.calculate_price_per_piece),
         onDismiss = { onDismiss() },
         onPrimaryButtonClicked = {
             onSave(
@@ -300,7 +304,7 @@ fun CalculatePiecePriceDialog(
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
 
             FCCTextField(
-                title = "Box price", value = boxPrice,
+                title = stringResource(id = R.string.box_price), value = boxPrice,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Next
@@ -310,7 +314,7 @@ fun CalculatePiecePriceDialog(
             }
 
             FCCTextField(
-                title = "Box quantity", value = quantityInBox,
+                title = stringResource(id = R.string.box_quantity), value = quantityInBox,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
                     imeAction = ImeAction.Done
@@ -334,11 +338,11 @@ private fun ButtonRow(
     onCalculateWaste: () -> Unit
 ) {
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-        FCCTextButton(text = "Count waste") {
+        FCCTextButton(text = stringResource(id = R.string.count_waste)) {
             onCalculateWaste()
         }
         Spacer(modifier = Modifier.width(8.dp))
-        FCCTextButton(text = "Count piece price", enabled = countPiecePriceEnabled) {
+        FCCTextButton(text = stringResource(id = R.string.count_piece_price), enabled = countPiecePriceEnabled) {
             onCalculatePiecePrice()
         }
         Spacer(modifier = Modifier.width(8.dp))
@@ -347,7 +351,7 @@ private fun ButtonRow(
             onClick = {
                 onAdd()
             },
-            text = "Add"
+            text = stringResource(id = R.string.add)
         )
     }
 }

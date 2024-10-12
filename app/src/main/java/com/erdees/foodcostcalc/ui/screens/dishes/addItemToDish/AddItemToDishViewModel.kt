@@ -84,7 +84,7 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
             is ProductDomain -> setProductUnitType(item)
             is HalfProductDomain -> setHalfProductUnitType(item)
             else -> {
-                unitType = ""
+                unitType = null
             }
         }
         updateUnitList()
@@ -111,7 +111,7 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
     }
 
     /** Represents type of the unit such as weight, volume or simply a piece of a product.*/
-    private var unitType: String? = null
+    private var unitType: UnitsUtils.UnitType? = null
 
     private fun updateUnitList() {
         _units.value = generateUnitSet(

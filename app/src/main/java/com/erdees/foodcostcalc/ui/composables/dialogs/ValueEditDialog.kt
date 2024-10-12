@@ -18,7 +18,9 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +62,10 @@ fun ValueEditDialog(
             )
             Spacer(modifier = Modifier.size(24.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                FCCTextButton(text = "Save", enabled = saveButtonEnabled) {
+                FCCTextButton(
+                    text = stringResource(id = R.string.save),
+                    enabled = saveButtonEnabled
+                ) {
                     onSave()
                 }
             }

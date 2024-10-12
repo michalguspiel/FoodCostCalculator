@@ -227,7 +227,7 @@ private fun OnlineDataBackup(
     onNavigateToOnlineDataBackup: () -> Unit
 ) {
     Section(modifier) {
-        SectionLabel(text = "Data", Modifier.padding(bottom = 4.dp))
+        SectionLabel(text = stringResource(id = R.string.data), Modifier.padding(bottom = 4.dp))
         NavigationListItem(
             title = stringResource(id = R.string.data_backup),
             icon = {
@@ -256,7 +256,7 @@ private fun Defaults(
     saveSettings: () -> Unit
 ) {
     Section(modifier) {
-        SectionLabel(text = "Your defaults", Modifier.padding(bottom = 4.dp))
+        SectionLabel(text = stringResource(id = R.string.your_defaults), Modifier.padding(bottom = 4.dp))
         FCCTextField(
             title = stringResource(id = R.string.default_dish_tax),
             value = settings.defaultTax,

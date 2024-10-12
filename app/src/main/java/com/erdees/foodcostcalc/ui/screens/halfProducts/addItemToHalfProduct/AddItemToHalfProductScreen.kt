@@ -38,17 +38,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
-import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.SelectedTab
 import com.erdees.foodcostcalc.utils.UnitsUtils
@@ -74,6 +76,8 @@ fun AddItemToHalfProductScreen(
     val tooltipState = rememberTooltipState(isPersistent = true)
     val scope = rememberCoroutineScope()
 
+    val itemAddedText = stringResource(id = R.string.item_added)
+
     LaunchedEffect(halfProductDomain) {
         viewModel.initializeWith(halfProductDomain)
     }
@@ -81,7 +85,7 @@ fun AddItemToHalfProductScreen(
     LaunchedEffect(screenState) {
         when (screenState) {
             is ScreenState.Success -> {
-                snackbarHostState.showSnackbar("Item added.", duration = SnackbarDuration.Short)
+                snackbarHostState.showSnackbar(itemAddedText, duration = SnackbarDuration.Short)
                 viewModel.resetScreenState()
             }
 
@@ -96,7 +100,10 @@ fun AddItemToHalfProductScreen(
                 Text(text = halfProductDomain.name)
             }, navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+                    Icon(
+                        Icons.AutoMirrored.Sharp.ArrowBack,
+                        contentDescription = stringResource(id = R.string.back)
+                    )
                 }
             }, actions = {
                 IconButton(onClick = {
@@ -104,7 +111,10 @@ fun AddItemToHalfProductScreen(
                         tooltipState.show(MutatePriority.PreventUserInput)
                     }
                 }) {
-                    Icon(imageVector = Icons.Sharp.Info, contentDescription = "")
+                    Icon(
+                        imageVector = Icons.Sharp.Info,
+                        contentDescription = stringResource(id = R.string.content_description_half_product_tip)
+                    )
                 }
             }
             )
@@ -145,13 +155,8 @@ fun AddItemToHalfProductScreen(
                     positionProvider =
                     TooltipDefaults.rememberPlainTooltipPositionProvider(), tooltip = {
                         RichTooltip(
-                            title = { Text("Tip") },
-                            text = {
-                                Text(
-                                    text = "To get the most accurate results, use the same unit as the half product." +
-                                            " If you mix weight and volume, products will be converted to the half product unit using the density of water at 4°C."
-                                )
-                            }
+                            title = { Text(stringResource(id = R.string.tip)) },
+                            text = { Text(text = stringResource(id = R.string.half_product_tip_content)) }
                         )
                     }, state = tooltipState
                 ) {
@@ -159,7 +164,7 @@ fun AddItemToHalfProductScreen(
                         FCCPrimaryButton(
                             enabled = addButtonEnabled,
                             onClick = { viewModel.addHalfProduct(halfProductDomain) },
-                            text = "Add"
+                            text = stringResource(id = R.string.add)
                         )
                     }
                 }
@@ -170,11 +175,11 @@ fun AddItemToHalfProductScreen(
                 is ScreenState.Error -> {
                     AlertDialog(
                         onDismissRequest = { viewModel.resetScreenState() },
-                        title = { Text("Error") },
-                        text = { Text("Something went wrong") },
+                        title = { Text(stringResource(id = R.string.error)) },
+                        text = { Text(stringResource(id = R.string.something_went_wrong)) },
                         confirmButton = {
                             Button(onClick = { viewModel.resetScreenState() }) {
-                                Text("OK")
+                                Text(stringResource(id = R.string.okay))
                             }
                         }
                     )
@@ -195,7 +200,7 @@ fun PieceWeightField(
 ) {
     Column(modifier) {
         FieldLabel(
-            text = "Piece ${UnitsUtils.getPerUnitAsDescription(halfProductUnit)}",
+            text = UnitsUtils.getPerUnitAsDescription(halfProductUnit),
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
         )
         OutlinedTextField(

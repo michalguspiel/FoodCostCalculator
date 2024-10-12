@@ -26,11 +26,6 @@ object Utils {
         return formattedResultCheck
     }
 
-    fun formatPriceOrWeight(number: Double): String {
-        val df = DecimalFormat("#.##")
-        return df.format(number)
-    }
-
     /**
      * Formats price to currency.
      *
@@ -82,26 +77,29 @@ object Utils {
     }
 
 
-    /**First clears unitList then adds correct units,
-     *  every time data set changes this function is called.*/
+    // TODO, this should return list of enums which will be later on mapped to strings
+    // TODO, otherwise this can't be fixed with string resources,
+    // TODO, however, this also requires migrating database to use enums instead of strings
+    /**Returns a set of units based on the unit type and user preferences.*/
     fun generateUnitSet(
-        unitType: String?,
+        unitType: UnitsUtils.UnitType?,
         metricEnabled: Boolean,
         imperialEnabled: Boolean
     ): Set<String> {
         val units = mutableSetOf<String>()
+        if (unitType == null) return units
         if (metricEnabled) {
             when (unitType) {
-                "weight" -> units += setOf("kilogram", "gram")
-                "volume" -> units += setOf("milliliter", "liter")
-                "piece" -> units += "piece"
+                UnitsUtils.UnitType.WEIGHT -> units += setOf("kilogram", "gram")
+                UnitsUtils.UnitType.VOLUME -> units += setOf("milliliter", "liter")
+                UnitsUtils.UnitType.PIECE -> units += "piece"
             }
         }
         if (imperialEnabled) {
             when (unitType) {
-                "weight" -> units += setOf("pound", "ounce")
-                "volume" -> units += arrayListOf("gallon", "fluid ounce")
-                "piece" -> units += "piece"
+                UnitsUtils.UnitType.WEIGHT -> units += setOf("pound", "ounce")
+                UnitsUtils.UnitType.VOLUME -> units += arrayListOf("gallon", "fluid ounce")
+                UnitsUtils.UnitType.PIECE -> units += "piece"
             }
         }
         return units

@@ -21,7 +21,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
+import com.erdees.foodcostcalc.R
 
 @Composable
 fun FCCPrimaryButton(
@@ -69,7 +71,7 @@ fun FCCOutlinedButton(
 @Composable
 fun FCCTopAppBarNavIconButton(navController: NavController, modifier: Modifier = Modifier) {
     IconButton(modifier = modifier, onClick = { navController.popBackStack() }) {
-        Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+        Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(id = R.string.back))
     }
 }
 

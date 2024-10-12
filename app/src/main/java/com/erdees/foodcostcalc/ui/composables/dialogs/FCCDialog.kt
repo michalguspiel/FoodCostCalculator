@@ -15,7 +15,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 
 
@@ -24,7 +26,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 fun FCCDialog(
     title: String,
     modifier: Modifier = Modifier,
-    primaryButtonText: String = "Save",
+    primaryButtonText: String = stringResource(id = R.string.save),
     onDismiss: () -> Unit,
     onPrimaryButtonClicked: () -> Unit,
     content: @Composable () -> Unit

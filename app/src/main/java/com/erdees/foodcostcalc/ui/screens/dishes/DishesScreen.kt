@@ -63,6 +63,7 @@ import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 
 @Composable
@@ -299,7 +300,11 @@ private fun Ingredients(
             IngredientRow(
                 modifier = Modifier.padding(bottom = 4.dp),
                 description = it.item.name,
-                quantity = it.formatQuantityForTargetServing(servings),
+                quantity = stringResource(
+                    R.string.formatted_quantity,
+                    it.formatQuantityForTargetServing(servings),
+                    getUnitAbbreviation(it.quantityUnit)
+                ),
                 price = it.formattedTotalPricePerServing(context, servings),
                 style = MaterialTheme.typography.bodyMedium
             )
