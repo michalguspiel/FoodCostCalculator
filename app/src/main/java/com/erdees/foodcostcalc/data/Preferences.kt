@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.data
 
 import android.content.Context
 import android.icu.util.Currency
+import android.util.Log
 import com.erdees.foodcostcalc.utils.Constants
 import java.util.Locale
 
@@ -65,6 +66,7 @@ class PreferencesImpl(context: Context) : Preferences {
     override var userHasActiveSubscription: Boolean
         get() = sharedPreference.getValueBoolean(Constants.SUBSCRIPTION_STATE, false)
         set(value) {
+            Log.i("Preferences", "Subscription state set to $value")
             sharedPreference.save(Constants.SUBSCRIPTION_STATE, value)
         }
     override var metricUsed: Boolean

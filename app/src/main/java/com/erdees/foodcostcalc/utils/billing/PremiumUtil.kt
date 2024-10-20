@@ -76,6 +76,10 @@ class PremiumUtil(private val preferences: Preferences) {
                         bc.queryPurchasesAsync(params.build()) { billingResult, purchase ->
 
                             if (billingResult.responseCode == BillingResponseCode.OK) {
+                                Log.i(
+                                    "PremiumUtil",
+                                    "queryPurchasesAsync() , responseCode: ${billingResult.responseCode}, purchase: $purchase"
+                                )
                                 if (purchase.isNotEmpty()) {
                                     Log.i(TAG, "User already has subscription")
                                     preferences.userHasActiveSubscription = true

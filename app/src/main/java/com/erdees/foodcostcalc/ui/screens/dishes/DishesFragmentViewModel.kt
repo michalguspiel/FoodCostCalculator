@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.dishes
 
 import androidx.lifecycle.viewModelScope
+import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
@@ -25,7 +26,12 @@ class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
 
     private val dishRepository: DishRepository by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
+    private val preferences: Preferences by inject()
     val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
+
+    private val adFrequency =
+        if (preferences.userHasActiveSubscription) Constants.Ads.PREMIUM_FREQUENCY
+        else Constants.Ads.DISHES_AD_FREQUENCY
 
     private val dishes = dishRepository.dishes.map { dishes ->
         dishes.map { dish -> dish.toDishDomain() }.also { dishesDomain ->
@@ -57,10 +63,7 @@ class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
 
     val filteredDishesInjectedWithAds =
         filteredDishes.map { dishes ->
-            ListAdsInjectorManager(
-                dishes,
-                Constants.Ads.DISHES_AD_FREQUENCY
-            ).listInjectedWithAds
+            ListAdsInjectorManager(dishes, adFrequency).listInjectedWithAds
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,

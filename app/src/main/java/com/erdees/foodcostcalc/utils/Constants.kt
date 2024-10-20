@@ -8,6 +8,7 @@ object Constants {
         const val PRODUCTS_AD_FREQUENCY = 4
         const val HALF_PRODUCTS_AD_FREQUENCY = 3
         const val DISHES_AD_FREQUENCY = 3
+        const val PREMIUM_FREQUENCY = 0
 
         const val ADMOB_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/2247696110"
         const val ADMOB_PRODUCTS_AD_UNIT_ID = "ca-app-pub-5093191239349402/7646868536"

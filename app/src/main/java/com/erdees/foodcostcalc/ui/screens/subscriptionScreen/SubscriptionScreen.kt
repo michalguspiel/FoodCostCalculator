@@ -50,7 +50,8 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
-
+// todo add some more visual elements if user has active subscription
+// todo add analytics when user opens this screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubscriptionScreen(navController: NavController) {
@@ -78,6 +79,7 @@ fun SubscriptionScreen(navController: NavController) {
                 PremiumSubscriptionOffer(
                     subscription = capturedScreenState.premiumSubscription,
                     selectedPlan = capturedScreenState.selectedPlan,
+                    userAlreadySubscribes = capturedScreenState.userAlreadySubscribes,
                     onPlanSelected = { viewModel.onPlanSelected(it) },
                     onSubscribeClicked = {
                         viewModel.onSubscribeClicked(activity)
@@ -110,7 +112,7 @@ fun SubscriptionScreen(navController: NavController) {
 @Composable
 fun PremiumSubscriptionOffer(
     subscription: PremiumSubscription,
-    userAlreadySubscribes: Boolean = false,
+    userAlreadySubscribes: Boolean,
     selectedPlan: Plan?,
     modifier: Modifier = Modifier,
     titleOverride: String? = null,
@@ -290,6 +292,7 @@ fun PremiumSubscriptionOfferModalPreview() {
         PremiumSubscriptionOffer(
             fakePremiumSubscription,
             titleOverride = "Premium",
+            userAlreadySubscribes = true,
             selectedPlan = fakePremiumSubscription.monthlyPlan
         ) {}
     }
