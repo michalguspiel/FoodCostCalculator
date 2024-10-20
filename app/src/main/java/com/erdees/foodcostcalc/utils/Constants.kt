@@ -2,6 +2,8 @@ package com.erdees.foodcostcalc.utils
 
 object Constants {
 
+    const val SUBSCRIPTION_STATE = "subscription_state"
+
     object Ads {
         const val PRODUCTS_AD_FREQUENCY = 4
         const val HALF_PRODUCTS_AD_FREQUENCY = 3

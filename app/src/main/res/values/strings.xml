@@ -148,6 +148,7 @@
     <string name="default_dish_margin_hint">Margin %</string>
     <string name="units_section">Units</string>
     <string name="default_currency">Default currency</string>
+    <string name="premium">Premium</string>
 
     <!-- DATA BACKUP -->
     <string name="signing_info">Sign in with google account to save and download your database from google drive.</string>
@@ -169,5 +170,16 @@
     <string name="sign_in">Sign in</string>
     <string name="sign_field_title">Google Account</string>
     <string name="sign_out">Sign out</string>
+
+    <!-- SUBSCRIPTION -->
+    <string name="subscription">Subscription</string>
+    <string name="monthly">Monthly</string>
+    <string name="yearly">Yearly</string>
+    <string name="try_it_out">Try it out</string>
+    <string name="best_value">Best Value</string>
+    <string name="cancel_anytime">Cancel anytime</string>
+    <string name="subscription_sub_title">Subscription</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="content_description_selected_plan">selected plan</string>
 
 </resources>

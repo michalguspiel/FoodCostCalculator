@@ -105,7 +105,7 @@ fun SettingsScreen(navController: NavController) {
         updateImperialUsed = viewModel::updateImperialUsed,
         updateDefaultCurrencyCode = viewModel::updateDefaultCurrencyCode,
         saveSettings = viewModel::saveSettings,
-        resetScreenState = viewModel::resetScreenState
+        resetScreenState = viewModel::resetScreenState,
     )
 }
 
@@ -124,7 +124,7 @@ private fun SettingsScreenContent(
     updateImperialUsed: (Boolean) -> Unit,
     updateDefaultCurrencyCode: (Currency) -> Unit,
     saveSettings: () -> Unit,
-    resetScreenState: () -> Unit
+    resetScreenState: () -> Unit,
 ) {
     val scrollState = rememberScrollState()
     Scaffold(
@@ -138,7 +138,7 @@ private fun SettingsScreenContent(
             )
         },
     ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
+        Box(modifier = Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
 
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -157,6 +157,13 @@ private fun SettingsScreenContent(
                     updateImperialUsed = updateImperialUsed,
                     updateDefaultCurrencyCode = updateDefaultCurrencyCode,
                     saveSettings = saveSettings
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Premium(
+                    modifier = Modifier,
+                    onClick = { navController.navigate(FCCScreen.Subscription) }
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -222,6 +229,28 @@ private fun AppInformation(modifier: Modifier = Modifier) {
 }
 
 @Composable
+private fun Premium(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    Section(modifier) {
+        SectionLabel(text = stringResource(id = R.string.data), Modifier.padding(bottom = 4.dp))
+        NavigationListItem(
+            title = stringResource(id = R.string.premium),
+            icon = {
+                Icon(
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.premium),
+                    contentDescription = stringResource(id = R.string.data_backup)
+                )
+            }) {
+            onClick()
+        }
+    }
+}
+
+
+@Composable
 private fun OnlineDataBackup(
     modifier: Modifier = Modifier,
     onNavigateToOnlineDataBackup: () -> Unit
@@ -256,7 +285,10 @@ private fun Defaults(
     saveSettings: () -> Unit
 ) {
     Section(modifier) {
-        SectionLabel(text = stringResource(id = R.string.your_defaults), Modifier.padding(bottom = 4.dp))
+        SectionLabel(
+            text = stringResource(id = R.string.your_defaults),
+            Modifier.padding(bottom = 4.dp)
+        )
         FCCTextField(
             title = stringResource(id = R.string.default_dish_tax),
             value = settings.defaultTax,

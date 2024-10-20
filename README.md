@@ -18,19 +18,8 @@ Please send suggestions / opinions.
 </p>
 
 
-## Information 
-It is my first android project as well as programming project in general. In total I'd estimate that I have spent around 300 hours on it, I learned a lot and I'm going to keep improving my knowledge with different projects.
-
-### Technologies used
-- MVVM architecture 
-- Room database
-- Shared preferences
-- Fragments
-- Dialog fragments
-- Recycler Views
-- List Views
-- Google Drive API
-- Rx Java / Rx Kotlin
+### Design
+App follows Material 3 Design. Icons are sharp with weight of 200, grade 0, and size 24.
 
 ### Features implemented 
 
@@ -41,13 +30,7 @@ It is my first android project as well as programming project in general. In tot
 - Presenting half products data for X of volume
 - Saving database into user google drive
 - Loading database from user google drive
-- Units: Metric(gram, kilogram, milliliter,liter) US(ounce, pound, fluid ounce, gallon)
-
+- Units: Metric(gram, kilogram, milliliter,liter), Imperial(ounce, pound, fluid ounce, gallon)
 
 ### TODO 
-- Printing recipe? 
-
-## Icons and images source: 
-https://www.flaticon.com By wanicon ,  Freepik , Dmitri13
-
-
+- Printing recipe
