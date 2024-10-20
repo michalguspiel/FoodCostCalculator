@@ -15,7 +15,6 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomainNavType
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomainNavType
-import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.DishesScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDish.CreateDishScreen
@@ -25,8 +24,10 @@ import com.erdees.foodcostcalc.ui.screens.halfProducts.addItemToHalfProduct.AddI
 import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.onlineBackup.DataBackupScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
+import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductScreen
 import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
+import com.erdees.foodcostcalc.ui.screens.subscriptionScreen.SubscriptionScreen
 import kotlin.reflect.typeOf
 
 @Composable
@@ -107,6 +108,10 @@ fun FCCNavigation(
                 providedProduct = editProduct.productDomain,
                 navController = navController
             )
+        }
+
+        composable<FCCScreen.Subscription> {
+            SubscriptionScreen(navController)
         }
     }
 }
