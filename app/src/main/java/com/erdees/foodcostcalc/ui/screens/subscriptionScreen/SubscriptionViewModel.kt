@@ -30,10 +30,23 @@ data object MissingProductDetails : Error("Plan not selected") {
     private fun readResolve(): Any = MissingProductDetails
 }
 
+/**
+ * Represents the state of the subscription screen.
+ *
+ *
+ * @param productDetails Data model of the premium subscription. Necessary to make the purchase
+ * @param premiumSubscription Domain level premium subscription.
+ * @param userAlreadySubscribes Whether the user already subscribes to the premium subscription.
+ * @param screenLaunchedWithoutSubscription Whether the screen was launched without a subscription. Necessary to determine if confetti should be launched or not.
+ * @param selectedPlan The selected plan.
+ * @param isLoading Whether the screen is loading.
+ * @param error The error.
+ * */
 data class SubscriptionScreenState(
     val productDetails: ProductDetails? = null,
     val premiumSubscription: PremiumSubscription? = null,
     val userAlreadySubscribes: Boolean = false,
+    val screenLaunchedWithoutSubscription: Boolean,
     val selectedPlan: Plan? = null,
     val isLoading: Boolean = false,
     val error: Error? = null
@@ -53,13 +66,24 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
                 selectedPlan = premiumUtil.productDetails.value.firstOrNull()
                     ?.toPremiumSubscription()
                     ?.monthlyPlan,
-                userAlreadySubscribes = preferences.userHasActiveSubscription
+                userAlreadySubscribes = preferences.userHasActiveSubscription,
+                screenLaunchedWithoutSubscription = !preferences.userHasActiveSubscription
             )
         )
     val screenState: StateFlow<SubscriptionScreenState> = _screenState
 
     fun onPlanSelected(plan: Plan) {
         _screenState.value = _screenState.value.copy(selectedPlan = plan)
+    }
+
+    /**
+     * This function checks the subscription status of the user.
+     *
+     * It is called onResume, so that when user made the purchase the screen will be updated.
+     * */
+    fun checkSubscriptionStatus() {
+        val userAlreadySubscribes = preferences.userHasActiveSubscription
+        _screenState.value = _screenState.value.copy(userAlreadySubscribes = userAlreadySubscribes)
     }
 
     fun onSubscribeClicked(activity: Activity?) {
@@ -99,13 +123,14 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
         _screenState.value = _screenState.value.copy(error = null)
     }
 
-    fun onManageSubscription(context: Context){
+    fun onManageSubscription(context: Context) {
         val link =
             "https://play.google.com/store/account/subscriptions?sku=${PremiumUtil.PRODUCT_ID}&package=com.erdees.foodcostcalc"
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data =
-            Uri.parse(link)
-        intent.setPackage("com.android.vending")
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(link)
+            setPackage("com.android.vending")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
         startActivity(context, intent, null)
     }
 }

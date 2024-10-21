@@ -181,5 +181,10 @@
     <string name="subscription_sub_title">Subscription</string>
     <string name="subscribe">Subscribe</string>
     <string name="content_description_selected_plan">selected plan</string>
+    <string name="subscription_extra_desc">Your subscription supports app development.</string>
+    <string name="active_subscription">Your Premium subscription is active!</string>
+    <string name="active_subscription_thank_you">Thank you for subscribing!</string>
+    <string name="star">star</string>
+    <string name="products_missing_error">Can\'t load products, please come back again later.</string>
 
 </resources>

@@ -31,6 +31,9 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
     private val halfProductRepository: HalfProductRepository by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
     val preferences: Preferences by inject()
+    private val adFrequency =
+        if (preferences.userHasActiveSubscription) Constants.Ads.PREMIUM_FREQUENCY
+        else Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
 
     val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
 
@@ -43,41 +46,31 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
                 // If it's in the map and not in the list, it means it was deleted.
                 // Therefore, it should be removed from itemPresentationState map. To be done in 3.1
 
-                listPresentationStateHandler.updatePresentationState(
-                    halfProductsDomain.associate { it.id to ItemPresentationState(quantity = it.totalQuantity) }
-                )
+                listPresentationStateHandler.updatePresentationState(halfProductsDomain.associate {
+                    it.id to ItemPresentationState(
+                        quantity = it.totalQuantity
+                    )
+                })
             }
         }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = emptyList()
+            scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList()
         )
 
     @OptIn(FlowPreview::class)
-    private val filteredHalfProducts = combine(
-        halfProducts,
-        searchKey.debounce(500).onStart { emit("") }
-    ) { halfProducts, searchKey ->
+    private val filteredHalfProducts = combine(halfProducts,
+        searchKey.debounce(500).onStart { emit("") }) { halfProducts, searchKey ->
         halfProducts.filter {
             it.name.lowercase(Locale.getDefault()).contains(searchKey.lowercase())
         }
     }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.Lazily,
-        initialValue = emptyList()
+        scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList()
     )
 
-    val filteredHalfProductsInjectedWithAds =
-        filteredHalfProducts.map { halfProducts ->
-            ListAdsInjectorManager(
-                halfProducts,
-                Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
-            ).listInjectedWithAds
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.Lazily,
-            initialValue = listOf()
-        )
+    val filteredHalfProductsInjectedWithAds = filteredHalfProducts.map { halfProducts ->
+        ListAdsInjectorManager(halfProducts, adFrequency).listInjectedWithAds
+    }.stateIn(
+        scope = viewModelScope, started = SharingStarted.Lazily, initialValue = listOf()
+    )
 
     fun addHalfProduct(name: String, unit: String) {
         val halfProductBase = HalfProductBase(0, name, unit)
