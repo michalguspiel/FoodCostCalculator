@@ -54,7 +54,7 @@ class PremiumUtil(private val preferences: Preferences) {
                         // MAKE SURE SURE TO SAVE THIS IN PREFERENCES
                         preferences.userHasActiveSubscription = true
                         // ACKNOWLEDGE PURCHASE
-                        val ackPurchaseResult = withContext(Dispatchers.IO) {
+                        withContext(Dispatchers.IO) {
                             bc.acknowledgePurchase(acknowledgePurchaseParams)
                         }
                     }
@@ -73,6 +73,8 @@ class PremiumUtil(private val preferences: Preferences) {
                     if (result.responseCode == BillingResponseCode.OK) {
                         val params = QueryPurchasesParams.newBuilder()
                             .setProductType(BillingClient.ProductType.SUBS)
+
+                        // Check whether the user already subscribes
                         bc.queryPurchasesAsync(params.build()) { billingResult, purchase ->
 
                             if (billingResult.responseCode == BillingResponseCode.OK) {
@@ -83,6 +85,9 @@ class PremiumUtil(private val preferences: Preferences) {
                                 if (purchase.isNotEmpty()) {
                                     Log.i(TAG, "User already has subscription")
                                     preferences.userHasActiveSubscription = true
+                                } else {
+                                    Log.i(TAG, "User does not have subscription")
+                                    preferences.userHasActiveSubscription = false
                                 }
                             }
                         }
@@ -138,7 +143,7 @@ class PremiumUtil(private val preferences: Preferences) {
             .setProductDetailsParamsList(productDetailsParamsList)
             .build()
 
-        val billingResult = billingClient.launchBillingFlow(activity, billingFlowParams)
+        billingClient.launchBillingFlow(activity, billingFlowParams)
     }
 
     companion object {

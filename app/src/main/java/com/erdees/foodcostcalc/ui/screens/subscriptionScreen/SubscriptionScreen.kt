@@ -1,6 +1,5 @@
 package com.erdees.foodcostcalc.ui.screens.subscriptionScreen
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,10 +22,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ParagraphStyle
@@ -37,8 +39,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.Plan
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumSubscription
@@ -49,19 +55,52 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
+import nl.dionsegijn.konfetti.compose.KonfettiView
+import nl.dionsegijn.konfetti.core.Party
+import nl.dionsegijn.konfetti.core.Position
+import nl.dionsegijn.konfetti.core.emitter.Emitter
+import java.util.concurrent.TimeUnit
 
-// todo add some more visual elements if user has active subscription
-// todo add analytics when user opens this screen
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SubscriptionScreen(navController: NavController) {
-
-    val viewModel: SubscriptionViewModel = viewModel()
     val context = LocalContext.current
     val activity = context.getActivity()
-
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val viewModel: SubscriptionViewModel = viewModel()
     val screenState by viewModel.screenState.collectAsState()
-    val capturedScreenState = screenState
+
+    DisposableEffect(Unit) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.checkSubscriptionStatus()
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    SubscriptionScreenContent(
+        navController = navController,
+        screenState = screenState,
+        onErrorAck = viewModel::acknowledgeError,
+        onPlanSelected = viewModel::onPlanSelected,
+        onSubscribeClicked = { viewModel.onSubscribeClicked(activity) },
+        onManageSubscription = { viewModel.onManageSubscription(context) }
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun SubscriptionScreenContent(
+    navController: NavController,
+    screenState: SubscriptionScreenState,
+    onSubscribeClicked: () -> Unit,
+    onManageSubscription: () -> Unit,
+    onErrorAck: () -> Unit,
+    onPlanSelected: (Plan) -> Unit
+) {
 
     Scaffold(
         topBar = {
@@ -74,113 +113,216 @@ fun SubscriptionScreen(navController: NavController) {
         },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+            ) {
+                val subscription = screenState.premiumSubscription
+                if (subscription != null) {
 
-            if (capturedScreenState.premiumSubscription != null) {
-                PremiumSubscriptionOffer(
-                    subscription = capturedScreenState.premiumSubscription,
-                    selectedPlan = capturedScreenState.selectedPlan,
-                    userAlreadySubscribes = capturedScreenState.userAlreadySubscribes,
-                    onPlanSelected = { viewModel.onPlanSelected(it) },
-                    onSubscribeClicked = {
-                        viewModel.onSubscribeClicked(activity)
-                    },
-                    onManageSubscription = {
-                        viewModel.onManageSubscription(context = context)
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Title(subscription = subscription)
+                        // Description
+                        Text(
+                            text = subscription.description,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(
+                                top = 8.dp,
+                                start = 12.dp,
+                                end = 12.dp,
+                                bottom = 8.dp
+                            )
+                        )
                     }
-                )
-            }
-        }
-        when {
-            capturedScreenState.isLoading -> {
-                ScreenLoadingOverlay()
-            }
 
-            (capturedScreenState.error != null) -> {
-                val errorMessage = capturedScreenState.error.message
-                ErrorDialog(
-                    title = stringResource(id = R.string.error),
-                    content = errorMessage
-                        ?: stringResource(id = R.string.something_went_wrong),
-                ) {
-                    viewModel.acknowledgeError()
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        if (!screenState.userAlreadySubscribes) {
+                            PlanSection(
+                                subscription = subscription,
+                                selectedPlan = screenState.selectedPlan,
+                                onPlanSelected = { onPlanSelected(it) }
+                            )
+                        } else {
+                            ActiveSubscriptionSection()
+                        }
+
+                        Text(
+                            text = stringResource(id = R.string.subscription_extra_desc),
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(
+                                top = 8.dp,
+                                start = 12.dp,
+                                end = 12.dp,
+                                bottom = 8.dp
+                            )
+                        )
+                    }
+
+
+                    ButtonRow(
+                        userAlreadySubscribes = screenState.userAlreadySubscribes,
+                        onSubscribeClicked = {
+                            onSubscribeClicked()
+                        },
+                        onManageSubscription = {
+                            onManageSubscription()
+                        }
+                    )
+                } else {
+                    SomethingWentWrongContent()
                 }
             }
+
+
+            if (screenState.screenLaunchedWithoutSubscription && screenState.userAlreadySubscribes) {
+                val party = Party(
+                    speed = 0f,
+                    maxSpeed = 30f,
+                    damping = 0.9f,
+                    spread = 360,
+                    colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
+                    emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100),
+                    position = Position.Relative(0.5, 0.3)
+                )
+
+                KonfettiView(
+                    modifier = Modifier.fillMaxSize(),
+                    parties = listOf(party),
+                )
+            }
+
+            ScreenStateOverlay(screenState) { onErrorAck() }
         }
     }
 }
 
 @Composable
-fun PremiumSubscriptionOffer(
-    subscription: PremiumSubscription,
-    userAlreadySubscribes: Boolean,
-    selectedPlan: Plan?,
-    modifier: Modifier = Modifier,
-    titleOverride: String? = null,
-    onPlanSelected: (Plan) -> Unit = {},
-    onSubscribeClicked: () -> Unit = {},
-    onManageSubscription: () -> Unit = {}
-) {
-    Log.i("SettingScreen", "BrowseProductsModal")
+private fun ActiveSubscriptionSection(modifier: Modifier = Modifier) {
+    val activeSubscriptionText = stringResource(id = R.string.active_subscription)
+    val thankYou = stringResource(id = R.string.active_subscription_thank_you)
+    Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
+        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            repeat(3) {
+                Icon(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .padding(vertical = 4.dp),
+                    imageVector = Icons.Filled.Star,
+                    tint = Color.Yellow,
+                    contentDescription = stringResource(
+                        id = R.string.star
+                    )
+                )
+            }
+        }
+        Text(
+            text = buildAnnotatedString {
+                withStyle(style = ParagraphStyle()) {
+                    append(activeSubscriptionText)
+                }
+                withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                    append(thankYou)
+
+                }
+            },
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding()
+        )
+    }
+}
+
+@Composable
+private fun SomethingWentWrongContent(modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        verticalArrangement = Arrangement.Center,
+        modifier = modifier.fillMaxSize()
     ) {
         Text(
+            text = stringResource(id = R.string.something_went_wrong),
             style = MaterialTheme.typography.headlineLarge,
-            lineHeight = 30.sp,
             textAlign = TextAlign.Center,
-            text = buildAnnotatedString {
-                withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
-                    append(titleOverride?.uppercase() ?: subscription.title.uppercase())
-                }
-                append("\n")
-                withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
-                    append("Subscription".uppercase())
-                }
-            })
-        Text(
-            text = subscription.description,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(
-                top = 8.dp,
-                start = 8.dp,
-                end = 8.dp,
-                bottom = 8.dp
-            )
+            modifier = Modifier.padding()
         )
 
-        Row(Modifier, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            PlanDetails(
-                modifier = Modifier.weight(1f),
-                plan = subscription.monthlyPlan,
-                selectedPlanId = selectedPlan?.id
-            ) { onPlanSelected(subscription.monthlyPlan) }
-            PlanDetails(
-                modifier = Modifier.weight(1f),
-                plan = subscription.yearlyPlan,
-                selectedPlanId = selectedPlan?.id
-            ) { onPlanSelected(subscription.yearlyPlan) }
+        Text(
+            text = stringResource(id = R.string.products_missing_error),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding()
+        )
+    }
+}
+
+@Composable
+private fun ButtonRow(
+    userAlreadySubscribes: Boolean,
+    modifier: Modifier = Modifier,
+    onManageSubscription: () -> Unit,
+    onSubscribeClicked: () -> Unit
+) {
+    Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+        if (userAlreadySubscribes) {
+            FCCTextButton(
+                modifier = Modifier.padding(end = 16.dp),
+                text = "Manage Subscription"
+            ) { onManageSubscription() }
         }
 
-        Spacer(modifier = Modifier.size(16.dp))
-
-        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-
-            if (userAlreadySubscribes) {
-                FCCTextButton(
-                    modifier = Modifier.padding(end = 16.dp),
-                    text = "Manage Subscription"
-                ) { onManageSubscription() }
-            }
-
-            FCCPrimaryButton(text = "Subscribe", enabled = !userAlreadySubscribes) {
-                onSubscribeClicked()
-            }
+        FCCPrimaryButton(text = "Subscribe", enabled = !userAlreadySubscribes) {
+            onSubscribeClicked()
         }
+    }
+}
+
+@Composable
+private fun Title(
+    subscription: PremiumSubscription,
+    modifier: Modifier = Modifier,
+    titleOverride: String? = null
+) {
+    Text(
+        modifier = modifier,
+        style = MaterialTheme.typography.headlineLarge,
+        lineHeight = 30.sp,
+        textAlign = TextAlign.Center,
+        text = buildAnnotatedString {
+            withStyle(style = SpanStyle(fontWeight = FontWeight.SemiBold)) {
+                append(titleOverride?.uppercase() ?: subscription.title.uppercase())
+            }
+            append("\n")
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Light)) {
+                append("Subscription".uppercase())
+            }
+        })
+}
+
+@Composable
+fun PlanSection(
+    subscription: PremiumSubscription,
+    selectedPlan: Plan?,
+    modifier: Modifier = Modifier,
+    onPlanSelected: (Plan) -> Unit
+) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        PlanDetails(
+            modifier = Modifier.weight(1f),
+            plan = subscription.monthlyPlan,
+            selectedPlanId = selectedPlan?.id
+        ) { onPlanSelected(subscription.monthlyPlan) }
+        PlanDetails(
+            modifier = Modifier.weight(1f),
+            plan = subscription.yearlyPlan,
+            selectedPlanId = selectedPlan?.id
+        ) { onPlanSelected(subscription.yearlyPlan) }
     }
 }
 
@@ -212,8 +354,8 @@ private fun PlanDetails(
         shape = MaterialTheme.shapes.medium,
         border = BorderStroke(
             width = if (isSelected) 1.dp else 0.7.dp,
-            color = if (isSelected) MaterialTheme.colorScheme.secondary
-            else MaterialTheme.colorScheme.surfaceTint
+            color = if (isSelected) MaterialTheme.colorScheme.surfaceTint
+            else MaterialTheme.colorScheme.outline
         )
     ) {
         Column(
@@ -266,12 +408,35 @@ private fun PlanDetails(
     }
 }
 
+@Composable
+private fun ScreenStateOverlay(
+    capturedScreenState: SubscriptionScreenState,
+    onErrorAck: () -> Unit
+) {
+    when {
+        capturedScreenState.isLoading -> {
+            ScreenLoadingOverlay()
+        }
+
+        (capturedScreenState.error != null) -> {
+            val errorMessage = capturedScreenState.error.message
+            ErrorDialog(
+                title = stringResource(id = R.string.error),
+                content = errorMessage
+                    ?: stringResource(id = R.string.something_went_wrong),
+            ) {
+                onErrorAck()
+            }
+        }
+    }
+}
+
 @Preview(backgroundColor = 0xFF999999, showBackground = true)
 @Composable
-fun PremiumSubscriptionOfferModalPreview() {
+fun SubscriptionScreenContentPreview1() {
     val fakePremiumSubscription = PremiumSubscription(
         id = "food.cost.calculator.premium.account",
-        title = "Premium Mode (Food Cost Calculator)",
+        title = "Premium Mode",
         description = "Premium mode. Ad-Free Experience: Removes all ads for uninterrupted workflow.",
         monthlyPlan = Plan(
             id = "premium-mode-monthly-plan",
@@ -289,11 +454,77 @@ fun PremiumSubscriptionOfferModalPreview() {
         )
     )
     FCCTheme {
-        PremiumSubscriptionOffer(
-            fakePremiumSubscription,
-            titleOverride = "Premium",
-            userAlreadySubscribes = true,
-            selectedPlan = fakePremiumSubscription.monthlyPlan
-        ) {}
+        SubscriptionScreenContent(
+            navController = rememberNavController(),
+            screenState = SubscriptionScreenState(
+                premiumSubscription = fakePremiumSubscription,
+                selectedPlan = fakePremiumSubscription.monthlyPlan,
+                userAlreadySubscribes = false,
+                screenLaunchedWithoutSubscription = true
+            ),
+            onErrorAck = {},
+            onPlanSelected = {},
+            onSubscribeClicked = {},
+            onManageSubscription = {}
+        )
+    }
+}
+
+@Preview(backgroundColor = 0xFF999999, showBackground = true)
+@Composable
+fun SubscriptionScreenContentPreview2() {
+    val fakePremiumSubscription = PremiumSubscription(
+        id = "food.cost.calculator.premium.account",
+        title = "Premium Mode",
+        description = "Premium mode. Ad-Free Experience: Removes all ads for uninterrupted workflow.",
+        monthlyPlan = Plan(
+            id = "premium-mode-monthly-plan",
+            offerIdToken = "fakeOfferIdTokenMonthly",
+            billingPeriod = "P1M",
+            formattedPrice = "PLN 9.99",
+            currencyCode = "PLN"
+        ),
+        yearlyPlan = Plan(
+            id = "premium-mode-yearly-plan",
+            offerIdToken = "fakeOfferIdTokenYearly",
+            billingPeriod = "P1Y",
+            formattedPrice = "PLN 59.99",
+            currencyCode = "PLN"
+        )
+    )
+    FCCTheme {
+        SubscriptionScreenContent(
+            navController = rememberNavController(),
+            screenState = SubscriptionScreenState(
+                premiumSubscription = fakePremiumSubscription,
+                selectedPlan = fakePremiumSubscription.monthlyPlan,
+                userAlreadySubscribes = true,
+                screenLaunchedWithoutSubscription = true
+            ),
+            onErrorAck = {},
+            onPlanSelected = {},
+            onSubscribeClicked = {},
+            onManageSubscription = {}
+        )
+    }
+}
+
+@Preview(backgroundColor = 0xFF999999, showBackground = true)
+@Composable
+fun SubscriptionScreenContentPreviewError() {
+
+    FCCTheme {
+        SubscriptionScreenContent(
+            navController = rememberNavController(),
+            screenState = SubscriptionScreenState(
+                premiumSubscription = null,
+                userAlreadySubscribes = true,
+                screenLaunchedWithoutSubscription = true
+            ),
+            onErrorAck = {},
+            onPlanSelected = {},
+            onSubscribeClicked = {},
+            onManageSubscription = {}
+        )
     }
 }

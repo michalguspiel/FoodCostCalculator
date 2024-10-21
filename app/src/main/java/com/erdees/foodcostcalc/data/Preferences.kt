@@ -64,7 +64,11 @@ class PreferencesImpl(context: Context) : Preferences {
         get() = Currency.getInstance(defaultCurrencyCode)
 
     override var userHasActiveSubscription: Boolean
-        get() = sharedPreference.getValueBoolean(Constants.SUBSCRIPTION_STATE, false)
+        get() {
+            val result = sharedPreference.getValueBoolean(Constants.SUBSCRIPTION_STATE, false)
+            Log.i("Preferences", "Subscription state is $result")
+            return result
+        }
         set(value) {
             Log.i("Preferences", "Subscription state set to $value")
             sharedPreference.save(Constants.SUBSCRIPTION_STATE, value)
