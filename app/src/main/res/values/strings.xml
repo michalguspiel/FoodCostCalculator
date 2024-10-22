@@ -138,7 +138,6 @@
     <string name="app_version">Version</string>
     <string name="build_number">Build Number</string>
     <string name="settings_saved">Settings saved!</string>
-    <string name="data">Data</string>
     <string name="your_defaults">Your defaults</string>
     <string name="use_metric_units">Use metric units.</string>
     <string name="use_us_units">Use imperial units.</string>
@@ -149,6 +148,7 @@
     <string name="units_section">Units</string>
     <string name="default_currency">Default currency</string>
     <string name="premium">Premium</string>
+    <string name="account_services">Account &amp; Services</string>
 
     <!-- DATA BACKUP -->
     <string name="signing_info">Sign in with google account to save and download your database from google drive.</string>

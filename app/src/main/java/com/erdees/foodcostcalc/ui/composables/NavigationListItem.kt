@@ -38,7 +38,7 @@ fun NavigationListItem(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Row {
+        Row(verticalAlignment = Alignment.CenterVertically) {
             icon?.let {
                 it()
                 Spacer(modifier = Modifier.width(8.dp))

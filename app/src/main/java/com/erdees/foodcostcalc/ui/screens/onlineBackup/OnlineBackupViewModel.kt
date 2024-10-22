@@ -285,7 +285,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
     private fun handleSuccess(context: Context, operation: Operation) {
         analyticsRepository.logEvent(Constants.Analytics.DATABASE_OPERATION_SUCCESS, null)
         AppRoomDataBase.destroyInstance()
-        (context as MyApplication).restartKoin()
+        (context as MyApplication).restartDataModule()
         _screenState.value = ScreenState.Success(operation)
     }
 
@@ -301,7 +301,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
         analyticsRepository.logEvent(Constants.Analytics.DATABASE_OPERATION_FAILURE, bundle)
         context?.let {
             AppRoomDataBase.destroyInstance()
-            (context as MyApplication).restartKoin()
+            (context as MyApplication).restartDataModule()
         }
         _screenState.value = ScreenState.Error(error)
     }

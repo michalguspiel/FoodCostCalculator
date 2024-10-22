@@ -209,7 +209,7 @@ private fun ActiveSubscriptionSection(modifier: Modifier = Modifier) {
     val thankYou = stringResource(id = R.string.active_subscription_thank_you)
     Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier) {
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-            repeat(3) {
+            repeat(5) {
                 Icon(
                     modifier = Modifier
                         .size(48.dp)

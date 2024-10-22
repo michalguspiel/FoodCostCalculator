@@ -159,20 +159,13 @@ private fun SettingsScreenContent(
                     saveSettings = saveSettings
                 )
 
-                Spacer(modifier = Modifier.height(8.dp))
+                AccountServicesSection(
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    onPremiumClick = { navController.navigate(FCCScreen.Subscription) },
+                    onOnlineDataBackupClick = {
+                        navController.navigate(FCCScreen.DataBackup)
+                    })
 
-                Premium(
-                    modifier = Modifier,
-                    onClick = { navController.navigate(FCCScreen.Subscription) }
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                OnlineDataBackup {
-                    navController.navigate(FCCScreen.DataBackup)
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
                 AppInformation()
             }
 
@@ -193,6 +186,44 @@ private fun SettingsScreenContent(
 
                 else -> {}
             }
+        }
+    }
+}
+
+@Composable
+private fun AccountServicesSection(
+    modifier: Modifier = Modifier,
+    onPremiumClick: () -> Unit,
+    onOnlineDataBackupClick: () -> Unit
+) {
+    Section(modifier) {
+        SectionLabel(
+            text = stringResource(id = R.string.account_services),
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+
+        NavigationListItem(
+            title = stringResource(id = R.string.premium),
+            icon = {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    painter = painterResource(id = R.drawable.premium),
+                    contentDescription = stringResource(id = R.string.premium)
+                )
+            }) {
+            onPremiumClick()
+        }
+
+        NavigationListItem(
+            title = stringResource(id = R.string.data_backup),
+            icon = {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    painter = painterResource(id = R.drawable.online),
+                    contentDescription = stringResource(id = R.string.data_backup)
+                )
+            }) {
+            onOnlineDataBackupClick()
         }
     }
 }
@@ -225,49 +256,6 @@ private fun AppInformation(modifier: Modifier = Modifier) {
             Text(text = stringResource(id = R.string.dev_signature))
         }
 
-    }
-}
-
-@Composable
-private fun Premium(
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Section(modifier) {
-        SectionLabel(text = stringResource(id = R.string.data), Modifier.padding(bottom = 4.dp))
-        NavigationListItem(
-            title = stringResource(id = R.string.premium),
-            icon = {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.premium),
-                    contentDescription = stringResource(id = R.string.data_backup)
-                )
-            }) {
-            onClick()
-        }
-    }
-}
-
-
-@Composable
-private fun OnlineDataBackup(
-    modifier: Modifier = Modifier,
-    onNavigateToOnlineDataBackup: () -> Unit
-) {
-    Section(modifier) {
-        SectionLabel(text = stringResource(id = R.string.data), Modifier.padding(bottom = 4.dp))
-        NavigationListItem(
-            title = stringResource(id = R.string.data_backup),
-            icon = {
-                Icon(
-                    modifier = Modifier.size(24.dp),
-                    painter = painterResource(id = R.drawable.online),
-                    contentDescription = stringResource(id = R.string.data_backup)
-                )
-            }) {
-            onNavigateToOnlineDataBackup()
-        }
     }
 }
 
