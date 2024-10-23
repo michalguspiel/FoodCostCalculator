@@ -320,7 +320,7 @@ private fun PriceSummary(dishDomain: DishDomain, servings: Int, modifier: Modifi
     Column(modifier) {
         PriceRow(
             description = stringResource(id = R.string.food_cost),
-            price = dishDomain.formattedTotalPricePerServing(context, servings)
+            price = dishDomain.formattedFoodCostPerServings(context, servings)
         )
         Spacer(modifier = Modifier.height(4.dp))
         PriceRow(
