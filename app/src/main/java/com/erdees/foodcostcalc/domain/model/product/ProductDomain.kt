@@ -15,8 +15,11 @@ data class ProductDomain(
   val waste: Double,
   val unit: String,
 ) : Item {
+
+  private val priceWithTax = pricePerUnit * (1 + tax / 100)
+
   val priceAfterWasteAndTax =
-    pricePerUnit + pricePerUnit * (waste / 100) + pricePerUnit * (tax / 100)
+    priceWithTax / (1 - waste / 100)
 
   private val formattedBruttoPrice: String = DecimalFormat("#.##").format(priceAfterWasteAndTax)
 
