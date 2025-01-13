@@ -25,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -72,7 +73,7 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
     val snackbarHostState = remember { SnackbarHostState() }
 
     val focusRequester = remember { FocusRequester() }
-    var textFieldLoaded by remember { mutableStateOf(false) }
+    var textFieldLoaded by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
     val itemAddedText = stringResource(id = R.string.item_added)

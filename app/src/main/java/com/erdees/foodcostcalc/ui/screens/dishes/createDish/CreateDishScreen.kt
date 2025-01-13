@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,10 +61,7 @@ fun CreateDishScreen(navController: NavController) {
     val focusRequester = remember { FocusRequester() }
     val itemAddedText = stringResource(id = R.string.item_added)
 
-    LaunchedEffect(Unit) {
-        focusRequester.requestFocus()
-    }
-    var textFieldLoaded by remember { mutableStateOf(false) }
+    var textFieldLoaded by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(addedDish) {
         addedDish?.let {
@@ -93,6 +93,7 @@ fun CreateDishScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
                 .padding(vertical = 24.dp)
                 .padding(horizontal = 12.dp)
