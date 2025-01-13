@@ -117,7 +117,7 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
 
     fun addHalfProduct(halfProductDomain: HalfProductDomain) {
         val pieceQuantity = if (pieceQuantityNeeded()) {
-            pieceWeight.value.toDouble()
+            pieceWeight.value.toDoubleOrNull() ?: 1.0
         } else {
             1.0
         }
