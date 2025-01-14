@@ -116,7 +116,7 @@ dependencies {
 
 
     // Compose
-    def composeBom = platform('androidx.compose:compose-bom:2024.09.02')
+    def composeBom = platform('androidx.compose:compose-bom:2024.12.01')
 
     implementation composeBom
     androidTestImplementation composeBom
@@ -125,7 +125,7 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-core'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose'
     implementation 'androidx.activity:activity-compose'
-    implementation "androidx.navigation:navigation-compose:2.8.0-beta07"
+    implementation "androidx.navigation:navigation-compose:2.8.5"
     implementation 'androidx.compose.ui:ui-viewbinding'
     implementation("io.coil-kt:coil-compose:2.7.0")
 
@@ -140,7 +140,7 @@ dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
-    implementation 'androidx.core:core-ktx:1.13.1'
+    implementation 'androidx.core:core-ktx:1.15.0'
 
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -154,8 +154,8 @@ dependencies {
     //Glide
     implementation 'com.github.bumptech.glide:glide:4.9.0'
 
-    implementation 'com.google.android.play:review:2.0.1'
-    implementation 'com.google.android.play:review-ktx:2.0.1'
+    implementation 'com.google.android.play:review:2.0.2'
+    implementation 'com.google.android.play:review-ktx:2.0.2'
 
     //SEARCHABLE SPINNER
     implementation 'com.github.DonMat:searchablespinner:v1.0.1'
@@ -189,7 +189,7 @@ dependencies {
 
     implementation 'nl.dionsegijn:konfetti-compose:2.0.4'
 
-    def koin_version = "3.5.6"
+    def koin_version = "4.0.1"
     implementation("io.insert-koin:koin-android:$koin_version")
     implementation "io.insert-koin:koin-androidx-compose:$koin_version"
 
