@@ -36,7 +36,7 @@ object Utils {
     fun formatPrice(number: Double, context: Context): String {
         val preferencesDatabase = PreferencesImpl.getInstance(context)
         val currencyCode = preferencesDatabase.currency?.currencyCode
-        val currency = Currency.getInstance(currencyCode)
+        val currency = currencyCode?.let { Currency.getInstance(it) }
         currencyCode?.let {
             getLocaleForCurrency(currencyCode)?.let { currencyLocale ->
                 val format = NumberFormat.getCurrencyInstance(currencyLocale)
@@ -45,7 +45,7 @@ object Utils {
             }
         }
         val format = NumberFormat.getCurrencyInstance()
-        format.currency = currency
+        currency?.let { format.currency = it }
         return format.format(number)
     }
 

@@ -32,7 +32,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         return UserSettings(
             preferences.defaultMargin,
             preferences.defaultTax,
-            Currency.getInstance(preferences.defaultCurrencyCode),
+            preferences.defaultCurrencyCode?.let { Currency.getInstance(it) },
             preferences.metricUsed,
             preferences.imperialUsed
         )
@@ -86,7 +86,9 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             preferences.defaultMargin = _settingsModel.value.defaultMargin
             preferences.defaultTax = _settingsModel.value.defaultTax
-            preferences.defaultCurrencyCode = _settingsModel.value.currency.currencyCode
+            _settingsModel.value.currency?.currencyCode?.let {
+                preferences.defaultCurrencyCode = it
+            }
             preferences.metricUsed = _settingsModel.value.metricUsed
             preferences.imperialUsed = _settingsModel.value.imperialUsed
         }

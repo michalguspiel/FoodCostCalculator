@@ -5,7 +5,7 @@ import android.icu.util.Currency
 data class UserSettings(
     val defaultMargin: String,
     val defaultTax: String,
-    val currency: Currency,
+    val currency: Currency?,
     val metricUsed: Boolean,
     val imperialUsed: Boolean
 )

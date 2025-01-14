@@ -379,7 +379,7 @@ private fun PreviewCheckBoxField() {
 @Composable
 fun CurrenciesDropDown(
     currencies: Set<Currency>,
-    selectedCurrency: Currency,
+    selectedCurrency: Currency?,
     modifier: Modifier = Modifier,
     selectCurrency: (Currency) -> Unit
 ) {
@@ -395,7 +395,7 @@ fun CurrenciesDropDown(
                 modifier = Modifier
                     .fillMaxWidth()
                     .menuAnchor(),
-                value = selectedCurrency.displayName,
+                value = selectedCurrency?.displayName ?: stringResource(R.string.currencies_failed_to_load),
                 onValueChange = {},
                 readOnly = true,
                 singleLine = true,

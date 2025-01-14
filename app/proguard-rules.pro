@@ -27,3 +27,5 @@
 -keep class com.google.** { *; }
 -keep class com.google.api.client.googleapis.** { *; }
 -keep class com.google.api.services.drive.** { *; }
+
+-dontwarn com.google.android.gms.common.annotation.NoNullnessRewrite
