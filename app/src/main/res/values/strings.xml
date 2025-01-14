@@ -149,6 +149,7 @@
     <string name="default_currency">Default currency</string>
     <string name="premium">Premium</string>
     <string name="account_services">Account &amp; Services</string>
+    <string name="currencies_failed_to_load">Failed to load currencies</string>
 
     <!-- DATA BACKUP -->
     <string name="signing_info">Sign in with google account to save and download your database from google drive.</string>

@@ -10,7 +10,7 @@ import java.util.Locale
 interface Preferences {
     var defaultMargin: String
     var defaultTax: String
-    var defaultCurrencyCode: String
+    var defaultCurrencyCode: String?
     val currency: Currency?
     var userHasActiveSubscription: Boolean
 
@@ -27,6 +27,7 @@ class PreferencesImpl(context: Context) : Preferences {
 
 
     companion object {
+        private const val PREF_NAME = "settings"
         private var instance: Preferences? = null
 
         fun getInstance(context: Context): Preferences {
@@ -54,14 +55,14 @@ class PreferencesImpl(context: Context) : Preferences {
         set(value) {
             sharedPreference.save(Constants.TAX, value)
         }
-    override var defaultCurrencyCode: String
+    override var defaultCurrencyCode: String?
         get() = sharedPreference.getValueString(Constants.PREFERRED_CURRENCY_CODE)
             ?: localeDefaultCurrencyCode
         set(value) {
-            sharedPreference.save(Constants.PREFERRED_CURRENCY_CODE, value)
+            value?.let { sharedPreference.save(Constants.PREFERRED_CURRENCY_CODE, value) }
         }
     override val currency: Currency?
-        get() = Currency.getInstance(defaultCurrencyCode)
+        get() = defaultCurrencyCode?.let { Currency.getInstance(it) }
 
     override var userHasActiveSubscription: Boolean
         get() {
@@ -85,34 +86,27 @@ class PreferencesImpl(context: Context) : Preferences {
         }
 
     inner class SharedPreferences(val context: Context) {
-        private val PREF_NAME = "settings"
         private val sharedPref: android.content.SharedPreferences =
             context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
 
-        fun clearKey(KEY_NAME: String) {
+        fun save(key: String, text: String) {
             val editor: android.content.SharedPreferences.Editor = sharedPref.edit()
-            editor.remove(KEY_NAME)
+            editor.putString(key, text)
             editor.apply()
         }
 
-        fun save(KEY_NAME: String, text: String) {
+        fun save(key: String, status: Boolean) {
             val editor: android.content.SharedPreferences.Editor = sharedPref.edit()
-            editor.putString(KEY_NAME, text)
+            editor.putBoolean(key, status)
             editor.apply()
         }
 
-        fun save(KEY_NAME: String, status: Boolean) {
-            val editor: android.content.SharedPreferences.Editor = sharedPref.edit()
-            editor.putBoolean(KEY_NAME, status)
-            editor.apply()
+        fun getValueString(key: String): String? {
+            return sharedPref.getString(key, null)
         }
 
-        fun getValueString(KEY_NAME: String): String? {
-            return sharedPref.getString(KEY_NAME, null)
-        }
-
-        fun getValueBoolean(KEY_NAME: String, defaultValue: Boolean): Boolean {
-            return sharedPref.getBoolean(KEY_NAME, defaultValue)
+        fun getValueBoolean(key: String, defaultValue: Boolean): Boolean {
+            return sharedPref.getBoolean(key, defaultValue)
         }
     }
 }
