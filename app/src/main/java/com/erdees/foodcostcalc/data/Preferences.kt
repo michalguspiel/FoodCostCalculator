@@ -20,8 +20,8 @@ interface Preferences {
 
 class PreferencesImpl(context: Context) : Preferences {
 
-    private val defaultLocale = Locale.getDefault()
-    private val localeDefaultCurrencyCode = Currency.getInstance(defaultLocale).currencyCode
+    private val defaultLocale: Locale? = Locale.getDefault()
+    private val localeDefaultCurrencyCode = defaultLocale?.let { Currency.getInstance(it)?.currencyCode }
 
     private val sharedPreference = SharedPreferences(context)
 
