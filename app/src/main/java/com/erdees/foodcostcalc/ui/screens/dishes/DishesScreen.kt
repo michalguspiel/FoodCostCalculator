@@ -349,6 +349,7 @@ fun DishItemPreview() {
                         1.0,
                         "pcs",
                         1.0,
+
                     ), UsedProductDomain(
                         1,
                         2,
@@ -357,7 +358,8 @@ fun DishItemPreview() {
                         "g",
                         null,
                     )
-                )
+                ),
+                methodDescription = "This is the recipe for this dish"
             ),
                 servings = 1.0,
                 isExpanded = true,
@@ -371,7 +373,8 @@ fun DishItemPreview() {
                 marginPercent = 320.0,
                 taxPercent = 23.0,
                 halfProducts = emptyList(),
-                products = listOf()
+                products = listOf(),
+                methodDescription = null
             ),
                 servings = 1.0,
                 isExpanded = false,

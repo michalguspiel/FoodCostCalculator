@@ -18,7 +18,8 @@ data class DishDomain(
     val marginPercent: Double,
     val taxPercent: Double,
     val products: List<UsedProductDomain>,
-    val halfProducts: List<UsedHalfProductDomain>
+    val halfProducts: List<UsedHalfProductDomain>,
+    val methodDescription: String?
 ) : Item {
     val foodCost: Double =
         products.sumOf {

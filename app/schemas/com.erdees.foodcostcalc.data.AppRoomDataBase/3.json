@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 3,
-    "identityHash": "b111ccb3f132d660893d3bf039d4d4bb",
+    "identityHash": "5bcbca0150fdcaae9fa409dea87fdd21",
     "entities": [
       {
         "tableName": "products",
@@ -56,7 +56,7 @@
       },
       {
         "tableName": "dishes",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dishId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dish_name` TEXT NOT NULL, `margin_percent` REAL NOT NULL, `dish_tax` REAL NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`dishId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `dish_name` TEXT NOT NULL, `margin_percent` REAL NOT NULL, `dish_tax` REAL NOT NULL, `method_description` TEXT)",
         "fields": [
           {
             "fieldPath": "dishId",
@@ -81,6 +81,12 @@
             "columnName": "dish_tax",
             "affinity": "REAL",
             "notNull": true
+          },
+          {
+            "fieldPath": "methodDescription",
+            "columnName": "method_description",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -392,7 +398,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b111ccb3f132d660893d3bf039d4d4bb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5bcbca0150fdcaae9fa409dea87fdd21')"
     ]
   }
 }
