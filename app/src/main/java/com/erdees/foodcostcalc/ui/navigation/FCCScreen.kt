@@ -10,8 +10,8 @@ import kotlinx.serialization.Serializable
 @Keep
 @Serializable
 sealed class FCCScreen(
-    val nameStringRes: Int?,
-    val iconResourceId: Int? = null,
+    val nameStringRes: Int = -1,
+    val iconResourceId: Int = -1,
 ) {
     /**Bottom nav*/
     @Keep
@@ -28,7 +28,7 @@ sealed class FCCScreen(
 
     /** Rest */
     @Serializable
-    data object CreateProduct : FCCScreen(null, null)
+    data object CreateProduct : FCCScreen()
 
     @Keep
     @Serializable
@@ -39,28 +39,25 @@ sealed class FCCScreen(
     data object DataBackup : FCCScreen(R.string.data_backup, R.drawable.online)
 
     @Serializable
-    data class AddItemToHalfProduct(val halfProductDomain: HalfProductDomain) :
-        FCCScreen(null, null)
+    data class AddItemToHalfProduct(val halfProductDomain: HalfProductDomain) : FCCScreen()
 
     @Serializable
-    data class AddItemsToDish(val dishId: Long, val dishName: String) :
-        FCCScreen(null, null)
+    data class AddItemsToDish(val dishId: Long, val dishName: String) : FCCScreen()
 
     @Serializable
-    data class EditDish(val dishDomain: DishDomain) : FCCScreen(null, null)
+    data class EditDish(val dishDomain: DishDomain) : FCCScreen()
 
     @Serializable
-    data object CreateDish : FCCScreen(null, null)
+    data object CreateDish : FCCScreen()
 
     @Serializable
-    data class EditHalfProduct(val halfProductDomain: HalfProductDomain) :
-        FCCScreen(null, null)
+    data class EditHalfProduct(val halfProductDomain: HalfProductDomain) : FCCScreen()
 
     @Serializable
-    data class EditProduct(val productDomain: ProductDomain) : FCCScreen(null, null)
+    data class EditProduct(val productDomain: ProductDomain) : FCCScreen()
 
     @Serializable
-    data object Subscription : FCCScreen(null, null)
+    data object Subscription : FCCScreen()
 
     companion object {
         val bottomNavigationScreens = listOf(Products, HalfProducts, Dishes, Settings)

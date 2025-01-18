@@ -51,17 +51,15 @@ fun FCCHostScreen(analyticsRepository: AnalyticsRepository = koinInject()) {
                             }
                         },
                         icon = {
-                            item.iconResourceId?.let {
-                                Icon(
-                                    modifier = Modifier.size(24.dp),
-                                    painter = painterResource(id = item.iconResourceId),
-                                    contentDescription = item.nameStringRes?.let { stringResource(id = it) }
-                                )
-                            }
+                            Icon(
+                                modifier = Modifier.size(24.dp),
+                                painter = painterResource(id = item.iconResourceId),
+                                contentDescription = stringResource(id = item.iconResourceId)
+                            )
                         },
                         label = {
                             Text(
-                                text = item.nameStringRes?.let { stringResource(id = it) } ?: "",
+                                text = stringResource(id = item.nameStringRes),
                                 style = MaterialTheme.typography.labelMedium,
                                 textAlign = TextAlign.Center
                             )

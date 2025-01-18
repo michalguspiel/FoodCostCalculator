@@ -37,10 +37,6 @@ data class DishDomain(
             }
         }
 
-    fun formattedFoodCost(context: Context): String {
-        return Utils.formatPrice(foodCost, context)
-    }
-
     fun formattedFoodCostPerServings(context: Context, amountOfServings: Int): String {
         return Utils.formatPrice(foodCost * amountOfServings, context)
     }
