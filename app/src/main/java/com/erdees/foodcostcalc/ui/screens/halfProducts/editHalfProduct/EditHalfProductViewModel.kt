@@ -4,10 +4,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductBase
+import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductHalfProduct
 import com.erdees.foodcostcalc.domain.model.InteractionType
-import com.erdees.foodcostcalc.domain.model.ScreenState.Interaction
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.ScreenState.Interaction
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
@@ -16,8 +17,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -75,9 +79,22 @@ class EditHalfProductViewModel : ViewModel(), KoinComponent {
         it?.products ?: listOf()
     }.stateIn(viewModelScope, SharingStarted.Lazily, listOf())
 
-    fun initializeWith(halfProductDomain: HalfProductDomain) {
-        _halfProduct.value = halfProductDomain
-        originalProducts = halfProductDomain.products
+    fun initializeWith(id: Long) {
+        _screenState.update { ScreenState.Loading() }
+        viewModelScope.launch {
+            try {
+                val halfProduct = halfProductRepository.getCompleteHalfProduct(id)
+                    .flowOn(Dispatchers.IO)
+                    .first()
+                with(halfProduct.toHalfProductDomain()) {
+                    _halfProduct.value = this
+                    originalProducts = this.products
+                }
+                _screenState.update { ScreenState.Idle }
+            } catch (e: Exception) {
+                _screenState.update { ScreenState.Error(Error(e)) }
+            }
+        }
     }
 
     fun saveName() {

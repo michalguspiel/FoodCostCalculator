@@ -63,7 +63,7 @@ import com.erdees.foodcostcalc.utils.Utils
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditDishScreen(providedDishDomain: DishDomain, navController: NavController) {
+fun EditDishScreen(dishId: Long, navController: NavController) {
 
     val viewModel: EditDishViewModel = viewModel()
     val screenState by viewModel.screenState.collectAsState()
@@ -74,8 +74,8 @@ fun EditDishScreen(providedDishDomain: DishDomain, navController: NavController)
     val editableMargin by viewModel.editableMargin.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
 
-    LaunchedEffect(providedDishDomain) {
-        viewModel.initializeWith(providedDishDomain)
+    LaunchedEffect(dishId) {
+        viewModel.initializeWith(dishId)
     }
 
     LaunchedEffect(screenState) {
@@ -99,13 +99,13 @@ fun EditDishScreen(providedDishDomain: DishDomain, navController: NavController)
             TopAppBar(
                 title = {
                     Text(
-                        text = modifiedDishDomain?.name ?: providedDishDomain.name,
+                        text = modifiedDishDomain?.name ?: dishId.toString(),
                         modifier = Modifier.clickable {
                             viewModel.setInteraction(InteractionType.EditName)
                         })
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.deleteDish(providedDishDomain.id) }) {
+                    IconButton(onClick = { viewModel.deleteDish(dishId) }) {
                         Icon(imageVector = Icons.Sharp.Delete, contentDescription = "Remove dish")
                     }
                 },
@@ -141,16 +141,17 @@ fun EditDishScreen(providedDishDomain: DishDomain, navController: NavController)
                 }
 
                 Column(Modifier) {
-                    DishDetails(
-                        modifiedDishDomain ?: providedDishDomain,
-                        onTaxClick = {
-                            viewModel.setInteraction(InteractionType.EditTax)
-                        }, onMarginClick = {
-                            viewModel.setInteraction(InteractionType.EditMargin)
-                        }, onTotalPriceClick = {
-                            viewModel.setInteraction(InteractionType.EditTotalPrice)
-                        })
-
+                    modifiedDishDomain?.let {
+                        DishDetails(
+                            it,
+                            onTaxClick = {
+                                viewModel.setInteraction(InteractionType.EditTax)
+                            }, onMarginClick = {
+                                viewModel.setInteraction(InteractionType.EditMargin)
+                            }, onTotalPriceClick = {
+                                viewModel.setInteraction(InteractionType.EditTotalPrice)
+                            })
+                    }
 
                     Spacer(Modifier.size(16.dp))
 

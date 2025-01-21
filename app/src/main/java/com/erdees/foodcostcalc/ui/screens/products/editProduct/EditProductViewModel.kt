@@ -6,17 +6,20 @@ import com.erdees.foodcostcalc.data.model.ProductBase
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableProductDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductBase
+import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -39,9 +42,24 @@ class EditProductViewModel : ViewModel(), KoinComponent {
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
 
-    fun initializeWith(productDomain: ProductDomain) {
-        _product.value = productDomain.toEditableProductDomain()
-        _editableName.value = productDomain.name
+    fun initializeWith(productId: Long) {
+        _screenState.update { ScreenState.Loading() }
+        viewModelScope.launch {
+            try {
+                val product = productRepository.getProduct(productId)
+                    .flowOn(Dispatchers.IO)
+                    .first()
+                with(product.toProductDomain()) {
+                    _product.value = this.toEditableProductDomain()
+                    _editableName.value = this.name
+                }
+                _screenState.update { ScreenState.Idle }
+            } catch (e: Exception) {
+                _screenState.update {
+                    ScreenState.Error(Error(e))
+                }
+            }
+        }
     }
 
     fun updateName(value: String) {
@@ -86,12 +104,11 @@ class EditProductViewModel : ViewModel(), KoinComponent {
         _screenState.value = ScreenState.Interaction(InteractionType.EditName)
     }
 
-    fun deleteProduct(productDomain: ProductDomain) {
-        val product = productDomain.toProductBase()
+    fun deleteProduct(id: Long) {
         _screenState.value = ScreenState.Loading()
         try {
             viewModelScope.launch(Dispatchers.IO) {
-                productRepository.deleteProduct(product)
+                productRepository.deleteProduct(id)
                 _screenState.value = ScreenState.Success()
             }
         } catch (e: Exception) {

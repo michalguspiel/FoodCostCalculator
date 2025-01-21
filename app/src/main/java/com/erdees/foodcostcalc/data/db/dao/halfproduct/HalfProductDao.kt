@@ -20,6 +20,10 @@ interface HalfProductDao {
     @Query("SELECT * FROM HalfProduct ORDER BY name ASC")
     fun getHalfProductBase(): Flow<List<HalfProductBase>>
 
+    @Transaction
+    @Query("SELECT * FROM HalfProduct WHERE HalfProductId =:id ")
+    fun getCompleteHalfProduct(id: Long): Flow<CompleteHalfProduct>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addHalfProduct(halfProductBase: HalfProductBase)
 

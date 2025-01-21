@@ -14,6 +14,7 @@ import org.koin.core.component.inject
 interface HalfProductRepository {
     val completeHalfProducts: Flow<List<CompleteHalfProduct>>
     val halfProducts: Flow<List<HalfProductBase>>
+    suspend fun getCompleteHalfProduct(id: Long): Flow<CompleteHalfProduct>
     suspend fun addHalfProduct(halfProductBase: HalfProductBase)
     suspend fun addHalfProductDish(halfProductDish: HalfProductDish)
     suspend fun addProductHalfProduct(productHalfProduct: ProductHalfProduct)
@@ -34,6 +35,8 @@ class HalfProductRepositoryImpl : HalfProductRepository, KoinComponent {
         halfProductDao.getCompleteHalfProducts()
 
     override val halfProducts: Flow<List<HalfProductBase>> = halfProductDao.getHalfProductBase()
+
+    override suspend fun getCompleteHalfProduct(id: Long) = halfProductDao.getCompleteHalfProduct(id)
 
     override suspend fun addHalfProduct(halfProductBase: HalfProductBase) =
         halfProductDao.addHalfProduct(halfProductBase)

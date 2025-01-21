@@ -138,14 +138,14 @@ fun HalfProductsScreen(navController: NavController) {
                                     onAddItemsClicked = {
                                         navController.navigate(
                                             FCCScreen.AddItemToHalfProduct(
-                                                halfProductDomain = item
+                                                item.id, item.name, item.halfProductUnit
                                             )
                                         )
                                     },
                                     onEditClicked = {
                                         navController.navigate(
                                             FCCScreen.EditHalfProduct(
-                                                halfProductDomain = item
+                                                halfProductId = item.id
                                             )
                                         )
                                     })

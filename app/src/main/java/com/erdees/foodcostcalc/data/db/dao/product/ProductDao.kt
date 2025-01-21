@@ -14,12 +14,15 @@ interface ProductDao {
     @Query("SELECT * from products ORDER BY product_name ASC")
     fun getProducts(): Flow<List<ProductBase>>
 
+    @Query("SELECT * FROM products WHERE productId = :id")
+    fun getProduct(id: Long): Flow<ProductBase>
+
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun addProduct(product: ProductBase)
 
     @Update
     suspend fun editProduct(newProduct: ProductBase)
 
-    @Delete
-    suspend fun deleteProduct(product: ProductBase)
+    @Query("DELETE FROM products WHERE productId = :id")
+    suspend fun deleteProduct(id: Long)
 }
