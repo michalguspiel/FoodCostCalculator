@@ -16,6 +16,10 @@ interface DishDao {
     @Query("SELECT * FROM DISHES ORDER BY DISH_NAME ASC")
     fun getCompleteDishes(): Flow<List<CompleteDish>>
 
+    @Transaction
+    @Query("SELECT * FROM dishes WHERE dishId =:id")
+    fun getCompleteDish(id: Long): Flow<CompleteDish>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun addDish(dish: DishBase)
 

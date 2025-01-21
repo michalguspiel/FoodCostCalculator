@@ -8,7 +8,6 @@ import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils
@@ -90,8 +89,8 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
         _selectedUnit.value = _units.value.firstOrNull() ?: ""
     }
 
-    fun initializeWith(halfProductDomain: HalfProductDomain) {
-        halfProductUnitType = UnitsUtils.getUnitType(halfProductDomain.halfProductUnit)
+    fun initializeWith(halfProductUnit: String) {
+        halfProductUnitType = UnitsUtils.getUnitType(halfProductUnit)
     }
 
     fun selectProduct(product: ProductDomain?) {
@@ -115,7 +114,7 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
             false
         )
 
-    fun addHalfProduct(halfProductDomain: HalfProductDomain) {
+    fun addHalfProduct(id: Long) {
         val pieceQuantity = if (pieceQuantityNeeded()) {
             pieceWeight.value.toDoubleOrNull() ?: 1.0
         } else {
@@ -125,7 +124,7 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
         val productHalfProduct = ProductHalfProduct(
             productHalfProductId = 0,
             productId = selectedProduct.value?.id ?: 0,
-            halfProductId = halfProductDomain.id,
+            halfProductId = id,
             quantity = quantity.value.toDouble(),
             quantityUnit = selectedUnit.value,
             weightPiece = pieceQuantity

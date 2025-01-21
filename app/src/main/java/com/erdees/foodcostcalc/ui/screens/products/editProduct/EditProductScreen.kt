@@ -9,7 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.Delete
@@ -36,7 +38,6 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
@@ -46,7 +47,7 @@ import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProductScreen(
-    providedProduct: ProductDomain,
+    productId: Long,
     navController: NavController
 ) {
     val viewModel: EditProductViewModel = viewModel()
@@ -57,7 +58,7 @@ fun EditProductScreen(
     val saveNameButtonEnabled by viewModel.saveNameButtonEnabled.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.initializeWith(providedProduct)
+        viewModel.initializeWith(productId)
     }
 
     LaunchedEffect(screenState) {
@@ -82,13 +83,13 @@ fun EditProductScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = product?.name ?: providedProduct.name,
+                        text = product?.name ?: "",
                         modifier = Modifier.clickable {
                             viewModel.setInteractionEditName()
                         })
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.deleteProduct(providedProduct) }) {
+                    IconButton(onClick = { viewModel.deleteProduct(productId) }) {
                         Icon(
                             imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
                                 id = R.string.content_description_remove_product
@@ -116,6 +117,7 @@ fun EditProductScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
                     .padding(vertical = 24.dp)
                     .padding(horizontal = 12.dp)
             ) {
@@ -126,7 +128,7 @@ fun EditProductScreen(
                 ) {
 
                     Text(
-                        text = stringResource(id = R.string.values_per_unit, providedProduct.unit),
+                        text = stringResource(id = R.string.values_per_unit, product?.unit ?: ""),
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )

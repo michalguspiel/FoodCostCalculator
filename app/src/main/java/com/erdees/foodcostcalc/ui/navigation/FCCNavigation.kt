@@ -9,12 +9,6 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
-import com.erdees.foodcostcalc.domain.model.dish.DishDomain
-import com.erdees.foodcostcalc.domain.model.dish.DishDomainNavType
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomainNavType
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
-import com.erdees.foodcostcalc.domain.model.product.ProductDomainNavType
 import com.erdees.foodcostcalc.ui.screens.dishes.DishesScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDish.CreateDishScreen
@@ -28,7 +22,6 @@ import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductSc
 import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
 import com.erdees.foodcostcalc.ui.screens.subscriptionScreen.SubscriptionScreen
-import kotlin.reflect.typeOf
 
 @Composable
 fun FCCNavigation(
@@ -58,13 +51,13 @@ fun FCCNavigation(
             DataBackupScreen(navController = navController)
         }
 
-        composable<FCCScreen.AddItemToHalfProduct>(
-            typeMap = mapOf(typeOf<HalfProductDomain>() to HalfProductDomainNavType)
-        ) { backStackEntry ->
-            val addItemToHalfProduct: FCCScreen.AddItemToHalfProduct = backStackEntry.toRoute()
+        composable<FCCScreen.AddItemToHalfProduct> { backStackEntry ->
+            val route: FCCScreen.AddItemToHalfProduct = backStackEntry.toRoute()
             AddItemToHalfProductScreen(
                 navController = navController,
-                halfProductDomain = addItemToHalfProduct.halfProductDomain
+                halfProductId = route.id,
+                halfProductName = route.name,
+                halfProductUnit = route.unit
             )
         }
         composable<FCCScreen.AddItemsToDish> { backStackEntry ->
@@ -76,20 +69,16 @@ fun FCCNavigation(
             )
         }
 
-        composable<FCCScreen.EditDish>(
-            typeMap = mapOf(typeOf<DishDomain>() to DishDomainNavType)
-        ) { backStackEntry ->
-            val editDish: FCCScreen.EditDish = backStackEntry.toRoute()
-            EditDishScreen(providedDishDomain = editDish.dishDomain, navController = navController)
+        composable<FCCScreen.EditDish> { backStackEntry ->
+            val route: FCCScreen.EditDish = backStackEntry.toRoute()
+            EditDishScreen(dishId = route.dishId, navController = navController)
         }
 
-        composable<FCCScreen.EditHalfProduct>(
-            typeMap = mapOf(typeOf<HalfProductDomain>() to HalfProductDomainNavType)
-        ) { backStackEntry ->
-            val editHalfProduct: FCCScreen.EditHalfProduct = backStackEntry.toRoute()
+        composable<FCCScreen.EditHalfProduct> { backStackEntry ->
+            val route: FCCScreen.EditHalfProduct = backStackEntry.toRoute()
             EditHalfProductScreen(
                 navController = navController,
-                providedHalfProduct = editHalfProduct.halfProductDomain
+                halfProductId = route.halfProductId
             )
         }
 
@@ -100,14 +89,9 @@ fun FCCNavigation(
             CreateDishScreen(navController = navController)
         }
 
-        composable<FCCScreen.EditProduct>(
-            typeMap = mapOf(typeOf<ProductDomain>() to ProductDomainNavType)
-        ) { backStackEntry ->
-            val editProduct: FCCScreen.EditProduct = backStackEntry.toRoute()
-            EditProductScreen(
-                providedProduct = editProduct.productDomain,
-                navController = navController
-            )
+        composable<FCCScreen.EditProduct> { backStackEntry ->
+            val route: FCCScreen.EditProduct = backStackEntry.toRoute()
+            EditProductScreen(route.productId, navController = navController)
         }
 
         composable<FCCScreen.Subscription> {

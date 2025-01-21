@@ -63,7 +63,7 @@ fun ValueEditDialog(
             Spacer(modifier = Modifier.size(24.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 FCCTextButton(
-                    text = stringResource(id = R.string.save),
+                    text = stringResource(id = R.string.confirm),
                     enabled = saveButtonEnabled
                 ) {
                     onSave()

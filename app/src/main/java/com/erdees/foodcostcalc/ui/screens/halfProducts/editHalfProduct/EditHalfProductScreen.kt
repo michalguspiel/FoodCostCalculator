@@ -50,7 +50,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.editDish.UsedItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditHalfProductScreen(navController: NavController, providedHalfProduct: HalfProductDomain) {
+fun EditHalfProductScreen(navController: NavController, halfProductId: Long) {
 
     val viewModel: EditHalfProductViewModel = viewModel()
     val screenState by viewModel.screenState.collectAsState()
@@ -59,8 +59,8 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
     val editableQuantity by viewModel.editableQuantity.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
 
-    LaunchedEffect(providedHalfProduct) {
-        viewModel.initializeWith(providedHalfProduct)
+    LaunchedEffect(halfProductId) {
+        viewModel.initializeWith(halfProductId)
     }
 
     LaunchedEffect(screenState) {
@@ -84,14 +84,14 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
             TopAppBar(
                 title = {
                     Text(
-                        text = halfProduct?.name ?: providedHalfProduct.name,
+                        text = halfProduct?.name ?: "",
                         modifier = Modifier.clickable {
                             viewModel.setInteraction(InteractionType.EditName)
                         })
                 },
                 actions = {
                     IconButton(onClick = {
-                        viewModel.deleteHalfProduct(providedHalfProduct.id)
+                        viewModel.deleteHalfProduct(halfProductId)
                     }) {
                         Icon(
                             imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
@@ -133,10 +133,13 @@ fun EditHalfProductScreen(navController: NavController, providedHalfProduct: Hal
                     }
                 }
 
-                HalfProductDetails(
-                    halfProductDomain = halfProduct ?: providedHalfProduct,
-                    modifier = Modifier
-                )
+                halfProduct?.let {
+                    HalfProductDetails(
+                        halfProductDomain = it,
+                        modifier = Modifier
+                    )
+                } // todo ?: EmptyOne
+
 
                 Spacer(Modifier.size(16.dp))
 
