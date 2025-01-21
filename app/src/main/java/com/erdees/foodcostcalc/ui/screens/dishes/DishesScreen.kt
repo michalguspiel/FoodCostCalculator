@@ -132,7 +132,7 @@ fun DishesScreen(navController: NavController) {
                                         )
                                     },
                                     onEditClicked = {
-                                        navController.navigate(FCCScreen.EditDish(item))
+                                        navController.navigate(FCCScreen.EditDish(item.id))
                                     })
                             }
                         }

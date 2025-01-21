@@ -10,10 +10,11 @@ import org.koin.core.component.inject
 
 interface ProductRepository {
   val products: Flow<List<ProductBase>>
+  suspend fun getProduct(id: Long) : Flow<ProductBase>
   suspend fun addProduct(product: ProductBase)
   suspend fun addProductDish(productDish: ProductDish)
   suspend fun editProduct(newProduct: ProductBase)
-  suspend fun deleteProduct(product: ProductBase)
+  suspend fun deleteProduct(id: Long)
 }
 
 class ProductRepositoryImpl : ProductRepository, KoinComponent {
@@ -23,6 +24,8 @@ class ProductRepositoryImpl : ProductRepository, KoinComponent {
 
   override val products: Flow<List<ProductBase>> = productDao.getProducts()
 
+  override suspend fun getProduct(id: Long) = productDao.getProduct(id)
+
   override suspend fun addProduct(product: ProductBase) = productDao.addProduct(product)
 
   override suspend fun addProductDish(productDish: ProductDish) =
@@ -30,5 +33,5 @@ class ProductRepositoryImpl : ProductRepository, KoinComponent {
 
   override suspend fun editProduct(newProduct: ProductBase) = productDao.editProduct(newProduct)
 
-  override suspend fun deleteProduct(product: ProductBase) = productDao.deleteProduct(product)
+  override suspend fun deleteProduct(id: Long) = productDao.deleteProduct(id)
 }

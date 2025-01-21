@@ -39,22 +39,22 @@ sealed class FCCScreen(
     data object DataBackup : FCCScreen(R.string.data_backup, R.drawable.online)
 
     @Serializable
-    data class AddItemToHalfProduct(val halfProductDomain: HalfProductDomain) : FCCScreen()
+    data class AddItemToHalfProduct(val id: Long, val name: String, val unit: String) : FCCScreen()
 
     @Serializable
     data class AddItemsToDish(val dishId: Long, val dishName: String) : FCCScreen()
 
     @Serializable
-    data class EditDish(val dishDomain: DishDomain) : FCCScreen()
+    data class EditDish(val dishId: Long) : FCCScreen()
 
     @Serializable
     data object CreateDish : FCCScreen()
 
     @Serializable
-    data class EditHalfProduct(val halfProductDomain: HalfProductDomain) : FCCScreen()
+    data class EditHalfProduct(val halfProductId: Long) : FCCScreen()
 
     @Serializable
-    data class EditProduct(val productDomain: ProductDomain) : FCCScreen()
+    data class EditProduct(val productId: Long) : FCCScreen()
 
     @Serializable
     data object Subscription : FCCScreen()

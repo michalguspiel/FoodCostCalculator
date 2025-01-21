@@ -60,7 +60,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun AddItemToHalfProductScreen(
     navController: NavController,
-    halfProductDomain: HalfProductDomain
+    halfProductId: Long,
+    halfProductName: String,
+    halfProductUnit: String
 ) {
 
     val viewModel: AddItemToHalfProductViewModel = viewModel()
@@ -78,8 +80,8 @@ fun AddItemToHalfProductScreen(
 
     val itemAddedText = stringResource(id = R.string.item_added)
 
-    LaunchedEffect(halfProductDomain) {
-        viewModel.initializeWith(halfProductDomain)
+    LaunchedEffect(halfProductUnit) {
+        viewModel.initializeWith(halfProductUnit)
     }
 
     LaunchedEffect(screenState) {
@@ -97,7 +99,7 @@ fun AddItemToHalfProductScreen(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(title = {
-                Text(text = halfProductDomain.name)
+                Text(text = halfProductName)
             }, navigationIcon = {
                 IconButton(onClick = { navController.popBackStack() }) {
                     Icon(
@@ -143,7 +145,7 @@ fun AddItemToHalfProductScreen(
                         if (viewModel.pieceQuantityNeeded()) {
                             PieceWeightField(
                                 modifier = Modifier.fillMaxWidth(),
-                                halfProductUnit = halfProductDomain.halfProductUnit,
+                                halfProductUnit = halfProductUnit,
                                 pieceWeight = pieceWeight,
                                 setPieceWeight = viewModel::setPieceWeight
                             )
@@ -163,7 +165,7 @@ fun AddItemToHalfProductScreen(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                         FCCPrimaryButton(
                             enabled = addButtonEnabled,
-                            onClick = { viewModel.addHalfProduct(halfProductDomain) },
+                            onClick = { viewModel.addHalfProduct(halfProductId) },
                             text = stringResource(id = R.string.add)
                         )
                     }

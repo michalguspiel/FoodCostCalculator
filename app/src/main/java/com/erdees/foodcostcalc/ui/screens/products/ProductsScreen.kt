@@ -94,7 +94,7 @@ fun ProductsScreen(navController: NavController) {
                                 productDomain = item,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             ) {
-                                navController.navigate(FCCScreen.EditProduct(item))
+                                navController.navigate(FCCScreen.EditProduct(item.id))
                             }
                         }
                     }

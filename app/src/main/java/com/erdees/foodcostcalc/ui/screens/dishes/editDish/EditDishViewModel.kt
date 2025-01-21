@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
+import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
 import com.erdees.foodcostcalc.domain.model.InteractionType
@@ -17,8 +18,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
@@ -154,10 +158,23 @@ class EditDishViewModel : ViewModel(), KoinComponent {
         products + halfProducts
     }.stateIn(viewModelScope, SharingStarted.Lazily, listOf())
 
-    fun initializeWith(dishDomain: DishDomain) {
-        _dish.value = dishDomain
-        originalProducts = dishDomain.products
-        originalHalfProducts = dishDomain.halfProducts
+    fun initializeWith(id: Long) {
+        _screenState.update { ScreenState.Loading() }
+        viewModelScope.launch {
+            try {
+                val dish = dishRepository.getDish(id)
+                    .flowOn(Dispatchers.IO)
+                    .first()
+                with(dish.toDishDomain()){
+                    _dish.update { this }
+                    originalProducts = this.products
+                    originalHalfProducts = this.halfProducts
+                }
+                _screenState.update { ScreenState.Idle }
+            } catch (e: Exception) {
+                _screenState.update { ScreenState.Error(Error(e)) }
+            }
+        }
     }
 
     /**

@@ -13,15 +13,13 @@ import org.koin.core.component.inject
 
 interface DishRepository {
     val dishes: Flow<List<CompleteDish>>
+    suspend fun getDish(id: Long): Flow<CompleteDish>
 
     suspend fun addDish(dish: DishBase)
     suspend fun deleteDish(dishId: Long)
     suspend fun updateDish(dish: DishBase)
-
     suspend fun deleteProductDish(productDish: ProductDish)
-
     suspend fun deleteHalfProductDish(halfProductDish: HalfProductDish)
-
     suspend fun updateProductDish(productDish: ProductDish)
     suspend fun updateHalfProductDish(halfProductDish: HalfProductDish)
 }
@@ -33,6 +31,8 @@ class DishRepositoryImpl : DishRepository, KoinComponent {
     private val halfProductDishDao: HalfProductDishDao by inject()
 
     override val dishes: Flow<List<CompleteDish>> = dishDao.getCompleteDishes()
+
+    override suspend fun getDish(id: Long) = dishDao.getCompleteDish(id)
 
     override suspend fun addDish(dish: DishBase) {
         dishDao.addDish(dish)
