@@ -189,4 +189,6 @@
     <string name="star">star</string>
     <string name="products_missing_error">Can\'t load products, please come back again later.</string>
 
+    <string name="recipe">Recipe</string>
+
 </resources>
