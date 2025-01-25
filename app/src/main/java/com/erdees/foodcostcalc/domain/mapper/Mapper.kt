@@ -26,8 +26,7 @@ object Mapper {
             marginPercent = dish.marginPercent,
             taxPercent = dish.dishTax,
             products = products.map { it.toUsedProductDomain() },
-            halfProducts = halfProducts.map { it.toUsedHalfProductDomain() },
-            methodDescription = dish.methodDescription
+            halfProducts = halfProducts.map { it.toUsedHalfProductDomain() }
         )
     }
 
@@ -175,8 +174,7 @@ object Mapper {
             dishId = id,
             name = name,
             marginPercent = marginPercent,
-            dishTax = taxPercent,
-            methodDescription = methodDescription
+            dishTax = taxPercent
         )
     }
 }
