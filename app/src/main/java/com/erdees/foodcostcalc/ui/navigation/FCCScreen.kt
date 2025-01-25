@@ -59,6 +59,9 @@ sealed class FCCScreen(
     @Serializable
     data object Subscription : FCCScreen()
 
+    @Serializable
+    data object Recipe : FCCScreen()
+
     companion object {
         val bottomNavigationScreens = listOf(Products, HalfProducts, Dishes, Settings)
     }

@@ -3,7 +3,9 @@ package com.erdees.foodcostcalc.ui.navigation
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,6 +15,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.DishesScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDish.CreateDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishScreen
+import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishViewModel
 import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.addItemToHalfProduct.AddItemToHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfProductScreen
@@ -20,6 +23,7 @@ import com.erdees.foodcostcalc.ui.screens.onlineBackup.DataBackupScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
 import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductScreen
 import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
+import com.erdees.foodcostcalc.ui.screens.recipe.RecipeScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
 import com.erdees.foodcostcalc.ui.screens.subscriptionScreen.SubscriptionScreen
 
@@ -72,6 +76,15 @@ fun FCCNavigation(
         composable<FCCScreen.EditDish> { backStackEntry ->
             val route: FCCScreen.EditDish = backStackEntry.toRoute()
             EditDishScreen(dishId = route.dishId, navController = navController)
+        }
+
+         composable<FCCScreen.Recipe> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(navController.previousBackStackEntry?.destination?.route.toString())
+            }
+
+            val viewModel = viewModel<EditDishViewModel>(parentEntry)
+            RecipeScreen(navController, viewModel)
         }
 
         composable<FCCScreen.EditHalfProduct> { backStackEntry ->

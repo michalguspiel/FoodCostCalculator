@@ -32,9 +32,7 @@ import java.io.File
         HalfProductDish::class,
     ],
     version = 4, exportSchema = true,
-    views = [],
-
-    )
+    views = [])
 abstract class AppRoomDataBase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao

@@ -27,6 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 
 class EditDishViewModel : ViewModel(), KoinComponent {
@@ -159,6 +160,7 @@ class EditDishViewModel : ViewModel(), KoinComponent {
     }.stateIn(viewModelScope, SharingStarted.Lazily, listOf())
 
     fun initializeWith(id: Long) {
+        Timber.i("initializeWith : $id")
         _screenState.update { ScreenState.Loading() }
         viewModelScope.launch {
             try {
