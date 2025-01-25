@@ -3,20 +3,23 @@ package com.erdees.foodcostcalc.domain.mapper
 import com.erdees.foodcostcalc.data.model.DishBase
 import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.Recipe
 import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductHalfProduct
 import com.erdees.foodcostcalc.data.model.joined.CompleteDish
-import com.erdees.foodcostcalc.data.model.joined.HalfProductUsedInDish
 import com.erdees.foodcostcalc.data.model.joined.CompleteHalfProduct
+import com.erdees.foodcostcalc.data.model.joined.HalfProductUsedInDish
 import com.erdees.foodcostcalc.data.model.joined.ProductAndProductDish
 import com.erdees.foodcostcalc.data.model.joined.ProductUsedInHalfProduct
+import com.erdees.foodcostcalc.data.model.joined.RecipeWithSteps
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
+import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 
 object Mapper {
     fun CompleteDish.toDishDomain(): DishDomain {
@@ -26,7 +29,8 @@ object Mapper {
             marginPercent = dish.marginPercent,
             taxPercent = dish.dishTax,
             products = products.map { it.toUsedProductDomain() },
-            halfProducts = halfProducts.map { it.toUsedHalfProductDomain() }
+            halfProducts = halfProducts.map { it.toUsedHalfProductDomain() },
+            recipe = recipe?.toRecipeDomain()
         )
     }
 
@@ -174,7 +178,29 @@ object Mapper {
             dishId = id,
             name = name,
             marginPercent = marginPercent,
-            dishTax = taxPercent
+            dishTax = taxPercent,
+            recipeId = recipe?.recipeId
+        )
+    }
+
+    fun RecipeWithSteps.toRecipeDomain(): RecipeDomain {
+        return RecipeDomain(
+            recipeId = recipe.recipeId,
+            prepTimeMinutes = recipe.prepTimeMinutes,
+            cookTimeMinutes = recipe.cookTimeMinutes,
+            description = recipe.description,
+            steps = steps.sortedBy { it.order }.map { it.stepDescription },
+            tips = recipe.tips
+        )
+    }
+
+    fun RecipeDomain.toRecipe(): Recipe {
+        return Recipe(
+            recipeId = recipeId,
+            prepTimeMinutes = prepTimeMinutes,
+            cookTimeMinutes = cookTimeMinutes,
+            description = description,
+            tips = tips
         )
     }
 }

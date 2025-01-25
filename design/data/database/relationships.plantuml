@@ -7,6 +7,9 @@ entity "Product_Dish" as pd
 entity "HalfProduct_Dish" as hpd
 entity "DishBase" as d
 
+entity "Recipe" as r
+entity "RecipeStep" as rs
+
 entity "ProductUsedInDish" as puid <<View>>
 entity "ProductUsedInHalfProduct" as puihp <<View>>
 entity "CompleteHalfProduct" as chp <<View>>
@@ -28,5 +31,9 @@ hpdchp --|> chp
 cd --|> d 
 cd --|> puid 
 cd --|> hpdchp 
+
+d --|> r
+r --|> rs
+
 
 @enduml

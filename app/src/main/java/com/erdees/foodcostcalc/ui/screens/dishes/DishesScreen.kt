@@ -357,7 +357,8 @@ fun DishItemPreview() {
                         "g",
                         null,
                     )
-                )
+                ),
+                recipe = null
             ),
                 servings = 1.0,
                 isExpanded = true,
@@ -371,7 +372,8 @@ fun DishItemPreview() {
                 marginPercent = 320.0,
                 taxPercent = 23.0,
                 halfProducts = emptyList(),
-                products = listOf()
+                products = listOf(),
+                recipe = null
             ),
                 servings = 1.0,
                 isExpanded = false,
