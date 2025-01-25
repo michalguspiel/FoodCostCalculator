@@ -2,9 +2,7 @@ package com.erdees.foodcostcalc.ui.navigation
 
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.domain.model.dish.DishDomain
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Keep
@@ -45,7 +43,7 @@ sealed class FCCScreen(
     data class AddItemsToDish(val dishId: Long, val dishName: String) : FCCScreen()
 
     @Serializable
-    data class EditDish(val dishId: Long) : FCCScreen()
+    data class EditDish(@SerialName(DISH_ID_KEY) val dishId: Long) : FCCScreen()
 
     @Serializable
     data object CreateDish : FCCScreen()
@@ -64,5 +62,6 @@ sealed class FCCScreen(
 
     companion object {
         val bottomNavigationScreens = listOf(Products, HalfProducts, Dishes, Settings)
+        const val DISH_ID_KEY = "dishId"
     }
 }

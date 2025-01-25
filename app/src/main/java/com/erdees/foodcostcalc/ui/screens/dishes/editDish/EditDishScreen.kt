@@ -3,13 +3,11 @@ package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,6 +43,7 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
@@ -64,25 +63,19 @@ import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Utils
-import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditDishScreen(dishId: Long, navController: NavController) {
 
     val viewModel: EditDishViewModel = viewModel()
-    Timber.i(viewModel.toString())
     val screenState by viewModel.screenState.collectAsState()
     val usedItems: List<UsedItem> by viewModel.items.collectAsState()
-    val modifiedDishDomain by viewModel.dish.collectAsState()
+    val modifiedDishDomain by viewModel.dish.collectAsStateWithLifecycle()
     val editableQuantity by viewModel.editableQuantity.collectAsState()
     val editableTax by viewModel.editableTax.collectAsState()
     val editableMargin by viewModel.editableMargin.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
-
-    LaunchedEffect(dishId) {
-        viewModel.initializeWith(dishId)
-    }
 
     LaunchedEffect(screenState) {
         when (screenState) {
@@ -156,19 +149,19 @@ fun EditDishScreen(dishId: Long, navController: NavController) {
 
                     Spacer(Modifier.size(16.dp))
 
-
-                    ButtonRow(primaryButton = {
-                        FCCPrimaryButton(text = stringResource(R.string.save)) {
-                            viewModel.saveDish()
-                        }
-                    }, secondaryButton = {
-                        FCCOutlinedButton(text = stringResource(R.string.recipe)) {
-                            navController.navigate(FCCScreen.Recipe)
-                        }
-                    })
+                    ButtonRow(
+                        modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
+                        primaryButton = {
+                            FCCPrimaryButton(text = stringResource(R.string.save)) {
+                                viewModel.saveDish()
+                            }
+                        }, secondaryButton = {
+                            FCCOutlinedButton(text = stringResource(R.string.recipe)) {
+                                navController.navigate(FCCScreen.Recipe)
+                            }
+                        })
                 }
             }
-
 
             when (screenState) {
                 is ScreenState.Loading -> {

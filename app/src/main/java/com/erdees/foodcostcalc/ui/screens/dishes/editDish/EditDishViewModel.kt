@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.repository.DishRepository
@@ -13,6 +14,7 @@ import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,7 +32,8 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 
-class EditDishViewModel : ViewModel(), KoinComponent {
+class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
+    KoinComponent {
 
     private val dishRepository: DishRepository by inject()
 
@@ -42,6 +45,27 @@ class EditDishViewModel : ViewModel(), KoinComponent {
 
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
+
+    init {
+        Timber.i("initialize \n SavedStateHandle: $savedStateHandle, ${savedStateHandle.get<Long>("dishId")}")
+        _screenState.update { ScreenState.Loading() }
+        viewModelScope.launch {
+            try {
+                val id = savedStateHandle.get<Long>(DISH_ID_KEY) ?: throw NullPointerException()
+                val dish = dishRepository.getDish(id)
+                    .flowOn(Dispatchers.IO)
+                    .first()
+                with(dish.toDishDomain()) {
+                    _dish.update { this }
+                    originalProducts = this.products
+                    originalHalfProducts = this.halfProducts
+                }
+                _screenState.update { ScreenState.Idle }
+            } catch (e: Exception) {
+                _screenState.update { ScreenState.Error(Error(e)) }
+            }
+        }
+    }
 
     fun updateName(value: String) {
         _editableName.value = value
@@ -158,26 +182,6 @@ class EditDishViewModel : ViewModel(), KoinComponent {
         val halfProducts = it?.halfProducts ?: listOf()
         products + halfProducts
     }.stateIn(viewModelScope, SharingStarted.Lazily, listOf())
-
-    fun initializeWith(id: Long) {
-        Timber.i("initializeWith : $id")
-        _screenState.update { ScreenState.Loading() }
-        viewModelScope.launch {
-            try {
-                val dish = dishRepository.getDish(id)
-                    .flowOn(Dispatchers.IO)
-                    .first()
-                with(dish.toDishDomain()){
-                    _dish.update { this }
-                    originalProducts = this.products
-                    originalHalfProducts = this.halfProducts
-                }
-                _screenState.update { ScreenState.Idle }
-            } catch (e: Exception) {
-                _screenState.update { ScreenState.Error(Error(e)) }
-            }
-        }
-    }
 
     /**
      * Removes item from the temporary list of items. Requires saving to persist.
