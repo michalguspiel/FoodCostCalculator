@@ -19,6 +19,7 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 
 object Mapper {
@@ -196,11 +197,21 @@ object Mapper {
 
     fun RecipeDomain.toRecipe(): Recipe {
         return Recipe(
-            recipeId = recipeId,
+            recipeId = 0,
             prepTimeMinutes = prepTimeMinutes,
             cookTimeMinutes = cookTimeMinutes,
             description = description,
             tips = tips
+        )
+    }
+
+    fun RecipeDomain?.toEditableRecipe(): EditableRecipe {
+        return EditableRecipe(
+            prepTimeMinutes = this?.prepTimeMinutes?.toString() ?: "",
+            cookTimeMinutes = this?.cookTimeMinutes?.toString() ?: "",
+            description = this?.description ?: "",
+            tips = this?.tips ?: "",
+            steps = this?.steps ?: listOf()
         )
     }
 }

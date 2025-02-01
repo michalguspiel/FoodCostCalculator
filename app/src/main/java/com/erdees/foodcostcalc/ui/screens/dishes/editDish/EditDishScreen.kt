@@ -100,12 +100,12 @@ fun EditDishScreen(dishId: Long, navController: NavController) {
                 },
                 actions = {
                     IconButton(onClick = { viewModel.deleteDish(dishId) }) {
-                        Icon(imageVector = Icons.Sharp.Delete, contentDescription = "Remove dish")
+                        Icon(imageVector = Icons.Sharp.Delete, contentDescription = stringResource(R.string.remove_dish))
                     }
                 },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 }
             )

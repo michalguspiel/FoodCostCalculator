@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "3b48cb71238e49a5125a34a6e451452b",
+    "identityHash": "9e32b9eb128f85cd3c46a37fb04c38d7",
     "entities": [
       {
         "tableName": "products",
@@ -418,7 +418,7 @@
       },
       {
         "tableName": "Recipe",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`recipeId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `prepTimeMinutes` INTEGER NOT NULL, `cookTimeMinutes` INTEGER NOT NULL, `description` TEXT NOT NULL, `tips` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`recipeId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `prepTimeMinutes` INTEGER, `cookTimeMinutes` INTEGER, `description` TEXT, `tips` TEXT)",
         "fields": [
           {
             "fieldPath": "recipeId",
@@ -430,25 +430,25 @@
             "fieldPath": "prepTimeMinutes",
             "columnName": "prepTimeMinutes",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "cookTimeMinutes",
             "columnName": "cookTimeMinutes",
             "affinity": "INTEGER",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "description",
             "columnName": "description",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "tips",
             "columnName": "tips",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -524,7 +524,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3b48cb71238e49a5125a34a6e451452b')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e32b9eb128f85cd3c46a37fb04c38d7')"
     ]
   }
 }

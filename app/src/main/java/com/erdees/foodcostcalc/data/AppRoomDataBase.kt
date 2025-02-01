@@ -10,6 +10,7 @@ import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.ProductHalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
+import com.erdees.foodcostcalc.data.db.dao.recipe.RecipeDao
 import com.erdees.foodcostcalc.data.db.migrations.Migration_1to2_RefactorDatabase
 import com.erdees.foodcostcalc.data.db.migrations.Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist
 import com.erdees.foodcostcalc.data.db.migrations.Migration_3to_4_CreateRecipeTable
@@ -47,6 +48,7 @@ abstract class AppRoomDataBase : RoomDatabase() {
     abstract fun productDishDao(): ProductDishDao
     abstract fun halfProductDishDao(): HalfProductDishDao
     abstract fun productHalfProductDao(): ProductHalfProductDao
+    abstract fun recipeDao(): RecipeDao
 
     /**Singleton of database.*/
     companion object {

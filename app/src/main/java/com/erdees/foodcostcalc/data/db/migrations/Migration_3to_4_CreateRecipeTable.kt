@@ -14,10 +14,10 @@ class Migration_3to_4_CreateRecipeTable : Migration(3, 4) {
             """
                 CREATE TABLE IF NOT EXISTS `Recipe` (
                     `recipeId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                    `prepTimeMinutes` INTEGER NOT NULL,
-                    `cookTimeMinutes` INTEGER NOT NULL,
-                    `description` TEXT NOT NULL,
-                    `tips` TEXT NOT NULL
+                    `prepTimeMinutes` INTEGER,
+                    `cookTimeMinutes` INTEGER,
+                    `description` TEXT,
+                    `tips` TEXT
                 )
             """.trimIndent()
         )
