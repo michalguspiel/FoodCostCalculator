@@ -4,6 +4,7 @@ import com.erdees.foodcostcalc.data.model.DishBase
 import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.data.model.ProductBase
 import com.erdees.foodcostcalc.data.model.Recipe
+import com.erdees.foodcostcalc.data.model.RecipeStep
 import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductHalfProduct
@@ -21,6 +22,7 @@ import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
+import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
 
 object Mapper {
     fun CompleteDish.toDishDomain(): DishDomain {
@@ -184,25 +186,19 @@ object Mapper {
         )
     }
 
-    fun RecipeWithSteps.toRecipeDomain(): RecipeDomain {
+    private fun RecipeWithSteps.toRecipeDomain(): RecipeDomain {
         return RecipeDomain(
             recipeId = recipe.recipeId,
             prepTimeMinutes = recipe.prepTimeMinutes,
             cookTimeMinutes = recipe.cookTimeMinutes,
             description = recipe.description,
-            steps = steps.sortedBy { it.order }.map { it.stepDescription },
+            steps = steps.sortedBy { it.order }.map { it.toRecipeStepDomain() },
             tips = recipe.tips
         )
     }
 
-    fun RecipeDomain.toRecipe(): Recipe {
-        return Recipe(
-            recipeId = 0,
-            prepTimeMinutes = prepTimeMinutes,
-            cookTimeMinutes = cookTimeMinutes,
-            description = description,
-            tips = tips
-        )
+    private fun RecipeStep.toRecipeStepDomain() : RecipeStepDomain {
+        return RecipeStepDomain(id,order, stepDescription)
     }
 
     fun RecipeDomain?.toEditableRecipe(): EditableRecipe {
@@ -212,6 +208,25 @@ object Mapper {
             description = this?.description ?: "",
             tips = this?.tips ?: "",
             steps = this?.steps ?: listOf()
+        )
+    }
+
+    fun EditableRecipe.toRecipe(id: Long?): Recipe {
+        return Recipe(
+            recipeId = id ?: 0,
+            cookTimeMinutes = cookTimeMinutes.toInt(),
+            prepTimeMinutes = prepTimeMinutes.toInt(),
+            description = description,
+            tips = tips
+        )
+    }
+
+    fun RecipeStepDomain.toRecipeStep(recipeId: Long): RecipeStep {
+        return RecipeStep(
+            id = id ?: 0,
+            recipeId = recipeId,
+            stepDescription = stepDescription,
+            order = order
         )
     }
 }

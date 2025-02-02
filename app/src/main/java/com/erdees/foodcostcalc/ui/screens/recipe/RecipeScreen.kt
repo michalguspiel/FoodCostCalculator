@@ -1,10 +1,12 @@
 package com.erdees.foodcostcalc.ui.screens.recipe
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,6 +34,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -39,16 +42,16 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
-import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
-import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
+import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
+import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeViewMode
@@ -68,18 +71,21 @@ fun RecipeScreen(navController: NavController, viewModel: EditDishViewModel) {
         updateTips = viewModel::updateTips,
         updateStep = viewModel::updateStep
     )
+    val recipeServings by viewModel.recipeServings.collectAsState()
 
     RecipeScreenContent(
         recipeViewMode = recipeViewMode,
         dish = dish,
         recipe = recipe,
         screenState = screenState,
+        servings = recipeServings,
         modifier = Modifier,
         popBackStack = navController::popBackStack,
-        toggleRecipeViewModel = viewModel::toggleRecipeViewMode,
+        toggleRecipeViewMode = viewModel::toggleRecipeViewMode,
         recipeUpdater = recipeUpdater,
         saveRecipe = viewModel::saveRecipe,
-        cancelEdit = viewModel::cancelEdit
+        cancelEdit = viewModel::cancelEdit,
+        updateServings = viewModel::editRecipeServings
     )
 }
 
@@ -90,19 +96,21 @@ private fun RecipeScreenContent(
     dish: DishDomain?,
     recipe: EditableRecipe,
     screenState: ScreenState,
+    servings: Int,
     modifier: Modifier = Modifier,
     popBackStack: () -> Unit = {},
-    toggleRecipeViewModel: () -> Unit = {},
+    toggleRecipeViewMode: () -> Unit = {},
     recipeUpdater: RecipeUpdater,
     saveRecipe: () -> Unit,
-    cancelEdit: () -> Unit
+    cancelEdit: () -> Unit,
+    updateServings: (Int) -> Unit
 ) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = {
                     Text(
-                        text = stringResource(R.string.recipe),
+                        text = stringResource(R.string.recipe, dish?.name ?: ""),
                         modifier = Modifier
                     )
                 },
@@ -130,16 +138,29 @@ private fun RecipeScreenContent(
                 when (recipeViewMode) {
                     RecipeViewMode.VIEW -> {
                         dish?.recipe?.let { recipe ->
-                            RecipeView(dish.products, dish.halfProducts, recipe)
+                            RecipeView(
+                                dish,
+                                servings,
+                                recipe,
+                                toggleRecipeViewMode = { toggleRecipeViewMode() })
                         } ?: RecipeMissingView()
                     }
 
-                    RecipeViewMode.EDIT -> RecipeEdit(recipe, Modifier, recipeUpdater,saveRecipe, cancelEdit)
+                    RecipeViewMode.EDIT -> RecipeEdit(
+                        recipe,
+                        Modifier,
+                        recipeUpdater,
+                        saveRecipe,
+                        cancelEdit
+                    )
                 }
             }
 
             when (screenState) {
-                is ScreenState.Success -> {}
+                is ScreenState.Success -> {
+                    toggleRecipeViewMode()
+                }
+
                 is ScreenState.Error -> {}
                 is ScreenState.Loading -> ScreenLoadingOverlay()
                 else -> {}
@@ -151,31 +172,97 @@ private fun RecipeScreenContent(
 
 @Composable
 private fun RecipeView(
-    products: List<UsedProductDomain>,
-    halfProducts: List<UsedHalfProductDomain>,
+    dish: DishDomain,
+    servings: Int,
     recipe: RecipeDomain,
     modifier: Modifier = Modifier,
+    toggleRecipeViewMode: () -> Unit
 ) {
-    Column {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Times
         Row(
+            Modifier.fillMaxWidth(0.8f),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+            horizontalArrangement = Arrangement.SpaceEvenly
         ) {
-            Column {
-                Text("Prep time")
-                Row {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(stringResource(R.string.prep_time_title))
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     DecorativeCircle()
-                    Text("${recipe.prepTimeMinutes} min")
+                    Spacer(Modifier.size(4.dp))
+                    Text(
+                        recipe.prepTimeMinutes?.let {
+                            stringResource(
+                                R.string.prep_time_value,
+                                recipe.prepTimeMinutes.toString()
+                            )
+                        } ?: stringResource(R.string.not_specified)
+                    )
                 }
             }
-            Column {
-                Text("Cook time")
-                Row {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(stringResource(R.string.cook_time_title))
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     DecorativeCircle()
-                    Text("${recipe.prepTimeMinutes} min")
+                    Spacer(Modifier.size(4.dp))
+                    Text(
+                        recipe.cookTimeMinutes?.let {
+                            stringResource(
+                                R.string.cook_time_value,
+                                recipe.cookTimeMinutes.toString()
+                            )
+                        } ?: stringResource(R.string.not_specified)
+                    )
                 }
             }
         }
+
+        // Description
+        recipe.description?.let {
+            Text(
+                recipe.description,
+                Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
+            )
+        }
+
+        // Tips
+
+        recipe.tips?.let { Text(recipe.tips, Modifier.fillMaxWidth(), textAlign = TextAlign.Start) }
+
+        // Steps
+
+        val steps: String? = recipe.steps?.sortedBy { it.order }
+            ?.joinToString(separator = "3\n") { "${it.order + 1}. ${it.stepDescription}" }
+
+        steps?.let {
+            Text(steps, Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
+        }
+
+        // Ingredients
+
+        Ingredients(
+            dishDomain = dish,
+            servings = servings.toDouble(),
+            modifier = Modifier,
+            showPrices = false
+        )
+
+        ButtonRow(primaryButton = {
+            FCCPrimaryButton(
+                text = stringResource(R.string.edit_recipe),
+                modifier = Modifier,
+                enabled = true,
+                onClick = {
+                    toggleRecipeViewMode()
+                })
+        }, secondaryButton = {
+            // For now nothing
+        })
     }
 }
 
@@ -274,14 +361,18 @@ private fun RecipeEdit(
                 singleLine = false,
                 maxLines = 5,
                 title = stringResource(id = R.string.step_number, (index + 1).toString()),
-                value = recipe.steps.getOrElse(index) { "" },
+                value = recipe.steps.getOrNull(index)?.stepDescription ?: "",
                 onValueChange = { recipeUpdater.updateStep(index, it) })
         }
 
         ButtonRow(primaryButton = {
-            FCCPrimaryButton(text = stringResource(R.string.save),modifier = Modifier, enabled = true, onClick = {
-                saveRecipe()
-            })
+            FCCPrimaryButton(
+                text = stringResource(R.string.save),
+                modifier = Modifier,
+                enabled = true,
+                onClick = {
+                    saveRecipe()
+                })
         }, secondaryButton = {
             FCCOutlinedButton(text = stringResource(R.string.cancel), enabled = true, onClick = {
                 cancelEdit()
@@ -289,6 +380,32 @@ private fun RecipeEdit(
         })
     }
 }
+
+private val previewSteps = listOf(
+    RecipeStepDomain(
+        null,
+        0,
+        "In a large bowl, whisk together 1 cup of all-purpose flour, 1 tablespoon of sugar, 1 teaspoon of baking powder, and ½ teaspoon of salt. " +
+                "In another bowl, combine 1 cup of milk, 1 egg, and 2 tablespoons of melted butter. " +
+                "Pour the wet ingredients into the dry ingredients and mix until just combined. Avoid overmixing."
+    ),
+    RecipeStepDomain(
+        null,
+        1,
+        "Heat a non-stick skillet or griddle over medium heat. Lightly grease the surface with butter or oil.",
+    ),
+    RecipeStepDomain(
+        null, 2,
+        "Pour ¼ cup of batter onto the pan for each pancake. Cook until bubbles form on the surface and the edges look set (about 2 minutes). " +
+                "Flip the pancake and cook the other side until golden brown (about 1-2 minutes).",
+    ),
+    RecipeStepDomain(
+        null, 3,
+        "Transfer cooked pancakes to a plate and cover with a clean towel or keep warm in a 90°C (200°F) oven while cooking the rest of the batter." +
+                "Stack the pancakes on a plate and serve with your favorite toppings, such as maple syrup, fresh fruit, whipped cream, or chocolate chips."
+    ),
+)
+
 
 private val previewDish = DishDomain(
     0L,
@@ -307,16 +424,7 @@ private val previewDish = DishDomain(
                 "Rest the Batter: Let the batter rest for 5-10 minutes before cooking to allow the gluten to relax and ensure fluffier pancakes.\n" +
                 "Use Medium Heat: Cooking on medium heat helps the pancakes cook through without burning.\n" +
                 "Grease the Pan Lightly: Use a small amount of butter or oil and wipe off the excess with a paper towel for an evenly browned pancake",
-        steps = listOf(
-            "In a large bowl, whisk together 1 cup of all-purpose flour, 1 tablespoon of sugar, 1 teaspoon of baking powder, and ½ teaspoon of salt. " +
-                    "In another bowl, combine 1 cup of milk, 1 egg, and 2 tablespoons of melted butter. " +
-                    "Pour the wet ingredients into the dry ingredients and mix until just combined. Avoid overmixing.",
-            "Heat a non-stick skillet or griddle over medium heat. Lightly grease the surface with butter or oil.",
-            "Pour ¼ cup of batter onto the pan for each pancake. Cook until bubbles form on the surface and the edges look set (about 2 minutes). " +
-                    "Flip the pancake and cook the other side until golden brown (about 1-2 minutes).",
-            "Transfer cooked pancakes to a plate and cover with a clean towel or keep warm in a 90°C (200°F) oven while cooking the rest of the batter." +
-                    "Stack the pancakes on a plate and serve with your favorite toppings, such as maple syrup, fresh fruit, whipped cream, or chocolate chips."
-        )
+        steps = previewSteps
     )
 )
 
@@ -330,11 +438,13 @@ private fun RecipeScreenContentViewPreview() {
             dish = previewDish,
             recipe = previewDish.recipe.toEditableRecipe(),
             screenState = ScreenState.Idle,
+            servings = 1,
             modifier = Modifier,
-            toggleRecipeViewModel = {},
-            recipeUpdater = RecipeUpdater({}, {}, {}, {}, {_, _ -> }),
+            toggleRecipeViewMode = {},
+            recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
             saveRecipe = {},
-            cancelEdit = {}
+            cancelEdit = {},
+            updateServings = {}
         )
     }
 }
@@ -348,11 +458,13 @@ private fun RecipeScreenContentEditPreview() {
             dish = previewDish,
             recipe = previewDish.recipe.toEditableRecipe(),
             screenState = ScreenState.Idle,
+            servings = 10,
             modifier = Modifier,
-            toggleRecipeViewModel = {},
-            recipeUpdater = RecipeUpdater({}, {}, {}, {}, {_, _ -> }),
+            toggleRecipeViewMode = {},
+            recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
             saveRecipe = {},
-            cancelEdit = {}
+            cancelEdit = {},
+            updateServings = {}
         )
     }
 }

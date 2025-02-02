@@ -28,4 +28,7 @@ interface DishDao {
 
     @Query("DELETE FROM dishes WHERE dishId =:id")
     suspend fun deleteDish(id: Long)
+
+    @Query("UPDATE dishes SET recipeId=:recipeId WHERE dishId=:dishId ")
+    suspend fun update(recipeId: Long, dishId: Long)
 }

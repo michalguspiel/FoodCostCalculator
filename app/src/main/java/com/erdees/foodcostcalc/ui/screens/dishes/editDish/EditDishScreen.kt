@@ -156,7 +156,7 @@ fun EditDishScreen(dishId: Long, navController: NavController) {
                                 viewModel.saveDish()
                             }
                         }, secondaryButton = {
-                            FCCOutlinedButton(text = stringResource(R.string.recipe)) {
+                            FCCOutlinedButton(text = stringResource(R.string.recipe_button_title)) {
                                 navController.navigate(FCCScreen.Recipe)
                             }
                         })
