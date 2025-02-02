@@ -1,14 +1,13 @@
 package com.erdees.foodcostcalc.data.model
 
 import androidx.annotation.Keep
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Keep
-@Entity(tableName = "dishes",
+@Entity(tableName = "Recipe_Step",
     indices = [Index("recipeId")],
     foreignKeys = [
     ForeignKey(
@@ -18,10 +17,9 @@ import androidx.room.PrimaryKey
         onDelete = ForeignKey.CASCADE
     ),
 ])
-data class DishBase(
-    @PrimaryKey(autoGenerate = true) val dishId: Long,
-    @ColumnInfo(name = "dish_name") val name: String,
-    @ColumnInfo(name = "margin_percent") val marginPercent: Double = 100.0,
-    @ColumnInfo(name = "dish_tax") val dishTax: Double = 0.0,
-    @ColumnInfo(name = "recipeId") val recipeId: Long?
+data class RecipeStep(
+    @PrimaryKey(autoGenerate = true) val id: Long,
+    val recipeId: Long,
+    val stepDescription: String,
+    val order: Int
 )

@@ -54,7 +54,8 @@ class CreateDishScreenViewModel : ViewModel(), KoinComponent {
             0,
             dishName.value,
             margin.value.toDoubleOrNull() ?: Constants.BASIC_MARGIN.toDouble(),
-            tax.value.toDoubleOrNull() ?: Constants.BASIC_TAX.toDouble()
+            tax.value.toDoubleOrNull() ?: Constants.BASIC_TAX.toDouble(),
+            recipeId = null
         )
         addDish(dish)
         analyticsRepository.logEvent(Constants.Analytics.DISH_CREATED, null)

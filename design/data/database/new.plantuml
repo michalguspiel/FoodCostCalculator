@@ -51,6 +51,7 @@ entity "Dish" as d {
     *name : text
     *marginPercent : number
     *dishTax : number
+    *recipeId: number?
 }
 
 entity Product_ProductDish <<View>> {
@@ -75,6 +76,21 @@ entity CompleteDish <<View>> {
     *dish : Dish
     *products : Product_ProductDish[]
     *halfProducts : HalfProductDish_HalfProduct_Product_ProductHalfProduct[]
+}
+
+entity Recipe  {
+    *id : number <<generated>>
+    *prepTimeMinutes : number
+    *cookTimeMinutes: number
+    *description : text
+    *tips : text
+}
+
+entity RecipeStep {
+    *id : number<<generated>>
+    *recipeId: number
+    *stepDescription : text
+    *order : number
 }
 
 @enduml

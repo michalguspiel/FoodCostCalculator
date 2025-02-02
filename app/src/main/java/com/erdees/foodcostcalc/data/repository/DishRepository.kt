@@ -18,6 +18,7 @@ interface DishRepository {
     suspend fun addDish(dish: DishBase)
     suspend fun deleteDish(dishId: Long)
     suspend fun updateDish(dish: DishBase)
+    suspend fun updateDishRecipe(recipeId: Long, dishId: Long)
     suspend fun deleteProductDish(productDish: ProductDish)
     suspend fun deleteHalfProductDish(halfProductDish: HalfProductDish)
     suspend fun updateProductDish(productDish: ProductDish)
@@ -44,6 +45,10 @@ class DishRepositoryImpl : DishRepository, KoinComponent {
 
     override suspend fun updateDish(dish: DishBase) {
         dishDao.editDish(dish)
+    }
+
+    override suspend fun updateDishRecipe(recipeId: Long, dishId: Long) {
+        dishDao.update(recipeId, dishId)
     }
 
     override suspend fun deleteProductDish(productDish: ProductDish) {

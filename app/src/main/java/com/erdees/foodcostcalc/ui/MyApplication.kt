@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.ui
 
 import android.app.Application
-import android.util.Log
+import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.data.di.dbModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
 import com.erdees.foodcostcalc.utils.di.utilModule
@@ -9,6 +9,10 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.context.unloadKoinModules
+import timber.log.Timber
+import timber.log.Timber.*
+import timber.log.Timber.Forest.plant
+
 
 class MyApplication : Application() {
 
@@ -17,12 +21,15 @@ class MyApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.i("MyApplication", "onCreate")
+        if (BuildConfig.DEBUG) {
+            plant(DebugTree())
+        }
+        Timber.i("onCreate")
         startKoin()
     }
 
     private fun startKoin() {
-        Log.i(TAG, "startKoin()")
+        Timber.i("startKoin()")
         startKoin {
             // declare used Android context
             androidContext(this@MyApplication)
@@ -37,12 +44,8 @@ class MyApplication : Application() {
      * Necessary action after recreating database from online backup.
      * */
     fun restartDataModule() {
-        Log.i(TAG, "restartDataModule()")
+        Timber.i("restartDataModule()")
         unloadKoinModules(reloadableModules)
         loadKoinModules(reloadableModules)
-    }
-
-    companion object {
-        private const val TAG = "MyApplication"
     }
 }

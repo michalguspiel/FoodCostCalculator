@@ -4,12 +4,19 @@ import androidx.annotation.Keep
 import androidx.room.Embedded
 import androidx.room.Relation
 import com.erdees.foodcostcalc.data.model.DishBase
+import com.erdees.foodcostcalc.data.model.Recipe
 import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductDish
 
 @Keep
 data class CompleteDish(
   @Embedded val dish: DishBase,
+  @Relation(
+    entity = Recipe::class,
+    parentColumn = "recipeId",
+    entityColumn = "recipeId"
+  )
+  val recipe: RecipeWithSteps?,
   @Relation(
     entity = ProductDish::class,
     parentColumn = "dishId",

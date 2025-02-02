@@ -9,6 +9,7 @@ import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.ProductHalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
+import com.erdees.foodcostcalc.data.db.dao.recipe.RecipeDao
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
 
@@ -22,4 +23,5 @@ val dbModule = module {
     single<ProductDishDao> { get<AppRoomDataBase>().productDishDao() }
     single<HalfProductDishDao> { get<AppRoomDataBase>().halfProductDishDao() }
     single<ProductHalfProductDao> { get<AppRoomDataBase>().productHalfProductDao() }
+    single<RecipeDao> { get<AppRoomDataBase>().recipeDao() }
 }

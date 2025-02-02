@@ -16,6 +16,8 @@ fun FCCTextField(
     value: String,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    singleLine: Boolean = true,
+    maxLines: Int = 1,
     onValueChange: (String) -> Unit,
 ) {
     Column {
@@ -26,8 +28,8 @@ fun FCCTextField(
         OutlinedTextField(
             modifier = modifier.fillMaxWidth(),
             value = value,
-            singleLine = true,
-            maxLines = 1,
+            singleLine = singleLine,
+            maxLines = maxLines,
             onValueChange = { onValueChange(it) },
             keyboardOptions = keyboardOptions
         )
