@@ -48,17 +48,6 @@ object Mapper {
         )
     }
 
-    fun ProductDomain.toProductBase(): ProductBase {
-        return ProductBase(
-            productId = id,
-            name = name,
-            pricePerUnit = pricePerUnit,
-            tax = tax,
-            waste = waste,
-            unit = unit
-        )
-    }
-
     fun ProductDomain.toEditableProductDomain(): EditableProductDomain {
         return EditableProductDomain(
             id = id,
@@ -186,7 +175,7 @@ object Mapper {
         )
     }
 
-    private fun RecipeWithSteps.toRecipeDomain(): RecipeDomain {
+    fun RecipeWithSteps.toRecipeDomain(): RecipeDomain {
         return RecipeDomain(
             recipeId = recipe.recipeId,
             prepTimeMinutes = recipe.prepTimeMinutes,
@@ -198,7 +187,7 @@ object Mapper {
     }
 
     private fun RecipeStep.toRecipeStepDomain() : RecipeStepDomain {
-        return RecipeStepDomain(id,order, stepDescription)
+        return RecipeStepDomain(id, order, stepDescription)
     }
 
     fun RecipeDomain?.toEditableRecipe(): EditableRecipe {
@@ -211,22 +200,27 @@ object Mapper {
         )
     }
 
+    fun RecipeWithSteps.toEditableRecipe(): EditableRecipe {
+        return this.toRecipeDomain().toEditableRecipe()
+    }
+
+
     fun EditableRecipe.toRecipe(id: Long?): Recipe {
         return Recipe(
             recipeId = id ?: 0,
-            cookTimeMinutes = cookTimeMinutes.toInt(),
-            prepTimeMinutes = prepTimeMinutes.toInt(),
+            cookTimeMinutes = cookTimeMinutes.toIntOrNull(),
+            prepTimeMinutes = prepTimeMinutes.toIntOrNull(),
             description = description,
             tips = tips
         )
     }
 
-    fun RecipeStepDomain.toRecipeStep(recipeId: Long): RecipeStep {
+    fun RecipeStepDomain.toRecipeStep(recipeId: Long, newOrder: Int? = null): RecipeStep {
         return RecipeStep(
             id = id ?: 0,
             recipeId = recipeId,
             stepDescription = stepDescription,
-            order = order
+            order = newOrder ?: order
         )
     }
 }

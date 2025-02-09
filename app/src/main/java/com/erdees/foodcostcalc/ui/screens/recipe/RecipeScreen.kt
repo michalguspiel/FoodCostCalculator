@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.recipe
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.snapping.SnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -45,13 +45,14 @@ import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
+import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
-import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeViewMode
@@ -105,66 +106,50 @@ private fun RecipeScreenContent(
     cancelEdit: () -> Unit,
     updateServings: (Int) -> Unit
 ) {
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.recipe, dish?.name ?: ""),
-                        modifier = Modifier
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = { popBackStack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Sharp.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-                }
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(
+                text = dish?.name ?: stringResource(R.string.recipe), modifier = Modifier
             )
+        }, navigationIcon = {
+            IconButton(onClick = { popBackStack() }) {
+                Icon(
+                    Icons.AutoMirrored.Sharp.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+        })
+    }) { paddingValues ->
+        Box(
+            modifier = modifier
+                .padding(paddingValues)
+                .padding(vertical = 24.dp)
+                .padding(horizontal = 12.dp)
+        ) {
+            when (recipeViewMode) {
+                RecipeViewMode.VIEW -> {
+                    dish?.recipe?.let { recipe ->
+                        RecipeView(dish,
+                            servings,
+                            recipe,
+                            toggleRecipeViewMode = { toggleRecipeViewMode() })
+                    } ?: RecipeMissingView()
+                }
+
+                RecipeViewMode.EDIT -> RecipeEdit(
+                    recipe, Modifier, recipeUpdater, saveRecipe, cancelEdit
+                )
+            }
         }
-    ) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(vertical = 24.dp)
-                    .padding(horizontal = 12.dp)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                when (recipeViewMode) {
-                    RecipeViewMode.VIEW -> {
-                        dish?.recipe?.let { recipe ->
-                            RecipeView(
-                                dish,
-                                servings,
-                                recipe,
-                                toggleRecipeViewMode = { toggleRecipeViewMode() })
-                        } ?: RecipeMissingView()
-                    }
 
-                    RecipeViewMode.EDIT -> RecipeEdit(
-                        recipe,
-                        Modifier,
-                        recipeUpdater,
-                        saveRecipe,
-                        cancelEdit
-                    )
-                }
+        when (screenState) {
+            is ScreenState.Success -> {
+                toggleRecipeViewMode()
             }
 
-            when (screenState) {
-                is ScreenState.Success -> {
-                    toggleRecipeViewMode()
-                }
-
-                is ScreenState.Error -> {}
-                is ScreenState.Loading -> ScreenLoadingOverlay()
-                else -> {}
-            }
+            is ScreenState.Error -> {}
+            is ScreenState.Loading -> ScreenLoadingOverlay()
+            else -> {}
         }
     }
 }
@@ -179,82 +164,59 @@ private fun RecipeView(
     toggleRecipeViewMode: () -> Unit
 ) {
     Column(
-        modifier = modifier,
+        verticalArrangement = Arrangement.SpaceBetween,
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
-        // Times
-        Row(
-            Modifier.fillMaxWidth(0.8f),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.prep_time_title))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    DecorativeCircle()
-                    Spacer(Modifier.size(4.dp))
-                    Text(
-                        recipe.prepTimeMinutes?.let {
-                            stringResource(
-                                R.string.prep_time_value,
-                                recipe.prepTimeMinutes.toString()
-                            )
-                        } ?: stringResource(R.string.not_specified)
-                    )
-                }
-            }
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(stringResource(R.string.cook_time_title))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    DecorativeCircle()
-                    Spacer(Modifier.size(4.dp))
-                    Text(
-                        recipe.cookTimeMinutes?.let {
-                            stringResource(
-                                R.string.cook_time_value,
-                                recipe.cookTimeMinutes.toString()
-                            )
-                        } ?: stringResource(R.string.not_specified)
-                    )
-                }
-            }
-        }
-
-        // Description
-        recipe.description?.let {
-            Text(
-                recipe.description,
-                Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Start
-            )
-        }
-
-        // Tips
-
-        recipe.tips?.let { Text(recipe.tips, Modifier.fillMaxWidth(), textAlign = TextAlign.Start) }
-
-        // Steps
-
-        val steps: String? = recipe.steps?.sortedBy { it.order }
-            ?.joinToString(separator = "3\n") { "${it.order + 1}. ${it.stepDescription}" }
-
-        steps?.let {
-            Text(steps, Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
-        }
-
-        // Ingredients
-
-        Ingredients(
-            dishDomain = dish,
-            servings = servings.toDouble(),
+        Column(
             modifier = Modifier,
-            showPrices = false
-        )
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Times(recipe, recipe.prepTimeMinutes, recipe.cookTimeMinutes)
 
-        ButtonRow(primaryButton = {
-            FCCPrimaryButton(
-                text = stringResource(R.string.edit_recipe),
+            FCCSecondaryHorizontalDivider(Modifier.fillMaxWidth())
+
+            Column {
+                SectionLabel(stringResource(R.string.description))
+                recipe.description?.let {
+                    Text(
+                        recipe.description, Modifier.fillMaxWidth(), textAlign = TextAlign.Start
+                    )
+                }
+            }
+
+            val steps: String? = recipe.steps?.sortedBy { it.order }
+                ?.joinToString(separator = "\n") { "${it.order + 1}. ${it.stepDescription}" }
+
+            steps?.let {
+                if (steps.isNotBlank()) {
+                    Column {
+                        SectionLabel(stringResource(R.string.steps_title))
+                        Text(steps, Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
+                    }
+                }
+            }
+
+            Column {
+                SectionLabel(stringResource(R.string.ingredients_title))
+                Ingredients(
+                    dishDomain = dish,
+                    servings = servings.toDouble(),
+                    modifier = Modifier,
+                    showPrices = false
+                )
+            }
+
+            Tips(recipe.tips)
+        }
+
+        ButtonRow(
+            modifier = Modifier.padding(top = 8.dp),
+            primaryButton = {
+            FCCPrimaryButton(text = stringResource(R.string.edit_recipe),
                 modifier = Modifier,
                 enabled = true,
                 onClick = {
@@ -263,6 +225,64 @@ private fun RecipeView(
         }, secondaryButton = {
             // For now nothing
         })
+    }
+}
+
+@Composable
+private fun Tips(tips: String?, modifier: Modifier = Modifier) {
+    tips?.let {
+        Column {
+            SectionLabel(stringResource(R.string.tips))
+            Spacer(Modifier.size(1.dp))
+            Column(
+                modifier
+                    .fillMaxWidth()
+                    .background(
+                        MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(6.dp)
+                    )
+                    .padding(8.dp)
+            ) {
+                Text(
+                    text = tips, modifier = Modifier, textAlign = TextAlign.Start, style = MaterialTheme.typography.bodySmall
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun Times(
+    recipe: RecipeDomain, prepTimeMinutes: Int?, cookTimeMinutes: Int?
+) {
+    Row(
+        Modifier.fillMaxWidth(0.8f),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(stringResource(R.string.prep_time_title))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                DecorativeCircle()
+                Spacer(Modifier.size(4.dp))
+                Text(recipe.prepTimeMinutes?.let {
+                    stringResource(
+                        R.string.prep_time_value, prepTimeMinutes.toString()
+                    )
+                } ?: stringResource(R.string.not_specified))
+            }
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(stringResource(R.string.cook_time_title))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                DecorativeCircle()
+                Spacer(Modifier.size(4.dp))
+                Text(recipe.cookTimeMinutes?.let {
+                    stringResource(
+                        R.string.cook_time_value, cookTimeMinutes.toString()
+                    )
+                } ?: stringResource(R.string.not_specified))
+            }
+        }
     }
 }
 
@@ -278,9 +298,8 @@ private fun DecorativeCircle(modifier: Modifier = Modifier) {
 
 @Composable
 private fun RecipeMissingView(modifier: Modifier = Modifier) {
-    Column(modifier) {
-        Text("Something about recipe missing.")
-        Text("Suggestion to provide recipe.")
+    Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Text(stringResource(R.string.recipe_something_went_wrong))
     }
 }
 
@@ -293,91 +312,92 @@ private fun RecipeEdit(
     cancelEdit: () -> Unit
 ) {
     Column(
-        modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
     ) {
+        Column(
+            modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
 
-        SectionLabel(stringResource(R.string.general_info_title))
+            SectionLabel(stringResource(R.string.general_info_title))
 
-        FCCTextField(
-            modifier = Modifier,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Sentences,
-                imeAction = ImeAction.Next
-            ),
-            singleLine = false,
-            maxLines = 10,
-            title = stringResource(id = R.string.description),
-            value = recipe.description,
-            onValueChange = { recipeUpdater.updateDescription(it) })
-
-        FCCTextField(
-            modifier = Modifier,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Sentences,
-                imeAction = ImeAction.Next
-            ),
-            singleLine = false,
-            maxLines = 3,
-            title = stringResource(id = R.string.tips),
-            value = recipe.tips,
-            onValueChange = { recipeUpdater.updateTips(it) })
-
-        SectionLabel(stringResource(R.string.time_title))
-
-        FCCTextField(
-            modifier = Modifier,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            title = stringResource(id = R.string.prep_time),
-            value = recipe.prepTimeMinutes,
-            onValueChange = { recipeUpdater.updatePrepTime(it) })
-
-        FCCTextField(
-            modifier = Modifier,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
-            ),
-            title = stringResource(id = R.string.cook_time),
-            value = recipe.cookTimeMinutes,
-            onValueChange = { recipeUpdater.updateCookTime(it) })
-
-
-        SectionLabel(stringResource(R.string.steps_title))
-
-        repeat(recipe.steps.size + 1) { index ->
-            FCCTextField(
-                modifier = Modifier,
+            FCCTextField(modifier = Modifier,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Sentences,
                     imeAction = ImeAction.Next
                 ),
                 singleLine = false,
-                maxLines = 5,
-                title = stringResource(id = R.string.step_number, (index + 1).toString()),
-                value = recipe.steps.getOrNull(index)?.stepDescription ?: "",
-                onValueChange = { recipeUpdater.updateStep(index, it) })
-        }
+                maxLines = 10,
+                title = stringResource(id = R.string.description),
+                value = recipe.description,
+                onValueChange = { recipeUpdater.updateDescription(it) })
 
-        ButtonRow(primaryButton = {
-            FCCPrimaryButton(
-                text = stringResource(R.string.save),
-                modifier = Modifier,
-                enabled = true,
-                onClick = {
-                    saveRecipe()
-                })
-        }, secondaryButton = {
-            FCCOutlinedButton(text = stringResource(R.string.cancel), enabled = true, onClick = {
-                cancelEdit()
+            FCCTextField(modifier = Modifier,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Sentences,
+                    imeAction = ImeAction.Next
+                ),
+                singleLine = false,
+                maxLines = 3,
+                title = stringResource(id = R.string.tips),
+                value = recipe.tips,
+                onValueChange = { recipeUpdater.updateTips(it) })
+
+            SectionLabel(stringResource(R.string.time_title))
+
+            FCCTextField(modifier = Modifier,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
+                ),
+                title = stringResource(id = R.string.prep_time),
+                value = recipe.prepTimeMinutes,
+                onValueChange = { recipeUpdater.updatePrepTime(it) })
+
+            FCCTextField(modifier = Modifier,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
+                ),
+                title = stringResource(id = R.string.cook_time),
+                value = recipe.cookTimeMinutes,
+                onValueChange = { recipeUpdater.updateCookTime(it) })
+
+
+            SectionLabel(stringResource(R.string.steps_title))
+
+            repeat(recipe.steps.size + 1) { index ->
+                FCCTextField(modifier = Modifier,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Sentences,
+                        imeAction = ImeAction.Next
+                    ),
+                    singleLine = false,
+                    maxLines = 5,
+                    title = stringResource(id = R.string.step_number, (index + 1).toString()),
+                    value = recipe.steps.getOrNull(index)?.stepDescription ?: "",
+                    onValueChange = { recipeUpdater.updateStep(index, it) })
+            }
+
+            ButtonRow(primaryButton = {
+                FCCPrimaryButton(text = stringResource(R.string.save),
+                    modifier = Modifier,
+                    enabled = true,
+                    onClick = {
+                        saveRecipe()
+                    })
+            }, secondaryButton = {
+                FCCOutlinedButton(text = stringResource(R.string.cancel),
+                    enabled = true,
+                    onClick = {
+                        cancelEdit()
+                    })
             })
-        })
+        }
     }
 }
 
@@ -385,9 +405,7 @@ private val previewSteps = listOf(
     RecipeStepDomain(
         null,
         0,
-        "In a large bowl, whisk together 1 cup of all-purpose flour, 1 tablespoon of sugar, 1 teaspoon of baking powder, and ½ teaspoon of salt. " +
-                "In another bowl, combine 1 cup of milk, 1 egg, and 2 tablespoons of melted butter. " +
-                "Pour the wet ingredients into the dry ingredients and mix until just combined. Avoid overmixing."
+        "In a large bowl, whisk together 1 cup of all-purpose flour, 1 tablespoon of sugar, 1 teaspoon of baking powder, and ½ teaspoon of salt. " + "In another bowl, combine 1 cup of milk, 1 egg, and 2 tablespoons of melted butter. " + "Pour the wet ingredients into the dry ingredients and mix until just combined. Avoid overmixing."
     ),
     RecipeStepDomain(
         null,
@@ -396,13 +414,12 @@ private val previewSteps = listOf(
     ),
     RecipeStepDomain(
         null, 2,
-        "Pour ¼ cup of batter onto the pan for each pancake. Cook until bubbles form on the surface and the edges look set (about 2 minutes). " +
-                "Flip the pancake and cook the other side until golden brown (about 1-2 minutes).",
+        "Pour ¼ cup of batter onto the pan for each pancake. Cook until bubbles form on the surface and the edges look set (about 2 minutes). " + "Flip the pancake and cook the other side until golden brown (about 1-2 minutes).",
     ),
     RecipeStepDomain(
-        null, 3,
-        "Transfer cooked pancakes to a plate and cover with a clean towel or keep warm in a 90°C (200°F) oven while cooking the rest of the batter." +
-                "Stack the pancakes on a plate and serve with your favorite toppings, such as maple syrup, fresh fruit, whipped cream, or chocolate chips."
+        null,
+        3,
+        "Transfer cooked pancakes to a plate and cover with a clean towel or keep warm in a 90°C (200°F) oven while cooking the rest of the batter." + "Stack the pancakes on a plate and serve with your favorite toppings, such as maple syrup, fresh fruit, whipped cream, or chocolate chips."
     ),
 )
 
@@ -414,16 +431,12 @@ private val previewDish = DishDomain(
     23.0,
     products = listOf(),
     halfProducts = listOf(),
-    recipe =
-    RecipeDomain(
+    recipe = RecipeDomain(
         recipeId = 0L,
         prepTimeMinutes = 10,
         cookTimeMinutes = 50,
         description = "These fluffy and golden pancakes are a breakfast classic! Perfect for a lazy weekend morning or a quick weekday treat, this recipe uses simple pantry ingredients and is easy to make. Serve with maple syrup, fresh berries, or your favorite toppings for a delicious start to your day.",
-        tips = "Don't Overmix: Mix the batter until just combined; small lumps are fine. Overmixing can make the pancakes tough.\n" +
-                "Rest the Batter: Let the batter rest for 5-10 minutes before cooking to allow the gluten to relax and ensure fluffier pancakes.\n" +
-                "Use Medium Heat: Cooking on medium heat helps the pancakes cook through without burning.\n" +
-                "Grease the Pan Lightly: Use a small amount of butter or oil and wipe off the excess with a paper towel for an evenly browned pancake",
+        tips = "Don't Overmix: Mix the batter until just combined; small lumps are fine. Overmixing can make the pancakes tough.\n" + "Rest the Batter: Let the batter rest for 5-10 minutes before cooking to allow the gluten to relax and ensure fluffier pancakes.\n" + "Use Medium Heat: Cooking on medium heat helps the pancakes cook through without burning.\n" + "Grease the Pan Lightly: Use a small amount of butter or oil and wipe off the excess with a paper towel for an evenly browned pancake",
         steps = previewSteps
     )
 )
@@ -433,8 +446,7 @@ private val previewDish = DishDomain(
 @Composable
 private fun RecipeScreenContentViewPreview() {
     FCCTheme {
-        RecipeScreenContent(
-            recipeViewMode = RecipeViewMode.VIEW,
+        RecipeScreenContent(recipeViewMode = RecipeViewMode.VIEW,
             dish = previewDish,
             recipe = previewDish.recipe.toEditableRecipe(),
             screenState = ScreenState.Idle,
@@ -444,8 +456,7 @@ private fun RecipeScreenContentViewPreview() {
             recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
             saveRecipe = {},
             cancelEdit = {},
-            updateServings = {}
-        )
+            updateServings = {})
     }
 }
 
@@ -453,8 +464,7 @@ private fun RecipeScreenContentViewPreview() {
 @Composable
 private fun RecipeScreenContentEditPreview() {
     FCCTheme {
-        RecipeScreenContent(
-            recipeViewMode = RecipeViewMode.EDIT,
+        RecipeScreenContent(recipeViewMode = RecipeViewMode.EDIT,
             dish = previewDish,
             recipe = previewDish.recipe.toEditableRecipe(),
             screenState = ScreenState.Idle,
@@ -464,7 +474,6 @@ private fun RecipeScreenContentEditPreview() {
             recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
             saveRecipe = {},
             cancelEdit = {},
-            updateServings = {}
-        )
+            updateServings = {})
     }
 }

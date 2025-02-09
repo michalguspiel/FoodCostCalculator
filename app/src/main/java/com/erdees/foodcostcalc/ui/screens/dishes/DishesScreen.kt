@@ -207,7 +207,6 @@ private fun DishItem(
     onAddItemsClicked: () -> Unit,
     onEditClicked: () -> Unit
 ) {
-    val context = LocalContext.current
 
     Card(
         modifier
@@ -231,7 +230,7 @@ private fun DishItem(
                 ButtonRow(primaryButton = {
                     FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClicked() }
                 }, secondaryButton = {
-                    FCCTextButton(text = stringResource(id = R.string.edit)) { onEditClicked() }
+                    FCCTextButton(text = stringResource(id = R.string.details)) { onEditClicked() }
                 })
             }
         })

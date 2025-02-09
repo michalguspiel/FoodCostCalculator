@@ -25,11 +25,11 @@ data class DishDomain(
     val foodCost: Double =
         products.sumOf {
             it.totalPrice.also { totalPrice ->
-                Timber.i("Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
+                Timber.v("Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
             }
         } + halfProducts.sumOf {
             it.totalPrice.also { totalPrice ->
-                Timber.i("Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
+                Timber.v("Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
             }
         }
 

@@ -46,6 +46,7 @@
     <string name="edit_name">Edit name</string>
 
     <string name="edit">Edit</string>
+    <string name="details">Details</string>
     <string name="add_items">Add Items</string>
 
     <string name="expanded">Expanded</string>
@@ -131,7 +132,7 @@
     <string name="add_half_product">Add Half Product</string>
     <string name="item_added">Item added</string>
     <string name="remove_dish">Remove dish</string>
-    <string name="recipe">%1$s Recipe</string>
+    <string name="recipe">Recipe</string>
     <string name="recipe_button_title">Recipe</string>
     <string name="time_title">Time</string>
     <string name="prep_time">Prep Time (minutes)</string>
@@ -148,6 +149,9 @@
     <string name="cancel">Cancel</string>
     <string name="not_specified">Not specified</string>
     <string name="edit_recipe">Edit Recipe</string>
+    <string name="recipe_something_went_wrong">Oops! It looks like something went wrong while getting your recipe.</string>
+    <string name="ingredients_title">Ingredients</string>
+
 
 
     <!-- SETTINGS -->
