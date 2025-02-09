@@ -361,6 +361,7 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
     }
 
     fun saveRecipe() {
+        Timber.i("saveRecipe()")
         val existingRecipeIdInDish = _dish.value?.recipe?.recipeId
         val editableRecipe = _recipe.value
         _screenState.value = ScreenState.Loading()
@@ -368,21 +369,24 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
             runCatching {
                 withContext(Dispatchers.IO) {
                     val recipe = editableRecipe.toRecipe(existingRecipeIdInDish)
-                    val recipeId = recipeRepository.upsertRecipe(recipe) // todo this returns -1 when updating
-                    Timber.i("Recipe saved with id: $recipeId \n $recipe")
+                    val newRecipeId = recipeRepository.upsertRecipe(recipe)
+                    Timber.i("Recipe saved with id: $newRecipeId \n $recipe")
                     val steps = editableRecipe.steps.map { step ->
-                        step.toRecipeStep(recipeId)
+                        step.toRecipeStep(existingRecipeIdInDish ?: newRecipeId)
                     }
                     recipeRepository.upsertRecipeSteps(steps)
                     Timber.i("Steps saved: \n $steps")
 
-                    dish.value?.id?.let { dishRepository.updateDishRecipe(recipeId, it) } ?: throw DishNotFound()
+                    if (existingRecipeIdInDish == null){
+                        Timber.i("Recipe created, updating dish with recipe: $newRecipeId")
+                        dish.value?.id?.let { dishRepository.updateDishRecipe(newRecipeId, it) } ?: throw DishNotFound()
+                    } else Timber.i("Recipe updated, skipping dish update.")
                 }
             }.onSuccess {
-                Timber.i("saveRecipe Success")
+                Timber.i("saveRecipe() Success")
                 _screenState.value = ScreenState.Success()
             }.onFailure {
-                Timber.e("saveRecipe failure: $it")
+                Timber.e("saveRecipe() failure: $it")
                 _screenState.value = ScreenState.Error(Error(it.message))
             }
         }
