@@ -27,6 +27,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
+import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
@@ -49,6 +52,8 @@ import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
+import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
@@ -57,6 +62,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeViewMode
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
+import com.erdees.foodcostcalc.utils.onIntegerValueChange
 
 @Composable
 fun RecipeScreen(navController: NavController, viewModel: EditDishViewModel) {
@@ -86,7 +92,9 @@ fun RecipeScreen(navController: NavController, viewModel: EditDishViewModel) {
         recipeUpdater = recipeUpdater,
         saveRecipe = viewModel::saveRecipe,
         cancelEdit = viewModel::cancelEdit,
-        updateServings = viewModel::editRecipeServings
+        onChangeServings = viewModel::onChangeServings,
+        updateServings = viewModel::updateServings,
+        resetScreenState = viewModel::resetScreenState
     )
 }
 
@@ -104,12 +112,18 @@ private fun RecipeScreenContent(
     recipeUpdater: RecipeUpdater,
     saveRecipe: () -> Unit,
     cancelEdit: () -> Unit,
-    updateServings: (Int) -> Unit
+    onChangeServings: () -> Unit,
+    updateServings: (String) -> Unit,
+    resetScreenState: () -> Unit,
 ) {
     Scaffold(topBar = {
         TopAppBar(title = {
             Text(
-                text = dish?.name ?: stringResource(R.string.recipe), modifier = Modifier
+                text = if (recipeViewMode == RecipeViewMode.VIEW) {
+                    dish?.name ?: stringResource(R.string.recipe)
+                } else {
+                    stringResource(R.string.edit_recipe)
+                }, modifier = Modifier
             )
         }, navigationIcon = {
             IconButton(onClick = { popBackStack() }) {
@@ -123,7 +137,6 @@ private fun RecipeScreenContent(
         Box(
             modifier = modifier
                 .padding(paddingValues)
-                .padding(vertical = 24.dp)
                 .padding(horizontal = 12.dp)
         ) {
             when (recipeViewMode) {
@@ -132,7 +145,8 @@ private fun RecipeScreenContent(
                         RecipeView(dish,
                             servings,
                             recipe,
-                            toggleRecipeViewMode = { toggleRecipeViewMode() })
+                            toggleRecipeViewMode = { toggleRecipeViewMode() },
+                            onChangeServings = { onChangeServings() })
                     } ?: RecipeMissingView()
                 }
 
@@ -149,6 +163,23 @@ private fun RecipeScreenContent(
 
             is ScreenState.Error -> {}
             is ScreenState.Loading -> ScreenLoadingOverlay()
+            is ScreenState.Interaction -> {
+                if (screenState.interaction == InteractionType.ChangeServings) {
+                    val editable = remember { mutableStateOf(servings.toString()) }
+                    ValueEditDialog(title = stringResource(id = R.string.change_portions),
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        value = editable.value,
+                        updateValue = { newValue ->
+                            editable.value =
+                                onIntegerValueChange(editable.value, newValue)
+                        },
+                        onSave = {
+                            updateServings(editable.value)
+                        },
+                        onDismiss = { resetScreenState() })
+                }
+            }
+
             else -> {}
         }
     }
@@ -161,7 +192,8 @@ private fun RecipeView(
     servings: Int,
     recipe: RecipeDomain,
     modifier: Modifier = Modifier,
-    toggleRecipeViewMode: () -> Unit
+    toggleRecipeViewMode: () -> Unit,
+    onChangeServings: () -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
@@ -179,7 +211,7 @@ private fun RecipeView(
 
             FCCSecondaryHorizontalDivider(Modifier.fillMaxWidth())
 
-            Column {
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 SectionLabel(stringResource(R.string.description))
                 recipe.description?.let {
                     Text(
@@ -193,47 +225,52 @@ private fun RecipeView(
 
             steps?.let {
                 if (steps.isNotBlank()) {
-                    Column {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         SectionLabel(stringResource(R.string.steps_title))
                         Text(steps, Modifier.fillMaxWidth(), textAlign = TextAlign.Start)
                     }
                 }
             }
 
-            Column {
-                SectionLabel(stringResource(R.string.ingredients_title))
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                SectionLabel(stringResource(R.string.ingredients_title, servings.toString()))
                 Ingredients(
                     dishDomain = dish,
                     servings = servings.toDouble(),
                     modifier = Modifier,
                     showPrices = false
                 )
+                FCCTextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.change_portions)
+                ) {
+                    onChangeServings()
+                }
             }
 
             Tips(recipe.tips)
         }
 
         ButtonRow(
-            modifier = Modifier.padding(top = 8.dp),
+            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
             primaryButton = {
-            FCCPrimaryButton(text = stringResource(R.string.edit_recipe),
-                modifier = Modifier,
-                enabled = true,
-                onClick = {
-                    toggleRecipeViewMode()
-                })
-        }, secondaryButton = {
-            // For now nothing
-        })
+                FCCPrimaryButton(text = stringResource(R.string.edit_recipe),
+                    modifier = Modifier,
+                    enabled = true,
+                    onClick = {
+                        toggleRecipeViewMode()
+                    })
+            }, secondaryButton = {
+                // For now nothing
+            })
     }
 }
 
 @Composable
 private fun Tips(tips: String?, modifier: Modifier = Modifier) {
     tips?.let {
-        Column {
+        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SectionLabel(stringResource(R.string.tips))
-            Spacer(Modifier.size(1.dp))
             Column(
                 modifier
                     .fillMaxWidth()
@@ -243,7 +280,10 @@ private fun Tips(tips: String?, modifier: Modifier = Modifier) {
                     .padding(8.dp)
             ) {
                 Text(
-                    text = tips, modifier = Modifier, textAlign = TextAlign.Start, style = MaterialTheme.typography.bodySmall
+                    text = tips,
+                    modifier = Modifier,
+                    textAlign = TextAlign.Start,
+                    style = MaterialTheme.typography.bodySmall
                 )
             }
         }
@@ -383,7 +423,9 @@ private fun RecipeEdit(
                     onValueChange = { recipeUpdater.updateStep(index, it) })
             }
 
-            ButtonRow(primaryButton = {
+            ButtonRow(
+                modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
+                primaryButton = {
                 FCCPrimaryButton(text = stringResource(R.string.save),
                     modifier = Modifier,
                     enabled = true,
@@ -446,7 +488,8 @@ private val previewDish = DishDomain(
 @Composable
 private fun RecipeScreenContentViewPreview() {
     FCCTheme {
-        RecipeScreenContent(recipeViewMode = RecipeViewMode.VIEW,
+        RecipeScreenContent(
+            recipeViewMode = RecipeViewMode.VIEW,
             dish = previewDish,
             recipe = previewDish.recipe.toEditableRecipe(),
             screenState = ScreenState.Idle,
@@ -456,7 +499,11 @@ private fun RecipeScreenContentViewPreview() {
             recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
             saveRecipe = {},
             cancelEdit = {},
-            updateServings = {})
+            updateServings = {},
+            popBackStack = {},
+            onChangeServings = {},
+            resetScreenState = {},
+        )
     }
 }
 
@@ -464,7 +511,8 @@ private fun RecipeScreenContentViewPreview() {
 @Composable
 private fun RecipeScreenContentEditPreview() {
     FCCTheme {
-        RecipeScreenContent(recipeViewMode = RecipeViewMode.EDIT,
+        RecipeScreenContent(
+            recipeViewMode = RecipeViewMode.EDIT,
             dish = previewDish,
             recipe = previewDish.recipe.toEditableRecipe(),
             screenState = ScreenState.Idle,
@@ -474,6 +522,10 @@ private fun RecipeScreenContentEditPreview() {
             recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
             saveRecipe = {},
             cancelEdit = {},
-            updateServings = {})
+            updateServings = {},
+            popBackStack = {},
+            onChangeServings = {},
+            resetScreenState = {},
+        )
     }
 }

@@ -150,9 +150,8 @@
     <string name="not_specified">Not specified</string>
     <string name="edit_recipe">Edit Recipe</string>
     <string name="recipe_something_went_wrong">Oops! It looks like something went wrong while getting your recipe.</string>
-    <string name="ingredients_title">Ingredients</string>
-
-
+    <string name="ingredients_title">Ingredients for %1$s portions</string>
+    <string name="change_portions">Change Portions</string>
 
     <!-- SETTINGS -->
     <string name="settings">Settings</string>

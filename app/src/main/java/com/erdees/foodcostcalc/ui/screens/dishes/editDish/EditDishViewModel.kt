@@ -76,8 +76,15 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
     private var _recipeServings: MutableStateFlow<Int> = MutableStateFlow(1)
     val recipeServings: StateFlow<Int> = _recipeServings
 
-    fun editRecipeServings(servings: Int) {
-        _recipeServings.update { servings }
+    fun updateServings(servings: String) {
+        servings.toIntOrNull()?.let {
+            _recipeServings.value = it
+        }
+        resetScreenState()
+    }
+
+    fun onChangeServings(){
+        _screenState.update { ScreenState.Interaction(InteractionType.ChangeServings) }
     }
 
     /**
