@@ -13,11 +13,13 @@ import androidx.compose.ui.unit.dp
 fun ButtonRow(
     modifier: Modifier = Modifier,
     primaryButton: @Composable () -> Unit,
-    secondaryButton: @Composable () -> Unit
+    secondaryButton: @Composable (() -> Unit)? = null
 ) {
     Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-        secondaryButton()
-        Spacer(modifier = Modifier.size(16.dp))
+        if (secondaryButton != null) {
+            secondaryButton()
+            Spacer(modifier = Modifier.size(16.dp))
+        }
         primaryButton()
     }
 }

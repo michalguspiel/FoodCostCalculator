@@ -25,12 +25,14 @@ import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -57,6 +59,10 @@ enum class RecipeViewMode {
     VIEW, EDIT
 }
 
+sealed class RecipeEvent{
+    data object CancelEditRecipeMissing : RecipeEvent()
+}
+
 class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
     KoinComponent {
 
@@ -75,6 +81,9 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
 
     private var _recipeServings: MutableStateFlow<Int> = MutableStateFlow(1)
     val recipeServings: StateFlow<Int> = _recipeServings
+
+    private var _recipeEvent: Channel<RecipeEvent> = Channel()
+    val recipeEvent = _recipeEvent.receiveAsFlow()
 
     fun updateServings(servings: String) {
         servings.toIntOrNull()?.let {
@@ -381,9 +390,23 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
         resetScreenState()
     }
 
+    /**
+     * Cancels editing of recipe, if dish does not include any recipe, sends event,
+     * which in turn instructs screen to pop backstack.
+     * */
     fun cancelEdit() {
-        _recipe.update { _dish.value?.recipe.toEditableRecipe() }
-        toggleRecipeViewMode()
+        Timber.i("cancelEdit()")
+        if (_dish.value?.recipe == null){
+            _screenState.update { ScreenState.Loading() }
+            viewModelScope.launch {
+                _recipeEvent.trySend(RecipeEvent.CancelEditRecipeMissing)
+            }
+            _screenState.update { ScreenState.Idle }
+        } else {
+            Timber.i("dish recipe is ${_dish.value?.recipe}, toggling recipe view mode")
+            _recipe.update { _dish.value?.recipe.toEditableRecipe() }
+            toggleRecipeViewMode()
+        }
     }
 
 

@@ -25,6 +25,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
@@ -59,10 +61,12 @@ import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeEvent
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeViewMode
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
+import timber.log.Timber
 
 @Composable
 fun RecipeScreen(navController: NavController, viewModel: EditDishViewModel) {
@@ -79,6 +83,15 @@ fun RecipeScreen(navController: NavController, viewModel: EditDishViewModel) {
         updateStep = viewModel::updateStep
     )
     val recipeServings by viewModel.recipeServings.collectAsState()
+    val recipeEvent by viewModel.recipeEvent.collectAsStateWithLifecycle(null)
+
+    LaunchedEffect(recipeEvent) {
+        Timber.i("New $recipeEvent received.")
+        when (recipeEvent) {
+            RecipeEvent.CancelEditRecipeMissing -> navController.popBackStack()
+            else -> {}
+        }
+    }
 
     RecipeScreenContent(
         recipeViewMode = recipeViewMode,
@@ -426,19 +439,19 @@ private fun RecipeEdit(
             ButtonRow(
                 modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
                 primaryButton = {
-                FCCPrimaryButton(text = stringResource(R.string.save),
-                    modifier = Modifier,
-                    enabled = true,
-                    onClick = {
-                        saveRecipe()
-                    })
-            }, secondaryButton = {
-                FCCOutlinedButton(text = stringResource(R.string.cancel),
-                    enabled = true,
-                    onClick = {
-                        cancelEdit()
-                    })
-            })
+                    FCCPrimaryButton(text = stringResource(R.string.save),
+                        modifier = Modifier,
+                        enabled = true,
+                        onClick = {
+                            saveRecipe()
+                        })
+                }, secondaryButton = {
+                    FCCOutlinedButton(text = stringResource(R.string.cancel),
+                        enabled = true,
+                        onClick = {
+                            cancelEdit()
+                        })
+                })
         }
     }
 }
