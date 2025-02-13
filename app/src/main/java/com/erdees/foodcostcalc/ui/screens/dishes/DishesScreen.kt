@@ -1,6 +1,5 @@
 package com.erdees.foodcostcalc.ui.screens.dishes
 
-import android.content.Context
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -46,6 +45,7 @@ import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.ExpandedIcon
+import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.animations.SearchFieldTransition
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCAnimatedFAB
@@ -54,16 +54,13 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
-import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.fields.SearchField
 import com.erdees.foodcostcalc.ui.composables.rememberNestedScrollConnection
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
-import com.erdees.foodcostcalc.ui.composables.rows.IngredientRow
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.UnitsUtils.getUnitAbbreviation
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 
 @Composable
@@ -210,7 +207,6 @@ private fun DishItem(
     onAddItemsClicked: () -> Unit,
     onEditClicked: () -> Unit
 ) {
-    val context = LocalContext.current
 
     Card(
         modifier
@@ -224,7 +220,7 @@ private fun DishItem(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 if (isExpanded) {
-                    Ingredients(dishDomain, servings, context)
+                    Ingredients(dishDomain, servings)
                 }
 
                 PriceSummary(dishDomain = dishDomain, servings = servings.toInt())
@@ -234,7 +230,7 @@ private fun DishItem(
                 ButtonRow(primaryButton = {
                     FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClicked() }
                 }, secondaryButton = {
-                    FCCTextButton(text = stringResource(id = R.string.edit)) { onEditClicked() }
+                    FCCTextButton(text = stringResource(id = R.string.details)) { onEditClicked() }
                 })
             }
         })
@@ -288,33 +284,6 @@ private fun DishDetails(
 }
 
 @Composable
-private fun Ingredients(
-    dishDomain: DishDomain,
-    servings: Double,
-    context: Context
-) {
-    Column(
-        Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        (dishDomain.products + dishDomain.halfProducts).forEach {
-            IngredientRow(
-                modifier = Modifier.padding(bottom = 4.dp),
-                description = it.item.name,
-                quantity = stringResource(
-                    R.string.formatted_quantity,
-                    it.formatQuantityForTargetServing(servings),
-                    getUnitAbbreviation(it.quantityUnit)
-                ),
-                price = it.formattedTotalPricePerServing(context, servings),
-                style = MaterialTheme.typography.bodyMedium
-            )
-            FCCSecondaryHorizontalDivider()
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-    }
-}
-
-@Composable
 private fun PriceSummary(dishDomain: DishDomain, servings: Int, modifier: Modifier = Modifier) {
     val context = LocalContext.current
     Column(modifier) {
@@ -357,7 +326,8 @@ fun DishItemPreview() {
                         "g",
                         null,
                     )
-                )
+                ),
+                recipe = null
             ),
                 servings = 1.0,
                 isExpanded = true,
@@ -371,7 +341,8 @@ fun DishItemPreview() {
                 marginPercent = 320.0,
                 taxPercent = 23.0,
                 halfProducts = emptyList(),
-                products = listOf()
+                products = listOf(),
+                recipe = null
             ),
                 servings = 1.0,
                 isExpanded = false,

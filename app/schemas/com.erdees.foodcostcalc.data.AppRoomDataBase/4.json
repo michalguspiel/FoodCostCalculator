@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 3,
-    "identityHash": "c87d2b8584d5bc1a04f71031529c1219",
+    "version": 4,
+    "identityHash": "9e32b9eb128f85cd3c46a37fb04c38d7",
     "entities": [
       {
         "tableName": "products",
@@ -95,7 +95,17 @@
             "dishId"
           ]
         },
-        "indices": [],
+        "indices": [
+          {
+            "name": "index_dishes_recipeId",
+            "unique": false,
+            "columnNames": [
+              "recipeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_dishes_recipeId` ON `${TABLE_NAME}` (`recipeId`)"
+          }
+        ],
         "foreignKeys": [
           {
             "table": "Recipe",
@@ -405,12 +415,116 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "Recipe",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`recipeId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `prepTimeMinutes` INTEGER, `cookTimeMinutes` INTEGER, `description` TEXT, `tips` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "recipeId",
+            "columnName": "recipeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "prepTimeMinutes",
+            "columnName": "prepTimeMinutes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "cookTimeMinutes",
+            "columnName": "cookTimeMinutes",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "description",
+            "columnName": "description",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "tips",
+            "columnName": "tips",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "recipeId"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "Recipe_Step",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `recipeId` INTEGER NOT NULL, `stepDescription` TEXT NOT NULL, `order` INTEGER NOT NULL, FOREIGN KEY(`recipeId`) REFERENCES `Recipe`(`recipeId`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "recipeId",
+            "columnName": "recipeId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "stepDescription",
+            "columnName": "stepDescription",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Recipe_Step_recipeId",
+            "unique": false,
+            "columnNames": [
+              "recipeId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Recipe_Step_recipeId` ON `${TABLE_NAME}` (`recipeId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "Recipe",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "recipeId"
+            ],
+            "referencedColumns": [
+              "recipeId"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c87d2b8584d5bc1a04f71031529c1219')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '9e32b9eb128f85cd3c46a37fb04c38d7')"
     ]
   }
 }

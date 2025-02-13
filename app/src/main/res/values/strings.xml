@@ -46,6 +46,7 @@
     <string name="edit_name">Edit name</string>
 
     <string name="edit">Edit</string>
+    <string name="details">Details</string>
     <string name="add_items">Add Items</string>
 
     <string name="expanded">Expanded</string>
@@ -130,6 +131,27 @@
     <string name="add_product">Add Product</string>
     <string name="add_half_product">Add Half Product</string>
     <string name="item_added">Item added</string>
+    <string name="remove_dish">Remove dish</string>
+    <string name="recipe">Recipe</string>
+    <string name="recipe_button_title">Recipe</string>
+    <string name="time_title">Time</string>
+    <string name="prep_time">Prep Time (minutes)</string>
+    <string name="prep_time_title">Prep Time</string>
+    <string name="prep_time_value">%1$s min</string>
+    <string name="cook_time">Cook Time (minutes)</string>
+    <string name="cook_time_title">Cook Time</string>
+    <string name="cook_time_value">%1$s min</string>
+    <string name="general_info_title">General</string>
+    <string name="description">Description</string>
+    <string name="tips">Tips</string>
+    <string name="steps_title">Steps</string>
+    <string name="step_number">%1$s.</string>
+    <string name="cancel">Cancel</string>
+    <string name="not_specified">Not specified</string>
+    <string name="edit_recipe">Edit Recipe</string>
+    <string name="recipe_something_went_wrong">Oops! It looks like something went wrong while getting your recipe.</string>
+    <string name="ingredients_title">Ingredients for %1$s portions</string>
+    <string name="change_portions">Change Portions</string>
 
     <!-- SETTINGS -->
     <string name="settings">Settings</string>
@@ -188,5 +210,6 @@
     <string name="active_subscription_thank_you">Thank you for subscribing!</string>
     <string name="star">star</string>
     <string name="products_missing_error">Can\'t load products, please come back again later.</string>
+
 
 </resources>

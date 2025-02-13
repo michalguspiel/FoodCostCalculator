@@ -1,13 +1,14 @@
 package com.erdees.foodcostcalc.domain.model.dish
 
 import android.content.Context
-import android.util.Log
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.serialization.Serializable
+import timber.log.Timber
 
 
 @Keep
@@ -18,22 +19,17 @@ data class DishDomain(
     val marginPercent: Double,
     val taxPercent: Double,
     val products: List<UsedProductDomain>,
-    val halfProducts: List<UsedHalfProductDomain>
+    val halfProducts: List<UsedHalfProductDomain>,
+    val recipe: RecipeDomain?,
 ) : Item {
     val foodCost: Double =
         products.sumOf {
             it.totalPrice.also { totalPrice ->
-                Log.i(
-                    "DishDomain",
-                    "Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice"
-                )
+                Timber.v("Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
             }
         } + halfProducts.sumOf {
             it.totalPrice.also { totalPrice ->
-                Log.i(
-                    "DishDomain",
-                    "Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice"
-                )
+                Timber.v("Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
             }
         }
 

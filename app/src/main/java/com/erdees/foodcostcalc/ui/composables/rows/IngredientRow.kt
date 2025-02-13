@@ -19,6 +19,7 @@ fun IngredientRow(
     quantity: String,
     price: String,
     modifier: Modifier = Modifier,
+    showPrice: Boolean = true,
     style: TextStyle = MaterialTheme.typography.bodyLarge
 ) {
     Row(
@@ -29,20 +30,23 @@ fun IngredientRow(
         Text(
             text = description,
             style = style,
-            modifier = Modifier.weight(0.6f),
+            modifier = Modifier.weight(if (showPrice) 0.6f else 0.8f)
         )
         Text(
             text = quantity,
             style = style,
             modifier = Modifier.weight(0.2f),
-            textAlign = TextAlign.Start
+            textAlign =
+            if (showPrice) TextAlign.Start else TextAlign.End
         )
-        Text(
-            text = price,
-            style = style,
-            modifier = Modifier.weight(0.2f),
-            textAlign = TextAlign.End
-        )
+        if (showPrice){
+            Text(
+                text = price,
+                style = style,
+                modifier = Modifier.weight(0.2f),
+                textAlign = TextAlign.End
+            )
+        }
     }
 }
 

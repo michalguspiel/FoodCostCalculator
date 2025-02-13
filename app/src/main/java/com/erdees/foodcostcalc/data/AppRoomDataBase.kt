@@ -10,11 +10,15 @@ import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.ProductHalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
+import com.erdees.foodcostcalc.data.db.dao.recipe.RecipeDao
 import com.erdees.foodcostcalc.data.db.migrations.Migration_1to2_RefactorDatabase
 import com.erdees.foodcostcalc.data.db.migrations.Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist
+import com.erdees.foodcostcalc.data.db.migrations.Migration_3to_4_CreateRecipeTable
 import com.erdees.foodcostcalc.data.model.DishBase
 import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.Recipe
+import com.erdees.foodcostcalc.data.model.RecipeStep
 import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductDish
 import com.erdees.foodcostcalc.data.model.associations.ProductHalfProduct
@@ -29,11 +33,13 @@ import java.io.File
         ProductDish::class,
         ProductHalfProduct::class,
         HalfProductDish::class,
-    ],
-    version = 3, exportSchema = true,
-    views = [],
 
-    )
+        Recipe::class,
+        RecipeStep::class
+    ],
+    version = 4, exportSchema = true,
+    views = []
+)
 abstract class AppRoomDataBase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
@@ -42,6 +48,7 @@ abstract class AppRoomDataBase : RoomDatabase() {
     abstract fun productDishDao(): ProductDishDao
     abstract fun halfProductDishDao(): HalfProductDishDao
     abstract fun productHalfProductDao(): ProductHalfProductDao
+    abstract fun recipeDao(): RecipeDao
 
     /**Singleton of database.*/
     companion object {
@@ -53,7 +60,8 @@ abstract class AppRoomDataBase : RoomDatabase() {
 
         private fun migrations() = arrayOf(
             Migration_1to2_RefactorDatabase(),
-            Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist()
+            Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist(),
+            Migration_3to_4_CreateRecipeTable()
         )
 
         fun getDatabase(context: Context): AppRoomDataBase {
