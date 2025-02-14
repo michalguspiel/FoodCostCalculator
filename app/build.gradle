@@ -8,6 +8,7 @@ plugins {
     id 'kotlin-parcelize'
     id("org.jetbrains.kotlin.plugin.compose") version "2.0.10"
     id 'com.google.firebase.crashlytics'
+    id 'io.gitlab.arturbosch.detekt'
 }
 
 android {
@@ -110,6 +111,27 @@ android {
         unitTests.returnDefaultValues = true
     }
 
+}
+
+detekt {
+    // Version of detekt that will be used. When unspecified the latest detekt
+    // version found will be used. Override to stay on the same version.
+    toolVersion = "1.23.7"
+    config.setFrom("$rootDir/config/detekt/config.yml")
+    baseline = file("$rootDir/config/detekt/baseline.yml")
+    // Disables all default detekt rulesets and will only run detekt with custom rules
+    // defined in plugins passed in with `detektPlugins` configuration. `false` by default.
+    disableDefaultRuleSets = false
+
+    // Adds debug output during task execution. `false` by default.
+    debug = false
+
+    // Android: Don't create tasks for the specified build types (e.g. "release")
+    ignoredBuildTypes = ["release"]
+
+    // Specify the base path for file paths in the formatted reports.
+    // If not set, all file paths reported will be absolute file path.
+    basePath = projectDir
 }
 
 dependencies {
