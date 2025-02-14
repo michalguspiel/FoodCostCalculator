@@ -1,0 +1,27 @@
+name: Detekt Check
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  detekt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+
+      - name: Run Detekt
+        run: ./gradlew detekt
+
+      - name: Upload Detekt report
+        uses: actions/upload-artifact@v3
+        with:
+          name: detekt-report
+          path: app/build/reports/detekt/  # Ensure this matches your Detekt output path
+          retention-days: 7  # Keep the report for a week
