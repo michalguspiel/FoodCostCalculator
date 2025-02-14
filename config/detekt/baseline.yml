@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues></ManuallySuppressedIssues>
+  <CurrentIssues>
+    <ID>ClassNaming:Migration_1to2_RefactorDatabase.kt$Migration_1to2_RefactorDatabase : Migration</ID>
+    <ID>ClassNaming:Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist.kt$Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist : Migration</ID>
+    <ID>ClassNaming:Migration_3to_4_CreateRecipeTable.kt$Migration_3to_4_CreateRecipeTable : Migration</ID>
+    <ID>CyclomaticComplexMethod:DataBackupScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun DataBackupScreen(navController: NavController)</ID>
+    <ID>LongMethod:DataBackupScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun DataBackupScreen(navController: NavController)</ID>
+    <ID>LongMethod:EditDishScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EditDishScreen(dishId: Long, navController: NavController)</ID>
+    <ID>LongParameterList:SettingsScreen.kt$( snackbarHostState: SnackbarHostState, navController: NavController, settings: UserSettings, currencies: Set&lt;Currency&gt;, saveButtonEnabled: Boolean, screenState: ScreenState, updateDefaultTax: (String) -&gt; Unit, updateDefaultMargin: (String) -&gt; Unit, updateMetricUsed: (Boolean) -&gt; Unit, updateImperialUsed: (Boolean) -&gt; Unit, updateDefaultCurrencyCode: (Currency) -&gt; Unit, saveSettings: () -&gt; Unit, resetScreenState: () -&gt; Unit, )</ID>
+    <ID>MagicNumber:Buttons.kt$250</ID>
+    <ID>MagicNumber:CreateProductScreenViewModel.kt$CreateProductScreenViewModel$100</ID>
+    <ID>MagicNumber:DishDomain.kt$DishDomain$100</ID>
+    <ID>MagicNumber:DishesScreen.kt$0.5</ID>
+    <ID>MagicNumber:DishesScreen.kt$100.0</ID>
+    <ID>MagicNumber:DishesScreen.kt$15.0</ID>
+    <ID>MagicNumber:DishesScreen.kt$5.0</ID>
+    <ID>MagicNumber:HalfProductDomain.kt$HalfProductDomain$100</ID>
+    <ID>MagicNumber:HalfProductsScreen.kt$0.5</ID>
+    <ID>MagicNumber:HalfProductsScreen.kt$100.0</ID>
+    <ID>MagicNumber:HalfProductsScreen.kt$15.0</ID>
+    <ID>MagicNumber:HalfProductsScreen.kt$5.0</ID>
+    <ID>MagicNumber:IngredientRow.kt$0.2f</ID>
+    <ID>MagicNumber:IngredientRow.kt$0.6f</ID>
+    <ID>MagicNumber:IngredientRow.kt$0.8f</ID>
+    <ID>MagicNumber:Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist.kt$Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist$3</ID>
+    <ID>MagicNumber:Migration_3to_4_CreateRecipeTable.kt$Migration_3to_4_CreateRecipeTable$3</ID>
+    <ID>MagicNumber:Migration_3to_4_CreateRecipeTable.kt$Migration_3to_4_CreateRecipeTable$4</ID>
+    <ID>MagicNumber:OnlineBackupViewModel.kt$OnlineBackupViewModel$1024</ID>
+    <ID>MagicNumber:RecipeScreen.kt$0.8f</ID>
+    <ID>MagicNumber:SearchField.kt$0.6f</ID>
+    <ID>MagicNumber:SubscriptionScreen.kt$0.3</ID>
+    <ID>MagicNumber:SubscriptionScreen.kt$0.5</ID>
+    <ID>MagicNumber:SubscriptionScreen.kt$0xb48def</ID>
+    <ID>MagicNumber:SubscriptionScreen.kt$0xf4306d</ID>
+    <ID>MagicNumber:SubscriptionScreen.kt$0xfce18a</ID>
+    <ID>MagicNumber:SubscriptionScreen.kt$0xff726d</ID>
+    <ID>MagicNumber:SubscriptionScreen.kt$100</ID>
+    <ID>MagicNumber:SubscriptionScreen.kt$5</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$0.119826427</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$0.264172052</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$1000</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$128</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$16</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$2.20462262</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$28.3495</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$3785.41178</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$453.59237</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$8.345404436202464</ID>
+    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$900000.9</ID>
+    <ID>MagicNumber:UsedItem.kt$UsedItem$100</ID>
+    <ID>MagicNumber:UsedProductDomain.kt$UsedProductDomain$100</ID>
+    <ID>MaxLineLength:AdHelperTests.kt$AdHelperTests$fun</ID>
+    <ID>MaxLineLength:EditDishScreen.kt$Icon(imageVector = Icons.Sharp.Delete, contentDescription = stringResource(R.string.remove_dish))</ID>
+    <ID>MaxLineLength:EditDishViewModel.kt$EditDishViewModel$*</ID>
+    <ID>MaxLineLength:EditDishViewModel.kt$EditDishViewModel$Timber.i("Dish's recipe and recipe refreshed with ${updatedRecipe.toRecipeDomain()} \n${updatedRecipe.toRecipeDomain().steps}")</ID>
+    <ID>MaxLineLength:EditDishViewModel.kt$EditDishViewModel$dishRepository.updateDish(this@EditDishViewModel.dish.value!!.toDishBase())</ID>
+    <ID>MaxLineLength:Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist.kt$Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist$*</ID>
+    <ID>MaxLineLength:PremiumUtil.kt$PremiumUtil.&lt;no name provided&gt;$"queryProductDetailsAsync() , responseCode: ${billingResult.responseCode}, productDetailsList: $productDetailsList"</ID>
+    <ID>MaxLineLength:PremiumUtil.kt$PremiumUtil.&lt;no name provided&gt;$"queryPurchasesAsync() , responseCode: ${billingResult.responseCode}, purchase: $purchase"</ID>
+    <ID>MaxLineLength:RecipeScreen.kt$"In a large bowl, whisk together 1 cup of all-purpose flour, 1 tablespoon of sugar, 1 teaspoon of baking powder, and ½ teaspoon of salt. " + "In another bowl, combine 1 cup of milk, 1 egg, and 2 tablespoons of melted butter. " + "Pour the wet ingredients into the dry ingredients and mix until just combined. Avoid overmixing."</ID>
+    <ID>MaxLineLength:RecipeScreen.kt$"Pour ¼ cup of batter onto the pan for each pancake. Cook until bubbles form on the surface and the edges look set (about 2 minutes). " + "Flip the pancake and cook the other side until golden brown (about 1-2 minutes)."</ID>
+    <ID>MaxLineLength:RecipeScreen.kt$"Transfer cooked pancakes to a plate and cover with a clean towel or keep warm in a 90°C (200°F) oven while cooking the rest of the batter." + "Stack the pancakes on a plate and serve with your favorite toppings, such as maple syrup, fresh fruit, whipped cream, or chocolate chips."</ID>
+    <ID>MaxLineLength:RecipeScreen.kt$description = "These fluffy and golden pancakes are a breakfast classic! Perfect for a lazy weekend morning or a quick weekday treat, this recipe uses simple pantry ingredients and is easy to make. Serve with maple syrup, fresh berries, or your favorite toppings for a delicious start to your day."</ID>
+    <ID>MaxLineLength:RecipeScreen.kt$tips = "Don't Overmix: Mix the batter until just combined; small lumps are fine. Overmixing can make the pancakes tough.\n" + "Rest the Batter: Let the batter rest for 5-10 minutes before cooking to allow the gluten to relax and ensure fluffier pancakes.\n" + "Use Medium Heat: Cooking on medium heat helps the pancakes cook through without burning.\n" + "Grease the Pan Lightly: Use a small amount of butter or oil and wipe off the excess with a paper towel for an evenly browned pancake"</ID>
+    <ID>MaxLineLength:SubscriptionViewModel.kt$SubscriptionScreenState$*</ID>
+    <ID>MaxLineLength:SubscriptionViewModel.kt$SubscriptionViewModel$"https://play.google.com/store/account/subscriptions?sku=${PremiumUtil.PRODUCT_ID}&amp;package=com.erdees.foodcostcalc"</ID>
+    <ID>ReturnCount:CreateProductScreenViewModel.kt$CreateProductScreenViewModel$fun addProduct()</ID>
+    <ID>ReturnCount:EditDishViewModel.kt$EditDishViewModel$fun updateItemQuantity()</ID>
+    <ID>ReturnCount:EditHalfProductViewModel.kt$EditHalfProductViewModel$fun updateProductQuantity()</ID>
+    <ID>ReturnCount:SubscriptionViewModel.kt$SubscriptionViewModel$fun onSubscribeClicked(activity: Activity?)</ID>
+    <ID>SpreadOperator:AppRoomDataBase.kt$AppRoomDataBase.Companion$(*migrations())</ID>
+    <ID>ThrowingExceptionsWithoutMessageOrCause:AdHelper.kt$AdHelper$NullPointerException()</ID>
+    <ID>ThrowingExceptionsWithoutMessageOrCause:EditDishViewModel.kt$EditDishViewModel$NullPointerException()</ID>
+    <ID>UnusedParameter:EditDishScreen.kt$onTotalPriceClick: () -&gt; Unit</ID>
+    <ID>UnusedPrivateMember:OnlineBackupError.kt$DownloadFailure$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:OnlineBackupError.kt$DrivePermissionFailure$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:OnlineBackupError.kt$DriveQueryFailure$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:OnlineBackupError.kt$DriveSetupFailure$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:OnlineBackupError.kt$FailedToSignOut$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:OnlineBackupError.kt$NoDatabaseFileError$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:OnlineBackupError.kt$SavingDatabaseFailure$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:SubscriptionViewModel.kt$MissingBillingClient$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:SubscriptionViewModel.kt$MissingProductDetails$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateMember:SubscriptionViewModel.kt$PlanNotSelected$private fun readResolve(): Any</ID>
+    <ID>UnusedPrivateProperty:AdHelper.kt$AdHelper$eachAd</ID>
+    <ID>UnusedPrivateProperty:Theme.kt$private val highContrastDarkColorScheme = darkColorScheme( primary = primaryDarkHighContrast, onPrimary = onPrimaryDarkHighContrast, primaryContainer = primaryContainerDarkHighContrast, onPrimaryContainer = onPrimaryContainerDarkHighContrast, secondary = secondaryDarkHighContrast, onSecondary = onSecondaryDarkHighContrast, secondaryContainer = secondaryContainerDarkHighContrast, onSecondaryContainer = onSecondaryContainerDarkHighContrast, tertiary = tertiaryDarkHighContrast, onTertiary = onTertiaryDarkHighContrast, tertiaryContainer = tertiaryContainerDarkHighContrast, onTertiaryContainer = onTertiaryContainerDarkHighContrast, error = errorDarkHighContrast, onError = onErrorDarkHighContrast, errorContainer = errorContainerDarkHighContrast, onErrorContainer = onErrorContainerDarkHighContrast, background = backgroundDarkHighContrast, onBackground = onBackgroundDarkHighContrast, surface = surfaceDarkHighContrast, onSurface = onSurfaceDarkHighContrast, surfaceVariant = surfaceVariantDarkHighContrast, onSurfaceVariant = onSurfaceVariantDarkHighContrast, outline = outlineDarkHighContrast, outlineVariant = outlineVariantDarkHighContrast, scrim = scrimDarkHighContrast, inverseSurface = inverseSurfaceDarkHighContrast, inverseOnSurface = inverseOnSurfaceDarkHighContrast, inversePrimary = inversePrimaryDarkHighContrast, surfaceDim = surfaceDimDarkHighContrast, surfaceBright = surfaceBrightDarkHighContrast, surfaceContainerLowest = surfaceContainerLowestDarkHighContrast, surfaceContainerLow = surfaceContainerLowDarkHighContrast, surfaceContainer = surfaceContainerDarkHighContrast, surfaceContainerHigh = surfaceContainerHighDarkHighContrast, surfaceContainerHighest = surfaceContainerHighestDarkHighContrast, )</ID>
+    <ID>UnusedPrivateProperty:Theme.kt$private val highContrastLightColorScheme = lightColorScheme( primary = primaryLightHighContrast, onPrimary = onPrimaryLightHighContrast, primaryContainer = primaryContainerLightHighContrast, onPrimaryContainer = onPrimaryContainerLightHighContrast, secondary = secondaryLightHighContrast, onSecondary = onSecondaryLightHighContrast, secondaryContainer = secondaryContainerLightHighContrast, onSecondaryContainer = onSecondaryContainerLightHighContrast, tertiary = tertiaryLightHighContrast, onTertiary = onTertiaryLightHighContrast, tertiaryContainer = tertiaryContainerLightHighContrast, onTertiaryContainer = onTertiaryContainerLightHighContrast, error = errorLightHighContrast, onError = onErrorLightHighContrast, errorContainer = errorContainerLightHighContrast, onErrorContainer = onErrorContainerLightHighContrast, background = backgroundLightHighContrast, onBackground = onBackgroundLightHighContrast, surface = surfaceLightHighContrast, onSurface = onSurfaceLightHighContrast, surfaceVariant = surfaceVariantLightHighContrast, onSurfaceVariant = onSurfaceVariantLightHighContrast, outline = outlineLightHighContrast, outlineVariant = outlineVariantLightHighContrast, scrim = scrimLightHighContrast, inverseSurface = inverseSurfaceLightHighContrast, inverseOnSurface = inverseOnSurfaceLightHighContrast, inversePrimary = inversePrimaryLightHighContrast, surfaceDim = surfaceDimLightHighContrast, surfaceBright = surfaceBrightLightHighContrast, surfaceContainerLowest = surfaceContainerLowestLightHighContrast, surfaceContainerLow = surfaceContainerLowLightHighContrast, surfaceContainer = surfaceContainerLightHighContrast, surfaceContainerHigh = surfaceContainerHighLightHighContrast, surfaceContainerHighest = surfaceContainerHighestLightHighContrast, )</ID>
+    <ID>UnusedPrivateProperty:Theme.kt$private val mediumContrastDarkColorScheme = darkColorScheme( primary = primaryDarkMediumContrast, onPrimary = onPrimaryDarkMediumContrast, primaryContainer = primaryContainerDarkMediumContrast, onPrimaryContainer = onPrimaryContainerDarkMediumContrast, secondary = secondaryDarkMediumContrast, onSecondary = onSecondaryDarkMediumContrast, secondaryContainer = secondaryContainerDarkMediumContrast, onSecondaryContainer = onSecondaryContainerDarkMediumContrast, tertiary = tertiaryDarkMediumContrast, onTertiary = onTertiaryDarkMediumContrast, tertiaryContainer = tertiaryContainerDarkMediumContrast, onTertiaryContainer = onTertiaryContainerDarkMediumContrast, error = errorDarkMediumContrast, onError = onErrorDarkMediumContrast, errorContainer = errorContainerDarkMediumContrast, onErrorContainer = onErrorContainerDarkMediumContrast, background = backgroundDarkMediumContrast, onBackground = onBackgroundDarkMediumContrast, surface = surfaceDarkMediumContrast, onSurface = onSurfaceDarkMediumContrast, surfaceVariant = surfaceVariantDarkMediumContrast, onSurfaceVariant = onSurfaceVariantDarkMediumContrast, outline = outlineDarkMediumContrast, outlineVariant = outlineVariantDarkMediumContrast, scrim = scrimDarkMediumContrast, inverseSurface = inverseSurfaceDarkMediumContrast, inverseOnSurface = inverseOnSurfaceDarkMediumContrast, inversePrimary = inversePrimaryDarkMediumContrast, surfaceDim = surfaceDimDarkMediumContrast, surfaceBright = surfaceBrightDarkMediumContrast, surfaceContainerLowest = surfaceContainerLowestDarkMediumContrast, surfaceContainerLow = surfaceContainerLowDarkMediumContrast, surfaceContainer = surfaceContainerDarkMediumContrast, surfaceContainerHigh = surfaceContainerHighDarkMediumContrast, surfaceContainerHighest = surfaceContainerHighestDarkMediumContrast, )</ID>
+    <ID>UnusedPrivateProperty:Theme.kt$private val mediumContrastLightColorScheme = lightColorScheme( primary = primaryLightMediumContrast, onPrimary = onPrimaryLightMediumContrast, primaryContainer = primaryContainerLightMediumContrast, onPrimaryContainer = onPrimaryContainerLightMediumContrast, secondary = secondaryLightMediumContrast, onSecondary = onSecondaryLightMediumContrast, secondaryContainer = secondaryContainerLightMediumContrast, onSecondaryContainer = onSecondaryContainerLightMediumContrast, tertiary = tertiaryLightMediumContrast, onTertiary = onTertiaryLightMediumContrast, tertiaryContainer = tertiaryContainerLightMediumContrast, onTertiaryContainer = onTertiaryContainerLightMediumContrast, error = errorLightMediumContrast, onError = onErrorLightMediumContrast, errorContainer = errorContainerLightMediumContrast, onErrorContainer = onErrorContainerLightMediumContrast, background = backgroundLightMediumContrast, onBackground = onBackgroundLightMediumContrast, surface = surfaceLightMediumContrast, onSurface = onSurfaceLightMediumContrast, surfaceVariant = surfaceVariantLightMediumContrast, onSurfaceVariant = onSurfaceVariantLightMediumContrast, outline = outlineLightMediumContrast, outlineVariant = outlineVariantLightMediumContrast, scrim = scrimLightMediumContrast, inverseSurface = inverseSurfaceLightMediumContrast, inverseOnSurface = inverseOnSurfaceLightMediumContrast, inversePrimary = inversePrimaryLightMediumContrast, surfaceDim = surfaceDimLightMediumContrast, surfaceBright = surfaceBrightLightMediumContrast, surfaceContainerLowest = surfaceContainerLowestLightMediumContrast, surfaceContainerLow = surfaceContainerLowLightMediumContrast, surfaceContainer = surfaceContainerLightMediumContrast, surfaceContainerHigh = surfaceContainerHighLightMediumContrast, surfaceContainerHighest = surfaceContainerHighestLightMediumContrast, )</ID>
+    <ID>UseCheckOrError:ProductDetails.kt$throw IllegalStateException("Monthly plan not found")</ID>
+    <ID>UseCheckOrError:ProductDetails.kt$throw IllegalStateException("Yearly plan not found")</ID>
+    <ID>WildcardImport:MyApplication.kt$import timber.log.Timber.*</ID>
+  </CurrentIssues>
+</SmellBaseline>
