@@ -129,12 +129,8 @@ fun HalfProductsScreen(navController: NavController, viewModel: HalfProductsScre
                                     onExpandToggle = {
                                         viewModel.listPresentationStateHandler.onExpandToggle(item)
                                     },
-                                    onChangeQuantityDialogOpen = {
-                                        viewModel.updateScreenState(
-                                            ScreenState.Interaction(
-                                                InteractionType.EditQuantity(item.id)
-                                            )
-                                        )
+                                    onEditQuantity = {
+                                        viewModel.onEditQuantity(item.id)
                                     },
                                     onAddItemsClick = {
                                         navController.navigate(
@@ -233,7 +229,7 @@ fun HalfProductItem(
     quantity: Double,
     modifier: Modifier = Modifier,
     onExpandToggle: () -> Unit,
-    onChangeQuantityDialogOpen: () -> Unit,
+    onEditQuantity: () -> Unit,
     onAddItemsClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
@@ -248,7 +244,7 @@ fun HalfProductItem(
                 TitleRow(halfProductDomain, isExpanded)
 
                 if (isExpanded) {
-                    Ingredients(quantity, halfProductDomain, onChangeQuantityDialogOpen, context)
+                    Ingredients(quantity, halfProductDomain, onEditQuantity, context)
                 }
 
                 PriceSummary(halfProductDomain, context, quantity)
@@ -442,7 +438,7 @@ private fun HalfProductsItemPreview() {
                 isExpanded = true,
                 quantity = 1.0,
                 onExpandToggle = { },
-                onChangeQuantityDialogOpen = { },
+                onEditQuantity = { },
                 onAddItemsClick = { }) {}
             HalfProductItem(halfProductDomain = HalfProductDomain(
                 id = 1, name = "Ketchup", halfProductUnit = "kg", products = emptyList()
@@ -450,7 +446,7 @@ private fun HalfProductsItemPreview() {
                 isExpanded = false,
                 quantity = 2.0,
                 onExpandToggle = { },
-                onChangeQuantityDialogOpen = { },
+                onEditQuantity = { },
                 onAddItemsClick = { }) {}
         }
     }

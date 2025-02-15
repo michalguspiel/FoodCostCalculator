@@ -6,7 +6,9 @@ import com.erdees.foodcostcalc.data.model.HalfProductBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
+import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
+import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
@@ -85,6 +87,15 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
         viewModelScope.launch(Dispatchers.IO) {
             halfProductRepository.addHalfProduct(halfProductBase)
         }
+    }
+
+    fun onEditQuantity(id: Long){
+        analyticsRepository.logEvent(Constants.Analytics.Buttons.HALF_PRODUCTS_EDIT_QUANTITY,null)
+        updateScreenState(
+            ScreenState.Interaction(
+                InteractionType.EditQuantity(id)
+            )
+        )
     }
 
     fun onAdFailedToLoad() {

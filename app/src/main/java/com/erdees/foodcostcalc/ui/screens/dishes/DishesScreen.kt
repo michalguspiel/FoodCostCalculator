@@ -116,11 +116,7 @@ fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewMode
                                         viewModel.listPresentationStateHandler.onExpandToggle(item)
                                     },
                                     onChangeServingsClick = {
-                                        viewModel.updateScreenState(
-                                            ScreenState.Interaction(
-                                                InteractionType.EditQuantity(item.id)
-                                            )
-                                        )
+                                        viewModel.onChangeServingsClick(item.id)
                                     },
                                     onAddItemsClick = {
                                         navController.navigate(

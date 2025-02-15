@@ -1,6 +1,5 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

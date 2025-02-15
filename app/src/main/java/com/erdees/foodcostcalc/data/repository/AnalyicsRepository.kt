@@ -1,9 +1,9 @@
 package com.erdees.foodcostcalc.data.repository
 
 import android.os.Bundle
-import android.util.Log
 import com.erdees.foodcostcalc.BuildConfig
 import com.google.firebase.analytics.FirebaseAnalytics
+import timber.log.Timber
 
 /**
  * Interface for the Analytics Repository.
@@ -25,7 +25,7 @@ class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) 
         if (!BuildConfig.DEBUG) {
             firebaseAnalytics.logEvent(event, bundle)
         } else {
-            Log.d("AnalyticsRepository", "Event: $event, Bundle: $bundle")
+            Timber.d("Event: $event, Bundle: $bundle")
         }
     }
 }
