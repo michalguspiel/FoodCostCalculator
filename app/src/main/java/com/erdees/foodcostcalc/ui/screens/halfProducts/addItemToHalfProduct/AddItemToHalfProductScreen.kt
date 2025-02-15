@@ -5,11 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.sharp.Info
@@ -51,6 +52,7 @@ import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
+import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.SelectedTab
 import com.erdees.foodcostcalc.utils.UnitsUtils
@@ -78,6 +80,7 @@ fun AddItemToHalfProductScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val tooltipState = rememberTooltipState(isPersistent = true)
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     val itemAddedText = stringResource(id = R.string.item_added)
 
@@ -123,14 +126,13 @@ fun AddItemToHalfProductScreen(
             )
         }) { paddingValues: PaddingValues ->
         Box(Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
-
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(vertical = 24.dp)
                     .padding(horizontal = 12.dp)
+                    .verticalScroll(scrollState)
             ) {
                 AddItemFields(
                     items = products,
@@ -163,13 +165,13 @@ fun AddItemToHalfProductScreen(
                         )
                     }, state = tooltipState
                 ) {
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    ButtonRow(primaryButton = {
                         FCCPrimaryButton(
                             enabled = addButtonEnabled,
                             onClick = { viewModel.addHalfProduct(halfProductId) },
                             text = stringResource(id = R.string.add)
                         )
-                    }
+                    })
                 }
             }
 

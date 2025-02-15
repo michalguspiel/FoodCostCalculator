@@ -124,6 +124,7 @@
     <string name="margin_value">%1$s \%%</string>
     <string name="tax_value">%1$s \%%</string>
     <string name="food_cost">Food cost</string>
+    <string name="total_cost">Total cost</string>
     <string name="final_price">Final price</string>
     <string name="app_icon">app icon</string>
     <string name="content_description_create_dish">Create dish</string>
@@ -152,6 +153,8 @@
     <string name="recipe_something_went_wrong">Oops! It looks like something went wrong while getting your recipe.</string>
     <string name="ingredients_title">Ingredients for %1$s portions</string>
     <string name="change_portions">Change Portions</string>
+    <string name="edit_margin">Edit margin</string>
+    <string name="edit_tax">Edit tax</string>
 
     <!-- SETTINGS -->
     <string name="settings">Settings</string>
