@@ -14,7 +14,7 @@ import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.DishNotFound
+import com.erdees.foodcostcalc.domain.model.errors.DishNotFound
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

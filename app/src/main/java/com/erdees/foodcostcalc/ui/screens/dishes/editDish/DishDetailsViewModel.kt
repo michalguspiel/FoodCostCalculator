@@ -1,5 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +17,7 @@ import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ext.toShareableText
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeUpdater
@@ -300,6 +303,21 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             }
         }
     }
+
+    fun shareDish(context: Context) {
+        val shareableText = _dish.value?.toShareableText(context).also {
+            Timber.i(it)
+        }
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareableText)
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        context.startActivity(shareIntent)
+    }
+
 
     fun toggleRecipeViewMode() = recipeHandler.toggleRecipeViewMode()
     fun cancelRecipeEdit() = recipeHandler.cancelRecipeEdit(_dish.value?.recipe)

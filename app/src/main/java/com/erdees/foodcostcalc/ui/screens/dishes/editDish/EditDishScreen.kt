@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
+import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,6 +58,7 @@ import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
@@ -142,19 +144,14 @@ fun EditDishScreen(
                         })
                     }
 
-                    Spacer(Modifier.size(16.dp))
-
-                    ButtonRow(modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
-                        primaryButton = {
-                            FCCPrimaryButton(text = stringResource(R.string.save)) {
-                                viewModel.saveDish()
-                            }
-                        },
-                        secondaryButton = {
-                            FCCOutlinedButton(text = stringResource(R.string.recipe_button_title)) {
-                                navController.navigate(FCCScreen.Recipe)
-                            }
-                        })
+                    Buttons(
+                        modifier = Modifier.padding(top = 16.dp),
+                        saveDish = viewModel::saveDish,
+                        shareDish = viewModel::shareDish,
+                        navigate = {
+                            navController.navigate(FCCScreen.Recipe)
+                        }
+                    )
                 }
             }
 
@@ -230,6 +227,33 @@ fun EditDishScreen(
             }
         }
     }
+}
+
+@Composable
+private fun Buttons(
+    saveDish: () -> Unit,
+    shareDish: (Context) -> Unit,
+    navigate: () -> Unit,
+    modifier: Modifier = Modifier,
+    ) {
+    val context = LocalContext.current
+    ButtonRow(modifier = modifier.padding(bottom = 16.dp, end = 16.dp),
+        primaryButton = {
+            FCCPrimaryButton(text = stringResource(R.string.save)) {
+                saveDish()
+            }
+        },
+        secondaryButton = {
+            FCCOutlinedButton(text = stringResource(R.string.recipe_button_title)) {
+                navigate()
+            }
+        },
+        tertiaryButton = {
+            FCCTextButton(stringResource(R.string.share)) {
+                shareDish(context)
+            }
+        }
+    )
 }
 
 @Composable
