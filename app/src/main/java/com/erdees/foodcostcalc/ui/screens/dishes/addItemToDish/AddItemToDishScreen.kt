@@ -39,6 +39,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 
 enum class SelectedTab {
@@ -50,7 +51,6 @@ enum class SelectedTab {
 @Screen
 @Composable
 fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: String, viewModel: AddItemToDishViewModel = viewModel()) {
-
 
     val selectedTab by viewModel.selectedTab.collectAsState()
     val selectedItem by viewModel.selectedItem.collectAsState()
@@ -124,7 +124,6 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(vertical = 24.dp)
                         .padding(horizontal = 12.dp)
                 ) {
                     AddItemFields(
@@ -141,13 +140,13 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
                         setQuantity = { viewModel.setQuantity(it) }
                     )
 
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    ButtonRow(primaryButton = {
                         FCCPrimaryButton(
                             onClick = { viewModel.addItem(dishId) },
                             text = stringResource(id = R.string.add),
                             enabled = addButtonEnabled
                         )
-                    }
+                    })
                 }
             } // Column
 

@@ -113,7 +113,6 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(vertical = 24.dp)
                     .padding(horizontal = 12.dp)
                     .verticalScroll(scrollState)
             ) {
@@ -339,7 +338,7 @@ private fun ButtonRow(
     onCalculatePiecePrice: () -> Unit,
     onCalculateWaste: () -> Unit
 ) {
-    Row(modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+    Row(modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalArrangement = Arrangement.End) {
         FCCTextButton(text = stringResource(id = R.string.count_waste)) {
             onCalculateWaste()
         }

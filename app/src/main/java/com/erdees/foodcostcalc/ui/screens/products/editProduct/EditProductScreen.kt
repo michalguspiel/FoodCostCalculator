@@ -1,11 +1,9 @@
 package com.erdees.foodcostcalc.ui.screens.products.editProduct
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,6 +41,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
+import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import timber.log.Timber
 
@@ -120,7 +119,6 @@ fun EditProductScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
-                    .padding(vertical = 24.dp)
                     .padding(horizontal = 12.dp)
             ) {
                 Column(
@@ -166,7 +164,7 @@ fun EditProductScreen(
                     )
                 }
 
-                Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                ButtonRow(primaryButton = {
                     FCCPrimaryButton(
                         enabled = saveButtonEnabled,
                         onClick = {
@@ -174,9 +172,8 @@ fun EditProductScreen(
                         },
                         text = stringResource(id = R.string.save)
                     )
-                }
+                })
             }
-
 
             when (screenState) {
                 is ScreenState.Interaction -> {

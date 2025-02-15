@@ -112,7 +112,6 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
             )
         }
     ) { paddingValues ->
-
         Box(modifier = Modifier.padding(paddingValues)) {
             Column {
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
@@ -183,7 +182,7 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
                     when ((screenState as ScreenState.Interaction).interaction) {
                         InteractionType.EditTax -> {
                             ValueEditDialog(
-                                title = "Edit tax",
+                                title = stringResource(R.string.edit_tax),
                                 value = editableTax,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 updateValue = viewModel::updateTax,
@@ -194,7 +193,7 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
 
                         InteractionType.EditMargin -> {
                             ValueEditDialog(
-                                title = "Edit margin",
+                                title = stringResource(R.string.edit_margin),
                                 value = editableMargin,
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 updateValue = viewModel::updateMargin,
@@ -209,7 +208,7 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
 
                         InteractionType.EditName -> {
                             ValueEditDialog(
-                                title = "Edit name",
+                                title = stringResource(R.string.edit_name),
                                 value = editableName,
                                 updateValue = viewModel::updateName,
                                 onSave = viewModel::saveDishName,
@@ -223,7 +222,7 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
 
                         is InteractionType.EditItem -> {
                             ValueEditDialog(
-                                title = "Edit quantity",
+                                title = stringResource(R.string.edit_quantity),
                                 value = editableQuantity,
                                 keyboardOptions = KeyboardOptions(
                                     keyboardType = KeyboardType.Number,
@@ -257,7 +256,7 @@ fun DishDetails(
     Column(modifier) {
         Row {
             DetailItem(
-                label = "Margin",
+                label = stringResource(R.string.margin),
                 value = "${dishDomain.marginPercent}%",
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
@@ -267,7 +266,7 @@ fun DishDetails(
                     }
             )
             DetailItem(
-                label = "Tax",
+                label = stringResource(R.string.tax),
                 value = "${dishDomain.taxPercent}%",
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
@@ -282,14 +281,14 @@ fun DishDetails(
 
         Row {
             DetailItem(
-                label = "Food cost",
+                label = stringResource(R.string.food_cost),
                 value = Utils.formatPrice(dishDomain.foodCost, context),
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .weight(1f)
             )
             DetailItem(
-                label = "Total cost",
+                label = stringResource(R.string.total_cost),
                 value = Utils.formatPrice(dishDomain.totalPrice, context),
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
