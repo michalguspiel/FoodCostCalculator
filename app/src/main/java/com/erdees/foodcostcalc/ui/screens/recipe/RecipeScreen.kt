@@ -61,29 +61,20 @@ import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishViewModel
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeEvent
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeUpdater
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeViewMode
+import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import timber.log.Timber
 
 @Screen
 @Composable
-fun RecipeScreen(navController: NavController, viewModel: EditDishViewModel) {
+fun RecipeScreen(navController: NavController, viewModel: DishDetailsViewModel) {
 
     val dish by viewModel.dish.collectAsState()
     val recipe by viewModel.recipe.collectAsState()
     val recipeViewMode by viewModel.recipeViewModeState.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
-    val recipeUpdater = RecipeUpdater(
-        updatePrepTime = viewModel::updatePrepTime,
-        updateCookTime = viewModel::updateCookTime,
-        updateDescription = viewModel::updateDescription,
-        updateTips = viewModel::updateTips,
-        updateStep = viewModel::updateStep
-    )
+    val recipeUpdater = viewModel.recipeUpdater
     val recipeServings by viewModel.recipeServings.collectAsState()
     val recipeEvent by viewModel.recipeEvent.collectAsStateWithLifecycle(null)
 
@@ -106,7 +97,7 @@ fun RecipeScreen(navController: NavController, viewModel: EditDishViewModel) {
         toggleRecipeViewMode = viewModel::toggleRecipeViewMode,
         recipeUpdater = recipeUpdater,
         saveRecipe = viewModel::saveRecipe,
-        cancelEdit = viewModel::cancelEdit,
+        cancelEdit = viewModel::cancelRecipeEdit,
         onChangeServings = viewModel::onChangeServings,
         updateServings = viewModel::updateServings,
         resetScreenState = viewModel::resetScreenState
