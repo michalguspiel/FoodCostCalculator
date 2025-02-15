@@ -43,14 +43,17 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
+import com.erdees.foodcostcalc.ui.navigation.Screen
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Screen
 @Composable
 fun EditProductScreen(
     productId: Long,
-    navController: NavController
+    navController: NavController,
+    viewModel: EditProductViewModel = viewModel()
 ) {
-    val viewModel: EditProductViewModel = viewModel()
     val screenState by viewModel.screenState.collectAsState()
     val product by viewModel.product.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
@@ -64,8 +67,7 @@ fun EditProductScreen(
     LaunchedEffect(screenState) {
         when (screenState) {
             is ScreenState.Success -> {
-                Log.i(
-                    "EditDishScreen",
+                Timber.i(
                     "Success, popping backstack \n" +
                             "Previous backstack entry: ${navController.previousBackStackEntry?.destination?.route} \n"
                 )

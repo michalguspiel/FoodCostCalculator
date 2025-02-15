@@ -43,13 +43,13 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Screen
 @Composable
-fun CreateDishScreen(navController: NavController) {
-
-    val viewModel: CreateDishScreenViewModel = viewModel()
+fun CreateDishScreen(navController: NavController, viewModel: CreateDishScreenViewModel = viewModel()) {
 
     val addedDish by viewModel.addedDish.collectAsState()
     val dishName by viewModel.dishName.collectAsState()

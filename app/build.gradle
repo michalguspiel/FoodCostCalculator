@@ -230,4 +230,6 @@ dependencies {
     testImplementation "io.kotest:kotest-assertions-core:$kotestVersion"
 
 
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
+    detektPlugins "io.nlopez.compose.rules:detekt:0.4.12"
 }

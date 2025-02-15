@@ -55,7 +55,7 @@ fun NavigationListItem(
 
 @Preview
 @Composable
-fun PreviewNavigationListItem() {
+private fun PreviewNavigationListItem() {
     NavigationListItem(
         title = "Sample Title",
         icon = { Icon(imageVector = Icons.Default.Home, contentDescription = null) },

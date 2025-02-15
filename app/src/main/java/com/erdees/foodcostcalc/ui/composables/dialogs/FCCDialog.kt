@@ -28,7 +28,7 @@ fun FCCDialog(
     modifier: Modifier = Modifier,
     primaryButtonText: String = stringResource(id = R.string.save),
     onDismiss: () -> Unit,
-    onPrimaryButtonClicked: () -> Unit,
+    onPrimaryButtonClick: () -> Unit,
     content: @Composable () -> Unit
 ) {
     BasicAlertDialog(
@@ -51,7 +51,7 @@ fun FCCDialog(
             Spacer(modifier = Modifier.size(24.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 FCCTextButton(text = primaryButtonText) {
-                    onPrimaryButtonClicked()
+                    onPrimaryButtonClick()
                 }
             }
         }

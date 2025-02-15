@@ -5,9 +5,30 @@
     <ID>ClassNaming:Migration_1to2_RefactorDatabase.kt$Migration_1to2_RefactorDatabase : Migration</ID>
     <ID>ClassNaming:Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist.kt$Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist : Migration</ID>
     <ID>ClassNaming:Migration_3to_4_CreateRecipeTable.kt$Migration_3to_4_CreateRecipeTable : Migration</ID>
-    <ID>CyclomaticComplexMethod:DataBackupScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun DataBackupScreen(navController: NavController)</ID>
-    <ID>LongMethod:DataBackupScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun DataBackupScreen(navController: NavController)</ID>
-    <ID>LongMethod:EditDishScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Composable fun EditDishScreen(dishId: Long, navController: NavController)</ID>
+    <ID>ComposableParamOrder:AddItemFields.kt$AddItemFields</ID>
+    <ID>ComposableParamOrder:ButtonRow.kt$ButtonRow</ID>
+    <ID>ComposableParamOrder:CreateProductScreen.kt$ButtonRow</ID>
+    <ID>ComposableParamOrder:CreateProductScreen.kt$CalculatePiecePriceDialog</ID>
+    <ID>ComposableParamOrder:CreateProductScreen.kt$CalculateWasteDialog</ID>
+    <ID>ComposableParamOrder:CreateProductScreen.kt$CreateProductScreen</ID>
+    <ID>ComposableParamOrder:DetailItem.kt$DetailItem</ID>
+    <ID>ComposableParamOrder:DishesScreen.kt$DishItem</ID>
+    <ID>ComposableParamOrder:EditDishScreen.kt$DishDetails</ID>
+    <ID>ComposableParamOrder:EditDishScreen.kt$UsedItem</ID>
+    <ID>ComposableParamOrder:FCCDialog.kt$FCCDialog</ID>
+    <ID>ComposableParamOrder:HalfProductsScreen.kt$CreateHalfProductDialog</ID>
+    <ID>ComposableParamOrder:HalfProductsScreen.kt$HalfProductItem</ID>
+    <ID>ComposableParamOrder:NavigationListItem.kt$NavigationListItem</ID>
+    <ID>ComposableParamOrder:RecipeScreen.kt$RecipeEdit</ID>
+    <ID>ComposableParamOrder:RecipeScreen.kt$RecipeScreenContent</ID>
+    <ID>ComposableParamOrder:RecipeScreen.kt$RecipeView</ID>
+    <ID>ComposableParamOrder:SettingsScreen.kt$AccountServicesSection</ID>
+    <ID>ComposableParamOrder:SettingsScreen.kt$Defaults</ID>
+    <ID>ComposableParamOrder:SubscriptionScreen.kt$ButtonRow</ID>
+    <ID>ComposableParamOrder:ValueEditDialog.kt$ValueEditDialog</ID>
+    <ID>CyclomaticComplexMethod:DataBackupScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Screen @Composable fun DataBackupScreen(navController: NavController, viewModel: OnlineBackupViewModel = viewModel())</ID>
+    <ID>LongMethod:DataBackupScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Screen @Composable fun DataBackupScreen(navController: NavController, viewModel: OnlineBackupViewModel = viewModel())</ID>
+    <ID>LongMethod:EditDishScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Screen @Composable fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDishViewModel = viewModel())</ID>
     <ID>LongParameterList:SettingsScreen.kt$( snackbarHostState: SnackbarHostState, navController: NavController, settings: UserSettings, currencies: Set&lt;Currency&gt;, saveButtonEnabled: Boolean, screenState: ScreenState, updateDefaultTax: (String) -&gt; Unit, updateDefaultMargin: (String) -&gt; Unit, updateMetricUsed: (Boolean) -&gt; Unit, updateImperialUsed: (Boolean) -&gt; Unit, updateDefaultCurrencyCode: (Currency) -&gt; Unit, saveSettings: () -&gt; Unit, resetScreenState: () -&gt; Unit, )</ID>
     <ID>MagicNumber:Buttons.kt$250</ID>
     <ID>MagicNumber:CreateProductScreenViewModel.kt$CreateProductScreenViewModel$100</ID>
@@ -51,21 +72,9 @@
     <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$900000.9</ID>
     <ID>MagicNumber:UsedItem.kt$UsedItem$100</ID>
     <ID>MagicNumber:UsedProductDomain.kt$UsedProductDomain$100</ID>
-    <ID>MaxLineLength:AdHelperTests.kt$AdHelperTests$fun</ID>
-    <ID>MaxLineLength:EditDishScreen.kt$Icon(imageVector = Icons.Sharp.Delete, contentDescription = stringResource(R.string.remove_dish))</ID>
-    <ID>MaxLineLength:EditDishViewModel.kt$EditDishViewModel$*</ID>
-    <ID>MaxLineLength:EditDishViewModel.kt$EditDishViewModel$Timber.i("Dish's recipe and recipe refreshed with ${updatedRecipe.toRecipeDomain()} \n${updatedRecipe.toRecipeDomain().steps}")</ID>
-    <ID>MaxLineLength:EditDishViewModel.kt$EditDishViewModel$dishRepository.updateDish(this@EditDishViewModel.dish.value!!.toDishBase())</ID>
-    <ID>MaxLineLength:Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist.kt$Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist$*</ID>
-    <ID>MaxLineLength:PremiumUtil.kt$PremiumUtil.&lt;no name provided&gt;$"queryProductDetailsAsync() , responseCode: ${billingResult.responseCode}, productDetailsList: $productDetailsList"</ID>
-    <ID>MaxLineLength:PremiumUtil.kt$PremiumUtil.&lt;no name provided&gt;$"queryPurchasesAsync() , responseCode: ${billingResult.responseCode}, purchase: $purchase"</ID>
-    <ID>MaxLineLength:RecipeScreen.kt$"In a large bowl, whisk together 1 cup of all-purpose flour, 1 tablespoon of sugar, 1 teaspoon of baking powder, and ½ teaspoon of salt. " + "In another bowl, combine 1 cup of milk, 1 egg, and 2 tablespoons of melted butter. " + "Pour the wet ingredients into the dry ingredients and mix until just combined. Avoid overmixing."</ID>
-    <ID>MaxLineLength:RecipeScreen.kt$"Pour ¼ cup of batter onto the pan for each pancake. Cook until bubbles form on the surface and the edges look set (about 2 minutes). " + "Flip the pancake and cook the other side until golden brown (about 1-2 minutes)."</ID>
-    <ID>MaxLineLength:RecipeScreen.kt$"Transfer cooked pancakes to a plate and cover with a clean towel or keep warm in a 90°C (200°F) oven while cooking the rest of the batter." + "Stack the pancakes on a plate and serve with your favorite toppings, such as maple syrup, fresh fruit, whipped cream, or chocolate chips."</ID>
-    <ID>MaxLineLength:RecipeScreen.kt$description = "These fluffy and golden pancakes are a breakfast classic! Perfect for a lazy weekend morning or a quick weekday treat, this recipe uses simple pantry ingredients and is easy to make. Serve with maple syrup, fresh berries, or your favorite toppings for a delicious start to your day."</ID>
-    <ID>MaxLineLength:RecipeScreen.kt$tips = "Don't Overmix: Mix the batter until just combined; small lumps are fine. Overmixing can make the pancakes tough.\n" + "Rest the Batter: Let the batter rest for 5-10 minutes before cooking to allow the gluten to relax and ensure fluffier pancakes.\n" + "Use Medium Heat: Cooking on medium heat helps the pancakes cook through without burning.\n" + "Grease the Pan Lightly: Use a small amount of butter or oil and wipe off the excess with a paper towel for an evenly browned pancake"</ID>
-    <ID>MaxLineLength:SubscriptionViewModel.kt$SubscriptionScreenState$*</ID>
-    <ID>MaxLineLength:SubscriptionViewModel.kt$SubscriptionViewModel$"https://play.google.com/store/account/subscriptions?sku=${PremiumUtil.PRODUCT_ID}&amp;package=com.erdees.foodcostcalc"</ID>
+    <ID>MutableStateParam:NestedScrollConnection.kt$isVisible</ID>
+    <ID>ParameterNaming:DishesScreen.kt$onChangeServingsClicked</ID>
+    <ID>ParameterNaming:SubscriptionScreen.kt$onPlanSelected</ID>
     <ID>ReturnCount:CreateProductScreenViewModel.kt$CreateProductScreenViewModel$fun addProduct()</ID>
     <ID>ReturnCount:EditDishViewModel.kt$EditDishViewModel$fun updateItemQuantity()</ID>
     <ID>ReturnCount:EditHalfProductViewModel.kt$EditHalfProductViewModel$fun updateProductQuantity()</ID>

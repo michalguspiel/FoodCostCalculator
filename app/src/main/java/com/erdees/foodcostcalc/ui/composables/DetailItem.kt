@@ -38,7 +38,7 @@ fun DetailItem(
 
 @Preview
 @Composable
-fun DetailItemPreview() {
+private fun DetailItemPreview() {
   FCCTheme {
     Column(Modifier.background(MaterialTheme.colorScheme.surface)) {
       Row {

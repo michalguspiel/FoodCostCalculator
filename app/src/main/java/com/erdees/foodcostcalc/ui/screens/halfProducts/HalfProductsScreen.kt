@@ -70,6 +70,7 @@ import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.composables.rows.IngredientRow
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.UnitsUtils
@@ -77,10 +78,10 @@ import com.erdees.foodcostcalc.utils.UnitsUtils.getPerUnitAbbreviation
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 
+@Screen
 @Composable
-fun HalfProductsScreen(navController: NavController) {
+fun HalfProductsScreen(navController: NavController, viewModel: HalfProductsScreenViewModel = viewModel()) {
 
-    val viewModel: HalfProductsScreenViewModel = viewModel()
     val adItems by viewModel.filteredHalfProductsInjectedWithAds.collectAsState()
     val searchKey by viewModel.searchKey.collectAsState()
     val isVisible = remember { mutableStateOf(true) }
@@ -128,21 +129,21 @@ fun HalfProductsScreen(navController: NavController) {
                                     onExpandToggle = {
                                         viewModel.listPresentationStateHandler.onExpandToggle(item)
                                     },
-                                    onChangeQuantityDialogOpened = {
+                                    onChangeQuantityDialogOpen = {
                                         viewModel.updateScreenState(
                                             ScreenState.Interaction(
                                                 InteractionType.EditQuantity(item.id)
                                             )
                                         )
                                     },
-                                    onAddItemsClicked = {
+                                    onAddItemsClick = {
                                         navController.navigate(
                                             FCCScreen.AddItemToHalfProduct(
                                                 item.id, item.name, item.halfProductUnit
                                             )
                                         )
                                     },
-                                    onEditClicked = {
+                                    onEditClick = {
                                         navController.navigate(
                                             FCCScreen.EditHalfProduct(
                                                 halfProductId = item.id
@@ -232,9 +233,9 @@ fun HalfProductItem(
     quantity: Double,
     modifier: Modifier = Modifier,
     onExpandToggle: () -> Unit,
-    onChangeQuantityDialogOpened: () -> Unit,
-    onAddItemsClicked: () -> Unit,
-    onEditClicked: () -> Unit
+    onChangeQuantityDialogOpen: () -> Unit,
+    onAddItemsClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -247,7 +248,7 @@ fun HalfProductItem(
                 TitleRow(halfProductDomain, isExpanded)
 
                 if (isExpanded) {
-                    Ingredients(quantity, halfProductDomain, onChangeQuantityDialogOpened, context)
+                    Ingredients(quantity, halfProductDomain, onChangeQuantityDialogOpen, context)
                 }
 
                 PriceSummary(halfProductDomain, context, quantity)
@@ -255,9 +256,9 @@ fun HalfProductItem(
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
                 ButtonRow(secondaryButton = {
-                    FCCTextButton(text = stringResource(id = R.string.edit)) { onEditClicked() }
+                    FCCTextButton(text = stringResource(id = R.string.edit)) { onEditClick() }
                 }, primaryButton = {
-                    FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClicked() }
+                    FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClick() }
                 })
             }
         })
@@ -284,7 +285,7 @@ private fun TitleRow(
 private fun Ingredients(
     quantity: Double,
     halfProductDomain: HalfProductDomain,
-    onChangeQuantityDialogOpened: () -> Unit,
+    onChangeQuantityDialogOpen: () -> Unit,
     context: Context
 ) {
     Column(
@@ -297,7 +298,7 @@ private fun Ingredients(
                 getPerUnitAbbreviation(halfProductDomain.halfProductUnit)
             )
         ) {
-            onChangeQuantityDialogOpened()
+            onChangeQuantityDialogOpen()
         }
 
         halfProductDomain.products.forEach {
@@ -413,7 +414,7 @@ fun CreateHalfProductDialog(
 
 @Preview
 @Composable
-fun HalfProductsItemPreview() {
+private fun HalfProductsItemPreview() {
     FCCTheme {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             HalfProductItem(halfProductDomain = HalfProductDomain(
@@ -441,16 +442,16 @@ fun HalfProductsItemPreview() {
                 isExpanded = true,
                 quantity = 1.0,
                 onExpandToggle = { },
-                onChangeQuantityDialogOpened = { },
-                onAddItemsClicked = { }) {}
+                onChangeQuantityDialogOpen = { },
+                onAddItemsClick = { }) {}
             HalfProductItem(halfProductDomain = HalfProductDomain(
                 id = 1, name = "Ketchup", halfProductUnit = "kg", products = emptyList()
             ),
                 isExpanded = false,
                 quantity = 2.0,
                 onExpandToggle = { },
-                onChangeQuantityDialogOpened = { },
-                onAddItemsClicked = { }) {}
+                onChangeQuantityDialogOpen = { },
+                onAddItemsClick = { }) {}
         }
     }
 }

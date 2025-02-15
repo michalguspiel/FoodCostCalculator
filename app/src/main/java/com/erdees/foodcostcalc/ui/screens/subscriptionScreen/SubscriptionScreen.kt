@@ -62,11 +62,10 @@ import nl.dionsegijn.konfetti.core.emitter.Emitter
 import java.util.concurrent.TimeUnit
 
 @Composable
-fun SubscriptionScreen(navController: NavController) {
+fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionViewModel = viewModel()) {
     val context = LocalContext.current
     val activity = context.getActivity()
     val lifecycleOwner = LocalLifecycleOwner.current
-    val viewModel: SubscriptionViewModel = viewModel()
     val screenState by viewModel.screenState.collectAsState()
 
     DisposableEffect(Unit) {
@@ -85,8 +84,8 @@ fun SubscriptionScreen(navController: NavController) {
         navController = navController,
         screenState = screenState,
         onErrorAck = viewModel::acknowledgeError,
-        onPlanSelected = viewModel::onPlanSelected,
-        onSubscribeClicked = { viewModel.onSubscribeClicked(activity) },
+        onPlanSelect = viewModel::onPlanSelected,
+        onSubscribeClick = { viewModel.onSubscribeClicked(activity) },
         onManageSubscription = { viewModel.onManageSubscription(context) }
     )
 }
@@ -96,10 +95,10 @@ fun SubscriptionScreen(navController: NavController) {
 private fun SubscriptionScreenContent(
     navController: NavController,
     screenState: SubscriptionScreenState,
-    onSubscribeClicked: () -> Unit,
+    onSubscribeClick: () -> Unit,
     onManageSubscription: () -> Unit,
     onErrorAck: () -> Unit,
-    onPlanSelected: (Plan) -> Unit
+    onPlanSelect: (Plan) -> Unit
 ) {
 
     Scaffold(
@@ -146,7 +145,7 @@ private fun SubscriptionScreenContent(
                             PlanSection(
                                 subscription = subscription,
                                 selectedPlan = screenState.selectedPlan,
-                                onPlanSelected = { onPlanSelected(it) }
+                                onPlanSelected = { onPlanSelect(it) }
                             )
                         } else {
                             ActiveSubscriptionSection()
@@ -168,8 +167,8 @@ private fun SubscriptionScreenContent(
 
                     ButtonRow(
                         userAlreadySubscribes = screenState.userAlreadySubscribes,
-                        onSubscribeClicked = {
-                            onSubscribeClicked()
+                        onSubscribeClick = {
+                            onSubscribeClick()
                         },
                         onManageSubscription = {
                             onManageSubscription()
@@ -267,7 +266,7 @@ private fun ButtonRow(
     userAlreadySubscribes: Boolean,
     modifier: Modifier = Modifier,
     onManageSubscription: () -> Unit,
-    onSubscribeClicked: () -> Unit
+    onSubscribeClick: () -> Unit
 ) {
     Row(modifier = modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
         if (userAlreadySubscribes) {
@@ -278,7 +277,7 @@ private fun ButtonRow(
         }
 
         FCCPrimaryButton(text = "Subscribe", enabled = !userAlreadySubscribes) {
-            onSubscribeClicked()
+            onSubscribeClick()
         }
     }
 }
@@ -331,7 +330,7 @@ private fun PlanDetails(
     plan: Plan,
     selectedPlanId: String?,
     modifier: Modifier = Modifier,
-    onSelected: () -> Unit = {}
+    onSelect: () -> Unit = {}
 ) {
 
     val isSelected = plan.id == selectedPlanId
@@ -359,7 +358,7 @@ private fun PlanDetails(
         )
     ) {
         Column(
-            modifier = Modifier.clickable { onSelected() },
+            modifier = Modifier.clickable { onSelect() },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
@@ -433,7 +432,7 @@ private fun ScreenStateOverlay(
 
 @Preview(backgroundColor = 0xFF999999, showBackground = true)
 @Composable
-fun SubscriptionScreenContentPreview1() {
+private fun SubscriptionScreenContentPreview1() {
     val fakePremiumSubscription = PremiumSubscription(
         id = "food.cost.calculator.premium.account",
         title = "Premium Mode",
@@ -463,8 +462,8 @@ fun SubscriptionScreenContentPreview1() {
                 screenLaunchedWithoutSubscription = true
             ),
             onErrorAck = {},
-            onPlanSelected = {},
-            onSubscribeClicked = {},
+            onPlanSelect = {},
+            onSubscribeClick = {},
             onManageSubscription = {}
         )
     }
@@ -472,7 +471,7 @@ fun SubscriptionScreenContentPreview1() {
 
 @Preview(backgroundColor = 0xFF999999, showBackground = true)
 @Composable
-fun SubscriptionScreenContentPreview2() {
+private fun SubscriptionScreenContentPreview2() {
     val fakePremiumSubscription = PremiumSubscription(
         id = "food.cost.calculator.premium.account",
         title = "Premium Mode",
@@ -502,8 +501,8 @@ fun SubscriptionScreenContentPreview2() {
                 screenLaunchedWithoutSubscription = true
             ),
             onErrorAck = {},
-            onPlanSelected = {},
-            onSubscribeClicked = {},
+            onPlanSelect = {},
+            onSubscribeClick = {},
             onManageSubscription = {}
         )
     }
@@ -511,7 +510,7 @@ fun SubscriptionScreenContentPreview2() {
 
 @Preview(backgroundColor = 0xFF999999, showBackground = true)
 @Composable
-fun SubscriptionScreenContentPreviewError() {
+private fun SubscriptionScreenContentPreviewError() {
 
     FCCTheme {
         SubscriptionScreenContent(
@@ -522,8 +521,8 @@ fun SubscriptionScreenContentPreviewError() {
                 screenLaunchedWithoutSubscription = true
             ),
             onErrorAck = {},
-            onPlanSelected = {},
-            onSubscribeClicked = {},
+            onPlanSelect = {},
+            onSubscribeClick = {},
             onManageSubscription = {}
         )
     }

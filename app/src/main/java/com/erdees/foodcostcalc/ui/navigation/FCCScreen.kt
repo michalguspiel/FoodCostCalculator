@@ -5,6 +5,8 @@ import com.erdees.foodcostcalc.R
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
+annotation class Screen(val description: String = "Screen annotation for screen composable that doesn't require modifier")
+
 @Keep
 @Serializable
 sealed class FCCScreen(
