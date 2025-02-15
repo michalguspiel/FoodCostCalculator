@@ -51,15 +51,16 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.fields.UnitField
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Screen
 @Composable
-fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavController) {
+fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavController, viewModel: CreateProductScreenViewModel = viewModel()) {
 
     val context = LocalContext.current
-    val viewModel: CreateProductScreenViewModel = viewModel()
 
     val productName by viewModel.productName.collectAsState()
     val productPrice by viewModel.productPrice.collectAsState()
@@ -244,7 +245,7 @@ fun CalculateWasteDialog(
         modifier = modifier,
         title = stringResource(id = R.string.count_waste),
         onDismiss = { onDismiss() },
-        onPrimaryButtonClicked = {
+        onPrimaryButtonClick = {
             onSave(
                 totalQuantity.toDoubleOrNull(),
                 wasteQuantity.toDoubleOrNull()
@@ -296,7 +297,7 @@ fun CalculatePiecePriceDialog(
         modifier = modifier,
         title = stringResource(id = R.string.calculate_price_per_piece),
         onDismiss = { onDismiss() },
-        onPrimaryButtonClicked = {
+        onPrimaryButtonClick = {
             onSave(
                 boxPrice.toDoubleOrNull(),
                 quantityInBox.toIntOrNull()

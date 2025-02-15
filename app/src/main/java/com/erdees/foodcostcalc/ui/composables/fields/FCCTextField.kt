@@ -20,13 +20,13 @@ fun FCCTextField(
     maxLines: Int = 1,
     onValueChange: (String) -> Unit,
 ) {
-    Column {
+    Column(modifier) {
         FieldLabel(
             text = title,
             modifier = Modifier.padding(bottom = 4.dp)
         )
         OutlinedTextField(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             value = value,
             singleLine = singleLine,
             maxLines = maxLines,

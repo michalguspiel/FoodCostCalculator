@@ -76,8 +76,9 @@ fun FCCTopAppBarNavIconButton(navController: NavController, modifier: Modifier =
 }
 
 @Composable
-fun FCCAnimatedFAB(isVisible: Boolean, contentDescription: String, onClick: () -> Unit) {
+fun FCCAnimatedFAB(isVisible: Boolean, contentDescription: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
     AnimatedVisibility(
+        modifier = modifier,
         visible = isVisible,
         enter = slideInHorizontally(initialOffsetX = { it * 2 }) + fadeIn(
             initialAlpha = 0.3f,

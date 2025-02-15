@@ -46,26 +46,27 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.SelectedTab
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Screen
 @Composable
 fun AddItemToHalfProductScreen(
     navController: NavController,
     halfProductId: Long,
     halfProductName: String,
-    halfProductUnit: String
+    halfProductUnit: String,
+    viewModel: AddItemToHalfProductViewModel = viewModel()
 ) {
 
-    val viewModel: AddItemToHalfProductViewModel = viewModel()
     val products by viewModel.products.collectAsState()
     val units by viewModel.units.collectAsState()
     val selectedUnit by viewModel.selectedUnit.collectAsState()

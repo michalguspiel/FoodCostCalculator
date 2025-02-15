@@ -21,9 +21,11 @@ import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.ui.navigation.FCCNavigation
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.utils.Constants
 import org.koin.compose.koinInject
 
+@Screen
 @Composable
 fun FCCHostScreen(analyticsRepository: AnalyticsRepository = koinInject()) {
     val navController = rememberNavController()

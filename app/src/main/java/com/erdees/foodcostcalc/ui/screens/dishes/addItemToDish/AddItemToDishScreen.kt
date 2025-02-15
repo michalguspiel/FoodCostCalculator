@@ -39,6 +39,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.navigation.Screen
 
 enum class SelectedTab {
     ADD_PRODUCT,
@@ -46,10 +47,10 @@ enum class SelectedTab {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Screen
 @Composable
-fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: String) {
+fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: String, viewModel: AddItemToDishViewModel = viewModel()) {
 
-    val viewModel: AddItemToDishViewModel = viewModel()
 
     val selectedTab by viewModel.selectedTab.collectAsState()
     val selectedItem by viewModel.selectedItem.collectAsState()

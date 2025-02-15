@@ -42,14 +42,15 @@ import com.erdees.foodcostcalc.ui.composables.fields.SearchField
 import com.erdees.foodcostcalc.ui.composables.rememberNestedScrollConnection
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Utils.formatPrice
 
 @Composable
-fun ProductsScreen(navController: NavController) {
+@Screen
+fun ProductsScreen(navController: NavController, viewModel: ProductsFragmentViewModel = viewModel()) {
 
-    val viewModel: ProductsFragmentViewModel = viewModel()
     val searchKey by viewModel.searchKey.collectAsState()
     val adItems by viewModel.filteredProductsInjectedWithAds.collectAsState()
     val isVisible = rememberSaveable { mutableStateOf(true) }
@@ -153,7 +154,7 @@ fun ProductItem(
 
 @Preview
 @Composable
-fun ProductItemPreview() {
+private fun ProductItemPreview() {
     FCCTheme {
         ProductItem(
             productDomain = ProductDomain(

@@ -130,7 +130,7 @@ fun SearchField(
 
 @Preview
 @Composable
-fun PreviewSearchFieldLight() {
+private fun PreviewSearchFieldLight() {
     FCCTheme(darkTheme = false) {
         SearchField(value = "") {}
     }
@@ -138,7 +138,7 @@ fun PreviewSearchFieldLight() {
 
 @Preview
 @Composable
-fun PreviewSearchFieldLightFilled() {
+private fun PreviewSearchFieldLightFilled() {
     FCCTheme(darkTheme = false) {
         SearchField(value = "chicken") {}
     }
@@ -146,7 +146,7 @@ fun PreviewSearchFieldLightFilled() {
 
 @Preview
 @Composable
-fun PreviewSearchFieldDark() {
+private fun PreviewSearchFieldDark() {
     FCCTheme(darkTheme = true) {
         SearchField(value = "") {}
     }

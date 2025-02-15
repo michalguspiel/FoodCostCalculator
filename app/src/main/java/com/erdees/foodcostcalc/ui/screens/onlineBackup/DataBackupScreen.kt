@@ -41,17 +41,19 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDialog
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 
+
 @OptIn(ExperimentalMaterial3Api::class)
+@Screen
 @Composable
-fun DataBackupScreen(navController: NavController) {
+fun DataBackupScreen(navController: NavController, viewModel: OnlineBackupViewModel = viewModel()) {
 
     val context = LocalContext.current
-    val viewModel: OnlineBackupViewModel = viewModel()
     val user by viewModel.user.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
 
@@ -226,7 +228,7 @@ fun DataBackupScreen(navController: NavController) {
                 title = stringResource(id = R.string.success),
                 primaryButtonText = stringResource(id = R.string.okay),
                 onDismiss = viewModel::resetScreenState,
-                onPrimaryButtonClicked = viewModel::resetScreenState
+                onPrimaryButtonClick = viewModel::resetScreenState
             ) {
                 Text(successText)
             }

@@ -61,14 +61,15 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Utils
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Screen
 @Composable
-fun EditDishScreen(dishId: Long, navController: NavController) {
+fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDishViewModel = viewModel()) {
 
-    val viewModel: EditDishViewModel = viewModel()
     val screenState by viewModel.screenState.collectAsState()
     val usedItems: List<UsedItem> by viewModel.items.collectAsState()
     val modifiedDishDomain by viewModel.dish.collectAsStateWithLifecycle()
@@ -361,7 +362,7 @@ fun UsedItem(
 
 @Preview
 @Composable
-fun UsedItemPreview() {
+private fun UsedItemPreview() {
     FCCTheme {
         UsedItem(
             UsedProductDomain(

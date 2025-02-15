@@ -65,9 +65,8 @@ import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
 @Composable
-fun SettingsScreen(navController: NavController) {
+fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = viewModel()) {
 
-    val viewModel: SettingsViewModel = viewModel()
 
     val settings by viewModel.settingsModel.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
@@ -395,7 +394,8 @@ fun CurrenciesDropDown(
                 modifier = Modifier
                     .fillMaxWidth()
                     .menuAnchor(),
-                value = selectedCurrency?.displayName ?: stringResource(R.string.currencies_failed_to_load),
+                value = selectedCurrency?.displayName
+                    ?: stringResource(R.string.currencies_failed_to_load),
                 onValueChange = {},
                 readOnly = true,
                 singleLine = true,
@@ -451,7 +451,7 @@ private fun PreviewSettingsScreenContent() {
 
 @Preview
 @Composable
-fun PreviewDefaults() {
+private fun PreviewDefaults() {
     FCCTheme {
         Defaults(
             settings = UserSettings(

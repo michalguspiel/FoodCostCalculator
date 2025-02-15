@@ -60,6 +60,7 @@ import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDiv
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeEvent
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.RecipeUpdater
@@ -68,6 +69,7 @@ import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import timber.log.Timber
 
+@Screen
 @Composable
 fun RecipeScreen(navController: NavController, viewModel: EditDishViewModel) {
 
@@ -129,7 +131,9 @@ private fun RecipeScreenContent(
     updateServings: (String) -> Unit,
     resetScreenState: () -> Unit,
 ) {
-    Scaffold(topBar = {
+    Scaffold(
+        modifier = modifier,
+        topBar = {
         TopAppBar(title = {
             Text(
                 text = if (recipeViewMode == RecipeViewMode.VIEW) {
@@ -148,7 +152,7 @@ private fun RecipeScreenContent(
         })
     }) { paddingValues ->
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .padding(paddingValues)
                 .padding(horizontal = 12.dp)
         ) {
@@ -282,10 +286,10 @@ private fun RecipeView(
 @Composable
 private fun Tips(tips: String?, modifier: Modifier = Modifier) {
     tips?.let {
-        Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(modifier = modifier,verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SectionLabel(stringResource(R.string.tips))
             Column(
-                modifier
+                Modifier
                     .fillMaxWidth()
                     .background(
                         MaterialTheme.colorScheme.surfaceContainerHigh, RoundedCornerShape(6.dp)
@@ -372,7 +376,7 @@ private fun RecipeEdit(
             .verticalScroll(rememberScrollState())
     ) {
         Column(
-            modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
 
             SectionLabel(stringResource(R.string.general_info_title))

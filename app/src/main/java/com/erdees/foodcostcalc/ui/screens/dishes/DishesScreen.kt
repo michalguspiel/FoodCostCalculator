@@ -59,14 +59,15 @@ import com.erdees.foodcostcalc.ui.composables.rememberNestedScrollConnection
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 
 @Composable
-fun DishesScreen(navController: NavController) {
+@Screen
+fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewModel = viewModel()) {
 
-    val viewModel: DishesFragmentViewModel = viewModel()
     val isVisible = remember { mutableStateOf(true) }
     val nestedScrollConnection = rememberNestedScrollConnection(isVisible)
     val searchKey by viewModel.searchKey.collectAsState()
@@ -114,21 +115,21 @@ fun DishesScreen(navController: NavController) {
                                     onExpandToggle = {
                                         viewModel.listPresentationStateHandler.onExpandToggle(item)
                                     },
-                                    onChangeServingsClicked = {
+                                    onChangeServingsClick = {
                                         viewModel.updateScreenState(
                                             ScreenState.Interaction(
                                                 InteractionType.EditQuantity(item.id)
                                             )
                                         )
                                     },
-                                    onAddItemsClicked = {
+                                    onAddItemsClick = {
                                         navController.navigate(
                                             FCCScreen.AddItemsToDish(
                                                 item.id, item.name
                                             )
                                         )
                                     },
-                                    onEditClicked = {
+                                    onEditClick = {
                                         navController.navigate(FCCScreen.EditDish(item.id))
                                     })
                             }
@@ -203,9 +204,9 @@ private fun DishItem(
     servings: Double,
     modifier: Modifier = Modifier,
     onExpandToggle: () -> Unit,
-    onChangeServingsClicked: () -> Unit,
-    onAddItemsClicked: () -> Unit,
-    onEditClicked: () -> Unit
+    onChangeServingsClick: () -> Unit,
+    onAddItemsClick: () -> Unit,
+    onEditClick: () -> Unit
 ) {
 
     Card(
@@ -215,7 +216,7 @@ private fun DishItem(
             Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
                 TitleRow(dishDomain, isExpanded)
 
-                DishDetails(dishDomain, onChangeServingsClicked, servings)
+                DishDetails(dishDomain, onChangeServingsClick, servings)
 
                 Spacer(modifier = Modifier.height(6.dp))
 
@@ -228,9 +229,9 @@ private fun DishItem(
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
                 ButtonRow(primaryButton = {
-                    FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClicked() }
+                    FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClick() }
                 }, secondaryButton = {
-                    FCCTextButton(text = stringResource(id = R.string.details)) { onEditClicked() }
+                    FCCTextButton(text = stringResource(id = R.string.details)) { onEditClick() }
                 })
             }
         })
@@ -301,7 +302,7 @@ private fun PriceSummary(dishDomain: DishDomain, servings: Int, modifier: Modifi
 
 @Preview
 @Composable
-fun DishItemPreview() {
+private fun DishItemPreview() {
     FCCTheme {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             DishItem(dishDomain = DishDomain(
@@ -332,8 +333,8 @@ fun DishItemPreview() {
                 servings = 1.0,
                 isExpanded = true,
                 onExpandToggle = { },
-                onChangeServingsClicked = { },
-                onAddItemsClicked = { }) {}
+                onChangeServingsClick = { },
+                onAddItemsClick = { }) {}
 
             DishItem(dishDomain = DishDomain(
                 id = 1,
@@ -347,8 +348,8 @@ fun DishItemPreview() {
                 servings = 1.0,
                 isExpanded = false,
                 onExpandToggle = { },
-                onChangeServingsClicked = { },
-                onAddItemsClicked = { }) {}
+                onChangeServingsClick = { },
+                onAddItemsClick = { }) {}
         }
     }
 }
