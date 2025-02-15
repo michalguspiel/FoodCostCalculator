@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.RecipeRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
@@ -22,6 +23,7 @@ import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +70,7 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
 
     private val dishRepository: DishRepository by inject()
     private val recipeRepository: RecipeRepository by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -93,6 +96,7 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
     }
 
     fun onChangeServings(){
+        analyticsRepository.logEvent(Constants.Analytics.Buttons.RECIPE_EDIT_DISPLAYED_PORTIONS,null)
         _screenState.update { ScreenState.Interaction(InteractionType.ChangeServings) }
     }
 

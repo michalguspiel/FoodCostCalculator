@@ -5,7 +5,9 @@ import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
+import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
+import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
@@ -72,5 +74,14 @@ class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
 
     fun onAdFailedToLoad() {
         analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)
+    }
+
+    fun onChangeServingsClick(id: Long){
+        analyticsRepository.logEvent(Constants.Analytics.Buttons.DISHES_EDIT_DISPLAYED_PORTIONS,null)
+        updateScreenState(
+            ScreenState.Interaction(
+                InteractionType.EditQuantity(id)
+            )
+        )
     }
 }
