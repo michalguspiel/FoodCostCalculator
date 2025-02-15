@@ -424,7 +424,7 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
                     deleteRemovedSteps(editableRecipe)
                     updateSteps(editableRecipe, existingRecipeIdInDish, newRecipeId)
                     updateDishWithRecipe(existingRecipeIdInDish, newRecipeId)
-                    refreshRecipeFromDatabase()
+                    refreshRecipeFromDatabase(newRecipeId)
                 }
             }.onSuccess {
                 Timber.i("saveRecipe() Success")
@@ -478,11 +478,14 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
 
     /**
      * Fetches recipe and updates [dish] recipe. Necessary after [saveRecipe].
+     * If recipe was updated, newRecipeId is -1, then takes recipeId from existing recipe.
+     * Otherwise uses newly created recipe.
      * */
-    private suspend fun refreshRecipeFromDatabase() {
-        Timber.i("refreshDishRecipe()")
-        val dish = _dish.value
-        dish?.recipe?.recipeId?.let {
+    private suspend fun refreshRecipeFromDatabase(newRecipeId: Long) {
+        val dish = _dish.value ?: return
+        val id: Long? = if (newRecipeId == -1L) dish.recipe?.recipeId else newRecipeId
+        Timber.i("refreshDishRecipe($newRecipeId)")
+        id?.let {
             val updatedRecipe = recipeRepository.getRecipeWithSteps(it)
             _dish.update { dish.copy(recipe = updatedRecipe.toRecipeDomain()) }
             _recipe.update { updatedRecipe.toEditableRecipe() }
