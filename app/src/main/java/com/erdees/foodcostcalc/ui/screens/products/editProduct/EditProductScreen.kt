@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.products.editProduct
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -123,7 +124,9 @@ fun EditProductScreen(
             ) {
                 Column(
                     Modifier
-                        .fillMaxWidth(),
+                        .fillMaxWidth()
+                        .animateContentSize()
+                    ,
                     verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
 
@@ -163,8 +166,8 @@ fun EditProductScreen(
                         )
                     )
                 }
-
-                ButtonRow(primaryButton = {
+                ButtonRow(
+                    primaryButton = {
                     FCCPrimaryButton(
                         enabled = saveButtonEnabled,
                         onClick = {

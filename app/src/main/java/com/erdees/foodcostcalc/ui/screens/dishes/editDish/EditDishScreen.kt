@@ -237,7 +237,7 @@ private fun Buttons(
     modifier: Modifier = Modifier,
     ) {
     val context = LocalContext.current
-    ButtonRow(modifier = modifier.padding(bottom = 16.dp, end = 16.dp),
+    ButtonRow(modifier = modifier.padding(end = 12.dp),
         primaryButton = {
             FCCPrimaryButton(text = stringResource(R.string.save)) {
                 saveDish()

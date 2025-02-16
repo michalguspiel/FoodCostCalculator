@@ -139,7 +139,9 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
                 } // todo ?: EmptyOne
 
 
-                ButtonRow(primaryButton = {
+                ButtonRow(
+                    modifier = Modifier.padding(end = 12.dp),
+                    primaryButton = {
                     FCCPrimaryButton(text = stringResource(id = R.string.save)) {
                         viewModel.saveHalfProduct()
                     }
