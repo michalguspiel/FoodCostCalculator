@@ -224,7 +224,7 @@ private fun DishItem(
 
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
-                ButtonRow(primaryButton = {
+                ButtonRow(applyDefaultPadding = false, primaryButton = {
                     FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClick() }
                 }, secondaryButton = {
                     FCCTextButton(text = stringResource(id = R.string.details)) { onEditClick() }

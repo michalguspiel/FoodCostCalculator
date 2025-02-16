@@ -125,23 +125,23 @@ private fun RecipeScreenContent(
     Scaffold(
         modifier = modifier,
         topBar = {
-        TopAppBar(title = {
-            Text(
-                text = if (recipeViewMode == RecipeViewMode.VIEW) {
-                    dish?.name ?: stringResource(R.string.recipe)
-                } else {
-                    stringResource(R.string.edit_recipe)
-                }, modifier = Modifier
-            )
-        }, navigationIcon = {
-            IconButton(onClick = { popBackStack() }) {
-                Icon(
-                    Icons.AutoMirrored.Sharp.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
+            TopAppBar(title = {
+                Text(
+                    text = if (recipeViewMode == RecipeViewMode.VIEW) {
+                        dish?.name ?: stringResource(R.string.recipe)
+                    } else {
+                        stringResource(R.string.edit_recipe)
+                    }, modifier = Modifier
                 )
-            }
-        })
-    }) { paddingValues ->
+            }, navigationIcon = {
+                IconButton(onClick = { popBackStack() }) {
+                    Icon(
+                        Icons.AutoMirrored.Sharp.ArrowBack,
+                        contentDescription = stringResource(R.string.back)
+                    )
+                }
+            })
+        }) { paddingValues ->
         Box(
             modifier = Modifier
                 .padding(paddingValues)
@@ -259,25 +259,19 @@ private fun RecipeView(
             Tips(recipe.tips)
         }
 
-        ButtonRow(
-            modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
-            primaryButton = {
-                FCCPrimaryButton(text = stringResource(R.string.edit_recipe),
-                    modifier = Modifier,
-                    enabled = true,
-                    onClick = {
-                        toggleRecipeViewMode()
-                    })
-            }, secondaryButton = {
-                // For now nothing
-            })
+        ButtonRow(primaryButton = {
+            FCCPrimaryButton(text = stringResource(R.string.edit_recipe),
+                modifier = Modifier,
+                enabled = true,
+                onClick = { toggleRecipeViewMode() })
+        })
     }
 }
 
 @Composable
 private fun Tips(tips: String?, modifier: Modifier = Modifier) {
     tips?.let {
-        Column(modifier = modifier,verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(4.dp)) {
             SectionLabel(stringResource(R.string.tips))
             Column(
                 Modifier
@@ -432,7 +426,7 @@ private fun RecipeEdit(
             }
 
             ButtonRow(
-                modifier = Modifier.padding(top = 8.dp, bottom = 24.dp),
+                modifier = Modifier,
                 primaryButton = {
                     FCCPrimaryButton(text = stringResource(R.string.save),
                         modifier = Modifier,

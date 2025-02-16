@@ -80,7 +80,10 @@ import com.erdees.foodcostcalc.utils.onNumericValueChange
 
 @Screen
 @Composable
-fun HalfProductsScreen(navController: NavController, viewModel: HalfProductsScreenViewModel = viewModel()) {
+fun HalfProductsScreen(
+    navController: NavController,
+    viewModel: HalfProductsScreenViewModel = viewModel()
+) {
 
     val adItems by viewModel.filteredHalfProductsInjectedWithAds.collectAsState()
     val searchKey by viewModel.searchKey.collectAsState()
@@ -251,7 +254,7 @@ fun HalfProductItem(
 
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
-                ButtonRow(secondaryButton = {
+                ButtonRow(applyDefaultPadding = false, secondaryButton = {
                     FCCTextButton(text = stringResource(id = R.string.edit)) { onEditClick() }
                 }, primaryButton = {
                     FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClick() }

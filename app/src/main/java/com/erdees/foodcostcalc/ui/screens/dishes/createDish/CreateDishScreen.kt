@@ -2,7 +2,6 @@ package com.erdees.foodcostcalc.ui.screens.dishes.createDish
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,13 +42,17 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
+import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Screen
 @Composable
-fun CreateDishScreen(navController: NavController, viewModel: CreateDishScreenViewModel = viewModel()) {
+fun CreateDishScreen(
+    navController: NavController,
+    viewModel: CreateDishScreenViewModel = viewModel()
+) {
 
     val addedDish by viewModel.addedDish.collectAsState()
     val dishName by viewModel.dishName.collectAsState()
@@ -95,10 +98,8 @@ fun CreateDishScreen(navController: NavController, viewModel: CreateDishScreenVi
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(paddingValues)
-                .padding(vertical = 24.dp)
                 .padding(horizontal = 12.dp)
         ) {
-
             Column(
                 Modifier
                     .fillMaxWidth(),
@@ -174,15 +175,13 @@ fun CreateDishScreen(navController: NavController, viewModel: CreateDishScreenVi
                     )
                 }
             }
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            ButtonRow(primaryButton = {
                 FCCPrimaryButton(
                     enabled = addButtonEnabled,
-                    onClick = {
-                        viewModel.addDish()
-                    },
+                    onClick = { viewModel.addDish() },
                     text = stringResource(id = R.string.add)
                 )
-            }
+            })
         }
     }
 }

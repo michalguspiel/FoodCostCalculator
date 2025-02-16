@@ -1,10 +1,8 @@
 package com.erdees.foodcostcalc.ui.screens.products
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +38,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.fields.SearchField
 import com.erdees.foodcostcalc.ui.composables.rememberNestedScrollConnection
+import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
@@ -49,7 +48,10 @@ import com.erdees.foodcostcalc.utils.Utils.formatPrice
 
 @Composable
 @Screen
-fun ProductsScreen(navController: NavController, viewModel: ProductsFragmentViewModel = viewModel()) {
+fun ProductsScreen(
+    navController: NavController,
+    viewModel: ProductsFragmentViewModel = viewModel()
+) {
 
     val searchKey by viewModel.searchKey.collectAsState()
     val adItems by viewModel.filteredProductsInjectedWithAds.collectAsState()
@@ -142,12 +144,11 @@ fun ProductItem(
             FCCPrimaryHorizontalDivider()
 
             Spacer(modifier = Modifier.height(12.dp))
-
-            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            ButtonRow(applyDefaultPadding = false, primaryButton = {
                 FCCPrimaryButton(text = stringResource(id = R.string.edit)) {
                     onEditClick()
                 }
-            }
+            })
         }
     })
 }
