@@ -14,9 +14,14 @@ import androidx.compose.ui.unit.dp
 fun ButtonRow(
     modifier: Modifier = Modifier,
     primaryButton: @Composable () -> Unit,
-    secondaryButton: @Composable (() -> Unit)? = null
-) {
+    secondaryButton: @Composable (() -> Unit)? = null,
+    tertiaryButton: @Composable (() -> Unit)? = null,
+    ) {
     Row(modifier.fillMaxWidth().padding(vertical = 12.dp), horizontalArrangement = Arrangement.End) {
+        if (tertiaryButton != null) {
+            tertiaryButton()
+            Spacer(modifier = Modifier.size(16.dp))
+        }
         if (secondaryButton != null) {
             secondaryButton()
             Spacer(modifier = Modifier.size(16.dp))

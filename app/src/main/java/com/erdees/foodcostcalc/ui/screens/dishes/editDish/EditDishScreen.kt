@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
+import android.content.Context
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,6 +58,7 @@ import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
@@ -68,7 +70,9 @@ import com.erdees.foodcostcalc.utils.Utils
 @OptIn(ExperimentalMaterial3Api::class)
 @Screen
 @Composable
-fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDishViewModel = viewModel()) {
+fun EditDishScreen(
+    dishId: Long, navController: NavController, viewModel: DishDetailsViewModel = viewModel()
+) {
 
     val screenState by viewModel.screenState.collectAsState()
     val usedItems: List<UsedItem> by viewModel.items.collectAsState()
@@ -89,44 +93,39 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
         }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = modifiedDishDomain?.name ?: dishId.toString(),
-                        modifier = Modifier.clickable {
-                            viewModel.setInteraction(InteractionType.EditName)
-                        })
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.deleteDish(dishId) }) {
-                        Icon(imageVector = Icons.Sharp.Delete, contentDescription = stringResource(R.string.remove_dish))
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(R.string.back))
-                    }
-                }
-            )
-        }
-    ) { paddingValues ->
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(text = modifiedDishDomain?.name ?: dishId.toString(),
+                modifier = Modifier.clickable {
+                    viewModel.setInteraction(InteractionType.EditName)
+                })
+        }, actions = {
+            IconButton(onClick = { viewModel.deleteDish(dishId) }) {
+                Icon(
+                    imageVector = Icons.Sharp.Delete,
+                    contentDescription = stringResource(R.string.remove_dish)
+                )
+            }
+        }, navigationIcon = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    Icons.AutoMirrored.Sharp.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+        })
+    }) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             Column {
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
                     items(usedItems, key = { item ->
                         item::class.simpleName + item.id.toString()
                     }) { item ->
-                        UsedItem(
-                            usedItem = item,
-                            onRemove = viewModel::removeItem,
-                            onEdit = {
-                                viewModel.setInteraction(
-                                    InteractionType.EditItem(it)
-                                )
-                            }
-                        )
+                        UsedItem(usedItem = item, onRemove = viewModel::removeItem, onEdit = {
+                            viewModel.setInteraction(
+                                InteractionType.EditItem(it)
+                            )
+                        })
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
                             thickness = 1.dp
@@ -136,41 +135,29 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
 
                 Column(Modifier) {
                     modifiedDishDomain?.let {
-                        DishDetails(
-                            it,
-                            onTaxClick = {
-                                viewModel.setInteraction(InteractionType.EditTax)
-                            }, onMarginClick = {
-                                viewModel.setInteraction(InteractionType.EditMargin)
-                            }, onTotalPriceClick = {
-                                viewModel.setInteraction(InteractionType.EditTotalPrice)
-                            })
+                        DishDetails(it, onTaxClick = {
+                            viewModel.setInteraction(InteractionType.EditTax)
+                        }, onMarginClick = {
+                            viewModel.setInteraction(InteractionType.EditMargin)
+                        }, onTotalPriceClick = {
+                            viewModel.setInteraction(InteractionType.EditTotalPrice)
+                        })
                     }
 
-                    Spacer(Modifier.size(16.dp))
-
-                    ButtonRow(
-                        modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
-                        primaryButton = {
-                            FCCPrimaryButton(text = stringResource(R.string.save)) {
-                                viewModel.saveDish()
-                            }
-                        }, secondaryButton = {
-                            FCCOutlinedButton(text = stringResource(R.string.recipe_button_title)) {
-                                navController.navigate(FCCScreen.Recipe)
-                            }
-                        })
+                    Buttons(
+                        modifier = Modifier.padding(top = 16.dp),
+                        saveDish = viewModel::saveDish,
+                        shareDish = viewModel::shareDish,
+                        navigate = {
+                            navController.navigate(FCCScreen.Recipe)
+                        }
+                    )
                 }
             }
 
             when (screenState) {
-                is ScreenState.Loading -> {
-                    ScreenLoadingOverlay()
-                }
-
-                is ScreenState.Success -> {
-                    // TODO
-                }
+                is ScreenState.Loading -> ScreenLoadingOverlay()
+                is ScreenState.Success -> {} // NOTHING
 
                 is ScreenState.Error -> {
                     ErrorDialog {
@@ -202,9 +189,7 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
                             )
                         }
 
-                        InteractionType.EditTotalPrice -> {
-                            // TODO
-                        }
+                        InteractionType.EditTotalPrice -> {} // TODO
 
                         InteractionType.EditName -> {
                             ValueEditDialog(
@@ -245,6 +230,33 @@ fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDi
 }
 
 @Composable
+private fun Buttons(
+    saveDish: () -> Unit,
+    shareDish: (Context) -> Unit,
+    navigate: () -> Unit,
+    modifier: Modifier = Modifier,
+    ) {
+    val context = LocalContext.current
+    ButtonRow(modifier = modifier.padding(bottom = 16.dp, end = 16.dp),
+        primaryButton = {
+            FCCPrimaryButton(text = stringResource(R.string.save)) {
+                saveDish()
+            }
+        },
+        secondaryButton = {
+            FCCOutlinedButton(text = stringResource(R.string.recipe_button_title)) {
+                navigate()
+            }
+        },
+        tertiaryButton = {
+            FCCTextButton(stringResource(R.string.share)) {
+                shareDish(context)
+            }
+        }
+    )
+}
+
+@Composable
 fun DishDetails(
     dishDomain: DishDomain,
     modifier: Modifier = Modifier,
@@ -255,26 +267,22 @@ fun DishDetails(
     val context = LocalContext.current
     Column(modifier) {
         Row {
-            DetailItem(
-                label = stringResource(R.string.margin),
+            DetailItem(label = stringResource(R.string.margin),
                 value = "${dishDomain.marginPercent}%",
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .weight(1f)
                     .clickable {
                         onMarginClick()
-                    }
-            )
-            DetailItem(
-                label = stringResource(R.string.tax),
+                    })
+            DetailItem(label = stringResource(R.string.tax),
                 value = "${dishDomain.taxPercent}%",
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .weight(1f)
                     .clickable {
                         onTaxClick()
-                    }
-            )
+                    })
         }
 
         Spacer(modifier = Modifier.size(8.dp))
@@ -308,8 +316,7 @@ fun UsedItem(
 ) {
     val swipeState = rememberSwipeToDismissBoxState()
 
-    SwipeToDismissBox(
-        modifier = modifier.animateContentSize(),
+    SwipeToDismissBox(modifier = modifier.animateContentSize(),
         state = swipeState,
         backgroundContent = {
             Box(
@@ -320,29 +327,27 @@ fun UsedItem(
             ) {
                 Icon(
                     modifier = Modifier.minimumInteractiveComponentSize(),
-                    imageVector = Icons.Sharp.Delete, contentDescription = null
+                    imageVector = Icons.Sharp.Delete,
+                    contentDescription = null
                 )
             }
         },
         enableDismissFromStartToEnd = false,
         enableDismissFromEndToStart = true,
         content = {
-            ListItem(
-                colors = (
-                        ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background)
-                        ),
+            ListItem(colors = (ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background)),
                 headlineContent = {
                     Text(text = usedItem.item.name)
-                }, supportingContent = {
+                },
+                supportingContent = {
                     Text(text = usedItem.quantity.toString() + " " + usedItem.quantityUnit)
-                }, trailingContent = {
+                },
+                trailingContent = {
                     IconButton(onClick = { onEdit(usedItem) }) {
                         Icon(imageVector = Icons.Sharp.Edit, contentDescription = "Edit")
                     }
-                }
-            )
-        }
-    )
+                })
+        })
 
     when (swipeState.currentValue) {
         SwipeToDismissBoxValue.EndToStart -> {
@@ -365,19 +370,14 @@ private fun UsedItemPreview() {
     FCCTheme {
         UsedItem(
             UsedProductDomain(
-                id = 0,
-                ownerId = 0,
-                item = ProductDomain(
+                id = 0, ownerId = 0, item = ProductDomain(
                     id = 1,
                     name = "Product",
                     pricePerUnit = 10.0,
                     unit = "kg",
                     tax = 23.0,
                     waste = 20.0
-                ),
-                quantity = 1.0,
-                quantityUnit = "kg",
-                weightPiece = 1.0
+                ), quantity = 1.0, quantityUnit = "kg", weightPiece = 1.0
             ),
             modifier = Modifier,
             onEdit = {},

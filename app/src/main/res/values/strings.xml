@@ -155,6 +155,16 @@
     <string name="change_portions">Change Portions</string>
     <string name="edit_margin">Edit margin</string>
     <string name="edit_tax">Edit tax</string>
+    <string name="share">Share</string>
+
+    <!-- Recipe Sharing -->
+    <string name="recipe_sharing_prep_time">Preparation time: %1$s minutes.</string>
+    <string name="recipe_sharing_cook_time">Cooking Time: %1$s minutes.</string>
+    <string name="recipe_sharing_tips">Tips: %1$s</string>
+    <string name="recipe_sharing_margin">Margin: %1$s %%</string>
+    <string name="recipe_sharing_food_cost">Food cost: %1$s.</string>
+    <string name="recipe_sharing_final_price">Final price: %1$s.</string>
+    <string name="recipe_sharing_generated_with_fcc">Generated with Food Cost Calculator</string>
 
     <!-- SETTINGS -->
     <string name="settings">Settings</string>

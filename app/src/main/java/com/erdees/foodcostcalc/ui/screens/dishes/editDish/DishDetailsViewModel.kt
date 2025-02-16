@@ -1,40 +1,35 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
+import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
-import com.erdees.foodcostcalc.data.repository.RecipeRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toRecipe
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toRecipeDomain
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toRecipeStep
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
-import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
-import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
+import com.erdees.foodcostcalc.ext.toShareableText
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
-import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.onIntegerValueChange
+import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
+import com.erdees.foodcostcalc.ui.screens.recipe.RecipeUpdater
+import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -43,122 +38,42 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 
-data class DishNotFound(override val message: String = "Dish not found to bind with recipe") :
-    Exception(message)
-
 /**
- * Wrapper to ease passing down functions to composable.
+ * Shared ViewModel between [EditDishScreen] and [RecipeScreen].
+ * It was decided to share it in order to avoid passing data between screens.
  * */
-data class RecipeUpdater(
-    val updatePrepTime: (String) -> Unit,
-    val updateCookTime: (String) -> Unit,
-    val updateDescription: (String) -> Unit,
-    val updateTips: (String) -> Unit,
-    val updateStep: (Int, String) -> Unit
-)
-
-enum class RecipeViewMode {
-    VIEW, EDIT
-}
-
-sealed class RecipeEvent{
-    data object CancelEditRecipeMissing : RecipeEvent()
-}
-
-class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
+class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
     KoinComponent {
 
     private val dishRepository: DishRepository by inject()
-    private val recipeRepository: RecipeRepository by inject()
-    private val analyticsRepository: AnalyticsRepository by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
 
-    private var _recipeViewModeState: MutableStateFlow<RecipeViewMode> =
-        MutableStateFlow(RecipeViewMode.VIEW)
-    val recipeViewModeState: StateFlow<RecipeViewMode> = _recipeViewModeState
-
     private var _dish = MutableStateFlow<DishDomain?>(null)
     val dish: StateFlow<DishDomain?> = _dish
 
-    private var _recipeServings: MutableStateFlow<Int> = MutableStateFlow(1)
-    val recipeServings: StateFlow<Int> = _recipeServings
-
-    private var _recipeEvent: Channel<RecipeEvent> = Channel()
-    val recipeEvent = _recipeEvent.receiveAsFlow()
-
-    fun updateServings(servings: String) {
-        servings.toIntOrNull()?.let {
-            _recipeServings.value = it
-        }
-        resetScreenState()
-    }
-
-    fun onChangeServings(){
-        analyticsRepository.logEvent(Constants.Analytics.Buttons.RECIPE_EDIT_DISPLAYED_PORTIONS,null)
-        _screenState.update { ScreenState.Interaction(InteractionType.ChangeServings) }
-    }
-
-    /**
-     * In order to have it persisted we must save it to the DB. This one is temporary.
-     * */
-    private var _recipe = MutableStateFlow(EditableRecipe())
-    val recipe: StateFlow<EditableRecipe> = _recipe
-
-    fun updatePrepTime(prepTime: String) {
-        _recipe.update {
-            _recipe.value.copy(
-                prepTimeMinutes = onIntegerValueChange(
-                    _recipe.value.prepTimeMinutes, prepTime
-                )
-            )
-        }
-    }
-
-    fun updateCookTime(cookTime: String) {
-        _recipe.update {
-            _recipe.value.copy(
-                cookTimeMinutes = onIntegerValueChange(
-                    _recipe.value.cookTimeMinutes, cookTime
-                )
-            )
-        }
-    }
-
-    fun updateDescription(description: String) {
-        _recipe.update {
-            _recipe.value.copy(description = description)
-        }
-    }
-
-    fun updateTips(tips: String) {
-        _recipe.update {
-            _recipe.value.copy(tips = tips)
-        }
-    }
-
-    fun updateStep(index: Int, newStep: String) {
-        Timber.i("updateStep: $index, newStep: $newStep")
-        _recipe.update {
-            val updatedSteps = _recipe.value.steps.toMutableList()
-            Timber.i("updatedSteps: ${updatedSteps.map { it.id }}, indices: ${updatedSteps.indices}")
-            if (index in updatedSteps.indices) {
-                Timber.i("Edit existing step")
-                updatedSteps[index] =
-                    updatedSteps[index].copy(stepDescription = newStep)
-            } else {
-                Timber.i("Add new step")
-                updatedSteps.add(RecipeStepDomain(null, index, newStep))
-            }
-
-            _recipe.value.copy(steps = updatedSteps)
-        }
-    }
-
-
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
+
+    private val recipeHandler: RecipeHandler = RecipeHandler(
+        viewModelScope = viewModelScope,
+        resetScreenState = { resetScreenState() },
+        updateScreenState = { _screenState.value = it },
+        updateDish = { _dish.value = it }
+    )
+
+    val recipe = recipeHandler.recipe
+    val recipeViewModeState = recipeHandler.recipeViewModeState
+    val recipeServings = recipeHandler.recipeServings
+    val recipeEvent = recipeHandler.recipeEvent
+    val recipeUpdater = RecipeUpdater(
+        updatePrepTime = recipeHandler::updatePrepTime,
+        updateCookTime = recipeHandler::updateCookTime,
+        updateDescription = recipeHandler::updateDescription,
+        updateTips = recipeHandler::updateTips,
+        updateStep = recipeHandler::updateStep
+    )
 
     init {
         fetchDish()
@@ -169,15 +84,15 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
         _screenState.update { ScreenState.Loading() }
         viewModelScope.launch {
             try {
-                val id = savedStateHandle.get<Long>(DISH_ID_KEY) ?: throw NullPointerException()
+                val id = savedStateHandle.get<Long>(DISH_ID_KEY) ?: throw NullPointerException("Failed to fetch dish due to missing id in savedStateHandle")
                 val dish = dishRepository.getDish(id).flowOn(Dispatchers.IO).first()
                 with(dish.toDishDomain()) {
                     Timber.i("Fetched dish: $this")
                     if (this.recipe == null) {
-                        _recipeViewModeState.update { RecipeViewMode.EDIT }
+                        recipeHandler.updateRecipeViewMode(RecipeViewMode.EDIT)
                     }
                     _dish.update { this }
-                    _recipe.update { this.recipe.toEditableRecipe() }
+                    recipeHandler.updateRecipe(this.recipe.toEditableRecipe())
                     originalProducts = this.products
                     originalHalfProducts = this.halfProducts
                 }
@@ -238,11 +153,15 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
         _screenState.value = ScreenState.Idle
     }
 
-
     fun updateItemQuantity() {
-        val value = editableQuantity.value.toDoubleOrNull() ?: return
-        val item = currentlyEditedItem.value ?: return
-        val dish = dish.value ?: return
+        val value = editableQuantity.value.toDoubleOrNull()
+        val item = currentlyEditedItem.value
+        val dish = dish.value
+
+        if (value == null || item == null || dish == null) {
+            return
+        }
+
         when (item) {
             is UsedProductDomain -> {
                 val index = dish.products.indexOf(item)
@@ -376,7 +295,7 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
                     editedProducts.forEach { dishRepository.updateProductDish(it) }
                     editedHalfProducts.forEach { dishRepository.updateHalfProductDish(it) }
 
-                    dishRepository.updateDish(this@EditDishViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
+                    dishRepository.updateDish(this@DishDetailsViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
                 }
                 _screenState.value = ScreenState.Success()
             } catch (e: Exception) {
@@ -385,115 +304,24 @@ class EditDishViewModel(private val savedStateHandle: SavedStateHandle) : ViewMo
         }
     }
 
-    fun toggleRecipeViewMode() {
-        if (_recipeViewModeState.value == RecipeViewMode.VIEW) {
-            _recipeViewModeState.update { RecipeViewMode.EDIT }
-        } else {
-            _recipeViewModeState.update { RecipeViewMode.VIEW }
+    fun shareDish(context: Context) {
+        val shareableText = _dish.value?.toShareableText(context).also {
+            Timber.i(it)
         }
-        resetScreenState()
-    }
-
-    /**
-     * Cancels editing of recipe, if dish does not include any recipe, sends event,
-     * which in turn instructs screen to pop backstack.
-     * */
-    fun cancelEdit() {
-        Timber.i("cancelEdit()")
-        if (_dish.value?.recipe == null){
-            _screenState.update { ScreenState.Loading() }
-            viewModelScope.launch {
-                _recipeEvent.trySend(RecipeEvent.CancelEditRecipeMissing)
-            }
-            _screenState.update { ScreenState.Idle }
-        } else {
-            Timber.i("dish recipe is ${_dish.value?.recipe}, toggling recipe view mode")
-            _recipe.update { _dish.value?.recipe.toEditableRecipe() }
-            toggleRecipeViewMode()
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareableText)
+            type = "text/plain"
         }
+
+        val shareIntent = Intent.createChooser(sendIntent, null)
+        context.startActivity(shareIntent)
     }
 
 
-    fun saveRecipe() {
-        Timber.i("saveRecipe()")
-        _screenState.value = ScreenState.Loading()
-        viewModelScope.launch(Dispatchers.Default) {
-            val existingRecipeIdInDish = _dish.value?.recipe?.recipeId
-            val editableRecipe = _recipe.value
-            val recipe = editableRecipe.toRecipe(existingRecipeIdInDish)
-            runCatching {
-                withContext(Dispatchers.IO) {
-                    val newRecipeId = recipeRepository.upsertRecipe(recipe)
-                    Timber.i("Recipe saved with id: $newRecipeId \n $recipe")
-                    deleteRemovedSteps(editableRecipe)
-                    updateSteps(editableRecipe, existingRecipeIdInDish, newRecipeId)
-                    updateDishWithRecipe(existingRecipeIdInDish, newRecipeId)
-                    refreshRecipeFromDatabase(newRecipeId)
-                }
-            }.onSuccess {
-                Timber.i("saveRecipe() Success")
-                _screenState.value = ScreenState.Success()
-            }.onFailure {
-                Timber.e("saveRecipe() failure: $it")
-                _screenState.value = ScreenState.Error(Error(it.message))
-            }
-        }
-    }
-
-    /**
-     * Identifies which steps user has removed and deletes them from DB.
-     * */
-    private suspend fun deleteRemovedSteps(editableRecipe: EditableRecipe) {
-        Timber.i("deleteRemovedSteps()")
-        val existingSteps = _dish.value?.recipe?.steps?.map { it.id }
-        val emptySteps =
-            editableRecipe.steps.filter { it.stepDescription.isBlank() }.mapNotNull { it.id }
-        Timber.i("emptyStepsIds : $emptySteps")
-        val removedSteps =
-            existingSteps?.filter { emptySteps.contains(it) }?.filterNotNull()
-        Timber.i("removedSteps: $removedSteps")
-        removedSteps?.let {
-            recipeRepository.deleteRecipeStepsByIds(it)
-        }
-    }
-
-    private suspend fun updateSteps(
-        editableRecipe: EditableRecipe, existingRecipeIdInDish: Long?, newRecipeId: Long
-    ) {
-        Timber.i("updateSteps()")
-        val steps = editableRecipe.steps.filter { it.stepDescription.isNotBlank() }
-            .mapIndexed { index, step ->
-                step.toRecipeStep(
-                    recipeId = existingRecipeIdInDish ?: newRecipeId, newOrder = index
-                )
-            }
-        recipeRepository.upsertRecipeSteps(steps)
-        Timber.i("Steps saved: \n $steps")
-    }
-
-    private suspend fun updateDishWithRecipe(existingRecipeIdInDish: Long?, newRecipeId: Long) {
-        if (existingRecipeIdInDish == null) {
-            Timber.i("Recipe created, updating dish with recipe: $newRecipeId")
-            dish.value?.id?.let { dishRepository.updateDishRecipe(newRecipeId, it) } ?: throw DishNotFound()
-        } else {
-            Timber.i("Recipe updated, skipping dish update")
-        }
-    }
-
-    /**
-     * Fetches recipe and updates [dish] recipe. Necessary after [saveRecipe].
-     * If recipe was updated, newRecipeId is -1, then takes recipeId from existing recipe.
-     * Otherwise uses newly created recipe.
-     * */
-    private suspend fun refreshRecipeFromDatabase(newRecipeId: Long) {
-        val dish = _dish.value ?: return
-        val id: Long? = if (newRecipeId == -1L) dish.recipe?.recipeId else newRecipeId
-        Timber.i("refreshDishRecipe($newRecipeId)")
-        id?.let {
-            val updatedRecipe = recipeRepository.getRecipeWithSteps(it)
-            _dish.update { dish.copy(recipe = updatedRecipe.toRecipeDomain()) }
-            _recipe.update { updatedRecipe.toEditableRecipe() }
-            Timber.i("Dish's recipe and recipe refreshed with ${updatedRecipe.toRecipeDomain()} \n${updatedRecipe.toRecipeDomain().steps}")
-        }
-    }
+    fun toggleRecipeViewMode() = recipeHandler.toggleRecipeViewMode()
+    fun cancelRecipeEdit() = recipeHandler.cancelRecipeEdit(_dish.value?.recipe)
+    fun onChangeServings() = recipeHandler.onChangeServings()
+    fun updateServings(servings: String) = recipeHandler.updateServings(servings)
+    fun saveRecipe() = recipeHandler.saveRecipe(_dish.value)
 }

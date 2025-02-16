@@ -15,7 +15,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.DishesScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDish.CreateDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishScreen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
 import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.addItemToHalfProduct.AddItemToHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfProductScreen
@@ -83,7 +83,7 @@ fun FCCNavigation(
                 navController.getBackStackEntry(navController.previousBackStackEntry?.destination?.route.toString())
             }
 
-            val viewModel = viewModel<EditDishViewModel>(parentEntry)
+            val viewModel = viewModel<DishDetailsViewModel>(parentEntry)
             RecipeScreen(navController, viewModel)
         }
 
