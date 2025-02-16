@@ -31,7 +31,7 @@ fun DishDomain.toShareableText(
 
     builder.appendLine()
 
-    recipe?.let {
+    recipe?.let { recipe ->
         builder.appendLine(context.getString(R.string.recipe))
         recipe.description?.let { desc -> builder.appendLine(desc) }
         builder.appendLine()
@@ -53,21 +53,23 @@ fun DishDomain.toShareableText(
         }
         builder.appendLine()
 
-        if (it.steps?.isNotEmpty() == true) {
+        if (recipe.steps?.isNotEmpty() == true) {
             builder.appendLine(context.getString(R.string.steps_title))
-            it.steps.sortedBy { step -> step.order }.forEach { step ->
+            recipe.steps.sortedBy { step -> step.order }.forEach { step ->
                 builder.appendLine("${step.order + 1 }. ${step.stepDescription}")
             }
             builder.appendLine()
         }
 
         recipe.tips?.let { tips ->
-            builder.appendLine(
-                context.getString(
-                    R.string.recipe_sharing_tips,
-                    tips
+            if(tips.isNotBlank()){
+                builder.appendLine(
+                    context.getString(
+                        R.string.recipe_sharing_tips,
+                        tips
+                    )
                 )
-            )
+            }
         }
     }
 
