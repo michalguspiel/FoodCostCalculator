@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.navigation
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -36,7 +37,9 @@ fun FCCNavigation(
     NavHost(
         navController = navController,
         startDestination = FCCScreen.Products,
-        modifier = modifier.padding(paddingValues)
+        modifier = modifier
+            .padding(paddingValues)
+            .consumeWindowInsets(paddingValues)
     ) {
         composable<FCCScreen.Products> {
             ProductsScreen(navController = navController)

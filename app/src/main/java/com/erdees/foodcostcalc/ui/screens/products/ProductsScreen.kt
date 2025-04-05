@@ -59,7 +59,6 @@ fun ProductsScreen(
     val nestedScrollConnection = rememberNestedScrollConnection(isVisible)
 
     Scaffold(
-        modifier = Modifier,
         floatingActionButton = {
             FCCAnimatedFAB(
                 isVisible = isVisible.value,

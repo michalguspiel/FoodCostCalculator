@@ -65,7 +65,6 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
         when (screenState) {
             is ScreenState.Success -> {
                 Timber.i(
-                    "EditHalfProductScreen",
                     "Success, popping backstack \n" +
                             "Previous backstack entry: ${navController.previousBackStackEntry?.destination?.route} \n"
                 )

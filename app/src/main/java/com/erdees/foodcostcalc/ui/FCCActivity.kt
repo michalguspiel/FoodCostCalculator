@@ -1,8 +1,8 @@
 package com.erdees.foodcostcalc.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.android.billingclient.api.BillingClient
@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
+import timber.log.Timber
 
 class FCCActivity : AppCompatActivity() {
 
@@ -27,7 +28,8 @@ class FCCActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
-        Log.i("FCCActivity", "onCreate")
+        enableEdgeToEdge()
+        Timber.i("onCreate")
 
         premiumUtil.billingClient = BillingClient.newBuilder(this)
             .setListener(premiumUtil.purchaseUpdateListener)
@@ -67,10 +69,7 @@ class FCCActivity : AppCompatActivity() {
             .setProductType(BillingClient.ProductType.SUBS)
 
         premiumUtil.billingClient?.queryPurchasesAsync(params.build()) { billingResult, purchase ->
-            Log.i(
-                "FCCActivity",
-                "queryPurchasesAsync() , responseCode: ${billingResult.responseCode}, purchase: $purchase"
-            )
+            Timber.i("queryPurchasesAsync(), responseCode: ${billingResult.responseCode}, purchase: $purchase")
             if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                 // Note that queryPurchasesAsync() returns only active subscriptions.
                 // FCC has only subscriptions, so we can safely assume that if the list is empty,
