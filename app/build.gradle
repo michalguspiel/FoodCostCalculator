@@ -51,7 +51,7 @@ android {
         compileSdk = 35
         applicationId "com.erdees.foodcostcalc"
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode version_code.toInteger()
         versionName version_name
         multiDexEnabled true
@@ -92,7 +92,7 @@ android {
         jvmTarget = '17'
     }
     configurations {
-        all {
+        configureEach {
             exclude module: 'httpclient'
         }
     }
@@ -135,10 +135,8 @@ detekt {
 }
 
 dependencies {
-
-
     // Compose
-    def composeBom = platform('androidx.compose:compose-bom:2024.12.01')
+    def composeBom = platform('androidx.compose:compose-bom:2025.03.00')
 
     implementation composeBom
     androidTestImplementation composeBom
@@ -147,7 +145,7 @@ dependencies {
     implementation 'androidx.compose.material:material-icons-core'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose'
     implementation 'androidx.activity:activity-compose'
-    implementation "androidx.navigation:navigation-compose:2.8.5"
+    implementation "androidx.navigation:navigation-compose:2.8.9"
     implementation 'androidx.compose.ui:ui-viewbinding'
     implementation("io.coil-kt:coil-compose:2.7.0")
 
@@ -159,35 +157,29 @@ dependencies {
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
 
-
     implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'com.google.android.material:material:1.12.0'
     implementation 'androidx.core:core-ktx:1.15.0'
 
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0"
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.3"
-    implementation 'androidx.drawerlayout:drawerlayout:1.2.0'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7"
     // Room components
     implementation "androidx.room:room-runtime:$room_version"
     ksp "androidx.room:room-compiler:$room_version"
     implementation "androidx.room:room-ktx:$room_version"
 
-    //Glide
-    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    // Activity
+    implementation("androidx.activity:activity-ktx:1.10.1")
 
     implementation 'com.google.android.play:review:2.0.2'
     implementation 'com.google.android.play:review-ktx:2.0.2'
-
-    //SEARCHABLE SPINNER
-    implementation 'com.github.DonMat:searchablespinner:v1.0.1'
 
     //SPLASH SCREEN
     implementation 'androidx.core:core-splashscreen:1.0.1'
 
     // GOOGLE DRIVE API
     implementation 'com.google.android.gms:play-services-drive:17.0.0'
-    implementation "com.google.android.gms:play-services-auth:21.2.0"
+    implementation "com.google.android.gms:play-services-auth:21.3.0"
     implementation 'com.google.http-client:google-http-client-gson:1.44.2'
     implementation('com.google.api-client:google-api-client-android:1.26.0')
     implementation('com.google.apis:google-api-services-drive:v3-rev136-1.25.0')
@@ -195,12 +187,12 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3'
 
     //FIREBASE ANALYTICS
-    implementation platform('com.google.firebase:firebase-bom:33.2.0')
+    implementation platform('com.google.firebase:firebase-bom:33.10.0')
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics-ktx")
 
     //GOOGLE ADS
-    implementation 'com.google.android.gms:play-services-ads:23.3.0'
+    implementation 'com.google.android.gms:play-services-ads:24.1.0'
     //ERROR HANDLE
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
 
