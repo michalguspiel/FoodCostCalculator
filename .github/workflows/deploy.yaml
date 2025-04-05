@@ -55,12 +55,6 @@ jobs:
         run: echo "versionName=$(date +'%Y%m%d')" >> $GITHUB_ENV
 
       - uses: android-actions/setup-android@v2
-      - uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
 
       - name: Build with Gradle
         working-directory: ./
