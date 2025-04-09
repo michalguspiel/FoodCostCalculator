@@ -38,16 +38,16 @@ fun FCCHostScreen(analyticsRepository: AnalyticsRepository = koinInject()) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination by remember(navBackStackEntry) { mutableStateOf(navBackStackEntry?.destination?.route) }
-    var isNavigationBarVisible by rememberSaveable { mutableStateOf(showNavBar(currentDestination)) }
+    var isNavigationBarVisible by rememberSaveable { mutableStateOf(showNavBar(currentDestination, analyticsRepository)) }
 
     LaunchedEffect(Unit) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
-            isNavigationBarVisible = showNavBar(destination.route)
-
-            val bundle = Bundle()
+            isNavigationBarVisible = showNavBar(destination.route, analyticsRepository)
             val screen =
                 destination.route?.removePrefix("com.erdees.foodcostcalc.ui.navigation.FCCScreen.")
-            bundle.putString(Constants.Analytics.SCREEN_NAME, screen ?: "")
+            val bundle = Bundle().apply {
+                putString(Constants.Analytics.SCREEN_NAME, screen ?: "")
+            }
             analyticsRepository.logEvent(Constants.Analytics.NAV_EVENT, bundle)
         }
     }
@@ -93,7 +93,15 @@ fun FCCHostScreen(analyticsRepository: AnalyticsRepository = koinInject()) {
     }
 }
 
-private fun showNavBar(currentDestination: String?): Boolean {
-    return FCCScreen.bottomNavigationScreens.map { it::class.qualifiedName }
-        .contains(currentDestination)
+private fun showNavBar(currentDestination: String?, analyticsRepository: AnalyticsRepository): Boolean {
+    return FCCScreen.bottomNavigationScreens.mapNotNull {
+        try {
+            it::class.qualifiedName
+        } catch (e: Exception) {
+            analyticsRepository.logException(e, Bundle().apply {
+                putString(Constants.Analytics.Exceptions.SHOW_NAV_BAR, currentDestination)
+            })
+            null
+        }
+    }.contains(currentDestination)
 }
