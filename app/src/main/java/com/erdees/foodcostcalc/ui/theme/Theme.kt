@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.ui.theme
 import android.app.Activity
 import android.os.Build
-import android.view.WindowInsets
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
@@ -264,15 +263,10 @@ fun FCCTheme(
     SideEffect {
         val window = (view.context as Activity).window
         val primaryColorRgb = colorScheme.primary.toArgb()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // Android 15+
-            window.decorView.setOnApplyWindowInsetsListener { view, insets ->
-                val statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars())
-                view.setBackgroundColor(primaryColorRgb)
-
-                // Adjust padding to avoid overlap
-                view.setPadding(0, statusBarInsets.top, 0, 0)
-                insets
-            }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+        // Android 15+
+        // If the app targets VANILLA_ICE_CREAM
+        // or above, the color will be transparent and cannot be changed
         } else {
             // For Android 14 and below
             window.statusBarColor = primaryColorRgb
