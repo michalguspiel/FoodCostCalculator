@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.data.repository
 
 import android.os.Bundle
 import com.erdees.foodcostcalc.BuildConfig
+import com.erdees.foodcostcalc.utils.Constants
 import com.google.firebase.analytics.FirebaseAnalytics
 import timber.log.Timber
 
@@ -17,6 +18,8 @@ import timber.log.Timber
  */
 interface AnalyticsRepository {
     fun logEvent(event: String, bundle: Bundle?)
+
+    fun logException(exception: Exception, bundle: Bundle?)
 }
 
 class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) :
@@ -26,6 +29,20 @@ class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) 
             firebaseAnalytics.logEvent(event, bundle)
         } else {
             Timber.d("Event: $event, Bundle: $bundle")
+        }
+    }
+
+    override fun logException(
+        exception: Exception,
+        bundle: Bundle?
+    ) {
+        bundle?.apply {
+            putString(Constants.Analytics.Exceptions.MESSAGE, exception.message)
+        }
+        if (!BuildConfig.DEBUG) {
+            firebaseAnalytics.logEvent(Constants.Analytics.Exceptions.EVENT, bundle)
+        } else {
+            Timber.d("Exception: $exception, Bundle: $bundle")
         }
     }
 }

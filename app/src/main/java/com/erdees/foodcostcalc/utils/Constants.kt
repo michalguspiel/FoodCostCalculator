@@ -36,10 +36,16 @@ object Constants {
         const val DATABASE_OPERATION_SUCCESS = "database_operation_success"
         const val DATABASE_OPERATION_ERROR = "database_operation_error"
 
-        object Buttons{
+        object Buttons {
             const val DISHES_EDIT_DISPLAYED_PORTIONS = "dishes_edit_displayed_portions"
             const val RECIPE_EDIT_DISPLAYED_PORTIONS = "recipe_edit_displayed_portions"
             const val HALF_PRODUCTS_EDIT_QUANTITY = "half_products_edit_quantity"
+        }
+
+        object Exceptions {
+            const val EVENT = "caught_logged_exception"
+            const val MESSAGE = "exception_message"
+            const val SHOW_NAV_BAR = "show_nav_bar"
         }
     }
 
