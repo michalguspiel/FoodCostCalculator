@@ -175,7 +175,7 @@ dependencies {
     implementation 'com.google.android.play:review-ktx:2.0.2'
 
     //SPLASH SCREEN
-    implementation 'androidx.core:core-splashscreen:1.0.1'
+    implementation 'androidx.core:core-splashscreen:1.2.0-beta02'
 
     // GOOGLE DRIVE API
     implementation 'com.google.android.gms:play-services-drive:17.0.0'

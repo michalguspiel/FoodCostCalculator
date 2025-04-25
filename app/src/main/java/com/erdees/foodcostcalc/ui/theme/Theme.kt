@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.theme
 import android.app.Activity
 import android.os.Build
+import android.view.WindowInsets
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.lightColorScheme
@@ -8,9 +9,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.SideEffect
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
@@ -244,18 +243,6 @@ private val highContrastDarkColorScheme = darkColorScheme(
     surfaceContainerHighest = surfaceContainerHighestDarkHighContrast,
 )
 
-@Immutable
-data class ColorFamily(
-    val color: Color,
-    val onColor: Color,
-    val colorContainer: Color,
-    val onColorContainer: Color
-)
-
-val unspecified_scheme = ColorFamily(
-    Color.Unspecified, Color.Unspecified, Color.Unspecified, Color.Unspecified
-)
-
 @Composable
 fun FCCTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -275,8 +262,21 @@ fun FCCTheme(
   val view = LocalView.current
   if (!view.isInEditMode) {
     SideEffect {
-      val window = (view.context as Activity).window
-      window.statusBarColor = colorScheme.primary.toArgb()
+        val window = (view.context as Activity).window
+        val primaryColorRgb = colorScheme.primary.toArgb()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) { // Android 15+
+            window.decorView.setOnApplyWindowInsetsListener { view, insets ->
+                val statusBarInsets = insets.getInsets(WindowInsets.Type.statusBars())
+                view.setBackgroundColor(primaryColorRgb)
+
+                // Adjust padding to avoid overlap
+                view.setPadding(0, statusBarInsets.top, 0, 0)
+                insets
+            }
+        } else {
+            // For Android 14 and below
+            window.statusBarColor = primaryColorRgb
+        }
       WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
     }
   }
