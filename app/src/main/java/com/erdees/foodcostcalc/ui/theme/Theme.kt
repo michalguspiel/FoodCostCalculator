@@ -258,22 +258,6 @@ fun FCCTheme(
       darkTheme -> darkScheme
       else -> lightScheme
   }
-  val view = LocalView.current
-  if (!view.isInEditMode) {
-    SideEffect {
-        val window = (view.context as Activity).window
-        val primaryColorRgb = colorScheme.primary.toArgb()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
-        // Android 15+
-        // If the app targets VANILLA_ICE_CREAM
-        // or above, the color will be transparent and cannot be changed
-        } else {
-            // For Android 14 and below
-            window.statusBarColor = primaryColorRgb
-        }
-      WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
-    }
-  }
 
   MaterialTheme(
     colorScheme = colorScheme,
