@@ -7,27 +7,37 @@ import com.erdees.foodcostcalc.data.model.DishBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.MyDispatchers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class CreateDishScreenViewModel : ViewModel(), KoinComponent {
 
+    private val dispatchers: MyDispatchers by inject()
     private val dishRepository: DishRepository by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
 
     private val sharedPreferences: Preferences by inject()
 
-
     var dishName = MutableStateFlow("")
-    var margin = MutableStateFlow(sharedPreferences.defaultMargin)
-    var tax = MutableStateFlow(sharedPreferences.defaultTax)
+    val margin: MutableStateFlow<String> = MutableStateFlow(Constants.BASIC_MARGIN.toString())
+    val tax: MutableStateFlow<String> = MutableStateFlow(Constants.BASIC_TAX.toString())
+
+    init {
+        viewModelScope.launch(dispatchers.ioDispatcher) {
+            launch { margin.update { sharedPreferences.defaultMargin.first() } }
+            launch { tax.update { sharedPreferences.defaultTax.first() } }
+        }
+    }
 
     val addButtonEnabled = dishName.map { it.isNotEmpty() }.stateIn(
         viewModelScope,

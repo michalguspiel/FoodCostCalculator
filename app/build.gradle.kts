@@ -214,6 +214,9 @@ dependencies {
     // Timber
     implementation(libs.timber)
 
+    // DataStore
+    implementation(libs.androidx.datastore)
+
     // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.runner)

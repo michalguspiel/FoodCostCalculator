@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.domain.model
 
-import android.content.Context
-import com.erdees.foodcostcalc.utils.UnitsUtils
+import android.icu.util.Currency
 import com.erdees.foodcostcalc.utils.Utils
 import java.text.DecimalFormat
 
@@ -14,8 +13,8 @@ interface UsedItem {
 
     val totalPrice: Double
 
-    fun formattedTotalPricePerServing(context: Context, amountOfServings: Double): String =
-        Utils.formatPrice(totalPrice * amountOfServings, context)
+    fun formattedTotalPricePerServing(amountOfServings: Double, currency: Currency?): String =
+        Utils.formatPrice(totalPrice * amountOfServings, currency)
 
     fun formatQuantityForTargetServing(servings: Double): String =
         DecimalFormat("#.##").format(quantity * servings)

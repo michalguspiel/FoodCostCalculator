@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.QueryPurchasesParams
@@ -40,7 +41,10 @@ class FCCActivity : AppCompatActivity() {
                     .build()
             )
             .build()
-        premiumUtil.billingSetup()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            premiumUtil.billingSetup()
+        }
 
         CoroutineScope(Dispatchers.IO).launch {
             val testDevices = listOf(
@@ -76,10 +80,14 @@ class FCCActivity : AppCompatActivity() {
                 // user does not have an active subscription.
                 if (purchase.isEmpty()) {
                     // USER DOES NOT HAVE AN ACTIVE SUBSCRIPTION
-                    preferences.userHasActiveSubscription = false
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        preferences.setUserHasActiveSubscription(false)
+                    }
                 } else {
                     // USER DOES HAVE AN ACTIVE SUBSCRIPTION
-                    preferences.userHasActiveSubscription = true
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        preferences.setUserHasActiveSubscription(true)
+                    }
                 }
             }
         }

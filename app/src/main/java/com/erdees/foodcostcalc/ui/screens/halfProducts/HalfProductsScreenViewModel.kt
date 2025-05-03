@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts
 
+import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.HalfProductBase
@@ -13,6 +14,7 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
 import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -33,9 +35,23 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
     private val halfProductRepository: HalfProductRepository by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
     val preferences: Preferences by inject()
-    private val adFrequency =
-        if (preferences.userHasActiveSubscription) Constants.Ads.PREMIUM_FREQUENCY
-        else Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
+
+    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    private val imperialUsed =
+        preferences.imperialUsed.stateIn(viewModelScope, SharingStarted.Lazily, false)
+    private val metricUsed =
+        preferences.metricUsed.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    private val adFrequency: StateFlow<Int> =
+        preferences.userHasActiveSubscription().map { hasSubscription ->
+                if (hasSubscription) Constants.Ads.PREMIUM_FREQUENCY
+                else Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
+            }.stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
+            )
+
 
     val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
 
@@ -59,8 +75,8 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
         )
 
     @OptIn(FlowPreview::class)
-    private val filteredHalfProducts = combine(halfProducts,
-        searchKey.debounce(500).onStart { emit("") }) { halfProducts, searchKey ->
+    private val filteredHalfProducts = combine(
+        halfProducts, searchKey.debounce(500).onStart { emit("") }) { halfProducts, searchKey ->
         halfProducts.filter {
             it.name.lowercase(Locale.getDefault()).contains(searchKey.lowercase())
         }
@@ -68,11 +84,12 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
         scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList()
     )
 
-    val filteredHalfProductsInjectedWithAds = filteredHalfProducts.map { halfProducts ->
-        ListAdsInjectorManager(halfProducts, adFrequency).listInjectedWithAds
-    }.stateIn(
-        scope = viewModelScope, started = SharingStarted.Lazily, initialValue = listOf()
-    )
+    val filteredHalfProductsInjectedWithAds =
+        combine(filteredHalfProducts, adFrequency) { halfProducts, adFrequency ->
+            ListAdsInjectorManager(halfProducts, adFrequency).listInjectedWithAds
+        }.stateIn(
+            scope = viewModelScope, started = SharingStarted.Lazily, initialValue = listOf()
+        )
 
     fun addHalfProduct(name: String, unit: String) {
         val halfProductBase = HalfProductBase(0, name, unit)
@@ -89,8 +106,8 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
         }
     }
 
-    fun onEditQuantity(id: Long){
-        analyticsRepository.logEvent(Constants.Analytics.Buttons.HALF_PRODUCTS_EDIT_QUANTITY,null)
+    fun onEditQuantity(id: Long) {
+        analyticsRepository.logEvent(Constants.Analytics.Buttons.HALF_PRODUCTS_EDIT_QUANTITY, null)
         updateScreenState(
             ScreenState.Interaction(
                 InteractionType.EditQuantity(id)
@@ -100,5 +117,9 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
     fun onAdFailedToLoad() {
         analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)
+    }
+
+    fun getUnitsSet(context: Context): Set<String> {
+        return Utils.getUnitsSet(context.resources, metricUsed.value, imperialUsed.value)
     }
 }

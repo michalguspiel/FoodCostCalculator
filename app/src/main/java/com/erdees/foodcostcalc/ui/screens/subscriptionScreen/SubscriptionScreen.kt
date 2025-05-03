@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -55,6 +56,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
+import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -62,16 +64,21 @@ import nl.dionsegijn.konfetti.core.emitter.Emitter
 import java.util.concurrent.TimeUnit
 
 @Composable
-fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionViewModel = viewModel()) {
+fun SubscriptionScreen(
+    navController: NavController,
+    viewModel: SubscriptionViewModel = viewModel()
+) {
     val context = LocalContext.current
     val activity = context.getActivity()
     val lifecycleOwner = LocalLifecycleOwner.current
     val screenState by viewModel.screenState.collectAsState()
 
     DisposableEffect(Unit) {
-        val observer = LifecycleEventObserver { _, event ->
+        val observer = LifecycleEventObserver { foo, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.checkSubscriptionStatus()
+                lifecycleOwner.lifecycleScope.launch {
+                    viewModel.updateSubscriptionStatus()
+                }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)
@@ -94,7 +101,7 @@ fun SubscriptionScreen(navController: NavController, viewModel: SubscriptionView
 @OptIn(ExperimentalMaterial3Api::class)
 private fun SubscriptionScreenContent(
     navController: NavController,
-    screenState: SubscriptionScreenState,
+    screenState: SubscriptionScreenState?,
     onSubscribeClick: () -> Unit,
     onManageSubscription: () -> Unit,
     onErrorAck: () -> Unit,
@@ -112,92 +119,98 @@ private fun SubscriptionScreenContent(
         },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-            ) {
-                val subscription = screenState.premiumSubscription
-                if (subscription != null) {
 
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Title(subscription = subscription)
-                        // Description
-                        Text(
-                            text = subscription.description,
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(
-                                top = 8.dp,
-                                start = 12.dp,
-                                end = 12.dp,
-                                bottom = 8.dp
-                            )
-                        )
-                    }
+            if (screenState != null) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
 
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        if (!screenState.userAlreadySubscribes) {
-                            PlanSection(
-                                subscription = subscription,
-                                selectedPlan = screenState.selectedPlan,
-                                onPlanSelected = { onPlanSelect(it) }
+
+                    val subscription = screenState.premiumSubscription
+                    if (subscription != null) {
+
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                        ) {
+                            Title(subscription = subscription)
+                            // Description
+                            Text(
+                                text = subscription.description,
+                                style = MaterialTheme.typography.bodyLarge,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(
+                                    top = 8.dp,
+                                    start = 12.dp,
+                                    end = 12.dp,
+                                    bottom = 8.dp
+                                )
                             )
-                        } else {
-                            ActiveSubscriptionSection()
                         }
 
-                        Text(
-                            text = stringResource(id = R.string.subscription_extra_desc),
-                            style = MaterialTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.padding(
-                                top = 8.dp,
-                                start = 12.dp,
-                                end = 12.dp,
-                                bottom = 8.dp
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            if (!screenState.userAlreadySubscribes) {
+                                PlanSection(
+                                    subscription = subscription,
+                                    selectedPlan = screenState.selectedPlan,
+                                    onPlanSelected = { onPlanSelect(it) }
+                                )
+                            } else {
+                                ActiveSubscriptionSection()
+                            }
+
+                            Text(
+                                text = stringResource(id = R.string.subscription_extra_desc),
+                                style = MaterialTheme.typography.bodySmall,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.padding(
+                                    top = 8.dp,
+                                    start = 12.dp,
+                                    end = 12.dp,
+                                    bottom = 8.dp
+                                )
                             )
-                        )
-                    }
-
-
-                    ButtonRow(
-                        userAlreadySubscribes = screenState.userAlreadySubscribes,
-                        onSubscribeClick = {
-                            onSubscribeClick()
-                        },
-                        onManageSubscription = {
-                            onManageSubscription()
                         }
-                    )
-                } else {
-                    SomethingWentWrongContent()
+
+
+                        ButtonRow(
+                            userAlreadySubscribes = screenState.userAlreadySubscribes,
+                            onSubscribeClick = {
+                                onSubscribeClick()
+                            },
+                            onManageSubscription = {
+                                onManageSubscription()
+                            }
+                        )
+                    } else {
+                        SomethingWentWrongContent()
+                    }
                 }
+
+
+                if (screenState.screenLaunchedWithoutSubscription && screenState.userAlreadySubscribes) {
+                    val party = Party(
+                        speed = 0f,
+                        maxSpeed = 30f,
+                        damping = 0.9f,
+                        spread = 360,
+                        colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
+                        emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100),
+                        position = Position.Relative(0.5, 0.3)
+                    )
+
+                    KonfettiView(
+                        modifier = Modifier.fillMaxSize(),
+                        parties = listOf(party),
+                    )
+                }
+                ScreenStateOverlay(screenState) { onErrorAck() }
+            } else {
+                ScreenLoadingOverlay()
             }
-
-
-            if (screenState.screenLaunchedWithoutSubscription && screenState.userAlreadySubscribes) {
-                val party = Party(
-                    speed = 0f,
-                    maxSpeed = 30f,
-                    damping = 0.9f,
-                    spread = 360,
-                    colors = listOf(0xfce18a, 0xff726d, 0xf4306d, 0xb48def),
-                    emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100),
-                    position = Position.Relative(0.5, 0.3)
-                )
-
-                KonfettiView(
-                    modifier = Modifier.fillMaxSize(),
-                    parties = listOf(party),
-                )
-            }
-
-            ScreenStateOverlay(screenState) { onErrorAck() }
         }
     }
 }

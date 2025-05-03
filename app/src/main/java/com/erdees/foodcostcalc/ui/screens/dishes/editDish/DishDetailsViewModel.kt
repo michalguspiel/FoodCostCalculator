@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
@@ -46,6 +47,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     KoinComponent {
 
     private val dishRepository: DishRepository by inject()
+    private val preferences: Preferences by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -55,6 +57,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
+
+    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val recipeHandler: RecipeHandler = RecipeHandler(
         viewModelScope = viewModelScope,
@@ -305,7 +309,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun shareDish(context: Context) {
-        val shareableText = _dish.value?.toShareableText(context).also {
+        val shareableText = _dish.value?.toShareableText(context, currency.value).also {
             Timber.i(it)
         }
         val sendIntent: Intent = Intent().apply {

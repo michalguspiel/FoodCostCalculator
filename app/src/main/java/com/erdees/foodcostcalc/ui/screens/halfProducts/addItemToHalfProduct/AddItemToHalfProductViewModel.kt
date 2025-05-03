@@ -9,21 +9,25 @@ import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.UnitsUtils
-import com.erdees.foodcostcalc.utils.Utils
+import com.erdees.foodcostcalc.utils.Utils.generateUnitSet
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
 class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
 
+    private val dispatchers: MyDispatchers by inject()
     private val preferences: Preferences by inject()
     private val productRepository: ProductRepository by inject()
     private val halfProductRepository: HalfProductRepository by inject()
@@ -62,9 +66,6 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
         onNumericValueChange(newValue, _pieceWeight)
     }
 
-    private var metricUnits = preferences.metricUsed
-    private var imperialUnits = preferences.imperialUsed
-
     private var _units = MutableStateFlow<Set<String>>(setOf())
     val units: StateFlow<Set<String>> = _units
 
@@ -81,12 +82,18 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
     private var unitType: UnitsUtils.UnitType? = null
 
     private fun updateUnitList() {
-        _units.value = Utils.generateUnitSet(
-            unitType,
-            metricUnits,
-            imperialUnits
-        )
-        _selectedUnit.value = _units.value.firstOrNull() ?: ""
+        viewModelScope.launch(dispatchers.ioDispatcher) {
+            val metricUnits = preferences.metricUsed.first()
+            val imperialUnits = preferences.imperialUsed.first()
+            withContext(dispatchers.mainDispatcher) {
+                _units.value = generateUnitSet(
+                    unitType,
+                    metricUnits,
+                    imperialUnits
+                )
+                _selectedUnit.value = _units.value.firstOrNull() ?: ""
+            }
+        }
     }
 
     fun initializeWith(halfProductUnit: String) {

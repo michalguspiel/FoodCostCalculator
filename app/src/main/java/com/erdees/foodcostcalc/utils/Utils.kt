@@ -1,10 +1,7 @@
 package com.erdees.foodcostcalc.utils
 
-import android.content.Context
 import android.content.res.Resources
 import com.erdees.foodcostcalc.R
-import com.erdees.foodcostcalc.data.Preferences
-import com.erdees.foodcostcalc.data.PreferencesImpl
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.NumberFormat
@@ -33,9 +30,8 @@ object Utils {
      * @param number Double
      * @return String
      */
-    fun formatPrice(number: Double, context: Context): String {
-        val preferencesDatabase = PreferencesImpl.getInstance(context)
-        val currencyCode = preferencesDatabase.currency?.currencyCode
+    fun formatPrice(number: Double, currency: android.icu.util.Currency?): String {
+        val currencyCode = currency?.currencyCode
         val currency = currencyCode?.let { Currency.getInstance(it) }
         currencyCode?.let {
             getLocaleForCurrency(currencyCode)?.let { currencyLocale ->
@@ -57,7 +53,7 @@ object Utils {
                 if (currency.currencyCode == currencyCode) {
                     return locale
                 }
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Ignore exceptions caused by unsupported locales
             }
         }
@@ -65,12 +61,12 @@ object Utils {
     }
 
     /**Get units preferred by the user.*/
-    fun getUnitsSet(resources: Resources, sharedPreferences: Preferences): Set<String> {
+    fun getUnitsSet(resources: Resources, isMetricUsed: Boolean, isImperialUsed: Boolean): Set<String> {
         var chosenUnits = resources.getStringArray(R.array.piece)
-        if (sharedPreferences.metricUsed) {
+        if (isMetricUsed) {
             chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
         }
-        if (sharedPreferences.imperialUsed) {
+        if (isImperialUsed) {
             chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
         }
         return chosenUnits.toSet()

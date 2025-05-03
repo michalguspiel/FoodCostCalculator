@@ -29,11 +29,15 @@ class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
     private val dishRepository: DishRepository by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
     private val preferences: Preferences by inject()
+
+    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
     val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
 
-    private val adFrequency =
-        if (preferences.userHasActiveSubscription) Constants.Ads.PREMIUM_FREQUENCY
-        else Constants.Ads.DISHES_AD_FREQUENCY
+    private val adFrequency: StateFlow<Int> = preferences.userHasActiveSubscription()
+        .map { hasSubscription ->
+            if (hasSubscription) Constants.Ads.PREMIUM_FREQUENCY
+            else Constants.Ads.DISHES_AD_FREQUENCY
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, Constants.Ads.DISHES_AD_FREQUENCY)
 
     private val dishes = dishRepository.dishes.map { dishes ->
         dishes.map { dish -> dish.toDishDomain() }.also { dishesDomain ->
@@ -64,20 +68,24 @@ class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
         }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     val filteredDishesInjectedWithAds =
-        filteredDishes.map { dishes ->
-            ListAdsInjectorManager(dishes, adFrequency).listInjectedWithAds
+        combine(filteredDishes, adFrequency) { dishes, freq ->
+            ListAdsInjectorManager(dishes, freq).listInjectedWithAds
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
             initialValue = listOf()
         )
 
+
     fun onAdFailedToLoad() {
         analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)
     }
 
-    fun onChangeServingsClick(id: Long){
-        analyticsRepository.logEvent(Constants.Analytics.Buttons.DISHES_EDIT_DISPLAYED_PORTIONS,null)
+    fun onChangeServingsClick(id: Long) {
+        analyticsRepository.logEvent(
+            Constants.Analytics.Buttons.DISHES_EDIT_DISPLAYED_PORTIONS,
+            null
+        )
         updateScreenState(
             ScreenState.Interaction(
                 InteractionType.EditQuantity(id)

@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts
 
-import android.content.Context
+import android.icu.util.Currency
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -75,8 +75,8 @@ import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.UnitsUtils.getPerUnitAbbreviation
-import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
+import java.util.Locale
 
 @Screen
 @Composable
@@ -90,6 +90,7 @@ fun HalfProductsScreen(
     val isVisible = remember { mutableStateOf(true) }
     val nestedScrollConnection = rememberNestedScrollConnection(isVisible)
     val screenState by viewModel.screenState.collectAsState()
+    val currency by viewModel.currency.collectAsState()
 
     Scaffold(modifier = Modifier, floatingActionButton = {
         FCCAnimatedFAB(
@@ -125,9 +126,11 @@ fun HalfProductsScreen(
                                 val itemPresentationState =
                                     viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState().value[item.id]
                                         ?: ItemPresentationState()
-                                HalfProductItem(halfProductDomain = item,
+                                HalfProductItem(
+                                    halfProductDomain = item,
                                     isExpanded = itemPresentationState.isExpanded,
                                     quantity = itemPresentationState.quantity,
+                                    currency = currency,
                                     modifier = Modifier.padding(vertical = 8.dp),
                                     onExpandToggle = {
                                         viewModel.listPresentationStateHandler.onExpandToggle(item)
@@ -179,11 +182,11 @@ fun HalfProductsScreen(
 
                     InteractionType.CreateHalfProduct -> {
                         CreateHalfProductDialog(
-                            units = Utils.getUnitsSet(
-                                LocalContext.current.resources, viewModel.preferences
-                            ), onSave = { name, unit ->
+                            units = viewModel.getUnitsSet(LocalContext.current),
+                            onSave = { name, unit ->
                                 viewModel.addHalfProduct(name = name, unit = unit)
-                            }, onDismiss = viewModel::resetScreenState
+                            },
+                            onDismiss = viewModel::resetScreenState
                         )
                     }
 
@@ -194,7 +197,8 @@ fun HalfProductsScreen(
                                 ?: ItemPresentationState()
                         val editableQuantity =
                             remember { mutableStateOf(itemPresentationState.quantity.toString()) }
-                        ValueEditDialog(title = stringResource(id = R.string.edit_quantity),
+                        ValueEditDialog(
+                            title = stringResource(id = R.string.edit_quantity),
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                             value = editableQuantity.value,
                             updateValue = { newValue ->
@@ -230,14 +234,13 @@ fun HalfProductItem(
     halfProductDomain: HalfProductDomain,
     isExpanded: Boolean,
     quantity: Double,
+    currency: Currency?,
     modifier: Modifier = Modifier,
     onExpandToggle: () -> Unit,
     onEditQuantity: () -> Unit,
     onAddItemsClick: () -> Unit,
     onEditClick: () -> Unit
 ) {
-    val context = LocalContext.current
-
     Card(
         modifier
             .fillMaxWidth()
@@ -247,10 +250,10 @@ fun HalfProductItem(
                 TitleRow(halfProductDomain, isExpanded)
 
                 if (isExpanded) {
-                    Ingredients(quantity, halfProductDomain, onEditQuantity, context)
+                    Ingredients(quantity, halfProductDomain, currency, onEditQuantity)
                 }
 
-                PriceSummary(halfProductDomain, context, quantity)
+                PriceSummary(halfProductDomain, currency, quantity)
 
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
@@ -284,8 +287,8 @@ private fun TitleRow(
 private fun Ingredients(
     quantity: Double,
     halfProductDomain: HalfProductDomain,
+    currency: Currency?,
     onChangeQuantityDialogOpen: () -> Unit,
-    context: Context
 ) {
     Column(
         Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
@@ -313,9 +316,9 @@ private fun Ingredients(
                     UnitsUtils.getUnitAbbreviation(unit = it.quantityUnit)
                 ),
                 price = it.formattedTotalPriceForTargetQuantity(
-                    context = context,
                     targetQuantity = quantity,
-                    baseQuantity = halfProductDomain.totalQuantity
+                    baseQuantity = halfProductDomain.totalQuantity,
+                    currency = currency
                 ),
                 style = MaterialTheme.typography.bodyMedium
             )
@@ -328,7 +331,7 @@ private fun Ingredients(
 @Composable
 private fun PriceSummary(
     halfProductDomain: HalfProductDomain,
-    context: Context,
+    currency: Currency?,
     quantity: Double
 ) {
     PriceRow(
@@ -336,14 +339,14 @@ private fun PriceSummary(
         price = halfProductDomain.formattedPricePresentedRecipe(
             targetQuantity = quantity,
             baseQuantity = halfProductDomain.totalQuantity,
-            context = context
+            currency = currency,
         )
     )
     Spacer(modifier = Modifier.height(4.dp))
     PriceRow(
         description = stringResource(
             id = R.string.price_per_unit, halfProductDomain.halfProductUnit
-        ), price = halfProductDomain.formattedPricePerUnit(context)
+        ), price = halfProductDomain.formattedPricePerUnit(currency)
     )
 }
 
@@ -396,7 +399,8 @@ fun CreateHalfProductDialog(
                         )
                     )
                 }
-                UnitField(units = units,
+                UnitField(
+                    units = units,
                     selectedUnit = selectedUnit,
                     selectUnit = { selectedUnit = it })
             }
@@ -416,38 +420,42 @@ fun CreateHalfProductDialog(
 private fun HalfProductsItemPreview() {
     FCCTheme {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            HalfProductItem(halfProductDomain = HalfProductDomain(
-                id = 1,
-                name = "Mayonnaise",
-                halfProductUnit = "per kilogram",
-                products = listOf(
-                    UsedProductDomain(
-                        1,
-                        2,
-                        ProductDomain(1, "Egg", 2.0, 0.5, 5.0, "kg"),
-                        1.0,
-                        "pcs",
-                        1.0,
-                    ), UsedProductDomain(
-                        1,
-                        2,
-                        ProductDomain(2, "Oil", 15.0, 0.5, 5.0, "kg"),
-                        100.0,
-                        "g",
-                        null,
+            HalfProductItem(
+                halfProductDomain = HalfProductDomain(
+                    id = 1,
+                    name = "Mayonnaise",
+                    halfProductUnit = "per kilogram",
+                    products = listOf(
+                        UsedProductDomain(
+                            1,
+                            2,
+                            ProductDomain(1, "Egg", 2.0, 0.5, 5.0, "kg"),
+                            1.0,
+                            "pcs",
+                            1.0,
+                        ), UsedProductDomain(
+                            1,
+                            2,
+                            ProductDomain(2, "Oil", 15.0, 0.5, 5.0, "kg"),
+                            100.0,
+                            "g",
+                            null,
+                        )
                     )
-                )
-            ),
+                ),
                 isExpanded = true,
                 quantity = 1.0,
+                currency = Currency.getInstance(Locale.getDefault()),
                 onExpandToggle = { },
                 onEditQuantity = { },
                 onAddItemsClick = { }) {}
-            HalfProductItem(halfProductDomain = HalfProductDomain(
-                id = 1, name = "Ketchup", halfProductUnit = "kg", products = emptyList()
-            ),
+            HalfProductItem(
+                halfProductDomain = HalfProductDomain(
+                    id = 1, name = "Ketchup", halfProductUnit = "kg", products = emptyList()
+                ),
                 isExpanded = false,
                 quantity = 2.0,
+                currency = Currency.getInstance(Locale.getDefault()),
                 onExpandToggle = { },
                 onEditQuantity = { },
                 onAddItemsClick = { }) {}

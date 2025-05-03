@@ -1,11 +1,13 @@
 package com.erdees.foodcostcalc.ext
 
 import android.content.Context
+import android.icu.util.Currency
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 
 fun DishDomain.toShareableText(
     context: Context,
+    currency: Currency?,
     portions: Int = 1,
     showIngredientPrices: Boolean = false,
     showFinancialDetails: Boolean = false,
@@ -84,13 +86,13 @@ fun DishDomain.toShareableText(
         builder.appendLine(
             context.getString(
                 R.string.recipe_sharing_food_cost,
-                formattedFoodCostPerServings(amountOfServings = portions, context = context)
+                formattedFoodCostPerServings(amountOfServings = portions, currency)
             )
         )
         builder.appendLine(
             context.getString(
                 R.string.recipe_sharing_food_cost,
-                formattedFoodCostPerServings(amountOfServings = portions, context = context)
+                formattedFoodCostPerServings(amountOfServings = portions, currency)
             )
         )
     }

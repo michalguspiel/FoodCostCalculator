@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct
 
+import android.icu.util.Currency
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +26,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -56,6 +56,7 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
     val halfProduct by viewModel.halfProduct.collectAsState()
     val editableQuantity by viewModel.editableQuantity.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
+    val currency by viewModel.currency.collectAsState()
 
     LaunchedEffect(halfProductId) {
         viewModel.initializeWith(halfProductId)
@@ -133,6 +134,7 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
                 halfProduct?.let {
                     HalfProductDetails(
                         halfProductDomain = it,
+                        currency = currency,
                         modifier = Modifier
                     )
                 } // todo ?: EmptyOne
@@ -202,13 +204,13 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
 @Composable
 fun HalfProductDetails(
     halfProductDomain: HalfProductDomain,
+    currency: Currency?,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     Row(modifier) {
         DetailItem(
             label = stringResource(id = R.string.price_per_recipe),
-            value = halfProductDomain.formattedSingleRecipePrice(context),
+            value = halfProductDomain.formattedSingleRecipePrice(currency),
             modifier = Modifier
                 .padding(horizontal = 12.dp)
                 .weight(1f)
@@ -218,7 +220,7 @@ fun HalfProductDetails(
             value = halfProductDomain.formattedPricePresentedRecipe(
                 halfProductDomain.totalQuantity,
                 1.0,
-                context
+                currency,
             ),
             modifier = Modifier
                 .padding(horizontal = 12.dp)

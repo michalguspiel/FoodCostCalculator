@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.utils.billing
 
 import android.app.Activity
-import android.util.Log
 import com.android.billingclient.api.AcknowledgePurchaseParams
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.BillingClient.BillingResponseCode
@@ -16,12 +15,14 @@ import com.android.billingclient.api.QueryPurchasesParams
 import com.android.billingclient.api.acknowledgePurchase
 import com.erdees.foodcostcalc.data.Preferences
 import com.google.common.collect.ImmutableList
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class PremiumUtil(private val preferences: Preferences) {
 
@@ -33,10 +34,6 @@ class PremiumUtil(private val preferences: Preferences) {
             for (purchase in purchases) {
                 handlePurchase(purchase)
             }
-        } else if (result.responseCode == BillingResponseCode.USER_CANCELED) {
-            // User canceled the purchase
-        } else {
-            // Handle other error cases
         }
     }
 
@@ -51,10 +48,10 @@ class PremiumUtil(private val preferences: Preferences) {
                         val acknowledgePurchaseParams = AcknowledgePurchaseParams.newBuilder()
                             .setPurchaseToken(purchase.purchaseToken)
                             .build()
-                        // MAKE SURE SURE TO SAVE THIS IN PREFERENCES
-                        preferences.userHasActiveSubscription = true
-                        // ACKNOWLEDGE PURCHASE
                         withContext(Dispatchers.IO) {
+                            // MAKE SURE SURE TO SAVE THIS IN PREFERENCES
+                            preferences.setUserHasActiveSubscription(true)
+                            // ACKNOWLEDGE PURCHASE
                             bc.acknowledgePurchase(acknowledgePurchaseParams)
                         }
                     }
@@ -64,12 +61,12 @@ class PremiumUtil(private val preferences: Preferences) {
     }
 
 
-    fun billingSetup() {
+    fun billingSetup(dispatcher: CoroutineDispatcher = Dispatchers.IO) {
         billingClient?.let { bc ->
-            Log.i(TAG, "billingSetup()")
+            Timber.i("billingSetup()")
             bc.startConnection(object : BillingClientStateListener {
                 override fun onBillingSetupFinished(result: BillingResult) {
-                    Log.i(TAG, "onBillingSetupFinished() , responseCode: ${result.responseCode}")
+                    Timber.i("onBillingSetupFinished() , responseCode: ${result.responseCode}")
                     if (result.responseCode == BillingResponseCode.OK) {
                         val params = QueryPurchasesParams.newBuilder()
                             .setProductType(BillingClient.ProductType.SUBS)
@@ -78,16 +75,19 @@ class PremiumUtil(private val preferences: Preferences) {
                         bc.queryPurchasesAsync(params.build()) { billingResult, purchase ->
 
                             if (billingResult.responseCode == BillingResponseCode.OK) {
-                                Log.i(
-                                    "PremiumUtil",
+                                Timber.i(
                                     "queryPurchasesAsync() , responseCode: ${billingResult.responseCode}, purchase: $purchase"
                                 )
                                 if (purchase.isNotEmpty()) {
-                                    Log.i(TAG, "User already has subscription")
-                                    preferences.userHasActiveSubscription = true
+                                    Timber.i("User already has subscription")
+                                    CoroutineScope(dispatcher).launch {
+                                        preferences.setUserHasActiveSubscription(true)
+                                    }
                                 } else {
-                                    Log.i(TAG, "User does not have subscription")
-                                    preferences.userHasActiveSubscription = false
+                                    Timber.i("User does not have subscription")
+                                    CoroutineScope(dispatcher).launch {
+                                        preferences.setUserHasActiveSubscription(false)
+                                    }
                                 }
                             }
                         }
@@ -106,8 +106,7 @@ class PremiumUtil(private val preferences: Preferences) {
                         bc.queryProductDetailsAsync(
                             queryProductDetailsParams
                         ) { billingResult, productDetailsList ->
-                            Log.i(
-                                TAG,
+                            Timber.i(
                                 "queryProductDetailsAsync() , responseCode: ${billingResult.responseCode}, productDetailsList: $productDetailsList"
                             )
                             when (billingResult.responseCode) {
@@ -147,7 +146,6 @@ class PremiumUtil(private val preferences: Preferences) {
     }
 
     companion object {
-        private const val TAG = "PremiumUtil"
         const val PRODUCT_ID = "food.cost.calculator.premium.account"
         const val SUBSCRIPTION_MONTHLY_PLAN_ID = "premium-mode-monthly-plan"
         const val SUBSCRIPTION_YEARLY_PLAN_ID = "premium-mode-yearly-plan"

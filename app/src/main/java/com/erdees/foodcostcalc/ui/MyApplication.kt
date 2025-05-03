@@ -1,6 +1,8 @@
 package com.erdees.foodcostcalc.ui
 
 import android.app.Application
+import android.os.StrictMode
+import android.os.StrictMode.VmPolicy
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.data.di.dbModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
@@ -20,6 +22,23 @@ class MyApplication : Application() {
     private val reloadableModules = listOf(dbModule, repositoryModule)
 
     override fun onCreate() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyFlashScreen()
+                    .penaltyLog()
+                    .build()
+            )
+            StrictMode.setVmPolicy(
+                VmPolicy.Builder()
+                    .detectLeakedSqlLiteObjects()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build()
+            )
+        }
         super.onCreate()
         if (BuildConfig.DEBUG) {
             plant(DebugTree())

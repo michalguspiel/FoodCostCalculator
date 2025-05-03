@@ -11,7 +11,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -28,14 +31,22 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         _screenState.value = ScreenState.Idle
     }
 
-    private fun getSettingsModel(): UserSettings {
-        return UserSettings(
+    private suspend fun getSettingsModel(): UserSettings {
+        return combine(
             preferences.defaultMargin,
             preferences.defaultTax,
-            preferences.defaultCurrencyCode?.let { Currency.getInstance(it) },
+            preferences.currency,
             preferences.metricUsed,
             preferences.imperialUsed
-        )
+        ) { margin, tax, currency, metric, imperial ->
+            UserSettings(
+                margin,
+                tax,
+                currency,
+                metric,
+                imperial
+            )
+        }.first()
     }
 
     private fun getCurrencies(): Set<Currency> {
@@ -50,58 +61,63 @@ class SettingsViewModel : ViewModel(), KoinComponent {
 
     val currencies: StateFlow<Set<Currency>> = MutableStateFlow(getCurrencies()).asStateFlow()
 
-    private var _settingsModel = MutableStateFlow(getSettingsModel())
-    val settingsModel = _settingsModel
+    private var _settingsModel: MutableStateFlow<UserSettings?> = MutableStateFlow(null)
+    val settingsModel = _settingsModel.onStart {
+        _settingsModel.value = getSettingsModel()
+    }.stateIn(viewModelScope,SharingStarted.Lazily,null)
 
     fun updateDefaultTax(newTax: String) {
         val tax =
-            onNumericValueChange(oldValue = _settingsModel.value.defaultTax, newValue = newTax)
-        _settingsModel.value = _settingsModel.value.copy(defaultTax = tax)
+            onNumericValueChange(oldValue = _settingsModel.value?.defaultTax ?: "", newValue = newTax)
+        _settingsModel.value = _settingsModel.value?.copy(defaultTax = tax)
     }
 
     fun updateDefaultMargin(newMargin: String) {
         val margin =
             onNumericValueChange(
-                oldValue = _settingsModel.value.defaultMargin,
+                oldValue = _settingsModel.value?.defaultMargin ?: "",
                 newValue = newMargin
             )
-        _settingsModel.value = _settingsModel.value.copy(defaultMargin = margin)
+        _settingsModel.value = _settingsModel.value?.copy(defaultMargin = margin)
     }
 
     fun updateDefaultCurrencyCode(currency: Currency) {
-        _settingsModel.value = _settingsModel.value.copy(currency = currency)
+        _settingsModel.value = _settingsModel.value?.copy(currency = currency)
     }
 
     fun updateMetricUsed(newSetting: Boolean) {
-        _settingsModel.value = _settingsModel.value.copy(metricUsed = newSetting)
+        _settingsModel.value = _settingsModel.value?.copy(metricUsed = newSetting)
     }
 
     fun updateImperialUsed(newSetting: Boolean) {
-        _settingsModel.value = _settingsModel.value.copy(imperialUsed = newSetting)
+        _settingsModel.value = _settingsModel.value?.copy(imperialUsed = newSetting)
     }
 
     /** Saves settings to preferences. */
     fun saveSettings() {
         _screenState.value = ScreenState.Loading()
         viewModelScope.launch {
-            preferences.defaultMargin = _settingsModel.value.defaultMargin
-            preferences.defaultTax = _settingsModel.value.defaultTax
-            _settingsModel.value.currency?.currencyCode?.let {
-                preferences.defaultCurrencyCode = it
+            _settingsModel.value?.let {  settingsModel ->
+                preferences.setDefaultMargin(settingsModel.defaultMargin)
+                preferences.setDefaultTax(settingsModel.defaultTax)
+                settingsModel.currency?.currencyCode?.let {
+                    preferences.setDefaultCurrencyCode(it)
+                }
+                preferences.setMetricUsed(settingsModel.metricUsed)
+                preferences.setImperialUsed(settingsModel.imperialUsed)
             }
-            preferences.metricUsed = _settingsModel.value.metricUsed
-            preferences.imperialUsed = _settingsModel.value.imperialUsed
+
         }
         _screenState.value = ScreenState.Success()
     }
 
     val saveButtonEnabled = _settingsModel.map {
-        it.defaultMargin.toDoubleOrNull() != null &&
+        it?.defaultMargin?.toDoubleOrNull() != null &&
                 it.defaultTax.toDoubleOrNull() != null &&
                 atLeastOneUnitSelected()
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     private fun atLeastOneUnitSelected(): Boolean {
-        return _settingsModel.value.metricUsed || _settingsModel.value.imperialUsed
+        return _settingsModel.value?.metricUsed == true || _settingsModel.value?.imperialUsed == true
     }
 }
