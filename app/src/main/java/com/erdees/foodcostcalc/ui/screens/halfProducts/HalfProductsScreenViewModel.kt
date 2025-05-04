@@ -38,9 +38,9 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
     val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
     private val imperialUsed =
-        preferences.imperialUsed.stateIn(viewModelScope, SharingStarted.Lazily, false)
+        preferences.imperialUsed.stateIn(viewModelScope, SharingStarted.Eagerly, false)
     private val metricUsed =
-        preferences.metricUsed.stateIn(viewModelScope, SharingStarted.Lazily, false)
+        preferences.metricUsed.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val adFrequency: StateFlow<Int> =
         preferences.userHasActiveSubscription().map { hasSubscription ->

@@ -66,6 +66,10 @@ fun Ad(
 
             val adLoader = AdLoader.Builder(context, adUnitId)
                 .forNativeAd { nativeAd ->
+                    if (isActivityDestroyed.value) {
+                        nativeAd.destroy()
+                        return@forNativeAd
+                    }
                     nativeAdState.value?.destroy()
                     nativeAdState.value = nativeAd
                 }
@@ -74,6 +78,14 @@ fun Ad(
                     override fun onAdFailedToLoad(error: LoadAdError) {
                         latestOnAdFailedToLoad()
                         Timber.e( "Ad failed to load: $error")
+                    }
+
+                    override fun onAdLoaded() {
+                        if (isActivityDestroyed.value) {
+                            nativeAdState.value?.destroy()
+                            nativeAdState.value = null
+                            return
+                        }
                     }
                 })
                 .build()

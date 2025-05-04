@@ -24,6 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -69,8 +70,8 @@ import java.util.Locale
 @Screen
 fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewModel = viewModel()) {
 
-    val isVisible = remember { mutableStateOf(true) }
-    val nestedScrollConnection = rememberNestedScrollConnection(isVisible)
+    val isVisible = rememberSaveable { mutableStateOf(true) }
+    val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
     val searchKey by viewModel.searchKey.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
     val adItems by viewModel.filteredDishesInjectedWithAds.collectAsState()

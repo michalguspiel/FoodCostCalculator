@@ -58,7 +58,7 @@ fun ProductsScreen(
     val adItems by viewModel.filteredProductsInjectedWithAds.collectAsState()
     val currency by viewModel.currency.collectAsState()
     val isVisible = rememberSaveable { mutableStateOf(true) }
-    val nestedScrollConnection = rememberNestedScrollConnection(isVisible)
+    val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
 
     Scaffold(
         floatingActionButton = {

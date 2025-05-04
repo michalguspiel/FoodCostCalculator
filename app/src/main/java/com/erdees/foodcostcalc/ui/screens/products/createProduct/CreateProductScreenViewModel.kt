@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -31,9 +32,6 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     private val productRepository: ProductRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
-
-    private val metricUsed = preferences.metricUsed.stateIn(viewModelScope, SharingStarted.Lazily, true)
-    private val imperialUsed = preferences.imperialUsed.stateIn(viewModelScope, SharingStarted.Lazily, true)
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> get() = _screenState
@@ -73,7 +71,11 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     val units = MutableStateFlow<Set<String>>(setOf())
 
     fun getUnits(resources: Resources) {
-        units.update { Utils.getUnitsSet(resources, metricUsed.value, imperialUsed.value) }
+        viewModelScope.launch {
+            val metricUsed = preferences.metricUsed.first()
+            val imperialUsed = preferences.imperialUsed.first()
+            units.update { Utils.getUnitsSet(resources, metricUsed, imperialUsed) }
+        }
     }
 
     private var _selectedUnit = MutableStateFlow("")

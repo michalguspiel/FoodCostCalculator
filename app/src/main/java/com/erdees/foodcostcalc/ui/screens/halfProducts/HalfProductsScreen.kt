@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -84,11 +85,10 @@ fun HalfProductsScreen(
     navController: NavController,
     viewModel: HalfProductsScreenViewModel = viewModel()
 ) {
-
     val adItems by viewModel.filteredHalfProductsInjectedWithAds.collectAsState()
     val searchKey by viewModel.searchKey.collectAsState()
-    val isVisible = remember { mutableStateOf(true) }
-    val nestedScrollConnection = rememberNestedScrollConnection(isVisible)
+    val isVisible = rememberSaveable { mutableStateOf(true) }
+    val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
     val screenState by viewModel.screenState.collectAsState()
     val currency by viewModel.currency.collectAsState()
 
