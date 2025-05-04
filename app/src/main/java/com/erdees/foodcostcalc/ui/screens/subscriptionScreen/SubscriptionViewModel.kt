@@ -15,7 +15,6 @@ import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -88,9 +87,10 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
      *
      * It is called onResume, so that when user made the purchase the screen will be updated.
      * */
-    suspend fun updateSubscriptionStatus() {
-        _screenState.update {
-            _screenState.value?.copy(userAlreadySubscribes = preferences.userHasActiveSubscription().first())
+    fun updateSubscriptionStatus() {
+        viewModelScope.launch {
+            _screenState.value = _screenState.value?.copy(userAlreadySubscribes = preferences.userHasActiveSubscription().first())
+
         }
     }
 
