@@ -12,7 +12,7 @@ import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.context.unloadKoinModules
 import timber.log.Timber
-import timber.log.Timber.*
+import timber.log.Timber.DebugTree
 import timber.log.Timber.Forest.plant
 
 
@@ -26,7 +26,6 @@ class MyApplication : Application() {
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()
                     .detectAll()
-                    .penaltyFlashScreen()
                     .penaltyLog()
                     .build()
             )
@@ -35,7 +34,6 @@ class MyApplication : Application() {
                     .detectLeakedSqlLiteObjects()
                     .detectLeakedClosableObjects()
                     .penaltyLog()
-                    .penaltyDeath()
                     .build()
             )
         }
