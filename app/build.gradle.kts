@@ -227,4 +227,7 @@ dependencies {
     // Detekt
     detektPlugins(libs.detekt.formatting)
     detektPlugins(libs.compose.rules.detekt)
+
+    // Canary Leak:
+    debugImplementation(libs.canary.leak)
 }
