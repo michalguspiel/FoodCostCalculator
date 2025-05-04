@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc.domain.model.product
 
-import android.content.Context
+import android.icu.util.Currency
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
@@ -30,10 +30,10 @@ data class UsedProductDomain(
     fun formattedTotalPriceForTargetQuantity(
         baseQuantity: Double,
         targetQuantity: Double,
-        context: Context
+        currency: Currency?
     ): String {
         val percentageOfBaseQuantity = targetQuantity * 100 / baseQuantity
         val adjustedPrice = totalPrice * (percentageOfBaseQuantity / 100)
-        return Utils.formatPrice(adjustedPrice, context)
+        return Utils.formatPrice(adjustedPrice, currency)
     }
 }

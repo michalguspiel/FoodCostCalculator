@@ -64,6 +64,16 @@ import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
+data class SettingsScreenCallbacks(
+    val updateDefaultTax: (String) -> Unit = {},
+    val updateDefaultMargin: (String) -> Unit = {},
+    val updateMetricUsed: (Boolean) -> Unit = {},
+    val updateImperialUsed: (Boolean) -> Unit = {},
+    val updateDefaultCurrencyCode: (Currency) -> Unit = {},
+    val saveSettings: () -> Unit = {},
+    val resetScreenState: () -> Unit = {},
+)
+
 @Composable
 fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = viewModel()) {
 
@@ -98,13 +108,15 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
         currencies,
         saveButtonEnabled,
         screenState,
-        updateDefaultMargin = viewModel::updateDefaultMargin,
-        updateDefaultTax = viewModel::updateDefaultTax,
-        updateMetricUsed = viewModel::updateMetricUsed,
-        updateImperialUsed = viewModel::updateImperialUsed,
-        updateDefaultCurrencyCode = viewModel::updateDefaultCurrencyCode,
-        saveSettings = viewModel::saveSettings,
-        resetScreenState = viewModel::resetScreenState,
+        settingsScreenCallbacks = SettingsScreenCallbacks(
+            updateDefaultMargin = viewModel::updateDefaultMargin,
+            updateDefaultTax = viewModel::updateDefaultTax,
+            updateMetricUsed = viewModel::updateMetricUsed,
+            updateImperialUsed = viewModel::updateImperialUsed,
+            updateDefaultCurrencyCode = viewModel::updateDefaultCurrencyCode,
+            saveSettings = viewModel::saveSettings,
+            resetScreenState = viewModel::resetScreenState,
+        )
     )
 }
 
@@ -113,17 +125,11 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
 private fun SettingsScreenContent(
     snackbarHostState: SnackbarHostState,
     navController: NavController,
-    settings: UserSettings,
+    settings: UserSettings?,
     currencies: Set<Currency>,
     saveButtonEnabled: Boolean,
     screenState: ScreenState,
-    updateDefaultTax: (String) -> Unit,
-    updateDefaultMargin: (String) -> Unit,
-    updateMetricUsed: (Boolean) -> Unit,
-    updateImperialUsed: (Boolean) -> Unit,
-    updateDefaultCurrencyCode: (Currency) -> Unit,
-    saveSettings: () -> Unit,
-    resetScreenState: () -> Unit,
+    settingsScreenCallbacks: SettingsScreenCallbacks
 ) {
     val scrollState = rememberScrollState()
     Scaffold(
@@ -150,12 +156,7 @@ private fun SettingsScreenContent(
                     settings,
                     currencies,
                     saveButtonEnabled,
-                    updateDefaultMargin = updateDefaultMargin,
-                    updateDefaultTax = updateDefaultTax,
-                    updateMetricUsed = updateMetricUsed,
-                    updateImperialUsed = updateImperialUsed,
-                    updateDefaultCurrencyCode = updateDefaultCurrencyCode,
-                    saveSettings = saveSettings
+                    settingsScreenCallbacks
                 )
 
                 AccountServicesSection(
@@ -179,7 +180,7 @@ private fun SettingsScreenContent(
 
                 is ScreenState.Error -> {
                     ErrorDialog {
-                        resetScreenState()
+                       settingsScreenCallbacks.resetScreenState()
                     }
                 }
 
@@ -260,16 +261,11 @@ private fun AppInformation(modifier: Modifier = Modifier) {
 
 @Composable
 private fun Defaults(
-    settings: UserSettings,
+    settings: UserSettings?,
     currencies: Set<Currency>,
     saveButtonEnabled: Boolean,
-    modifier: Modifier = Modifier,
-    updateDefaultTax: (String) -> Unit,
-    updateDefaultMargin: (String) -> Unit,
-    updateMetricUsed: (Boolean) -> Unit,
-    updateImperialUsed: (Boolean) -> Unit,
-    updateDefaultCurrencyCode: (Currency) -> Unit,
-    saveSettings: () -> Unit
+    settingsScreenCallbacks: SettingsScreenCallbacks,
+    modifier: Modifier = Modifier
 ) {
     Section(modifier) {
         SectionLabel(
@@ -278,24 +274,24 @@ private fun Defaults(
         )
         FCCTextField(
             title = stringResource(id = R.string.default_dish_tax),
-            value = settings.defaultTax,
+            value = settings?.defaultTax ?: "",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             )
         ) {
-            updateDefaultTax(it)
+            settingsScreenCallbacks.updateDefaultTax(it)
         }
 
         FCCTextField(
             title = stringResource(id = R.string.default_dish_margin),
-            value = settings.defaultMargin,
+            value = settings?.defaultMargin ?: "",
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             )
         ) {
-            updateDefaultMargin(it)
+            settingsScreenCallbacks.updateDefaultMargin(it)
         }
 
 
@@ -303,14 +299,14 @@ private fun Defaults(
 
         CheckBoxField(
             title = stringResource(id = R.string.use_metric_units),
-            value = settings.metricUsed,
-            onValueChange = { updateMetricUsed(it) }
+            value = settings?.metricUsed == true,
+            onValueChange = { settingsScreenCallbacks.updateMetricUsed(it) }
         )
 
         CheckBoxField(
             title = stringResource(id = R.string.use_us_units),
-            value = settings.imperialUsed,
-            onValueChange = { updateImperialUsed(it) }
+            value = settings?.imperialUsed == true,
+            onValueChange = { settingsScreenCallbacks.updateImperialUsed(it) }
         )
 
 
@@ -318,8 +314,8 @@ private fun Defaults(
             FieldLabel(text = stringResource(id = R.string.default_currency))
             CurrenciesDropDown(
                 currencies = currencies,
-                selectedCurrency = settings.currency,
-                selectCurrency = { updateDefaultCurrencyCode(it) }
+                selectedCurrency = settings?.currency,
+                selectCurrency = { settingsScreenCallbacks.updateDefaultCurrencyCode(it) }
             )
         }
 
@@ -334,7 +330,7 @@ private fun Defaults(
                 text = stringResource(id = R.string.save),
                 enabled = saveButtonEnabled
             ) {
-                saveSettings()
+                settingsScreenCallbacks.saveSettings()
             }
         }
     }
@@ -437,13 +433,7 @@ private fun PreviewSettingsScreenContent() {
             currencies = Currency.getAvailableCurrencies(),
             saveButtonEnabled = true,
             screenState = ScreenState.Idle,
-            updateDefaultMargin = {},
-            updateDefaultTax = {},
-            updateMetricUsed = {},
-            updateImperialUsed = {},
-            updateDefaultCurrencyCode = {},
-            saveSettings = {},
-            resetScreenState = {}
+            settingsScreenCallbacks = SettingsScreenCallbacks()
         )
     }
 }
@@ -463,13 +453,6 @@ private fun PreviewDefaults() {
             ),
             currencies = Currency.getAvailableCurrencies(),
             saveButtonEnabled = true,
-            updateDefaultTax = {},
-            updateDefaultMargin = {},
-            updateMetricUsed = {},
-            updateImperialUsed = {},
-            updateDefaultCurrencyCode = {},
-        ) {
-
-        }
+            settingsScreenCallbacks = SettingsScreenCallbacks())
     }
 }

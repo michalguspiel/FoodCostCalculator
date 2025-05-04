@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.products
 
+import android.icu.util.Currency
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,7 +22,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,6 +45,7 @@ import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Utils.formatPrice
+import java.util.Locale
 
 @Composable
 @Screen
@@ -55,8 +56,9 @@ fun ProductsScreen(
 
     val searchKey by viewModel.searchKey.collectAsState()
     val adItems by viewModel.filteredProductsInjectedWithAds.collectAsState()
+    val currency by viewModel.currency.collectAsState()
     val isVisible = rememberSaveable { mutableStateOf(true) }
-    val nestedScrollConnection = rememberNestedScrollConnection(isVisible)
+    val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
 
     Scaffold(
         floatingActionButton = {
@@ -94,6 +96,7 @@ fun ProductsScreen(
                         is ProductDomain -> {
                             ProductItem(
                                 productDomain = item,
+                                currency = currency,
                                 modifier = Modifier.padding(vertical = 8.dp)
                             ) {
                                 navController.navigate(FCCScreen.EditProduct(item.id))
@@ -117,11 +120,10 @@ fun ProductsScreen(
 @Composable
 fun ProductItem(
     productDomain: ProductDomain,
+    currency: Currency?,
     modifier: Modifier = Modifier,
     onEditClick: () -> Unit = {}
 ) {
-    val context = LocalContext.current
-
     Card(modifier.fillMaxWidth(), content = {
         Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
             Text(text = productDomain.name, style = MaterialTheme.typography.titleLarge)
@@ -130,12 +132,12 @@ fun ProductItem(
 
             PriceRow(
                 description = stringResource(id = R.string.netto_price, productDomain.unit),
-                price = formatPrice(productDomain.pricePerUnit, context)
+                price = formatPrice(productDomain.pricePerUnit, currency)
             )
             Spacer(modifier = Modifier.height(4.dp))
             PriceRow(
                 description = stringResource(id = R.string.total_price, productDomain.unit),
-                price = formatPrice(productDomain.priceAfterWasteAndTax, context)
+                price = formatPrice(productDomain.priceAfterWasteAndTax, currency)
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -164,7 +166,8 @@ private fun ProductItemPreview() {
                 tax = 0.23,
                 waste = 0.1,
                 unit = "kg"
-            )
+            ),
+            currency = Currency.getInstance(Locale.getDefault())
         )
     }
 }

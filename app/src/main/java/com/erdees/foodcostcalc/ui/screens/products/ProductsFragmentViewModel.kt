@@ -27,9 +27,13 @@ class ProductsFragmentViewModel : ViewModel(), KoinComponent {
     private val analyticsRepository: AnalyticsRepository by inject()
     private val preferences: Preferences by inject()
 
-    private val adFrequency =
-        if (preferences.userHasActiveSubscription) Constants.Ads.PREMIUM_FREQUENCY
-        else Constants.Ads.PRODUCTS_AD_FREQUENCY
+    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
+
+    private val adFrequency: StateFlow<Int> = preferences.userHasActiveSubscription()
+        .map { hasSubscription ->
+            if (hasSubscription) Constants.Ads.PREMIUM_FREQUENCY
+            else Constants.Ads.PRODUCTS_AD_FREQUENCY
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, Constants.Ads.PRODUCTS_AD_FREQUENCY)
 
     private val products = productRepository.products.map { products ->
         products.map { it.toProductDomain() }
@@ -54,11 +58,12 @@ class ProductsFragmentViewModel : ViewModel(), KoinComponent {
             scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList()
         )
 
-    val filteredProductsInjectedWithAds = filteredProducts.map {
-        ListAdsInjectorManager(it, adFrequency).listInjectedWithAds
-    }.stateIn(
-        scope = viewModelScope, started = SharingStarted.Lazily, initialValue = listOf()
-    )
+    val filteredProductsInjectedWithAds =
+        combine(filteredProducts, adFrequency) { filteredProducts, adFrequency ->
+            ListAdsInjectorManager(filteredProducts, adFrequency).listInjectedWithAds
+        }.stateIn(
+            scope = viewModelScope, started = SharingStarted.Lazily, initialValue = listOf()
+        )
 
     fun onAdFailedToLoad() {
         analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)

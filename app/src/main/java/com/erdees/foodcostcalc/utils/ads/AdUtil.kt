@@ -6,15 +6,12 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import com.erdees.foodcostcalc.R
-import com.google.android.gms.ads.VideoController
 import com.google.android.gms.ads.nativead.NativeAd
 import com.google.android.gms.ads.nativead.NativeAdView
 
 fun populateNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
     // Set the media view.
     adView.mediaView = adView.findViewById(R.id.ad_media)
-
-    // Set other ad assets.
     adView.headlineView = adView.findViewById(R.id.ad_headline)
     adView.bodyView = adView.findViewById(R.id.ad_body)
     adView.callToActionView = adView.findViewById(R.id.ad_call_to_action)
@@ -82,17 +79,4 @@ fun populateNativeAdView(nativeAd: NativeAd, adView: NativeAdView) {
     // This method tells the Google Mobile Ads SDK that you have finished populating your
     // native ad view with this native ad.
     adView.setNativeAd(nativeAd)
-
-    // Get the video controller for the ad. One will always be provided, even if the ad doesn't
-    // have a video asset.
-    val vc = nativeAd.mediaContent?.videoController
-
-    // Updates the UI to say whether or not this ad has a video asset.
-    if (vc?.hasVideoContent() == true) {
-        // Create a new VideoLifecycleCallbacks object and pass it to the VideoController. The
-        // VideoController will call methods on this object when events occur in the video
-        // lifecycle.
-        vc.videoLifecycleCallbacks = object : VideoController.VideoLifecycleCallbacks() {
-        }
-    }
 }

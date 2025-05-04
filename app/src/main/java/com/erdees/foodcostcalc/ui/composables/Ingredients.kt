@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.composables
 
+import android.icu.util.Currency
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +10,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.R
@@ -22,10 +22,10 @@ import com.erdees.foodcostcalc.utils.UnitsUtils
 fun Ingredients(
     dishDomain: DishDomain,
     servings: Double,
+    currency: Currency?,
     modifier: Modifier = Modifier,
     showPrices: Boolean = true
 ) {
-    val context = LocalContext.current
     Column(
         modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -38,7 +38,7 @@ fun Ingredients(
                     it.formatQuantityForTargetServing(servings),
                     UnitsUtils.getUnitAbbreviation(it.quantityUnit)
                 ),
-                price = it.formattedTotalPricePerServing(context, servings),
+                price = it.formattedTotalPricePerServing(servings, currency),
                 style = MaterialTheme.typography.bodyMedium,
                 showPrice = showPrices
             )

@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc.domain.model.dish
 
-import android.content.Context
+import android.icu.util.Currency
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
@@ -9,7 +9,6 @@ import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.serialization.Serializable
 import timber.log.Timber
-
 
 @Keep
 @Serializable
@@ -33,8 +32,8 @@ data class DishDomain(
             }
         }
 
-    fun formattedFoodCostPerServings(context: Context, amountOfServings: Int): String {
-        return Utils.formatPrice(foodCost * amountOfServings, context)
+    fun formattedFoodCostPerServings(amountOfServings: Int, currency: Currency?): String {
+        return Utils.formatPrice(foodCost * amountOfServings, currency)
     }
 
     val totalPrice: Double
@@ -48,7 +47,7 @@ data class DishDomain(
         return totalPrice * amountOfServings
     }
 
-    fun formattedTotalPricePerServing(context: Context, amountOfServings: Int): String {
-        return Utils.formatPrice(finalPricePerServing(amountOfServings), context)
+    fun formattedTotalPricePerServing(amountOfServings: Int, currency: Currency?): String {
+        return Utils.formatPrice(finalPricePerServing(amountOfServings), currency)
     }
 }

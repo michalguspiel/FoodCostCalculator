@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.recipe
 
+import android.icu.util.Currency
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +66,17 @@ import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import timber.log.Timber
+import java.util.Locale
+
+data class RecipeScreenCallbacks(
+    val popBackStack: () -> Unit = {},
+    val toggleRecipeViewMode: () -> Unit = {},
+    val saveRecipe: () -> Unit = {},
+    val cancelEdit: () -> Unit = {},
+    val onChangeServings: () -> Unit = {},
+    val updateServings: (String) -> Unit = {},
+    val resetScreenState: () -> Unit = {},
+)
 
 @Screen
 @Composable
@@ -77,6 +89,7 @@ fun RecipeScreen(navController: NavController, viewModel: DishDetailsViewModel) 
     val recipeUpdater = viewModel.recipeUpdater
     val recipeServings by viewModel.recipeServings.collectAsState()
     val recipeEvent by viewModel.recipeEvent.collectAsStateWithLifecycle(null)
+    val currency by viewModel.currency.collectAsState()
 
     LaunchedEffect(recipeEvent) {
         Timber.i("New $recipeEvent received.")
@@ -92,15 +105,18 @@ fun RecipeScreen(navController: NavController, viewModel: DishDetailsViewModel) 
         recipe = recipe,
         screenState = screenState,
         servings = recipeServings,
-        modifier = Modifier,
-        popBackStack = navController::popBackStack,
-        toggleRecipeViewMode = viewModel::toggleRecipeViewMode,
+        currency = currency,
         recipeUpdater = recipeUpdater,
-        saveRecipe = viewModel::saveRecipe,
-        cancelEdit = viewModel::cancelRecipeEdit,
-        onChangeServings = viewModel::onChangeServings,
-        updateServings = viewModel::updateServings,
-        resetScreenState = viewModel::resetScreenState
+        modifier = Modifier,
+        recipeScreenCallbacks = RecipeScreenCallbacks(
+            popBackStack = navController::popBackStack,
+            toggleRecipeViewMode = viewModel::toggleRecipeViewMode,
+            saveRecipe = viewModel::saveRecipe,
+            cancelEdit = viewModel::cancelRecipeEdit,
+            onChangeServings = viewModel::onChangeServings,
+            updateServings = viewModel::updateServings,
+            resetScreenState = viewModel::resetScreenState
+        ),
     )
 }
 
@@ -112,15 +128,10 @@ private fun RecipeScreenContent(
     recipe: EditableRecipe,
     screenState: ScreenState,
     servings: Int,
-    modifier: Modifier = Modifier,
-    popBackStack: () -> Unit = {},
-    toggleRecipeViewMode: () -> Unit = {},
+    currency: Currency?,
     recipeUpdater: RecipeUpdater,
-    saveRecipe: () -> Unit,
-    cancelEdit: () -> Unit,
-    onChangeServings: () -> Unit,
-    updateServings: (String) -> Unit,
-    resetScreenState: () -> Unit,
+    modifier: Modifier = Modifier,
+    recipeScreenCallbacks: RecipeScreenCallbacks,
 ) {
     Scaffold(
         modifier = modifier,
@@ -134,7 +145,7 @@ private fun RecipeScreenContent(
                     }, modifier = Modifier
                 )
             }, navigationIcon = {
-                IconButton(onClick = { popBackStack() }) {
+                IconButton(onClick = { recipeScreenCallbacks.popBackStack() }) {
                     Icon(
                         Icons.AutoMirrored.Sharp.ArrowBack,
                         contentDescription = stringResource(R.string.back)
@@ -150,23 +161,29 @@ private fun RecipeScreenContent(
             when (recipeViewMode) {
                 RecipeViewMode.VIEW -> {
                     dish?.recipe?.let { recipe ->
-                        RecipeView(dish,
+                        RecipeView(
+                            dish,
                             servings,
                             recipe,
-                            toggleRecipeViewMode = { toggleRecipeViewMode() },
-                            onChangeServings = { onChangeServings() })
+                            currency,
+                            toggleRecipeViewMode = { recipeScreenCallbacks.toggleRecipeViewMode() },
+                            onChangeServings = { recipeScreenCallbacks.onChangeServings() })
                     } ?: RecipeMissingView()
                 }
 
                 RecipeViewMode.EDIT -> RecipeEdit(
-                    recipe, Modifier, recipeUpdater, saveRecipe, cancelEdit
+                    recipe,
+                    Modifier,
+                    recipeUpdater,
+                    recipeScreenCallbacks.saveRecipe,
+                    recipeScreenCallbacks.cancelEdit
                 )
             }
         }
 
         when (screenState) {
             is ScreenState.Success -> {
-                toggleRecipeViewMode()
+                recipeScreenCallbacks.toggleRecipeViewMode()
             }
 
             is ScreenState.Error -> {}
@@ -174,7 +191,8 @@ private fun RecipeScreenContent(
             is ScreenState.Interaction -> {
                 if (screenState.interaction == InteractionType.ChangeServings) {
                     val editable = remember { mutableStateOf(servings.toString()) }
-                    ValueEditDialog(title = stringResource(id = R.string.change_portions),
+                    ValueEditDialog(
+                        title = stringResource(id = R.string.change_portions),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                         value = editable.value,
                         updateValue = { newValue ->
@@ -182,9 +200,9 @@ private fun RecipeScreenContent(
                                 onIntegerValueChange(editable.value, newValue)
                         },
                         onSave = {
-                            updateServings(editable.value)
+                            recipeScreenCallbacks.updateServings(editable.value)
                         },
-                        onDismiss = { resetScreenState() })
+                        onDismiss = { recipeScreenCallbacks.resetScreenState() })
                 }
             }
 
@@ -199,6 +217,7 @@ private fun RecipeView(
     dish: DishDomain,
     servings: Int,
     recipe: RecipeDomain,
+    currency: Currency?,
     modifier: Modifier = Modifier,
     toggleRecipeViewMode: () -> Unit,
     onChangeServings: () -> Unit
@@ -245,6 +264,7 @@ private fun RecipeView(
                 Ingredients(
                     dishDomain = dish,
                     servings = servings.toDouble(),
+                    currency = currency,
                     modifier = Modifier,
                     showPrices = false
                 )
@@ -260,7 +280,8 @@ private fun RecipeView(
         }
 
         ButtonRow(primaryButton = {
-            FCCPrimaryButton(text = stringResource(R.string.edit_recipe),
+            FCCPrimaryButton(
+                text = stringResource(R.string.edit_recipe),
                 modifier = Modifier,
                 enabled = true,
                 onClick = { toggleRecipeViewMode() })
@@ -366,7 +387,8 @@ private fun RecipeEdit(
 
             SectionLabel(stringResource(R.string.general_info_title))
 
-            FCCTextField(modifier = Modifier,
+            FCCTextField(
+                modifier = Modifier,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Sentences,
@@ -378,7 +400,8 @@ private fun RecipeEdit(
                 value = recipe.description,
                 onValueChange = { recipeUpdater.updateDescription(it) })
 
-            FCCTextField(modifier = Modifier,
+            FCCTextField(
+                modifier = Modifier,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Sentences,
@@ -392,7 +415,8 @@ private fun RecipeEdit(
 
             SectionLabel(stringResource(R.string.time_title))
 
-            FCCTextField(modifier = Modifier,
+            FCCTextField(
+                modifier = Modifier,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
                 ),
@@ -400,7 +424,8 @@ private fun RecipeEdit(
                 value = recipe.prepTimeMinutes,
                 onValueChange = { recipeUpdater.updatePrepTime(it) })
 
-            FCCTextField(modifier = Modifier,
+            FCCTextField(
+                modifier = Modifier,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number, imeAction = ImeAction.Next
                 ),
@@ -412,7 +437,8 @@ private fun RecipeEdit(
             SectionLabel(stringResource(R.string.steps_title))
 
             repeat(recipe.steps.size + 1) { index ->
-                FCCTextField(modifier = Modifier,
+                FCCTextField(
+                    modifier = Modifier,
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
                         capitalization = KeyboardCapitalization.Sentences,
@@ -428,14 +454,16 @@ private fun RecipeEdit(
             ButtonRow(
                 modifier = Modifier,
                 primaryButton = {
-                    FCCPrimaryButton(text = stringResource(R.string.save),
+                    FCCPrimaryButton(
+                        text = stringResource(R.string.save),
                         modifier = Modifier,
                         enabled = true,
                         onClick = {
                             saveRecipe()
                         })
                 }, secondaryButton = {
-                    FCCOutlinedButton(text = stringResource(R.string.cancel),
+                    FCCOutlinedButton(
+                        text = stringResource(R.string.cancel),
                         enabled = true,
                         onClick = {
                             cancelEdit()
@@ -496,15 +524,18 @@ private fun RecipeScreenContentViewPreview() {
             recipe = previewDish.recipe.toEditableRecipe(),
             screenState = ScreenState.Idle,
             servings = 1,
+            currency = Currency.getInstance(Locale.getDefault()),
             modifier = Modifier,
-            toggleRecipeViewMode = {},
             recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
-            saveRecipe = {},
-            cancelEdit = {},
-            updateServings = {},
-            popBackStack = {},
-            onChangeServings = {},
-            resetScreenState = {},
+            recipeScreenCallbacks = RecipeScreenCallbacks(
+                toggleRecipeViewMode = {},
+                saveRecipe = {},
+                cancelEdit = {},
+                updateServings = {},
+                popBackStack = {},
+                onChangeServings = {},
+                resetScreenState = {},
+            )
         )
     }
 }
@@ -519,15 +550,18 @@ private fun RecipeScreenContentEditPreview() {
             recipe = previewDish.recipe.toEditableRecipe(),
             screenState = ScreenState.Idle,
             servings = 10,
-            modifier = Modifier,
-            toggleRecipeViewMode = {},
+            currency = Currency.getInstance(Locale.getDefault()),
             recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
-            saveRecipe = {},
-            cancelEdit = {},
-            updateServings = {},
-            popBackStack = {},
-            onChangeServings = {},
-            resetScreenState = {},
+            modifier = Modifier,
+            recipeScreenCallbacks = RecipeScreenCallbacks(
+                toggleRecipeViewMode = {},
+                saveRecipe = {},
+                cancelEdit = {},
+                updateServings = {},
+                popBackStack = {},
+                onChangeServings = {},
+                resetScreenState = {},
+            )
         )
     }
 }

@@ -1,25 +1,32 @@
 package com.erdees.foodcostcalc.ui.composables
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 
+const val ScrollThreshold = 10
+
 @Composable
-fun rememberNestedScrollConnection(isVisible: MutableState<Boolean>): NestedScrollConnection {
+fun rememberNestedScrollConnection(
+    onVisibilityChange: (Boolean) -> Unit
+): NestedScrollConnection {
     return remember {
+        var isCurrentlyVisible = true
+
         object : NestedScrollConnection {
             override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                // Hide Elements
-                if (available.y < -1) {
-                    isVisible.value = false
+                // Scrolling down — hide
+                if (available.y < -ScrollThreshold && isCurrentlyVisible) {
+                    isCurrentlyVisible = false
+                    onVisibilityChange(false)
                 }
 
-                // Show Elements
-                if (available.y > 1) {
-                    isVisible.value = true
+                // Scrolling up — show
+                if (available.y > ScrollThreshold && !isCurrentlyVisible) {
+                    isCurrentlyVisible = true
+                    onVisibilityChange(true)
                 }
 
                 return Offset.Zero

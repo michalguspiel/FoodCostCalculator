@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc.domain.model.halfProduct
 
-import android.content.Context
+import android.icu.util.Currency
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
@@ -45,17 +45,17 @@ data class HalfProductDomain(
             }
         }
 
-    fun formattedSingleRecipePrice(context: Context): String = Utils.formatPrice(singleRecipePrice, context)
+    fun formattedSingleRecipePrice(currency: Currency?): String = Utils.formatPrice(singleRecipePrice, currency)
 
-    fun formattedPricePerUnit(context: Context): String = Utils.formatPrice(pricePerUnit, context)
+    fun formattedPricePerUnit(currency: Currency?): String = Utils.formatPrice(pricePerUnit, currency)
 
     fun formattedPricePresentedRecipe(
         baseQuantity: Double,
         targetQuantity: Double,
-        context: Context
+        currency: Currency?
     ): String {
         val percentageOfBaseQuantity = targetQuantity * 100 / baseQuantity
         val adjustedPrice = singleRecipePrice * (percentageOfBaseQuantity / 100)
-        return Utils.formatPrice(adjustedPrice, context)
+        return Utils.formatPrice(adjustedPrice, currency)
     }
 }

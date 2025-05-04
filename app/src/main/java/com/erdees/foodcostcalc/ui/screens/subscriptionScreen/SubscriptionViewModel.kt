@@ -3,10 +3,9 @@ package com.erdees.foodcostcalc.ui.screens.subscriptionScreen
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.util.Log
-import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.ProductDetails
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.Plan
@@ -15,8 +14,11 @@ import com.erdees.foodcostcalc.ext.toPremiumSubscription
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 data object MissingBillingClient : Error("BillingClient is missing") {
     private fun readResolve(): Any = MissingBillingClient
@@ -57,23 +59,27 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
     private val preferences: Preferences by inject()
     private val premiumUtil: PremiumUtil by inject()
 
-    private val _screenState: MutableStateFlow<SubscriptionScreenState> =
-        MutableStateFlow(
-            SubscriptionScreenState(
-                productDetails = premiumUtil.productDetails.value.firstOrNull(),
-                premiumSubscription = premiumUtil.productDetails.value.firstOrNull()
-                    ?.toPremiumSubscription(),
-                selectedPlan = premiumUtil.productDetails.value.firstOrNull()
-                    ?.toPremiumSubscription()
-                    ?.monthlyPlan,
-                userAlreadySubscribes = preferences.userHasActiveSubscription,
-                screenLaunchedWithoutSubscription = !preferences.userHasActiveSubscription
+    private val _screenState = MutableStateFlow<SubscriptionScreenState?>(null)
+    val screenState: StateFlow<SubscriptionScreenState?> = _screenState
+
+    init {
+        viewModelScope.launch {
+            val userHasSub = preferences.userHasActiveSubscription().first()
+            val productDetails = premiumUtil.productDetails.value.firstOrNull()
+            val subscription = productDetails?.toPremiumSubscription()
+            _screenState.value = SubscriptionScreenState(
+                productDetails = productDetails,
+                premiumSubscription = subscription,
+                selectedPlan = subscription?.monthlyPlan,
+                userAlreadySubscribes = userHasSub,
+                screenLaunchedWithoutSubscription = !userHasSub
             )
-        )
-    val screenState: StateFlow<SubscriptionScreenState> = _screenState
+        }
+    }
+
 
     fun onPlanSelected(plan: Plan) {
-        _screenState.value = _screenState.value.copy(selectedPlan = plan)
+        _screenState.value = _screenState.value?.copy(selectedPlan = plan)
     }
 
     /**
@@ -81,9 +87,11 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
      *
      * It is called onResume, so that when user made the purchase the screen will be updated.
      * */
-    fun checkSubscriptionStatus() {
-        val userAlreadySubscribes = preferences.userHasActiveSubscription
-        _screenState.value = _screenState.value.copy(userAlreadySubscribes = userAlreadySubscribes)
+    fun updateSubscriptionStatus() {
+        viewModelScope.launch {
+            _screenState.value = _screenState.value?.copy(userAlreadySubscribes = preferences.userHasActiveSubscription().first())
+
+        }
     }
 
     fun onSubscribeClicked(activity: Activity?) {
@@ -93,14 +101,14 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
             return
         }
 
-        val selectedPlan = _screenState.value.selectedPlan
+        val selectedPlan = _screenState.value?.selectedPlan
 
         if (selectedPlan == null) {
             setError(PlanNotSelected)
             return
         }
 
-        val productDetails = _screenState.value.productDetails
+        val productDetails = _screenState.value?.productDetails
         if (productDetails == null) {
             setError(MissingProductDetails)
             return
@@ -115,22 +123,22 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
     }
 
     private fun setError(error: Error) {
-        Log.i("SettingsViewModel", "setError: $error")
-        _screenState.value = _screenState.value.copy(error = error, isLoading = false)
+        Timber.i("setError: $error")
+        _screenState.value = _screenState.value?.copy(error = error, isLoading = false)
     }
 
     fun acknowledgeError() {
-        _screenState.value = _screenState.value.copy(error = null)
+        _screenState.value = _screenState.value?.copy(error = null)
     }
 
     fun onManageSubscription(context: Context) {
         val link =
             "https://play.google.com/store/account/subscriptions?sku=${PremiumUtil.PRODUCT_ID}&package=com.erdees.foodcostcalc"
         val intent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(link)
+            data = link.toUri()
             setPackage("com.android.vending")
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        startActivity(context, intent, null)
+        context.startActivity(intent)
     }
 }

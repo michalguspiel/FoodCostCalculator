@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import android.content.Context
+import android.icu.util.Currency
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -81,6 +82,7 @@ fun EditDishScreen(
     val editableTax by viewModel.editableTax.collectAsState()
     val editableMargin by viewModel.editableMargin.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
+    val currency by viewModel.currency.collectAsState()
 
     LaunchedEffect(screenState) {
         when (screenState) {
@@ -135,7 +137,7 @@ fun EditDishScreen(
 
                 Column(Modifier) {
                     modifiedDishDomain?.let {
-                        DishDetails(it, onTaxClick = {
+                        DishDetails(it, currency, onTaxClick = {
                             viewModel.setInteraction(InteractionType.EditTax)
                         }, onMarginClick = {
                             viewModel.setInteraction(InteractionType.EditMargin)
@@ -259,12 +261,12 @@ private fun Buttons(
 @Composable
 fun DishDetails(
     dishDomain: DishDomain,
+    currency: Currency?,
     modifier: Modifier = Modifier,
     onTaxClick: () -> Unit,
     onMarginClick: () -> Unit,
     onTotalPriceClick: () -> Unit
 ) {
-    val context = LocalContext.current
     Column(modifier) {
         Row {
             DetailItem(label = stringResource(R.string.margin),
@@ -290,14 +292,14 @@ fun DishDetails(
         Row {
             DetailItem(
                 label = stringResource(R.string.food_cost),
-                value = Utils.formatPrice(dishDomain.foodCost, context),
+                value = Utils.formatPrice(dishDomain.foodCost, currency),
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .weight(1f)
             )
             DetailItem(
                 label = stringResource(R.string.total_cost),
-                value = Utils.formatPrice(dishDomain.totalPrice, context),
+                value = Utils.formatPrice(dishDomain.totalPrice, currency),
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .weight(1f)

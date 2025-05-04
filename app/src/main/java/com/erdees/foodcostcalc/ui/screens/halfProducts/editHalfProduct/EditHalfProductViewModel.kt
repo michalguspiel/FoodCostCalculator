@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
@@ -30,6 +31,9 @@ import org.koin.core.component.inject
 class EditHalfProductViewModel : ViewModel(), KoinComponent {
 
     private val halfProductRepository: HalfProductRepository by inject()
+    private val preferences: Preferences by inject()
+
+    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState

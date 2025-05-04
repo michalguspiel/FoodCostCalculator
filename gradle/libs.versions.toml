@@ -1,12 +1,12 @@
 [versions]
 kotlin = "2.0.10"
 compose_compiler = "1.5.15"
-compose_bom = "2025.03.00"
+compose_bom = "2025.04.01"
 navigation_compose = "2.8.9"
 coil = "2.7.0"
 appcompat = "1.7.0"
 material = "1.12.0"
-core_ktx = "1.15.0"
+core_ktx = "1.16.0"
 coroutines = "1.8.1"
 lifecycle_viewmodel_ktx = "2.8.7"
 activity_ktx = "1.10.1"
@@ -18,8 +18,8 @@ google_http_client_gson = "1.44.2"
 google_api_client_android = "1.26.0"
 google_api_services_drive = "v3-rev136-1.25.0"
 serialization_json = "1.7.3"
-firebase_bom = "33.10.0"
-ads = "24.1.0"
+firebase_bom = "33.13.0"
+ads = "24.2.0"
 guava_listenablefuture = "9999.0-empty-to-avoid-conflict-with-guava"
 billing = "7.1.1"
 konfetti = "2.0.4"
@@ -32,10 +32,11 @@ kotest = "5.9.0"
 detekt = "1.23.7"
 compose_rules_detekt = "0.4.12"
 room = "2.7.1"
-agp = "8.9.0"
+agp = "8.9.2"
 google-services = "4.4.2"
 ksp = "2.0.10-1.0.24"
 crashlytics = "3.0.3"
+androidx_datastore = "1.1.4"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -97,3 +98,5 @@ mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 compose-rules-detekt = { group = "io.nlopez.compose.rules", name = "detekt", version.ref = "compose_rules_detekt" }
+androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx_datastore"}
+canary-leak = { group = "com.squareup.leakcanary", name = "leakcanary-android", version = "2.14" }

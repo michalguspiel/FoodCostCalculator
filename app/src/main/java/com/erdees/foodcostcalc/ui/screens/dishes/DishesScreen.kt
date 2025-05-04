@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes
 
+import android.icu.util.Currency
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,10 +24,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,16 +64,18 @@ import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
+import java.util.Locale
 
 @Composable
 @Screen
 fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewModel = viewModel()) {
 
-    val isVisible = remember { mutableStateOf(true) }
-    val nestedScrollConnection = rememberNestedScrollConnection(isVisible)
+    val isVisible = rememberSaveable { mutableStateOf(true) }
+    val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
     val searchKey by viewModel.searchKey.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
     val adItems by viewModel.filteredDishesInjectedWithAds.collectAsState()
+    val currency by viewModel.currency.collectAsState()
 
     Scaffold(modifier = Modifier, floatingActionButton = {
         FCCAnimatedFAB(
@@ -112,6 +115,7 @@ fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewMode
                                     dishDomain = item,
                                     isExpanded = itemPresentationState.isExpanded,
                                     servings = itemPresentationState.quantity,
+                                    currency = currency,
                                     onExpandToggle = {
                                         viewModel.listPresentationStateHandler.onExpandToggle(item)
                                     },
@@ -198,6 +202,7 @@ private fun DishItem(
     dishDomain: DishDomain,
     isExpanded: Boolean,
     servings: Double,
+    currency: Currency?,
     modifier: Modifier = Modifier,
     onExpandToggle: () -> Unit,
     onChangeServingsClick: () -> Unit,
@@ -217,10 +222,10 @@ private fun DishItem(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 if (isExpanded) {
-                    Ingredients(dishDomain, servings)
+                    Ingredients(dishDomain, servings, currency)
                 }
 
-                PriceSummary(dishDomain = dishDomain, servings = servings.toInt())
+                PriceSummary(dishDomain = dishDomain, servings = servings.toInt(), currency = currency)
 
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
@@ -281,17 +286,16 @@ private fun DishDetails(
 }
 
 @Composable
-private fun PriceSummary(dishDomain: DishDomain, servings: Int, modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+private fun PriceSummary(dishDomain: DishDomain, servings: Int, currency: Currency?, modifier: Modifier = Modifier) {
     Column(modifier) {
         PriceRow(
             description = stringResource(id = R.string.food_cost),
-            price = dishDomain.formattedFoodCostPerServings(context, servings)
+            price = dishDomain.formattedFoodCostPerServings(servings, currency)
         )
         Spacer(modifier = Modifier.height(4.dp))
         PriceRow(
             description = stringResource(id = R.string.final_price),
-            price = dishDomain.formattedTotalPricePerServing(context, servings)
+            price = dishDomain.formattedTotalPricePerServing(servings, currency)
         )
     }
 }
@@ -327,6 +331,7 @@ private fun DishItemPreview() {
                 recipe = null
             ),
                 servings = 1.0,
+                currency = Currency.getInstance(Locale.getDefault()),
                 isExpanded = true,
                 onExpandToggle = { },
                 onChangeServingsClick = { },
@@ -342,6 +347,7 @@ private fun DishItemPreview() {
                 recipe = null
             ),
                 servings = 1.0,
+                currency = Currency.getInstance(Locale.getDefault()),
                 isExpanded = false,
                 onExpandToggle = { },
                 onChangeServingsClick = { },
