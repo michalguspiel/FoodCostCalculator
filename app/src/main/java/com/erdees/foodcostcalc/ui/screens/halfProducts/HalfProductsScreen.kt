@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,6 +35,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,7 +48,9 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Ad
+import com.erdees.foodcostcalc.domain.model.AdItem
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
@@ -63,6 +67,7 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDivider
+import com.erdees.foodcostcalc.ui.composables.emptylist.EmptyListContent
 import com.erdees.foodcostcalc.ui.composables.fields.SearchField
 import com.erdees.foodcostcalc.ui.composables.fields.UnitField
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
@@ -85,84 +90,49 @@ fun HalfProductsScreen(
     navController: NavController,
     viewModel: HalfProductsScreenViewModel = viewModel()
 ) {
-    val adItems by viewModel.filteredHalfProductsInjectedWithAds.collectAsState()
+    val listItems by viewModel.filteredHalfProductsInjectedWithAds.collectAsState()
     val searchKey by viewModel.searchKey.collectAsState()
+    val isEmptyListContentVisible by viewModel.isEmptyListContentVisible.collectAsState()
     val isVisible = rememberSaveable { mutableStateOf(true) }
     val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
     val screenState by viewModel.screenState.collectAsState()
     val currency by viewModel.currency.collectAsState()
+    val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
 
     Scaffold(modifier = Modifier, floatingActionButton = {
-        FCCAnimatedFAB(
-            isVisible = isVisible.value,
-            contentDescription = stringResource(id = R.string.content_description_create_half_product)
-        ) {
-            viewModel.updateScreenState(ScreenState.Interaction(InteractionType.CreateHalfProduct))
+        if (!isEmptyListContentVisible) {
+            FCCAnimatedFAB(
+                isVisible = isVisible.value,
+                contentDescription = stringResource(id = R.string.content_description_create_half_product)
+            ) {
+                viewModel.updateScreenState(ScreenState.Interaction(InteractionType.CreateHalfProduct))
+            }
         }
     }) { paddingValues ->
         Box(
             contentAlignment = Alignment.TopCenter, modifier = Modifier.padding(paddingValues)
         ) {
-            LazyColumn(
-                Modifier
-                    .nestedScroll(nestedScrollConnection)
-                    .padding(horizontal = 8.dp),
-                contentPadding = PaddingValues(top = (36 + 8 + 8).dp)
-            ) {
-                items(adItems) { item ->
-
-                    when (item) {
-                        is Ad -> {
-                            Ad(
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
-                                else Constants.Ads.ADMOB_HALF_PRODUCTS_AD_UNIT_ID,
-                                onAdFailedToLoad = viewModel::onAdFailedToLoad
-                            )
-                        }
-
-                        is HalfProductDomain -> {
-                            key(item) {
-                                val itemPresentationState =
-                                    viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState().value[item.id]
-                                        ?: ItemPresentationState()
-                                HalfProductItem(
-                                    halfProductDomain = item,
-                                    isExpanded = itemPresentationState.isExpanded,
-                                    quantity = itemPresentationState.quantity,
-                                    currency = currency,
-                                    modifier = Modifier.padding(vertical = 8.dp),
-                                    onExpandToggle = {
-                                        viewModel.listPresentationStateHandler.onExpandToggle(item)
-                                    },
-                                    onEditQuantity = {
-                                        viewModel.onEditQuantity(item.id)
-                                    },
-                                    onAddItemsClick = {
-                                        navController.navigate(
-                                            FCCScreen.AddItemToHalfProduct(
-                                                item.id, item.name, item.halfProductUnit
-                                            )
-                                        )
-                                    },
-                                    onEditClick = {
-                                        navController.navigate(
-                                            FCCScreen.EditHalfProduct(
-                                                halfProductId = item.id
-                                            )
-                                        )
-                                    })
-                            }
-                        }
+            listItems?.let { listItems ->
+                if (isEmptyListContentVisible) {
+                    EmptyListContent(screen = FCCScreen.HalfProducts) {
+                        viewModel.updateScreenState(ScreenState.Interaction(InteractionType.CreateHalfProduct))
                     }
+                } else {
+                    HalfProductsContent(
+                        nestedScrollConnection,
+                        listItems,
+                        itemsPresentationState,
+                        currency,
+                        navController,
+                        isVisible.value,
+                        searchKey,
+                        viewModel::onAdFailedToLoad,
+                        viewModel.listPresentationStateHandler::onExpandToggle,
+                        viewModel::onEditQuantity,
+                        viewModel::updateSearchKey
+                    )
                 }
-            }
-        }
-
-        SearchFieldTransition(isVisible = isVisible.value) {
-            SearchField(
-                modifier = Modifier, value = searchKey, onValueChange = viewModel::updateSearchKey
-            )
+            } ?: ScreenLoadingOverlay(Modifier.fillMaxSize())
         }
 
         when (screenState) {
@@ -192,9 +162,8 @@ fun HalfProductsScreen(
 
                     is InteractionType.EditQuantity -> {
                         val itemId = interactionType.itemId
-                        val itemPresentationState =
-                            viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState().value[itemId]
-                                ?: ItemPresentationState()
+                        val itemPresentationState = itemsPresentationState[itemId]
+                            ?: ItemPresentationState()
                         val editableQuantity =
                             remember { mutableStateOf(itemPresentationState.quantity.toString()) }
                         ValueEditDialog(
@@ -225,6 +194,87 @@ fun HalfProductsScreen(
                 // Nothing special here
             }
 
+        }
+    }
+}
+
+@Composable
+private fun HalfProductsContent(
+    nestedScrollConnection: NestedScrollConnection,
+    listItems: List<AdItem>,
+    itemsPresentationState: Map<Long, ItemPresentationState>,
+    currency: Currency?,
+    navController: NavController,
+    isVisible: Boolean,
+    searchKey: String,
+    onAdFailedToLoad: () -> Unit,
+    onExpandToggle: (Item) -> Unit,
+    onEditQuantity: (Long) -> Unit,
+    updateSearchKey: (String) -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.TopCenter
+    ) {
+        LazyColumn(
+            Modifier
+                .nestedScroll(nestedScrollConnection)
+                .padding(horizontal = 8.dp),
+            contentPadding = PaddingValues(top = (36 + 8 + 8).dp)
+        ) {
+            items(listItems) { item ->
+
+                when (item) {
+                    is Ad -> {
+                        Ad(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
+                            else Constants.Ads.ADMOB_HALF_PRODUCTS_AD_UNIT_ID,
+                            onAdFailedToLoad = { onAdFailedToLoad() }
+                        )
+                    }
+
+                    is HalfProductDomain -> {
+                        key(item) {
+                            val itemPresentationState =
+                                itemsPresentationState[item.id] ?: ItemPresentationState()
+                            HalfProductItem(
+                                halfProductDomain = item,
+                                isExpanded = itemPresentationState.isExpanded,
+                                quantity = itemPresentationState.quantity,
+                                currency = currency,
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                onExpandToggle = {
+                                    onExpandToggle(item)
+                                },
+                                onEditQuantity = {
+                                    onEditQuantity(item.id)
+                                },
+                                onAddItemsClick = {
+                                    navController.navigate(
+                                        FCCScreen.AddItemToHalfProduct(
+                                            item.id, item.name, item.halfProductUnit
+                                        )
+                                    )
+                                },
+                                onEditClick = {
+                                    navController.navigate(
+                                        FCCScreen.EditHalfProduct(
+                                            halfProductId = item.id
+                                        )
+                                    )
+                                })
+                        }
+                    }
+                }
+            }
+        }
+
+        SearchFieldTransition(isVisible = isVisible) {
+            SearchField(
+                modifier = Modifier,
+                value = searchKey,
+                onValueChange = { updateSearchKey(it) }
+            )
         }
     }
 }
