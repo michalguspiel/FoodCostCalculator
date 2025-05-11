@@ -25,11 +25,10 @@ import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
-import com.erdees.foodcostcalc.ui.theme.spacing
 
 @Composable
 fun EmptyListContent(
-    modifier: Modifier = Modifier, screen: FCCScreen, ctaClick: () -> Unit = {}
+    screen: FCCScreen, modifier: Modifier = Modifier, ctaClick: () -> Unit = {}
 ) {
 
     val scrollState = rememberScrollState()
@@ -38,13 +37,13 @@ fun EmptyListContent(
     Column(
         modifier
             .fillMaxSize()
-            .padding(horizontal = MaterialTheme.spacing.default)
+            .padding(horizontal = 12.dp)
             .verticalScroll(scrollState),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(MaterialTheme.spacing.large)
+        verticalArrangement = Arrangement.spacedBy(32.dp)
     ) {
 
-        Spacer(Modifier.size(MaterialTheme.spacing.large))
+        Spacer(Modifier.size(32.dp))
         Text(
             text = stringResource(config.titleRes),
             textAlign = TextAlign.Center,
@@ -73,7 +72,7 @@ fun EmptyListContent(
         FCCPrimaryButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(MaterialTheme.spacing.regular),
+                .padding(16.dp),
             text = stringResource(config.buttonTextRes),
             enabled = true
         ) {
@@ -84,7 +83,7 @@ fun EmptyListContent(
 
 @Preview(name = "Empty List - Products", showBackground = true)
 @Composable
-fun PreviewEmptyListContentProducts() {
+private fun PreviewEmptyListContentProducts() {
     FCCTheme {
         EmptyListContent(screen = FCCScreen.Products)
     }
@@ -92,7 +91,7 @@ fun PreviewEmptyListContentProducts() {
 
 @Preview(name = "Empty List - HalfProducts", showBackground = true)
 @Composable
-fun PreviewEmptyListContentHalfProducts() {
+private fun PreviewEmptyListContentHalfProducts() {
     FCCTheme {
         EmptyListContent(screen = FCCScreen.HalfProducts)
     }
@@ -100,7 +99,7 @@ fun PreviewEmptyListContentHalfProducts() {
 
 @Preview(name = "Empty List - Dishes", showBackground = true)
 @Composable
-fun PreviewEmptyListContentDishes() {
+private fun PreviewEmptyListContentDishes() {
     FCCTheme {
         EmptyListContent(screen = FCCScreen.Dishes)
     }

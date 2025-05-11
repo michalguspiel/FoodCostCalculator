@@ -36,5 +36,5 @@ fun FCCScreen.emptyListConfig(): EmptyListContentConfig = when (this) {
         buttonTextRes = R.string.create_dish
     )
 
-    else -> throw IllegalStateException("EmptyListContent not supported for this screen")
+    else -> error("EmptyListContent not supported for this screen")
 }
