@@ -13,11 +13,9 @@ import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -50,32 +48,31 @@ class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
                 dishesDomain.associate { it.id to ItemPresentationState() }
             )
         }
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.Lazily,
-        emptyList()
-    )
+    }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    @OptIn(FlowPreview::class)
-    private val filteredDishes: StateFlow<List<DishDomain>> =
+    private val filteredDishes: StateFlow<List<DishDomain>?> =
         combine(
-            dishes,
-            searchKey.debounce(500).onStart { emit("") }
+            dishes, debouncedSearch.onStart { emit("") }
         ) { dishes, searchKey ->
-            dishes.filter {
+            dishes?.filter {
                 it.name.lowercase().contains(searchKey.lowercase())
             }
-        }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
+        }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     val filteredDishesInjectedWithAds =
         combine(filteredDishes, adFrequency) { dishes, freq ->
-            ListAdsInjectorManager(dishes, freq).listInjectedWithAds
+            dishes?.let { ListAdsInjectorManager(it, freq).listInjectedWithAds }
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
-            initialValue = listOf()
+            initialValue = null
         )
 
+    val isEmptyListContentVisible: StateFlow<Boolean> = dishes.map { dishes ->
+        dishes?.isEmpty() == true
+    }.stateIn(
+        scope = viewModelScope, started = SharingStarted.Lazily, initialValue = false
+    )
 
     fun onAdFailedToLoad() {
         analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)

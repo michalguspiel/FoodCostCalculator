@@ -17,11 +17,9 @@ import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
@@ -44,18 +42,18 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
     private val adFrequency: StateFlow<Int> =
         preferences.userHasActiveSubscription().map { hasSubscription ->
-                if (hasSubscription) Constants.Ads.PREMIUM_FREQUENCY
-                else Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
-            }.stateIn(
-                viewModelScope,
-                SharingStarted.Eagerly,
-                Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
-            )
+            if (hasSubscription) Constants.Ads.PREMIUM_FREQUENCY
+            else Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
+        }.stateIn(
+            viewModelScope,
+            SharingStarted.Eagerly,
+            Constants.Ads.HALF_PRODUCTS_AD_FREQUENCY
+        )
 
 
     val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }
 
-    private val halfProducts: StateFlow<List<HalfProductDomain>> =
+    private val halfProducts: StateFlow<List<HalfProductDomain>?> =
         halfProductRepository.completeHalfProducts.map { halfProducts ->
             halfProducts.map { it.toHalfProductDomain() }.also { halfProductsDomain ->
                 // Initialize presentation state for each item
@@ -71,25 +69,36 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
                 })
             }
         }.stateIn(
-            scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList()
+            scope = viewModelScope, started = SharingStarted.Lazily, initialValue = null
         )
 
-    @OptIn(FlowPreview::class)
     private val filteredHalfProducts = combine(
-        halfProducts, searchKey.debounce(500).onStart { emit("") }) { halfProducts, searchKey ->
-        halfProducts.filter {
+        halfProducts, debouncedSearch.onStart { emit("") }) { halfProducts, searchKey ->
+        halfProducts?.filter {
             it.name.lowercase(Locale.getDefault()).contains(searchKey.lowercase())
         }
     }.stateIn(
-        scope = viewModelScope, started = SharingStarted.Lazily, initialValue = emptyList()
+        scope = viewModelScope, started = SharingStarted.Lazily, initialValue = null
     )
 
     val filteredHalfProductsInjectedWithAds =
         combine(filteredHalfProducts, adFrequency) { halfProducts, adFrequency ->
-            ListAdsInjectorManager(halfProducts, adFrequency).listInjectedWithAds
+            halfProducts?.let {
+                ListAdsInjectorManager(
+                    halfProducts,
+                    adFrequency
+                ).listInjectedWithAds
+            }
         }.stateIn(
-            scope = viewModelScope, started = SharingStarted.Lazily, initialValue = listOf()
+            scope = viewModelScope, started = SharingStarted.Lazily, initialValue = null
         )
+
+    val isEmptyListContentVisible: StateFlow<Boolean> = halfProducts.map { halfProducts ->
+        halfProducts?.isEmpty() == true
+    }.stateIn(
+        scope = viewModelScope, started = SharingStarted.Lazily, initialValue = false
+    )
+
 
     fun addHalfProduct(name: String, unit: String) {
         val halfProductBase = HalfProductBase(0, name, unit)

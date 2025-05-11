@@ -34,6 +34,17 @@
     <string name="volume">volume</string>
     <string name="piece">piece</string>
 
+    <!--Empty List Content-->
+
+    <string name="empty_dish_list_content_title">Let\'s get cooking</string>
+    <string name="empty_dish_list_content_description">Tap button below to add your first dish and start building your menu magic.</string>
+    <string name="empty_product_list_content_title">Stock the pantry</string>
+    <string name="empty_product_list_content_description">Tap button below to add some ingredients so you’ve got something to cook with!</string>
+    <string name="empty_half_product_list_content_title">Prep like a pro</string>
+    <string name="empty_half_product_list_content_description">Create reusable parts like sauces or dough to speed things up later.</string>
+    <string name="cd_icon_products">Shopping basket icon</string>
+    <string name="cd_icon_half_products">Bakery preparation icon</string>
+    <string name="cd_icon_dishes">Restaurant plate icon</string>
     <!-- Navigation -->
     <string name="products">Products</string>
     <string name="half_products">Half Products</string>

@@ -49,6 +49,10 @@ object Constants {
         }
     }
 
+    object UI {
+        const val SEARCH_DEBOUNCE_MS = 500L
+    }
+
     const val METRIC = "metric"
     const val IMPERIAL = "usa"
 

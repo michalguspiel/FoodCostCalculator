@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -27,6 +28,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,7 +39,9 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Ad
+import com.erdees.foodcostcalc.domain.model.AdItem
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
@@ -55,6 +59,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
+import com.erdees.foodcostcalc.ui.composables.emptylist.EmptyListContent
 import com.erdees.foodcostcalc.ui.composables.fields.SearchField
 import com.erdees.foodcostcalc.ui.composables.rememberNestedScrollConnection
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
@@ -74,77 +79,45 @@ fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewMode
     val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
     val searchKey by viewModel.searchKey.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
-    val adItems by viewModel.filteredDishesInjectedWithAds.collectAsState()
+    val listItems by viewModel.filteredDishesInjectedWithAds.collectAsState()
+    val isEmptyListContentVisible by viewModel.isEmptyListContentVisible.collectAsState()
     val currency by viewModel.currency.collectAsState()
+    val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
 
     Scaffold(modifier = Modifier, floatingActionButton = {
-        FCCAnimatedFAB(
-            isVisible = isVisible.value,
-            contentDescription = stringResource(id = R.string.content_description_create_dish)
-        ) {
-            navController.navigate(FCCScreen.CreateDish)
+        if (!isEmptyListContentVisible) {
+            FCCAnimatedFAB(
+                isVisible = isVisible.value,
+                contentDescription = stringResource(id = R.string.content_description_create_dish)
+            ) {
+                navController.navigate(FCCScreen.CreateDish)
+            }
         }
     }) { paddingValues ->
         Box(
             contentAlignment = Alignment.TopCenter, modifier = Modifier.padding(paddingValues)
         ) {
-
-            LazyColumn(
-                Modifier
-                    .nestedScroll(nestedScrollConnection)
-                    .padding(horizontal = 8.dp),
-                contentPadding = PaddingValues(top = (36 + 8 + 8).dp)
-            ) {
-                items(adItems) { item ->
-                    when (item) {
-                        is Ad -> {
-                            Ad(
-                                modifier = Modifier.padding(vertical = 8.dp),
-                                adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
-                                else Constants.Ads.ADMOB_DISHES_AD_UNIT_ID,
-                                onAdFailedToLoad = viewModel::onAdFailedToLoad
-                            )
-                        }
-
-                        is DishDomain -> {
-                            key(item.id) {
-                                val itemPresentationState =
-                                    viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState().value[item.id]
-                                        ?: ItemPresentationState()
-                                DishItem(modifier = Modifier.padding(vertical = 8.dp),
-                                    dishDomain = item,
-                                    isExpanded = itemPresentationState.isExpanded,
-                                    servings = itemPresentationState.quantity,
-                                    currency = currency,
-                                    onExpandToggle = {
-                                        viewModel.listPresentationStateHandler.onExpandToggle(item)
-                                    },
-                                    onChangeServingsClick = {
-                                        viewModel.onChangeServingsClick(item.id)
-                                    },
-                                    onAddItemsClick = {
-                                        navController.navigate(
-                                            FCCScreen.AddItemsToDish(
-                                                item.id, item.name
-                                            )
-                                        )
-                                    },
-                                    onEditClick = {
-                                        navController.navigate(FCCScreen.EditDish(item.id))
-                                    })
-                            }
-                        }
+            listItems?.let { listItems ->
+                if (isEmptyListContentVisible) {
+                    EmptyListContent(screen = FCCScreen.Dishes) {
+                        navController.navigate(FCCScreen.CreateDish)
                     }
+                } else {
+                    DishesScreenContent(
+                        nestedScrollConnection,
+                        listItems,
+                        itemsPresentationState,
+                        currency,
+                        navController,
+                        isVisible.value,
+                        searchKey,
+                        viewModel::onAdFailedToLoad,
+                        viewModel.listPresentationStateHandler::onExpandToggle,
+                        viewModel::onChangeServingsClick,
+                        viewModel::updateSearchKey
+                    )
                 }
-            }
-
-            SearchFieldTransition(isVisible = isVisible.value) {
-                SearchField(
-                    modifier = Modifier,
-                    value = searchKey,
-                    onValueChange = viewModel::updateSearchKey
-                )
-            }
+            } ?: ScreenLoadingOverlay(Modifier.fillMaxSize())
 
             when (screenState) {
                 is ScreenState.Error -> {
@@ -170,7 +143,8 @@ fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewMode
                                     itemPresentationState.quantity.toInt().toString()
                                 )
                             }
-                            ValueEditDialog(title = stringResource(id = R.string.edit_displayed_servings),
+                            ValueEditDialog(
+                                title = stringResource(id = R.string.edit_displayed_servings),
                                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                 value = editableQuantity.value,
                                 updateValue = { newValue ->
@@ -193,6 +167,82 @@ fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewMode
 
                 else -> {}
             }
+        }
+    }
+}
+
+@Composable
+private fun DishesScreenContent(
+    nestedScrollConnection: NestedScrollConnection,
+    listItems: List<AdItem>,
+    itemsPresentationState: Map<Long, ItemPresentationState>,
+    currency: Currency?,
+    navController: NavController,
+    isVisible: Boolean,
+    searchKey: String,
+    onAdFailedToLoad: () -> Unit,
+    onExpandToggle: (Item) -> Unit,
+    onChangeServingsClick: (Long) -> Unit,
+    updateSearchKey: (String) -> Unit
+) {
+    Box(
+        contentAlignment = Alignment.TopCenter
+    ) {
+        LazyColumn(
+            Modifier
+                .nestedScroll(nestedScrollConnection)
+                .padding(horizontal = 8.dp),
+            contentPadding = PaddingValues(top = (36 + 8 + 8).dp)
+        ) {
+            items(listItems) { item ->
+                when (item) {
+                    is Ad -> {
+                        Ad(
+                            modifier = Modifier.padding(vertical = 8.dp),
+                            adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
+                            else Constants.Ads.ADMOB_DISHES_AD_UNIT_ID,
+                            onAdFailedToLoad = { onAdFailedToLoad() }
+                        )
+                    }
+
+                    is DishDomain -> {
+                        key(item.id) {
+                            val itemPresentationState = itemsPresentationState[item.id]
+                                ?: ItemPresentationState()
+                            DishItem(
+                                modifier = Modifier.padding(vertical = 8.dp),
+                                dishDomain = item,
+                                isExpanded = itemPresentationState.isExpanded,
+                                servings = itemPresentationState.quantity,
+                                currency = currency,
+                                onExpandToggle = {
+                                    onExpandToggle(item)
+                                },
+                                onChangeServingsClick = {
+                                    onChangeServingsClick(item.id)
+                                },
+                                onAddItemsClick = {
+                                    navController.navigate(
+                                        FCCScreen.AddItemsToDish(
+                                            item.id, item.name
+                                        )
+                                    )
+                                },
+                                onEditClick = {
+                                    navController.navigate(FCCScreen.EditDish(item.id))
+                                })
+                        }
+                    }
+                }
+            }
+        }
+
+        SearchFieldTransition(isVisible = isVisible) {
+            SearchField(
+                modifier = Modifier,
+                value = searchKey,
+                onValueChange = { updateSearchKey(it) }
+            )
         }
     }
 }
@@ -225,7 +275,11 @@ private fun DishItem(
                     Ingredients(dishDomain, servings, currency)
                 }
 
-                PriceSummary(dishDomain = dishDomain, servings = servings.toInt(), currency = currency)
+                PriceSummary(
+                    dishDomain = dishDomain,
+                    servings = servings.toInt(),
+                    currency = currency
+                )
 
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
@@ -286,7 +340,12 @@ private fun DishDetails(
 }
 
 @Composable
-private fun PriceSummary(dishDomain: DishDomain, servings: Int, currency: Currency?, modifier: Modifier = Modifier) {
+private fun PriceSummary(
+    dishDomain: DishDomain,
+    servings: Int,
+    currency: Currency?,
+    modifier: Modifier = Modifier
+) {
     Column(modifier) {
         PriceRow(
             description = stringResource(id = R.string.food_cost),
@@ -305,31 +364,32 @@ private fun PriceSummary(dishDomain: DishDomain, servings: Int, currency: Curren
 private fun DishItemPreview() {
     FCCTheme {
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            DishItem(dishDomain = DishDomain(
-                id = 1,
-                name = "Burger",
-                marginPercent = 320.0,
-                taxPercent = 23.0,
-                halfProducts = emptyList(),
-                products = listOf(
-                    UsedProductDomain(
-                        1,
-                        2,
-                        ProductDomain(1, "Bun", 2.0, 0.5, 5.0, "kg"),
-                        1.0,
-                        "pcs",
-                        1.0,
-                    ), UsedProductDomain(
-                        1,
-                        2,
-                        ProductDomain(2, "Meat Patty", 15.0, 0.5, 5.0, "kg"),
-                        100.0,
-                        "g",
-                        null,
-                    )
+            DishItem(
+                dishDomain = DishDomain(
+                    id = 1,
+                    name = "Burger",
+                    marginPercent = 320.0,
+                    taxPercent = 23.0,
+                    halfProducts = emptyList(),
+                    products = listOf(
+                        UsedProductDomain(
+                            1,
+                            2,
+                            ProductDomain(1, "Bun", 2.0, 0.5, 5.0, "kg"),
+                            1.0,
+                            "pcs",
+                            1.0,
+                        ), UsedProductDomain(
+                            1,
+                            2,
+                            ProductDomain(2, "Meat Patty", 15.0, 0.5, 5.0, "kg"),
+                            100.0,
+                            "g",
+                            null,
+                        )
+                    ),
+                    recipe = null
                 ),
-                recipe = null
-            ),
                 servings = 1.0,
                 currency = Currency.getInstance(Locale.getDefault()),
                 isExpanded = true,
@@ -337,15 +397,16 @@ private fun DishItemPreview() {
                 onChangeServingsClick = { },
                 onAddItemsClick = { }) {}
 
-            DishItem(dishDomain = DishDomain(
-                id = 1,
-                name = "Salmon with chips",
-                marginPercent = 320.0,
-                taxPercent = 23.0,
-                halfProducts = emptyList(),
-                products = listOf(),
-                recipe = null
-            ),
+            DishItem(
+                dishDomain = DishDomain(
+                    id = 1,
+                    name = "Salmon with chips",
+                    marginPercent = 320.0,
+                    taxPercent = 23.0,
+                    halfProducts = emptyList(),
+                    products = listOf(),
+                    recipe = null
+                ),
                 servings = 1.0,
                 currency = Currency.getInstance(Locale.getDefault()),
                 isExpanded = false,
