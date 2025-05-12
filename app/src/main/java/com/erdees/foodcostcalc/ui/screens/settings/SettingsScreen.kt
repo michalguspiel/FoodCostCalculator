@@ -312,6 +312,7 @@ private fun Defaults(
 
         Column {
             FieldLabel(text = stringResource(id = R.string.default_currency))
+            Spacer(Modifier.size(2.dp))
             CurrenciesDropDown(
                 currencies = currencies,
                 selectedCurrency = settings?.currency,
