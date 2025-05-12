@@ -298,11 +298,12 @@ fun DishDetails(
                     .weight(1f)
             )
             DetailItem(
-                label = stringResource(R.string.total_cost),
+                label = stringResource(R.string.final_price),
                 value = Utils.formatPrice(dishDomain.totalPrice, currency),
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
-                    .weight(1f)
+                    .weight(1f),
+                bolder = true
             )
         }
     }

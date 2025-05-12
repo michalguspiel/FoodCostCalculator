@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -165,7 +166,7 @@ fun ProductItem(
 ) {
     Card(modifier.fillMaxWidth(), content = {
         Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
-            Text(text = productDomain.name, style = MaterialTheme.typography.titleLarge)
+            Text(text = productDomain.name, style = MaterialTheme.typography.headlineSmall)
 
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -176,7 +177,8 @@ fun ProductItem(
             Spacer(modifier = Modifier.height(4.dp))
             PriceRow(
                 description = stringResource(id = R.string.total_price, productDomain.unit),
-                price = formatPrice(productDomain.priceAfterWasteAndTax, currency)
+                price = formatPrice(productDomain.priceAfterWasteAndTax, currency),
+                style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
             )
 
             Spacer(modifier = Modifier.height(8.dp))

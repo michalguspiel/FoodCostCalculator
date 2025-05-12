@@ -105,8 +105,8 @@
     <string name="price">Price</string>
     <string name="tax_percent">Tax %</string>
     <string name="percent_of_waste">% of waste</string>
-    <string name="count_waste">Count waste</string>
-    <string name="count_piece_price">Count piece price</string>
+    <string name="count_waste">Get waste</string>
+    <string name="count_piece_price">Unit price</string>
     <string name="quantity_before_processing">Quantity before processing</string>
     <string name="waste_quantity">Waste quantity</string>
     <string name="calculate_price_per_piece">Calculate price per piece</string>
@@ -132,6 +132,10 @@
 
     <string name="edit_displayed_servings">Edit displayed servings</string>
     <string name="portions">Portions</string>
+    <plurals name="portions">
+        <item quantity="one">%d Portion</item>
+        <item quantity="other">%d Portions</item>
+    </plurals>
     <string name="margin_value">%1$s \%%</string>
     <string name="tax_value">%1$s \%%</string>
     <string name="food_cost">Food cost</string>

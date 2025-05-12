@@ -39,6 +39,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -57,8 +58,8 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ad
-import com.erdees.foodcostcalc.ui.composables.ExpandedIcon
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
+import com.erdees.foodcostcalc.ui.composables.TitleRow
 import com.erdees.foodcostcalc.ui.composables.animations.SearchFieldTransition
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCAnimatedFAB
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -297,7 +298,7 @@ fun HalfProductItem(
             .clickable { onExpandToggle() }, content = {
             Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
 
-                TitleRow(halfProductDomain, isExpanded)
+                TitleRow(halfProductDomain.name, isExpanded)
 
                 if (isExpanded) {
                     Ingredients(quantity, halfProductDomain, currency, onEditQuantity)
@@ -314,23 +315,6 @@ fun HalfProductItem(
                 })
             }
         })
-}
-
-@Composable
-private fun TitleRow(
-    halfProductDomain: HalfProductDomain,
-    isExpanded: Boolean
-) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
-    ) {
-        Text(text = halfProductDomain.name, style = MaterialTheme.typography.titleLarge)
-        ExpandedIcon(isExpanded = isExpanded)
-    }
 }
 
 @Composable
@@ -370,7 +354,6 @@ private fun Ingredients(
                     baseQuantity = halfProductDomain.totalQuantity,
                     currency = currency
                 ),
-                style = MaterialTheme.typography.bodyMedium
             )
             FCCSecondaryHorizontalDivider()
         }
@@ -390,13 +373,15 @@ private fun PriceSummary(
             targetQuantity = quantity,
             baseQuantity = halfProductDomain.totalQuantity,
             currency = currency,
-        )
+        ),
+        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
     )
     Spacer(modifier = Modifier.height(4.dp))
     PriceRow(
         description = stringResource(
             id = R.string.price_per_unit, halfProductDomain.halfProductUnit
-        ), price = halfProductDomain.formattedPricePerUnit(currency)
+        ), price = halfProductDomain.formattedPricePerUnit(currency),
+        style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
     )
 }
 

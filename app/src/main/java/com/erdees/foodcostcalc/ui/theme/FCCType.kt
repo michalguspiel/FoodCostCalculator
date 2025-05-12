@@ -59,7 +59,7 @@ val AppTypography = Typography(
     ),
     headlineSmall = TextStyle(
         fontFamily = Inter,
-        fontWeight = FontWeight.Normal,
+        fontWeight = FontWeight.Medium,
         fontSize = 24.sp,
         lineHeight = 32.sp
     ),
