@@ -14,10 +14,11 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun TitleRow(
     name: String,
-    isExpanded: Boolean
+    isExpanded: Boolean,
+    modifier: Modifier = Modifier
 ) {
     Row(
-        Modifier
+        modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,

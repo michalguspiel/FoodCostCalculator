@@ -130,7 +130,7 @@ val AppTypography = Typography(
 
 @Preview(showBackground = true, name = "FCCType")
 @Composable
-fun FCCTypographyPreview() {
+private fun FCCTypographyPreview() {
     FCCTheme {
        ColumnWithTypography()
     }
@@ -138,7 +138,7 @@ fun FCCTypographyPreview() {
 
 @Preview(showBackground = true, name = "Default Type")
 @Composable
-fun DefaultTypographyPreview() {
+private fun DefaultTypographyPreview() {
         ColumnWithTypography()
 }
 
