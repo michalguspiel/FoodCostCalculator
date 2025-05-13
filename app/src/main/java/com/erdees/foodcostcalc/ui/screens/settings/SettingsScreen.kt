@@ -61,6 +61,7 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
+import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
@@ -70,6 +71,7 @@ data class SettingsScreenCallbacks(
     val updateMetricUsed: (Boolean) -> Unit = {},
     val updateImperialUsed: (Boolean) -> Unit = {},
     val updateDefaultCurrencyCode: (Currency) -> Unit = {},
+    val updateShowHalfProducts: (Boolean) -> Unit = {},
     val saveSettings: () -> Unit = {},
     val resetScreenState: () -> Unit = {},
 )
@@ -114,6 +116,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
             updateMetricUsed = viewModel::updateMetricUsed,
             updateImperialUsed = viewModel::updateImperialUsed,
             updateDefaultCurrencyCode = viewModel::updateDefaultCurrencyCode,
+            updateShowHalfProducts = viewModel::updateShowHalfProducts,
             saveSettings = viewModel::saveSettings,
             resetScreenState = viewModel::resetScreenState,
         )
@@ -294,9 +297,6 @@ private fun Defaults(
             settingsScreenCallbacks.updateDefaultMargin(it)
         }
 
-
-        FieldLabel(text = stringResource(id = R.string.units_section))
-
         CheckBoxField(
             title = stringResource(id = R.string.use_metric_units),
             value = settings?.metricUsed == true,
@@ -309,6 +309,11 @@ private fun Defaults(
             onValueChange = { settingsScreenCallbacks.updateImperialUsed(it) }
         )
 
+        CheckBoxField(
+            title = stringResource(id = R.string.use_half_products),
+            value = settings?.showHalfProducts == true,
+            onValueChange = { settingsScreenCallbacks.updateShowHalfProducts(it) }
+        )
 
         Column {
             FieldLabel(text = stringResource(id = R.string.default_currency))
@@ -320,20 +325,11 @@ private fun Defaults(
             )
         }
 
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.Bottom
-        ) {
-            FCCPrimaryButton(
+        ButtonRow(primaryButton = { FCCPrimaryButton(
                 text = stringResource(id = R.string.save),
                 enabled = saveButtonEnabled
-            ) {
-                settingsScreenCallbacks.saveSettings()
-            }
-        }
+            ) { settingsScreenCallbacks.saveSettings() }
+        })
     }
 }
 
@@ -429,7 +425,8 @@ private fun PreviewSettingsScreenContent() {
                 defaultTax = "10",
                 currency = Currency.getInstance("USD"),
                 metricUsed = true,
-                imperialUsed = false
+                imperialUsed = false,
+                showHalfProducts = true
             ),
             currencies = Currency.getAvailableCurrencies(),
             saveButtonEnabled = true,
@@ -450,7 +447,8 @@ private fun PreviewDefaults() {
                 defaultTax = "10",
                 currency = Currency.getInstance("USD"),
                 metricUsed = true,
-                imperialUsed = false
+                imperialUsed = false,
+                showHalfProducts = false
             ),
             currencies = Currency.getAvailableCurrencies(),
             saveButtonEnabled = true,

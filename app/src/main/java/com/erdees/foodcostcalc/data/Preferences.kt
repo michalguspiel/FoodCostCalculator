@@ -31,6 +31,9 @@ interface Preferences {
 
     val imperialUsed: Flow<Boolean>
     suspend fun setImperialUsed(value: Boolean)
+
+    val showHalfProducts: Flow<Boolean>
+    suspend fun setShowHalfProducts(value: Boolean)
 }
 
 
@@ -42,12 +45,13 @@ class PreferencesImpl(private val context: Context) : Preferences {
 
     // Preference Keys
     private object Keys {
-        val DEFAULT_MARGIN = stringPreferencesKey(Constants.MARGIN)
-        val DEFAULT_TAX = stringPreferencesKey(Constants.TAX)
-        val CURRENCY_CODE = stringPreferencesKey(Constants.PREFERRED_CURRENCY_CODE)
-        val SUBSCRIPTION_STATE = booleanPreferencesKey(Constants.SUBSCRIPTION_STATE)
-        val METRIC = booleanPreferencesKey(Constants.METRIC)
-        val IMPERIAL = booleanPreferencesKey(Constants.IMPERIAL)
+        val DEFAULT_MARGIN = stringPreferencesKey(Constants.Preferences.MARGIN)
+        val DEFAULT_TAX = stringPreferencesKey(Constants.Preferences.TAX)
+        val CURRENCY_CODE = stringPreferencesKey(Constants.Preferences.PREFERRED_CURRENCY_CODE)
+        val SUBSCRIPTION_STATE = booleanPreferencesKey(Constants.Preferences.SUBSCRIPTION_STATE)
+        val METRIC = booleanPreferencesKey(Constants.Preferences.METRIC)
+        val IMPERIAL = booleanPreferencesKey(Constants.Preferences.IMPERIAL)
+        val SHOW_HALF_PRODUCTS = booleanPreferencesKey(Constants.Preferences.SHOW_HALF_PRODUCTS)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -110,5 +114,12 @@ class PreferencesImpl(private val context: Context) : Preferences {
 
     override suspend fun setImperialUsed(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.IMPERIAL] = value }
+    }
+
+    override val showHalfProducts: Flow<Boolean> =
+        context.dataStore.data.map { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] ?: true }
+
+    override suspend fun setShowHalfProducts(value: Boolean) {
+        context.dataStore.edit { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] = value }
     }
 }

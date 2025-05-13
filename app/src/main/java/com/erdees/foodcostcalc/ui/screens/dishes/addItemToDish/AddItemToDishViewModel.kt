@@ -19,6 +19,7 @@ import com.erdees.foodcostcalc.utils.Utils.generateUnitSet
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -39,6 +40,10 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
+
+    val showHalfProducts = sharedPreferences.showHalfProducts.stateIn(
+        viewModelScope, SharingStarted.Eagerly, null
+    )
 
     fun resetScreenState() {
         _screenState.value = ScreenState.Idle

@@ -31,20 +31,23 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         _screenState.value = ScreenState.Idle
     }
 
+    @Suppress("MagicNumber")
     private suspend fun getSettingsModel(): UserSettings {
         return combine(
             preferences.defaultMargin,
             preferences.defaultTax,
             preferences.currency,
             preferences.metricUsed,
-            preferences.imperialUsed
-        ) { margin, tax, currency, metric, imperial ->
+            preferences.imperialUsed,
+            preferences.showHalfProducts,
+        ) { array ->
             UserSettings(
-                margin,
-                tax,
-                currency,
-                metric,
-                imperial
+                array[0] as String,
+                array[1] as String,
+                array[2] as Currency?,
+                array[3] as Boolean,
+                array[4] as Boolean,
+                array[5] as Boolean,
             )
         }.first()
     }
@@ -93,6 +96,10 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         _settingsModel.value = _settingsModel.value?.copy(imperialUsed = newSetting)
     }
 
+    fun updateShowHalfProducts(newSetting: Boolean) {
+        _settingsModel.value = _settingsModel.value?.copy(showHalfProducts = newSetting)
+    }
+
     /** Saves settings to preferences. */
     fun saveSettings() {
         _screenState.value = ScreenState.Loading()
@@ -105,6 +112,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
                 }
                 preferences.setMetricUsed(settingsModel.metricUsed)
                 preferences.setImperialUsed(settingsModel.imperialUsed)
+                preferences.setShowHalfProducts(settingsModel.showHalfProducts)
             }
 
         }

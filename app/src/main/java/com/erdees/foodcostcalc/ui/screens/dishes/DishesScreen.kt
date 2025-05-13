@@ -74,7 +74,7 @@ import java.util.Locale
 
 @Composable
 @Screen
-fun DishesScreen(navController: NavController, viewModel: DishesFragmentViewModel = viewModel()) {
+fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel = viewModel()) {
 
     val isVisible = rememberSaveable { mutableStateOf(true) }
     val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }

@@ -1,9 +1,9 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -31,14 +31,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 
@@ -50,7 +51,12 @@ enum class SelectedTab {
 @OptIn(ExperimentalMaterial3Api::class)
 @Screen
 @Composable
-fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: String, viewModel: AddItemToDishViewModel = viewModel()) {
+fun AddItemToDishScreen(
+    navController: NavController,
+    dishId: Long,
+    dishName: String,
+    viewModel: AddItemToDishViewModel = viewModel()
+) {
 
     val selectedTab by viewModel.selectedTab.collectAsState()
     val selectedItem by viewModel.selectedItem.collectAsState()
@@ -61,6 +67,7 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
     val quantity by viewModel.quantity.collectAsState()
     val addButtonEnabled by viewModel.addButtonEnabled.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
+    val showHalfProducts by viewModel.showHalfProducts.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val itemAddedText = stringResource(id = R.string.item_added)
@@ -92,40 +99,50 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
         }) { paddingValues ->
         Box(Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
             Column(Modifier) {
-
-                // Tabs
-                Row {
-                    Tab(
-                        modifier = Modifier.weight(1f),
-                        selected = selectedTab == SelectedTab.ADD_PRODUCT,
-                        onClick = { viewModel.selectTab(SelectedTab.ADD_PRODUCT) },
-                        text = { Text(text = stringResource(id = R.string.add_product)) },
-                        selectedContentColor = MaterialTheme.colorScheme.primary,
-                        unselectedContentColor = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Tab(
-                        modifier = Modifier.weight(1f),
-                        selected = selectedTab == SelectedTab.ADD_HALF_PRODUCT,
-                        onClick = { viewModel.selectTab(SelectedTab.ADD_HALF_PRODUCT) }, text = {
-                            Text(text = stringResource(id = R.string.add_half_product))
-                        },
-                        selectedContentColor = MaterialTheme.colorScheme.primary,
-                        unselectedContentColor = MaterialTheme.colorScheme.onSurface
-                    )
+                if (showHalfProducts == true) {
+                    // Tabs
+                    Row {
+                        Tab(
+                            modifier = Modifier.weight(1f),
+                            selected = selectedTab == SelectedTab.ADD_PRODUCT,
+                            onClick = { viewModel.selectTab(SelectedTab.ADD_PRODUCT) },
+                            text = { Text(text = stringResource(id = R.string.add_product)) },
+                            selectedContentColor = MaterialTheme.colorScheme.primary,
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurface
+                        )
+                        Tab(
+                            modifier = Modifier.weight(1f),
+                            selected = selectedTab == SelectedTab.ADD_HALF_PRODUCT,
+                            onClick = { viewModel.selectTab(SelectedTab.ADD_HALF_PRODUCT) },
+                            text = {
+                                Text(text = stringResource(id = R.string.add_half_product))
+                            },
+                            selectedContentColor = MaterialTheme.colorScheme.primary,
+                            unselectedContentColor = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                    HorizontalDivider(Modifier.padding(bottom = 12.dp))
                 }
-                HorizontalDivider()
 
                 // Fields
                 val items = if (selectedTab == SelectedTab.ADD_PRODUCT) products else halfProducts
 
                 Column(
-                    verticalArrangement = Arrangement.SpaceBetween,
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 12.dp)
                 ) {
+
+                    if (showHalfProducts == false) {
+                        Text(
+                            text = stringResource(id = R.string.add_product),
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                            textAlign = TextAlign.Start
+                        )
+                    }
+
                     AddItemFields(
                         modifier = Modifier
                             .fillMaxWidth(),
@@ -139,6 +156,8 @@ fun AddItemToDishScreen(navController: NavController, dishId: Long, dishName: St
                         selectUnit = { viewModel.selectUnit(it) },
                         setQuantity = { viewModel.setQuantity(it) }
                     )
+
+                    Spacer(Modifier.weight(1f))
 
                     ButtonRow(primaryButton = {
                         FCCPrimaryButton(
