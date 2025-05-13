@@ -18,7 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,7 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -49,9 +50,9 @@ import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.DetailItem
-import com.erdees.foodcostcalc.ui.composables.ExpandedIcon
 import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
+import com.erdees.foodcostcalc.ui.composables.TitleRow
 import com.erdees.foodcostcalc.ui.composables.animations.SearchFieldTransition
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCAnimatedFAB
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -265,7 +266,7 @@ private fun DishItem(
             .fillMaxWidth()
             .clickable { onExpandToggle() }, content = {
             Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
-                TitleRow(dishDomain, isExpanded)
+                TitleRow(dishDomain.name, isExpanded)
 
                 DishDetails(dishDomain, onChangeServingsClick, servings)
 
@@ -293,23 +294,6 @@ private fun DishItem(
 }
 
 @Composable
-private fun TitleRow(
-    dishDomain: DishDomain,
-    isExpanded: Boolean
-) {
-    Row(
-        Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.Top
-    ) {
-        Text(text = dishDomain.name, style = MaterialTheme.typography.titleLarge)
-        ExpandedIcon(isExpanded = isExpanded)
-    }
-}
-
-@Composable
 private fun DishDetails(
     dishDomain: DishDomain,
     onChangeServingsClicked: () -> Unit,
@@ -330,12 +314,16 @@ private fun DishDetails(
                 id = R.string.tax_value, dishDomain.taxPercent.toString()
             )
         )
-        DetailItem(
-            modifier = Modifier.clickable { onChangeServingsClicked() },
-            divider = false,
-            label = stringResource(id = R.string.portions),
-            value = servings.toInt().toString()
-        )
+        Spacer(Modifier.weight(1f))
+        FCCTextButton(
+            pluralStringResource(
+                R.plurals.portions,
+                servings.toInt(),
+                servings.toInt()
+            )
+        ) {
+            onChangeServingsClicked()
+        }
     }
 }
 
@@ -354,7 +342,8 @@ private fun PriceSummary(
         Spacer(modifier = Modifier.height(4.dp))
         PriceRow(
             description = stringResource(id = R.string.final_price),
-            price = dishDomain.formattedTotalPricePerServing(servings, currency)
+            price = dishDomain.formattedTotalPricePerServing(servings, currency),
+            style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
         )
     }
 }

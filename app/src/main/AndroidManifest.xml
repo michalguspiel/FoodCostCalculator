@@ -39,6 +39,9 @@
       android:value="ca-app-pub-5093191239349402~1464603569" />
     <meta-data android:name="com.google.android.gms.ads.flag.NATIVE_AD_DEBUGGER_ENABLED"
         android:value="false" />
+    <meta-data
+        android:name="preloaded_fonts"
+        android:resource="@array/preloaded_fonts" />
 
   </application>
 
