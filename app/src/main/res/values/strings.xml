@@ -190,8 +190,8 @@
     <string name="build_number">Build Number</string>
     <string name="settings_saved">Settings saved!</string>
     <string name="your_defaults">Your defaults</string>
-    <string name="use_metric_units">Use metric units.</string>
-    <string name="use_us_units">Use imperial units.</string>
+    <string name="use_metric_units">Use metric units</string>
+    <string name="use_us_units">Use imperial units</string>
     <string name="default_dish_tax">Default dish tax %</string>
     <string name="default_dish_tax_hint">Tax %</string>
     <string name="default_dish_margin">Default dish margin %</string>
@@ -201,6 +201,8 @@
     <string name="premium">Premium</string>
     <string name="account_services">Account &amp; Services</string>
     <string name="currencies_failed_to_load">Failed to load currencies</string>
+    <string name="personalize">Personalize</string>
+    <string name="use_half_products">Use half products</string>
 
     <!-- DATA BACKUP -->
     <string name="signing_info">Sign in with google account to save and download your database from google drive.</string>

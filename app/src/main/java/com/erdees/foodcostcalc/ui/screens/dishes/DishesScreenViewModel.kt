@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class DishesFragmentViewModel : FCCBaseViewModel(), KoinComponent {
+class DishesScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
     private val dishRepository: DishRepository by inject()
     private val analyticsRepository: AnalyticsRepository by inject()

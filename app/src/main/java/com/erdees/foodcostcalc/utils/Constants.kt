@@ -2,7 +2,6 @@ package com.erdees.foodcostcalc.utils
 
 object Constants {
 
-    const val SUBSCRIPTION_STATE = "subscription_state"
 
     object Ads {
         const val PRODUCTS_AD_FREQUENCY = 4
@@ -53,12 +52,18 @@ object Constants {
         const val SEARCH_DEBOUNCE_MS = 500L
     }
 
-    const val METRIC = "metric"
-    const val IMPERIAL = "usa"
+    object Preferences {
+        const val METRIC = "metric"
+        const val IMPERIAL = "usa"
 
-    const val MARGIN = "margin"
-    const val TAX = "tax"
-    const val PREFERRED_CURRENCY_CODE = "preferred_currency"
+        const val MARGIN = "margin"
+        const val TAX = "tax"
+        const val PREFERRED_CURRENCY_CODE = "preferred_currency"
+        const val SUBSCRIPTION_STATE = "subscription_state"
+        const val SHOW_HALF_PRODUCTS = "show_half_products"
+    }
+
+
 
     const val BASIC_MARGIN = 100
     const val BASIC_TAX = 23

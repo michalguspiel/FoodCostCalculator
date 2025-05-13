@@ -7,5 +7,6 @@ data class UserSettings(
     val defaultTax: String,
     val currency: Currency?,
     val metricUsed: Boolean,
-    val imperialUsed: Boolean
+    val imperialUsed: Boolean,
+    val showHalfProducts: Boolean
 )
