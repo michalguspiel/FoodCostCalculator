@@ -297,8 +297,6 @@ private fun Defaults(
             settingsScreenCallbacks.updateDefaultMargin(it)
         }
 
-        FieldLabel(text = stringResource(id = R.string.units_section))
-
         CheckBoxField(
             title = stringResource(id = R.string.use_metric_units),
             value = settings?.metricUsed == true,
@@ -311,6 +309,11 @@ private fun Defaults(
             onValueChange = { settingsScreenCallbacks.updateImperialUsed(it) }
         )
 
+        CheckBoxField(
+            title = stringResource(id = R.string.use_half_products),
+            value = settings?.showHalfProducts == true,
+            onValueChange = { settingsScreenCallbacks.updateShowHalfProducts(it) }
+        )
 
         Column {
             FieldLabel(text = stringResource(id = R.string.default_currency))
@@ -321,12 +324,6 @@ private fun Defaults(
                 selectCurrency = { settingsScreenCallbacks.updateDefaultCurrencyCode(it) }
             )
         }
-
-        CheckBoxField(
-            title = stringResource(id = R.string.use_half_products),
-            value = settings?.showHalfProducts == true,
-            onValueChange = { settingsScreenCallbacks.updateShowHalfProducts(it) }
-        )
 
         ButtonRow(primaryButton = { FCCPrimaryButton(
                 text = stringResource(id = R.string.save),
