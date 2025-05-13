@@ -26,7 +26,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -76,7 +75,6 @@ import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import com.google.android.play.core.ktx.requestReview
 import com.google.android.play.core.review.ReviewManagerFactory
-import kotlinx.coroutines.launch
 import java.util.Locale
 
 const val ReviewThreshold = 6
@@ -102,7 +100,6 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
     val currency by viewModel.currency.collectAsState()
     val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
     val askForReview by viewModel.askForReview.collectAsState()
-    val coroutineScope = rememberCoroutineScope()
 
     val callbacks = DishesScreenCallbacks(
         viewModel::onAdFailedToLoad,
@@ -119,7 +116,6 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
         if (activity == null) return@LaunchedEffect
         if (askForReview) {
             val manager = ReviewManagerFactory.create(context)
-            coroutineScope.launch {
                 runCatching {
                     manager.requestReview()
                 }.onFailure {
@@ -129,7 +125,6 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                         .addOnSuccessListener { viewModel.reviewSuccess() }
                         .addOnFailureListener { viewModel.reviewFailure(it) }
                 }
-            }
         }
     }
 
