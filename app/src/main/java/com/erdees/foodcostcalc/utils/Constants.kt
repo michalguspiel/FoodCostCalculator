@@ -35,6 +35,9 @@ object Constants {
         const val DATABASE_OPERATION_SUCCESS = "database_operation_success"
         const val DATABASE_OPERATION_ERROR = "database_operation_error"
 
+        const val REVIEW_FAILURE = "review_failure"
+        const val REVIEW_SUCCESS = "review_success"
+
         object Buttons {
             const val DISHES_EDIT_DISPLAYED_PORTIONS = "dishes_edit_displayed_portions"
             const val RECIPE_EDIT_DISPLAYED_PORTIONS = "recipe_edit_displayed_portions"
