@@ -116,15 +116,15 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
         if (activity == null) return@LaunchedEffect
         if (askForReview) {
             val manager = ReviewManagerFactory.create(context)
-                runCatching {
-                    manager.requestReview()
-                }.onFailure {
-                    viewModel.reviewFailure(it)
-                }.onSuccess { result ->
-                    manager.launchReviewFlow(activity, result)
-                        .addOnSuccessListener { viewModel.reviewSuccess() }
-                        .addOnFailureListener { viewModel.reviewFailure(it) }
-                }
+            runCatching {
+                manager.requestReview()
+            }.onFailure {
+                viewModel.reviewFailure(it)
+            }.onSuccess { result ->
+                manager.launchReviewFlow(activity, result)
+                    .addOnSuccessListener { viewModel.reviewSuccess() }
+                    .addOnFailureListener { viewModel.reviewFailure(it) }
+            }
         }
     }
 
