@@ -79,6 +79,16 @@ import com.google.android.play.core.review.ReviewManagerFactory
 import kotlinx.coroutines.launch
 import java.util.Locale
 
+const val ReviewThreshold = 6
+
+data class DishesScreenCallbacks(
+    val onAdFailedToLoad: () -> Unit,
+    val onExpandToggle: (Item) -> Unit,
+    val onChangeServingsClick: (Long) -> Unit,
+    val updateSearchKey: (String) -> Unit,
+    val userCanBeAskedForReview: () -> Unit
+)
+
 @Composable
 @Screen
 fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel = viewModel()) {
@@ -93,6 +103,14 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
     val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
     val askForReview by viewModel.askForReview.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+
+    val callbacks = DishesScreenCallbacks(
+        viewModel::onAdFailedToLoad,
+        viewModel.listPresentationStateHandler::onExpandToggle,
+        viewModel::onChangeServingsClick,
+        viewModel::updateSearchKey,
+        viewModel::userCanBeAskedForReview
+    )
 
     val activity = LocalActivity.current
     val context = LocalContext.current
@@ -142,11 +160,7 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                         navController,
                         isVisible.value,
                         searchKey,
-                        viewModel::onAdFailedToLoad,
-                        viewModel.listPresentationStateHandler::onExpandToggle,
-                        viewModel::onChangeServingsClick,
-                        viewModel::updateSearchKey,
-                        viewModel::userCanBeAskedForReview
+                        callbacks
                     )
                 }
             } ?: ScreenLoadingOverlay(Modifier.fillMaxSize())
@@ -212,11 +226,7 @@ private fun DishesScreenContent(
     navController: NavController,
     isVisible: Boolean,
     searchKey: String,
-    onAdFailedToLoad: () -> Unit,
-    onExpandToggle: (Item) -> Unit,
-    onChangeServingsClick: (Long) -> Unit,
-    updateSearchKey: (String) -> Unit,
-    userCanBeAskedForReview: () -> Unit
+    callbacks: DishesScreenCallbacks
 ) {
     Box(
         contentAlignment = Alignment.TopCenter
@@ -228,8 +238,8 @@ private fun DishesScreenContent(
             contentPadding = PaddingValues(top = (36 + 8 + 8).dp)
         ) {
             itemsIndexed(listItems) { i, item ->
-                if (i == 6) {
-                    userCanBeAskedForReview()
+                if (i == ReviewThreshold) {
+                    callbacks.userCanBeAskedForReview()
                 }
                 when (item) {
                     is Ad -> {
@@ -237,7 +247,7 @@ private fun DishesScreenContent(
                             modifier = Modifier.padding(vertical = 8.dp),
                             adUnitId = if (BuildConfig.DEBUG) Constants.Ads.ADMOB_TEST_AD_UNIT_ID
                             else Constants.Ads.ADMOB_DISHES_AD_UNIT_ID,
-                            onAdFailedToLoad = { onAdFailedToLoad() }
+                            onAdFailedToLoad = { callbacks.onAdFailedToLoad() }
                         )
                     }
 
@@ -252,10 +262,10 @@ private fun DishesScreenContent(
                                 servings = itemPresentationState.quantity,
                                 currency = currency,
                                 onExpandToggle = {
-                                    onExpandToggle(item)
+                                    callbacks.onExpandToggle(item)
                                 },
                                 onChangeServingsClick = {
-                                    onChangeServingsClick(item.id)
+                                    callbacks.onChangeServingsClick(item.id)
                                 },
                                 onAddItemsClick = {
                                     navController.navigate(
@@ -277,7 +287,7 @@ private fun DishesScreenContent(
             SearchField(
                 modifier = Modifier,
                 value = searchKey,
-                onValueChange = { updateSearchKey(it) }
+                onValueChange = { callbacks.updateSearchKey(it) }
             )
         }
     }
