@@ -31,6 +31,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         _screenState.value = ScreenState.Idle
     }
 
+    @Suppress("MagicNumber")
     private suspend fun getSettingsModel(): UserSettings {
         return combine(
             preferences.defaultMargin,
