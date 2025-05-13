@@ -19,7 +19,7 @@ import timber.log.Timber
 interface AnalyticsRepository {
     fun logEvent(event: String, bundle: Bundle?)
 
-    fun logException(exception: Exception, bundle: Bundle?)
+    fun logException(exception: Throwable, bundle: Bundle?)
 }
 
 class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) :
@@ -33,7 +33,7 @@ class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) 
     }
 
     override fun logException(
-        exception: Exception,
+        exception: Throwable,
         bundle: Bundle?
     ) {
         bundle?.apply {

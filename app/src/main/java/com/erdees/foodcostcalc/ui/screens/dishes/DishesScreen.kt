@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.dishes
 
 import android.icu.util.Currency
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,22 +14,25 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -70,6 +74,9 @@ import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
+import com.google.android.play.core.ktx.requestReview
+import com.google.android.play.core.review.ReviewManagerFactory
+import kotlinx.coroutines.launch
 import java.util.Locale
 
 @Composable
@@ -84,6 +91,29 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
     val isEmptyListContentVisible by viewModel.isEmptyListContentVisible.collectAsState()
     val currency by viewModel.currency.collectAsState()
     val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
+    val askForReview by viewModel.askForReview.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+
+    val activity = LocalActivity.current
+    val context = LocalContext.current
+
+    LaunchedEffect(askForReview) {
+        if (activity == null) return@LaunchedEffect
+        if (askForReview) {
+            val manager = ReviewManagerFactory.create(context)
+            coroutineScope.launch {
+                runCatching {
+                    manager.requestReview()
+                }.onFailure {
+                    viewModel.reviewFailure(it)
+                }.onSuccess { result ->
+                    manager.launchReviewFlow(activity, result)
+                        .addOnSuccessListener { viewModel.reviewSuccess() }
+                        .addOnFailureListener { viewModel.reviewFailure(it) }
+                }
+            }
+        }
+    }
 
     Scaffold(modifier = Modifier, floatingActionButton = {
         if (!isEmptyListContentVisible) {
@@ -115,7 +145,8 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                         viewModel::onAdFailedToLoad,
                         viewModel.listPresentationStateHandler::onExpandToggle,
                         viewModel::onChangeServingsClick,
-                        viewModel::updateSearchKey
+                        viewModel::updateSearchKey,
+                        viewModel::userCanBeAskedForReview
                     )
                 }
             } ?: ScreenLoadingOverlay(Modifier.fillMaxSize())
@@ -184,7 +215,8 @@ private fun DishesScreenContent(
     onAdFailedToLoad: () -> Unit,
     onExpandToggle: (Item) -> Unit,
     onChangeServingsClick: (Long) -> Unit,
-    updateSearchKey: (String) -> Unit
+    updateSearchKey: (String) -> Unit,
+    userCanBeAskedForReview: () -> Unit
 ) {
     Box(
         contentAlignment = Alignment.TopCenter
@@ -195,7 +227,10 @@ private fun DishesScreenContent(
                 .padding(horizontal = 8.dp),
             contentPadding = PaddingValues(top = (36 + 8 + 8).dp)
         ) {
-            items(listItems) { item ->
+            itemsIndexed(listItems) { i, item ->
+                if (i == 6) {
+                    userCanBeAskedForReview()
+                }
                 when (item) {
                     is Ad -> {
                         Ad(
