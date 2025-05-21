@@ -1,5 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.dishes
 
+import android.app.Activity
+import android.content.Context
 import android.icu.util.Currency
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
@@ -26,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +41,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.BuildConfig
@@ -75,6 +82,8 @@ import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import com.google.android.play.core.ktx.requestReview
 import com.google.android.play.core.review.ReviewManagerFactory
+import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Locale
 
 const val ReviewThreshold = 6
@@ -109,24 +118,11 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
         viewModel::userCanBeAskedForReview
     )
 
-    val activity = LocalActivity.current
-    val context = LocalContext.current
-
-    LaunchedEffect(askForReview) {
-        if (activity == null) return@LaunchedEffect
-        if (askForReview) {
-            val manager = ReviewManagerFactory.create(context)
-            runCatching {
-                manager.requestReview()
-            }.onFailure {
-                viewModel.reviewFailure(it)
-            }.onSuccess { result ->
-                manager.launchReviewFlow(activity, result)
-                    .addOnSuccessListener { viewModel.reviewSuccess() }
-                    .addOnFailureListener { viewModel.reviewFailure(it) }
-            }
-        }
-    }
+    AskForReviewEffect(
+        askForReview = askForReview,
+        onReviewLaunch = { viewModel.reviewSuccess() },
+        onFailure = { viewModel.reviewFailure(it) }
+    )
 
     Scaffold(modifier = Modifier, floatingActionButton = {
         if (!isEmptyListContentVisible) {
@@ -139,7 +135,8 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
         }
     }) { paddingValues ->
         Box(
-            contentAlignment = Alignment.TopCenter, modifier = Modifier.padding(paddingValues)
+            contentAlignment = Alignment.TopCenter,
+            modifier = Modifier.padding(paddingValues)
         ) {
             listItems?.let { listItems ->
                 if (isEmptyListContentVisible) {
@@ -207,6 +204,42 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                 }
 
                 else -> {}
+            }
+        }
+    }
+}
+
+@Composable
+fun AskForReviewEffect(
+    askForReview: Boolean,
+    onReviewLaunch: () -> Unit,
+    onFailure: (Throwable) -> Unit,
+    context: Context = LocalContext.current,
+    activity: Activity? = LocalActivity.current
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val currentOnReviewLaunched by rememberUpdatedState(onReviewLaunch)
+    val currentOnFailure by rememberUpdatedState(onFailure)
+    LaunchedEffect(askForReview) {
+        if (!askForReview || activity == null) return@LaunchedEffect
+
+        lifecycleOwner.lifecycleScope.launch {
+            lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                val reviewManager = ReviewManagerFactory.create(context)
+
+                runCatching {
+                    reviewManager.requestReview()
+                }.onFailure {
+                    currentOnFailure(it)
+                }.onSuccess { reviewInfo ->
+                    Timber.i(reviewInfo.toString())
+                    reviewManager.launchReviewFlow(activity, reviewInfo)
+                        .addOnSuccessListener { currentOnReviewLaunched() }
+                        .addOnFailureListener { currentOnFailure(it) }
+                }
+
+                // Only run once per true value
+                return@repeatOnLifecycle
             }
         }
     }
