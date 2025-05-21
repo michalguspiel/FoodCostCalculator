@@ -37,6 +37,7 @@ google-services = "4.4.2"
 ksp = "2.0.10-1.0.24"
 crashlytics = "3.0.3"
 androidx_datastore = "1.1.4"
+google_fonts = "1.8.1"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -100,3 +101,4 @@ detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-form
 compose-rules-detekt = { group = "io.nlopez.compose.rules", name = "detekt", version.ref = "compose_rules_detekt" }
 androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx_datastore"}
 canary-leak = { group = "com.squareup.leakcanary", name = "leakcanary-android", version = "2.14" }
+google-fonts = {group = "androidx.compose.ui", name = "ui-text-google-fonts", version = "google_fonts"}

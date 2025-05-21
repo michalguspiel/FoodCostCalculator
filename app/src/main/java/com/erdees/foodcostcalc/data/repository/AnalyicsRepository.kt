@@ -20,6 +20,8 @@ interface AnalyticsRepository {
     fun logEvent(event: String, bundle: Bundle?)
 
     fun logException(exception: Throwable, bundle: Bundle?)
+
+    fun logException(exception: Throwable, origin: String)
 }
 
 class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) :
@@ -38,6 +40,18 @@ class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) 
     ) {
         bundle?.apply {
             putString(Constants.Analytics.Exceptions.MESSAGE, exception.message)
+        }
+        if (!BuildConfig.DEBUG) {
+            firebaseAnalytics.logEvent(Constants.Analytics.Exceptions.EVENT, bundle)
+        } else {
+            Timber.d("Exception: $exception, Bundle: $bundle")
+        }
+    }
+
+    override fun logException(exception: Throwable, origin: String) {
+        val bundle = Bundle().apply {
+            putString(Constants.Analytics.Exceptions.MESSAGE, exception.message)
+            putString(Constants.Analytics.Exceptions.ORIGINATION, origin)
         }
         if (!BuildConfig.DEBUG) {
             firebaseAnalytics.logEvent(Constants.Analytics.Exceptions.EVENT, bundle)

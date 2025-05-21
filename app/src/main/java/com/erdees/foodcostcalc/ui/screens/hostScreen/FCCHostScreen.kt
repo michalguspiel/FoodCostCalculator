@@ -13,6 +13,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,8 +22,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,6 +37,7 @@ import com.erdees.foodcostcalc.ui.navigation.FCCNavigation
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.utils.Constants
+import kotlinx.coroutines.CoroutineExceptionHandler
 import org.koin.compose.koinInject
 
 @Screen
@@ -46,6 +51,9 @@ fun FCCHostScreen(
     val currentDestination by remember(navBackStackEntry) { mutableStateOf(navBackStackEntry?.destination?.route) }
     var isNavigationBarVisible by rememberSaveable { mutableStateOf(showNavBar(currentDestination, analyticsRepository)) }
     val bottomNavigationScreens by viewModel.bottomNavigationScreens.collectAsState()
+    val fontLoaderHandler = CoroutineExceptionHandler { _, throwable ->
+        analyticsRepository.logException(throwable, Constants.Analytics.Exceptions.FONT_LOAD_FAILURE)
+    }
 
     LaunchedEffect(Unit) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -59,44 +67,48 @@ fun FCCHostScreen(
         }
     }
 
-    Scaffold(
-        contentWindowInsets = WindowInsets.safeDrawing,
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            AnimatedVisibility(isNavigationBarVisible && bottomNavigationScreens != null) {
-                NavigationBar {
-                    bottomNavigationScreens?.forEach { item ->
-                        NavigationBarItem(
-                            selected = currentDestination == item::class.qualifiedName,
-                            onClick = {
-                                if (currentDestination != item::class.qualifiedName) {
-                                    navController.navigate(item) {
-                                        popUpTo(item) { inclusive = true }
-                                        launchSingleTop = true
-                                        restoreState = true
+    CompositionLocalProvider(
+        LocalFontFamilyResolver provides createFontFamilyResolver(LocalContext.current, fontLoaderHandler)
+    ) {
+        Scaffold(
+            contentWindowInsets = WindowInsets.safeDrawing,
+            modifier = Modifier.fillMaxSize(),
+            bottomBar = {
+                AnimatedVisibility(isNavigationBarVisible && bottomNavigationScreens != null) {
+                    NavigationBar {
+                        bottomNavigationScreens?.forEach { item ->
+                            NavigationBarItem(
+                                selected = currentDestination == item::class.qualifiedName,
+                                onClick = {
+                                    if (currentDestination != item::class.qualifiedName) {
+                                        navController.navigate(item) {
+                                            popUpTo(item) { inclusive = true }
+                                            launchSingleTop = true
+                                            restoreState = true
+                                        }
                                     }
-                                }
-                            },
-                            icon = {
-                                Icon(
-                                    modifier = Modifier.size(24.dp),
-                                    painter = painterResource(id = item.iconResourceId),
-                                    contentDescription = stringResource(id = item.iconResourceId)
-                                )
-                            },
-                            label = {
-                                Text(
-                                    text = stringResource(id = item.nameStringRes),
-                                    style = MaterialTheme.typography.labelMedium,
-                                    textAlign = TextAlign.Center
-                                )
-                            })
+                                },
+                                icon = {
+                                    Icon(
+                                        modifier = Modifier.size(24.dp),
+                                        painter = painterResource(id = item.iconResourceId),
+                                        contentDescription = stringResource(id = item.iconResourceId)
+                                    )
+                                },
+                                label = {
+                                    Text(
+                                        text = stringResource(id = item.nameStringRes),
+                                        style = MaterialTheme.typography.labelMedium,
+                                        textAlign = TextAlign.Center
+                                    )
+                                })
+                        }
                     }
                 }
             }
+        ) { paddingValues ->
+            FCCNavigation(paddingValues = paddingValues, navController = navController)
         }
-    ) { paddingValues ->
-        FCCNavigation(paddingValues = paddingValues, navController = navController)
     }
 }
 

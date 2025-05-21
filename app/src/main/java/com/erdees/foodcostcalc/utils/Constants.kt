@@ -47,7 +47,9 @@ object Constants {
         object Exceptions {
             const val EVENT = "caught_logged_exception"
             const val MESSAGE = "exception_message"
+            const val ORIGINATION = "origination"
             const val SHOW_NAV_BAR = "show_nav_bar"
+            const val FONT_LOAD_FAILURE = "font_load_failure"
         }
     }
 

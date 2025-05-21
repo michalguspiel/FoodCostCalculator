@@ -217,6 +217,9 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore)
 
+    // Google Fonts
+    implementation(libs.google.fonts)
+
     // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.runner)
