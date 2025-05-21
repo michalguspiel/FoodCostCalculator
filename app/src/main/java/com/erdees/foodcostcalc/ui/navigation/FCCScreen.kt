@@ -26,13 +26,13 @@ sealed class FCCScreen(
     @Serializable
     data object Dishes : FCCScreen(R.string.dishes, R.drawable.dishes)
 
-    /** Rest */
-    @Serializable
-    data object CreateProduct : FCCScreen()
-
     @Keep
     @Serializable
     data object Settings : FCCScreen(R.string.settings, R.drawable.settings)
+
+    /** Rest */
+    @Serializable
+    data object CreateProduct : FCCScreen()
 
     @Keep
     @Serializable
@@ -63,7 +63,6 @@ sealed class FCCScreen(
     data object Recipe : FCCScreen()
 
     companion object {
-        val bottomNavigationScreens = listOf(Products, HalfProducts, Dishes, Settings)
         const val DISH_ID_KEY = "dishId"
     }
 }
