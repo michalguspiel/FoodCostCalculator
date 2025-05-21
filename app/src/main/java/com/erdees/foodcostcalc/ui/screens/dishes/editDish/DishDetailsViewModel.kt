@@ -2,10 +2,12 @@ package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
@@ -23,6 +25,7 @@ import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,6 +51,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -309,6 +313,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun shareDish(context: Context) {
+        analyticsRepository.logEvent(Constants.Analytics.DISH_SHARE, Bundle().apply{
+            putString(Constants.Analytics.DISH_NAME, _dish.value?.name)
+        })
+
         val shareableText = _dish.value?.toShareableText(context, currency.value).also {
             Timber.i(it)
         }

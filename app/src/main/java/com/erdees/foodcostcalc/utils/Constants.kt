@@ -27,6 +27,9 @@ object Constants {
         const val SCREEN_NAME = "screen_name"
         const val NAV_EVENT = "navigation_event"
 
+        const val DISH_SHARE = "dish_share_click"
+        const val DISH_NAME = "dish_name"
+
         const val AD_FAILED_TO_LOAD =  "ad_failed_to_load"
 
         const val LOAD_DATABASE = "load_database"
@@ -47,7 +50,6 @@ object Constants {
         object Exceptions {
             const val EVENT = "caught_logged_exception"
             const val MESSAGE = "exception_message"
-            const val SHOW_NAV_BAR = "show_nav_bar"
         }
     }
 
