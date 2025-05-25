@@ -185,7 +185,7 @@ private fun FeatureRequestScreenContent(
 
 @Preview
 @Composable
-fun FeatureRequestScreenPreview() {
+private fun FeatureRequestScreenPreview() {
     FeatureRequestScreenContent(
         navController = rememberNavController(),
         title = "",

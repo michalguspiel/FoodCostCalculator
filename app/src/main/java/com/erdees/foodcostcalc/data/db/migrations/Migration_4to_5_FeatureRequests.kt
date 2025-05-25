@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.data.db.migrations
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 
+@Suppress("ClassName", "MagicNumber")
 class Migration_4to_5_FeatureRequests : Migration(4, 5) {
     override fun migrate(db: SupportSQLiteDatabase) {
 

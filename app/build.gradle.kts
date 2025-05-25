@@ -132,7 +132,6 @@ detekt {
 }
 
 dependencies {
-    implementation(libs.firebase.firestore.ktx)
     // Compose BOM
     val composeBom = platform(libs.compose.bom)
     implementation(composeBom)

@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.composables // Or your preferred package
+package com.erdees.foodcostcalc.ui.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -21,19 +21,20 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
 @Composable
 fun InfoBox(
-    modifier: Modifier = Modifier,
     title: String,
     description: String,
-    icon: ImageVector? = Icons.Sharp.Info, // Optional icon, defaults to Info
-    iconTint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary // Or onSurfaceVariant
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = Icons.Sharp.Info,
+    iconTint: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.primary
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clip(MaterialTheme.shapes.medium) // Rounded corners
+            .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp))
             .padding(16.dp),
         verticalAlignment = Alignment.Top
@@ -68,7 +69,7 @@ fun InfoBox(
 @Preview(showBackground = true)
 @Composable
 private fun InfoBoxPreview() {
-    MaterialTheme { // Wrap with your app's theme for accurate preview
+    FCCTheme {
         Column(modifier = Modifier.padding(16.dp)) {
             InfoBox(
                 title = "Important Information",
