@@ -3,10 +3,10 @@ package com.erdees.foodcostcalc.data.repository
 import com.erdees.foodcostcalc.data.db.dao.dish.DishDao
 import com.erdees.foodcostcalc.data.db.dao.dish.HalfProductDishDao
 import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
-import com.erdees.foodcostcalc.data.model.DishBase
-import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
-import com.erdees.foodcostcalc.data.model.associations.ProductDish
-import com.erdees.foodcostcalc.data.model.joined.CompleteDish
+import com.erdees.foodcostcalc.data.model.local.DishBase
+import com.erdees.foodcostcalc.data.model.local.associations.HalfProductDish
+import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
+import com.erdees.foodcostcalc.data.model.local.joined.CompleteDish
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

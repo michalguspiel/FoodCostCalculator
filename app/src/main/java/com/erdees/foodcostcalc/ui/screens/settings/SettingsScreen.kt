@@ -147,9 +147,9 @@ private fun SettingsScreenContent(
         },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
-
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(8.dp),
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
@@ -163,11 +163,16 @@ private fun SettingsScreenContent(
                 )
 
                 AccountServicesSection(
-                    modifier = Modifier.padding(vertical = 8.dp),
                     onPremiumClick = { navController.navigate(FCCScreen.Subscription) },
                     onOnlineDataBackupClick = {
                         navController.navigate(FCCScreen.DataBackup)
                     })
+
+                HelpAndFeedbackSection {
+                    navController.navigate(
+                        FCCScreen.FeatureRequest
+                    )
+                }
 
                 AppInformation()
             }
@@ -183,12 +188,37 @@ private fun SettingsScreenContent(
 
                 is ScreenState.Error -> {
                     ErrorDialog {
-                       settingsScreenCallbacks.resetScreenState()
+                        settingsScreenCallbacks.resetScreenState()
                     }
                 }
 
                 else -> {}
             }
+        }
+    }
+}
+
+@Composable
+private fun HelpAndFeedbackSection(
+    modifier: Modifier = Modifier,
+    onFeatureRequestClick: () -> Unit
+) {
+    Section(modifier) {
+        SectionLabel(
+            text = stringResource(id = R.string.help_feedback),
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+
+        NavigationListItem(
+            title = stringResource(id = R.string.feature_request),
+            icon = {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    painter = painterResource(id = R.drawable.contact_support),
+                    contentDescription = stringResource(id = R.string.premium)
+                )
+            }) {
+            onFeatureRequestClick()
         }
     }
 }
@@ -325,7 +355,8 @@ private fun Defaults(
             )
         }
 
-        ButtonRow(primaryButton = { FCCPrimaryButton(
+        ButtonRow(primaryButton = {
+            FCCPrimaryButton(
                 text = stringResource(id = R.string.save),
                 enabled = saveButtonEnabled
             ) { settingsScreenCallbacks.saveSettings() }
@@ -452,6 +483,7 @@ private fun PreviewDefaults() {
             ),
             currencies = Currency.getAvailableCurrencies(),
             saveButtonEnabled = true,
-            settingsScreenCallbacks = SettingsScreenCallbacks())
+            settingsScreenCallbacks = SettingsScreenCallbacks()
+        )
     }
 }

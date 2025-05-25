@@ -2,8 +2,8 @@ package com.erdees.foodcostcalc.data.repository
 
 import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
 import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
-import com.erdees.foodcostcalc.data.model.ProductBase
-import com.erdees.foodcostcalc.data.model.associations.ProductDish
+import com.erdees.foodcostcalc.data.model.local.ProductBase
+import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
 import kotlinx.coroutines.flow.Flow
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject

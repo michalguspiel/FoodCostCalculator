@@ -5,6 +5,7 @@ import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.data.di.dbModule
+import com.erdees.foodcostcalc.data.di.remoteDataModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
 import com.erdees.foodcostcalc.utils.di.utilModule
 import org.koin.android.ext.koin.androidContext
@@ -20,6 +21,7 @@ class MyApplication : Application() {
 
     // modules that need to be restarted after database recreation
     private val reloadableModules = listOf(dbModule, repositoryModule)
+    private val otherModules = listOf(utilModule, remoteDataModule)
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
@@ -52,7 +54,7 @@ class MyApplication : Application() {
             androidContext(this@MyApplication)
             // declare modules
             modules(
-                reloadableModules + utilModule
+                reloadableModules + otherModules
             )
         }
     }

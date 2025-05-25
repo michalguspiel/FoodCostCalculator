@@ -3,8 +3,8 @@ package com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
-import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
-import com.erdees.foodcostcalc.data.model.associations.ProductDish
+import com.erdees.foodcostcalc.data.model.local.associations.HalfProductDish
+import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain

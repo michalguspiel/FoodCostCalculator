@@ -4,9 +4,9 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import com.erdees.foodcostcalc.data.model.Recipe
-import com.erdees.foodcostcalc.data.model.RecipeStep
-import com.erdees.foodcostcalc.data.model.joined.RecipeWithSteps
+import com.erdees.foodcostcalc.data.model.local.Recipe
+import com.erdees.foodcostcalc.data.model.local.RecipeStep
+import com.erdees.foodcostcalc.data.model.local.joined.RecipeWithSteps
 
 @Dao
 interface RecipeDao {

@@ -1,7 +1,7 @@
 package com.erdees.foodcostcalc.ui.composables.fields
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -26,7 +26,7 @@ fun FCCTextField(
             modifier = Modifier.padding(bottom = 4.dp)
         )
         OutlinedTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxSize(),
             value = value,
             singleLine = singleLine,
             maxLines = maxLines,

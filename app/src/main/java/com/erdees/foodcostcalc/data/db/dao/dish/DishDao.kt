@@ -6,8 +6,8 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.erdees.foodcostcalc.data.model.DishBase
-import com.erdees.foodcostcalc.data.model.joined.CompleteDish
+import com.erdees.foodcostcalc.data.model.local.DishBase
+import com.erdees.foodcostcalc.data.model.local.joined.CompleteDish
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -1,9 +1,9 @@
-package com.erdees.foodcostcalc.data.model.joined
+package com.erdees.foodcostcalc.data.model.local.joined
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.erdees.foodcostcalc.data.model.HalfProductBase
-import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
+import com.erdees.foodcostcalc.data.model.local.HalfProductBase
+import com.erdees.foodcostcalc.data.model.local.associations.HalfProductDish
 
 data class HalfProductUsedInDish(
     @Embedded val halfProductDish: HalfProductDish,

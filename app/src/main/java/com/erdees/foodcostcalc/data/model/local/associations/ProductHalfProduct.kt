@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.data.model.associations
+package com.erdees.foodcostcalc.data.model.local.associations
 
 import androidx.annotation.Keep
 import androidx.room.Entity
@@ -6,8 +6,8 @@ import androidx.room.ForeignKey
 import androidx.room.Ignore
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.erdees.foodcostcalc.data.model.HalfProductBase
-import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.local.HalfProductBase
+import com.erdees.foodcostcalc.data.model.local.ProductBase
 
 @Keep
 @Entity(

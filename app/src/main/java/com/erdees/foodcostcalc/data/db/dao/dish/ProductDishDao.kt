@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.erdees.foodcostcalc.data.model.associations.ProductDish
+import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
 
 @Dao
 interface ProductDishDao {
