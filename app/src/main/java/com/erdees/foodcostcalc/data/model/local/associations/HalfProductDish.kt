@@ -1,12 +1,12 @@
-package com.erdees.foodcostcalc.data.model.associations
+package com.erdees.foodcostcalc.data.model.local.associations
 
 import androidx.annotation.Keep
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.erdees.foodcostcalc.data.model.DishBase
-import com.erdees.foodcostcalc.data.model.HalfProductBase
+import com.erdees.foodcostcalc.data.model.local.DishBase
+import com.erdees.foodcostcalc.data.model.local.HalfProductBase
 
 @Keep
 @Entity(

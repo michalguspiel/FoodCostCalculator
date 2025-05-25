@@ -2,7 +2,7 @@ package com.erdees.foodcostcalc.ui.screens.products.editProduct
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableProductDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductBase

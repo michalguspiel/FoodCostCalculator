@@ -1,19 +1,21 @@
 package com.erdees.foodcostcalc.domain.mapper
 
-import com.erdees.foodcostcalc.data.model.DishBase
-import com.erdees.foodcostcalc.data.model.HalfProductBase
-import com.erdees.foodcostcalc.data.model.ProductBase
-import com.erdees.foodcostcalc.data.model.Recipe
-import com.erdees.foodcostcalc.data.model.RecipeStep
-import com.erdees.foodcostcalc.data.model.associations.HalfProductDish
-import com.erdees.foodcostcalc.data.model.associations.ProductDish
-import com.erdees.foodcostcalc.data.model.associations.ProductHalfProduct
-import com.erdees.foodcostcalc.data.model.joined.CompleteDish
-import com.erdees.foodcostcalc.data.model.joined.CompleteHalfProduct
-import com.erdees.foodcostcalc.data.model.joined.HalfProductUsedInDish
-import com.erdees.foodcostcalc.data.model.joined.ProductAndProductDish
-import com.erdees.foodcostcalc.data.model.joined.ProductUsedInHalfProduct
-import com.erdees.foodcostcalc.data.model.joined.RecipeWithSteps
+import com.erdees.foodcostcalc.data.model.local.DishBase
+import com.erdees.foodcostcalc.data.model.local.FeatureRequestEntity
+import com.erdees.foodcostcalc.data.model.local.HalfProductBase
+import com.erdees.foodcostcalc.data.model.local.ProductBase
+import com.erdees.foodcostcalc.data.model.local.Recipe
+import com.erdees.foodcostcalc.data.model.local.RecipeStep
+import com.erdees.foodcostcalc.data.model.local.associations.HalfProductDish
+import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
+import com.erdees.foodcostcalc.data.model.local.associations.ProductHalfProduct
+import com.erdees.foodcostcalc.data.model.local.joined.CompleteDish
+import com.erdees.foodcostcalc.data.model.local.joined.CompleteHalfProduct
+import com.erdees.foodcostcalc.data.model.local.joined.HalfProductUsedInDish
+import com.erdees.foodcostcalc.data.model.local.joined.ProductAndProductDish
+import com.erdees.foodcostcalc.data.model.local.joined.ProductUsedInHalfProduct
+import com.erdees.foodcostcalc.data.model.local.joined.RecipeWithSteps
+import com.erdees.foodcostcalc.data.model.remote.FeatureRequest
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
@@ -23,6 +25,7 @@ import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
+import java.util.Date
 
 object Mapper {
     fun CompleteDish.toDishDomain(): DishDomain {
@@ -186,7 +189,7 @@ object Mapper {
         )
     }
 
-    private fun RecipeStep.toRecipeStepDomain() : RecipeStepDomain {
+    private fun RecipeStep.toRecipeStepDomain(): RecipeStepDomain {
         return RecipeStepDomain(id, order, stepDescription)
     }
 
@@ -221,6 +224,19 @@ object Mapper {
             recipeId = recipeId,
             stepDescription = stepDescription,
             order = newOrder ?: order
+        )
+    }
+
+    /**
+     * Creates entity out of remote feature request data model. Takes generated id from firestore and
+     * uses it as entity id. Takes timestamp from local device, as timestamp isn't so critical for this.
+     * */
+    fun FeatureRequest.toEntity(id: String, timeStamp: Date): FeatureRequestEntity {
+        return FeatureRequestEntity(
+            id = id,
+            title = this.title,
+            description = this.description,
+            timestamp = timeStamp
         )
     }
 }

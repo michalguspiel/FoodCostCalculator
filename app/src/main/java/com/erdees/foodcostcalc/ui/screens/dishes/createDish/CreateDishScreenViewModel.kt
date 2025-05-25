@@ -3,7 +3,7 @@ package com.erdees.foodcostcalc.ui.screens.dishes.createDish
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
-import com.erdees.foodcostcalc.data.model.DishBase
+import com.erdees.foodcostcalc.data.model.local.DishBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.utils.Constants

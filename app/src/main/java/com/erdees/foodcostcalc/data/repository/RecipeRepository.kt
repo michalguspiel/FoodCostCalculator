@@ -1,9 +1,9 @@
 package com.erdees.foodcostcalc.data.repository
 
 import com.erdees.foodcostcalc.data.db.dao.recipe.RecipeDao
-import com.erdees.foodcostcalc.data.model.Recipe
-import com.erdees.foodcostcalc.data.model.RecipeStep
-import com.erdees.foodcostcalc.data.model.joined.RecipeWithSteps
+import com.erdees.foodcostcalc.data.model.local.Recipe
+import com.erdees.foodcostcalc.data.model.local.RecipeStep
+import com.erdees.foodcostcalc.data.model.local.joined.RecipeWithSteps
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 

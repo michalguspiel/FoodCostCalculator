@@ -62,6 +62,12 @@ sealed class FCCScreen(
     @Serializable
     data object Recipe : FCCScreen()
 
+    @Serializable
+    data object FeatureRequest: FCCScreen()
+
+    @Serializable
+    data object FeatureRequestList: FCCScreen()
+
     companion object {
         const val DISH_ID_KEY = "dishId"
     }

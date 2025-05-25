@@ -6,6 +6,7 @@ import com.erdees.foodcostcalc.data.PreferencesImpl
 import com.erdees.foodcostcalc.data.db.dao.dish.DishDao
 import com.erdees.foodcostcalc.data.db.dao.dish.HalfProductDishDao
 import com.erdees.foodcostcalc.data.db.dao.dish.ProductDishDao
+import com.erdees.foodcostcalc.data.db.dao.featurerequest.FeatureRequestDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.HalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.halfproduct.ProductHalfProductDao
 import com.erdees.foodcostcalc.data.db.dao.product.ProductDao
@@ -24,4 +25,5 @@ val dbModule = module {
     single<HalfProductDishDao> { get<AppRoomDataBase>().halfProductDishDao() }
     single<ProductHalfProductDao> { get<AppRoomDataBase>().productHalfProductDao() }
     single<RecipeDao> { get<AppRoomDataBase>().recipeDao() }
+    single<FeatureRequestDao> { get<AppRoomDataBase>().featureRequestDao() }
 }

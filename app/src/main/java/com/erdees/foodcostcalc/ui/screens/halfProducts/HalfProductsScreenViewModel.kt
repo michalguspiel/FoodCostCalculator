@@ -3,7 +3,7 @@ package com.erdees.foodcostcalc.ui.screens.halfProducts
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
-import com.erdees.foodcostcalc.data.model.HalfProductBase
+import com.erdees.foodcostcalc.data.model.local.HalfProductBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain

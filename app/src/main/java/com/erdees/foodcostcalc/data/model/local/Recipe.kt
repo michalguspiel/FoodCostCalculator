@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.data.model
+package com.erdees.foodcostcalc.data.model.local
 
 import androidx.annotation.Keep
 import androidx.room.Entity

@@ -4,6 +4,8 @@ import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepositoryImpl
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.DishRepositoryImpl
+import com.erdees.foodcostcalc.data.repository.FeatureRequestRepository
+import com.erdees.foodcostcalc.data.repository.FeatureRequestRepositoryImpl
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.data.repository.HalfProductRepositoryImpl
 import com.erdees.foodcostcalc.data.repository.ProductRepository
@@ -19,6 +21,7 @@ val repositoryModule = module {
     single<ProductRepository> { ProductRepositoryImpl() }
     single<HalfProductRepository> { HalfProductRepositoryImpl() }
     single<RecipeRepository> { RecipeRepositoryImpl() }
+    single<FeatureRequestRepository> { FeatureRequestRepositoryImpl() }
 
     single<FirebaseAnalytics> { FirebaseAnalytics.getInstance(androidApplication()) }
     single<AnalyticsRepository> { AnalyticsRepositoryImpl(get()) }

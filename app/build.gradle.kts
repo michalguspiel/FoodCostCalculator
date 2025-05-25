@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         applicationId = "com.erdees.foodcostcalc"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = project.property("version_code").toString().toInt()
         versionName = project.property("version_name").toString()
@@ -194,6 +194,7 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
     implementation(libs.firebase.analytics.ktx)
+    implementation(libs.firebase.firestore.ktx)
 
     // Ads
     implementation(libs.play.services.ads)
@@ -228,6 +229,6 @@ dependencies {
     detektPlugins(libs.detekt.formatting)
     detektPlugins(libs.compose.rules.detekt)
 
-    // Canary Leak:
+    // Canary Leak
     debugImplementation(libs.canary.leak)
 }

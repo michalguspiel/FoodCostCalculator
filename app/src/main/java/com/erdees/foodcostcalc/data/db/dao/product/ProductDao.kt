@@ -1,12 +1,11 @@
 package com.erdees.foodcostcalc.data.db.dao.product
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.erdees.foodcostcalc.data.model.ProductBase
+import com.erdees.foodcostcalc.data.model.local.ProductBase
 import kotlinx.coroutines.flow.Flow
 
 @Dao

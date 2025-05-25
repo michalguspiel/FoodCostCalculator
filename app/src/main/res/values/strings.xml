@@ -53,6 +53,8 @@
 
     <!-- COMMON -->
 
+    <string name="description">Description</string>
+
     <string name="edit_quantity">Edit quantity</string>
     <string name="edit_name">Edit name</string>
 
@@ -158,7 +160,6 @@
     <string name="cook_time_title">Cook Time</string>
     <string name="cook_time_value">%1$s min</string>
     <string name="general_info_title">General</string>
-    <string name="description">Description</string>
     <string name="tips">Tips</string>
     <string name="steps_title">Steps</string>
     <string name="step_number">%1$s.</string>
@@ -200,9 +201,19 @@
     <string name="default_currency">Default currency</string>
     <string name="premium">Premium</string>
     <string name="account_services">Account &amp; Services</string>
+    <string name="help_feedback">Help &amp; Feedback</string>
     <string name="currencies_failed_to_load">Failed to load currencies</string>
     <string name="personalize">Personalize</string>
     <string name="use_half_products">Use half products</string>
+
+    <!-- FEATURE REQUEST -->
+    <string name="feature_request">Feature Request</string>
+    <string name="submit_feature_request">Submit a Feature Request</string>
+    <string name="submit">Submit</string>
+    <string name="title">Title</string>
+    <string name="visibility_of_feature_requests">Request Visibility</string>
+    <string name="only_approved_requests_info">Only feature requests that have been reviewed and approved will be visible to other users for upvoting.</string>
+    <string name="feature_submitted_successfully">Feature request submitted successfully! You can see it in the list of requested features, once approved it can be also seen by other users. Thank you for your contribution.</string>
 
     <!-- DATA BACKUP -->
     <string name="signing_info">Sign in with google account to save and download your database from google drive.</string>
