@@ -161,5 +161,3 @@ fun FeatureRequestScreen(
 enum class FeatureRequestScreenState {
     LOADING, SUCCESS, ERROR, IDLE
 }
-
-

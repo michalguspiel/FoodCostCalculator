@@ -7,6 +7,7 @@ import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.data.di.dbModule
 import com.erdees.foodcostcalc.data.di.remoteDataModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
+import com.erdees.foodcostcalc.domain.usecase.di.useCaseModule
 import com.erdees.foodcostcalc.utils.di.utilModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
@@ -21,7 +22,7 @@ class MyApplication : Application() {
 
     // modules that need to be restarted after database recreation
     private val reloadableModules = listOf(dbModule, repositoryModule)
-    private val otherModules = listOf(utilModule, remoteDataModule)
+    private val otherModules = listOf(utilModule, remoteDataModule, useCaseModule)
 
     override fun onCreate() {
         if (BuildConfig.DEBUG) {
