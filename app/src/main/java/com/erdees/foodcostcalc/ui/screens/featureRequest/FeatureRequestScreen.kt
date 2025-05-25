@@ -25,9 +25,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.InfoBox
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
@@ -38,7 +40,6 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FeatureRequestScreen(
     navController: NavController,
@@ -47,7 +48,39 @@ fun FeatureRequestScreen(
     val screenState by viewModel.screenState.collectAsState()
     val title by viewModel.title.collectAsState()
     val description by viewModel.description.collectAsState()
+    val isSubmitEnabled by viewModel.isSubmitButtonEnabled.collectAsState()
 
+    val callbacks = FeatureRequestScreenCallbacks(
+        onBackClick = { navController.popBackStack() },
+        onSubmitClick = viewModel::submitFeatureRequest,
+        onDismiss = {
+            viewModel.resetScreenState()
+            navController.popBackStack()
+        },
+        updateTitle = viewModel::updateTitle,
+        updateDescription = viewModel::updateDescription
+    )
+
+    FeatureRequestScreenContent(
+        navController,
+        title,
+        description,
+        isSubmitEnabled,
+        screenState,
+        callbacks
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun FeatureRequestScreenContent(
+    navController: NavController,
+    title: String,
+    description: String,
+    isSubmitEnabled: Boolean,
+    screenState: FeatureRequestScreenState,
+    callbacks: FeatureRequestScreenCallbacks
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -76,7 +109,7 @@ fun FeatureRequestScreen(
 
                 FCCTextField(
                     value = title,
-                    onValueChange = viewModel::updateTitle,
+                    onValueChange = { callbacks.updateTitle(it) },
                     title = stringResource(R.string.title),
                     modifier = Modifier.fillMaxWidth(),
                     keyboardOptions = KeyboardOptions(
@@ -88,7 +121,7 @@ fun FeatureRequestScreen(
 
                 FCCTextField(
                     value = description,
-                    onValueChange = viewModel::updateDescription,
+                    onValueChange = { callbacks.updateDescription(it) },
                     title = stringResource(R.string.description),
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Text,
@@ -114,13 +147,8 @@ fun FeatureRequestScreen(
                 ButtonRow(primaryButton = {
                     FCCPrimaryButton(
                         text = stringResource(R.string.submit),
-                        enabled = screenState != FeatureRequestScreenState.LOADING
-                    ) {
-                        viewModel.submitFeatureRequest(
-                            title = title,
-                            description = description,
-                        )
-                    }
+                        enabled = isSubmitEnabled
+                    ) { callbacks.onSubmitClick() }
                 })
             }
 
@@ -134,19 +162,17 @@ fun FeatureRequestScreen(
                         title = stringResource(R.string.success),
                         content = { Text(stringResource(R.string.feature_submitted_successfully)) },
                         onDismiss = {
-                            viewModel.resetScreenState()
-                            navController.popBackStack()
+                            callbacks.onDismiss()
                         },
                         onPrimaryButtonClick = {
-                            viewModel.resetScreenState()
-                            navController.popBackStack()
+                            callbacks.onDismiss()
                         },
                         primaryButtonText = stringResource(R.string.okay)
                     )
                 }
 
                 FeatureRequestScreenState.ERROR -> {
-                    ErrorDialog(onDismiss = viewModel::resetScreenState)
+                    ErrorDialog(onDismiss = { callbacks.onDismiss() })
                 }
 
                 FeatureRequestScreenState.IDLE -> {
@@ -157,7 +183,21 @@ fun FeatureRequestScreen(
     }
 }
 
-
-enum class FeatureRequestScreenState {
-    LOADING, SUCCESS, ERROR, IDLE
+@Preview
+@Composable
+fun FeatureRequestScreenPreview() {
+    FeatureRequestScreenContent(
+        navController = rememberNavController(),
+        title = "",
+        description = "",
+        isSubmitEnabled = true,
+        screenState = FeatureRequestScreenState.IDLE,
+        callbacks = FeatureRequestScreenCallbacks(
+            onBackClick = {},
+            onSubmitClick = {},
+            onDismiss = {},
+            updateTitle = {},
+            updateDescription = {}
+        )
+    )
 }
