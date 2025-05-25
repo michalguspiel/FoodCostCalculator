@@ -9,6 +9,10 @@ import com.erdees.foodcostcalc.data.di.remoteDataModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
 import com.erdees.foodcostcalc.domain.usecase.di.useCaseModule
 import com.erdees.foodcostcalc.utils.di.utilModule
+import com.google.firebase.Firebase
+import com.google.firebase.appcheck.appCheck
+import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import com.google.firebase.initialize
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
@@ -25,7 +29,10 @@ class MyApplication : Application() {
     private val otherModules = listOf(utilModule, remoteDataModule, useCaseModule)
 
     override fun onCreate() {
+        super.onCreate()
         if (BuildConfig.DEBUG) {
+            plant(DebugTree())
+            Timber.i("onCreate(), planted Timber tree.")
             StrictMode.setThreadPolicy(
                 StrictMode.ThreadPolicy.Builder()
                     .detectAll()
@@ -39,13 +46,17 @@ class MyApplication : Application() {
                     .penaltyLog()
                     .build()
             )
+            Timber.i("StrictMode set")
         }
-        super.onCreate()
-        if (BuildConfig.DEBUG) {
-            plant(DebugTree())
-        }
-        Timber.i("onCreate")
+
+        Firebase.initialize(this)
+        Firebase.appCheck.installAppCheckProviderFactory(
+            PlayIntegrityAppCheckProviderFactory.getInstance()
+        )
+        Timber.i("Firebase App Check with Play Integrity Installed")
+
         startKoin()
+        Timber.i("Koin Started!")
     }
 
     private fun startKoin() {
