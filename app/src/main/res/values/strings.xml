@@ -252,5 +252,7 @@
     <string name="star">star</string>
     <string name="products_missing_error">Can\'t load products, please come back again later.</string>
 
-
+    <!-- Onboarding Screen -->
+    <string name="welcome_to_app">Welcome to Food Cost Calculator!</string>
+    <string name="complete_onboarding">Get Started</string>
 </resources>
