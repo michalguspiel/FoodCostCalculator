@@ -8,6 +8,7 @@ appcompat = "1.7.0"
 material = "1.12.0"
 core_ktx = "1.16.0"
 coroutines = "1.8.1"
+kotlinxCoroutinesTest = "1.8.1"
 lifecycle_viewmodel_ktx = "2.8.7"
 activity_ktx = "1.10.1"
 review = "2.0.2"
@@ -24,7 +25,9 @@ guava_listenablefuture = "9999.0-empty-to-avoid-conflict-with-guava"
 billing = "7.1.1"
 konfetti = "2.0.4"
 koin = "4.0.1"
+koinTest = "4.0.1"
 timber = "5.0.1"
+androidxArchCoreTesting = "2.2.0"
 junit = "4.13.2"
 androidx_test = "1.6.1"
 mockk = "1.13.12"
@@ -93,11 +96,19 @@ konfetti-compose = { group = "nl.dionsegijn", name = "konfetti-compose", version
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+# Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx_test" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidx_test" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+androidx-arch-core-testing = { group = "androidx.arch.core", name = "core-testing", version.ref = "androidxArchCoreTesting" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koinTest" }
+koin-test-junit4 = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koinTest" }
+
+# Detekt
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 compose-rules-detekt = { group = "io.nlopez.compose.rules", name = "detekt", version.ref = "compose_rules_detekt" }
 androidx-datastore = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "androidx_datastore"}
