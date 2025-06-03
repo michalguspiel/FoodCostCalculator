@@ -201,19 +201,31 @@
     <string name="default_currency">Default currency</string>
     <string name="premium">Premium</string>
     <string name="account_services">Account &amp; Services</string>
-    <string name="help_feedback">Help &amp; Feedback</string>
+    <string name="feedback_features">Feedback &amp; Features</string>
     <string name="currencies_failed_to_load">Failed to load currencies</string>
     <string name="personalize">Personalize</string>
     <string name="use_half_products">Use half products</string>
 
     <!-- FEATURE REQUEST -->
     <string name="feature_request">Feature Request</string>
+    <string name="feature_requests">Feature Requests</string>
     <string name="submit_feature_request">Submit a Feature Request</string>
     <string name="submit">Submit</string>
     <string name="title">Title</string>
+    <string name="feature_request_list">Requested Features</string>
     <string name="visibility_of_feature_requests">Request Visibility</string>
-    <string name="only_approved_requests_info">Only feature requests that have been reviewed and approved will be visible to other users for upvoting.</string>
+    <string name="only_approved_requests_info">Only feature requests that have been reviewed and approved will be visible to other users.</string>
     <string name="feature_submitted_successfully">Feature request submitted successfully! You can see it in the list of requested features, once approved it can be also seen by other users. Thank you for your contribution.</string>
+    <string name="submitted_on_date">Submitted on %1$s</string>
+
+    <string name="feature_request_status_pending">Pending Approval</string>
+    <string name="feature_request_status_approved">Approved</string>
+    <string name="feature_request_status_in_progress">In Progress</string>
+    <string name="feature_request_status_completed">Completed</string>
+    <string name="feature_request_status_unknown">Unknown</string>
+
+    <string name="empty_feature_request_list_content_title">Let\'s build it together</string>
+    <string name="empty_feature_request_list_content_description">Got an idea? Tap the button and let us know what you\'d love to see next.</string>
 
     <!-- DATA BACKUP -->
     <string name="signing_info">Sign in with google account to save and download your database from google drive.</string>

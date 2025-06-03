@@ -36,5 +36,13 @@ fun FCCScreen.emptyListConfig(): EmptyListContentConfig = when (this) {
         buttonTextRes = R.string.create_dish
     )
 
+    FCCScreen.FeatureRequestList -> EmptyListContentConfig(
+        titleRes = R.string.empty_feature_request_list_content_title,
+        descriptionRes = R.string.empty_feature_request_list_content_description,
+        iconRes = R.drawable.contact_support,
+        iconContentDescriptionRes = R.string.feature_request,
+        buttonTextRes = R.string.submit_feature_request
+    )
+
     else -> error("EmptyListContent not supported for this screen")
 }
