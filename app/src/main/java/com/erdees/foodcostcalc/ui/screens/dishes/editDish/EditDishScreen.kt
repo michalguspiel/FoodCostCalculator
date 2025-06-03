@@ -191,7 +191,16 @@ fun EditDishScreen(
                             )
                         }
 
-                        InteractionType.EditTotalPrice -> {} // TODO
+                        InteractionType.EditTotalPrice -> {
+                            ValueEditDialog(
+                                title = stringResource(R.string.edit_total_price),
+                                value = viewModel.editableTotalPrice.collectAsState().value,
+                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                updateValue = viewModel::updateTotalPrice,
+                                onSave = viewModel::saveDishTotalPrice,
+                                onDismiss = viewModel::resetScreenState
+                            )
+                        }
 
                         InteractionType.EditName -> {
                             ValueEditDialog(

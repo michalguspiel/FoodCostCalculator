@@ -62,6 +62,9 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
 
+    private var _editableTotalPrice: MutableStateFlow<String> = MutableStateFlow("")
+    val editableTotalPrice: StateFlow<String> = _editableTotalPrice
+
     val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private val recipeHandler: RecipeHandler = RecipeHandler(
@@ -136,6 +139,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         onNumericValueChange(value, _editableMargin)
     }
 
+    fun updateTotalPrice(value: String) {
+        onNumericValueChange(value, _editableTotalPrice)
+    }
+
     private var currentlyEditedItem: MutableStateFlow<UsedItem?> = MutableStateFlow(null)
 
     fun setInteraction(interaction: InteractionType) {
@@ -151,6 +158,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 dish.value?.marginPercent.toString()
 
             is InteractionType.EditName -> _editableName.value = dish.value?.name ?: ""
+
+            is InteractionType.EditTotalPrice -> {
+                _editableTotalPrice.value = dish.value?.totalPrice?.toString() ?: "0.0"
+            }
 
             else -> {}
         }
@@ -209,6 +220,25 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             return
         }
         _dish.value = _dish.value?.copy(marginPercent = value)
+        resetScreenState()
+    }
+
+    fun saveDishTotalPrice() {
+        val newTotalPriceString = _editableTotalPrice.value
+        val currentDish = _dish.value
+        if (currentDish == null) {
+            Timber.e("Current dish is null, cannot save total price.")
+            resetScreenState() // Or handle error appropriately
+            return
+        }
+        val newTotalPrice = newTotalPriceString.toDoubleOrNull()
+        if (newTotalPrice == null) {
+            Timber.e("Invalid total price format: $newTotalPriceString")
+            _screenState.value = ScreenState.Error(Error("Invalid total price format.")) // Example error handling
+            // Optionally, reset _editableTotalPrice.value or keep it for user correction
+            return
+        }
+        _dish.value = currentDish.withUpdatedTotalPrice(newTotalPrice)
         resetScreenState()
     }
 

@@ -50,4 +50,11 @@ data class DishDomain(
     fun formattedTotalPricePerServing(amountOfServings: Int, currency: Currency?): String {
         return Utils.formatPrice(finalPricePerServing(amountOfServings), currency)
     }
+
+    fun withUpdatedTotalPrice(newTotalPrice: Double): DishDomain {
+        val priceBeforeTax = newTotalPrice / (1 + taxPercent / 100)
+        val marginAmount = priceBeforeTax - foodCost
+        val newMarginPercent = if (foodCost == 0.0) 0.0 else (marginAmount / foodCost) * 100
+        return this.copy(marginPercent = newMarginPercent)
+    }
 }
