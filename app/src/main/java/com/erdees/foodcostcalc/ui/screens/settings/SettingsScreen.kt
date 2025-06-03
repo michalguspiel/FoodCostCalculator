@@ -168,11 +168,19 @@ private fun SettingsScreenContent(
                         navController.navigate(FCCScreen.DataBackup)
                     })
 
-                HelpAndFeedbackSection {
-                    navController.navigate(
-                        FCCScreen.FeatureRequest
-                    )
-                }
+                FeedbackFeaturesSection(
+                    modifier = Modifier,
+                    onFeatureRequestClick = {
+                        navController.navigate(
+                            FCCScreen.FeatureRequest
+                        )
+                    },
+                    onFeatureListClick = {
+                        navController.navigate(
+                            FCCScreen.FeatureRequestList
+                        )
+                    }
+                )
 
                 AppInformation()
             }
@@ -199,13 +207,14 @@ private fun SettingsScreenContent(
 }
 
 @Composable
-private fun HelpAndFeedbackSection(
+private fun FeedbackFeaturesSection(
     modifier: Modifier = Modifier,
-    onFeatureRequestClick: () -> Unit
+    onFeatureRequestClick: () -> Unit = {},
+    onFeatureListClick: () -> Unit = {},
 ) {
     Section(modifier) {
         SectionLabel(
-            text = stringResource(id = R.string.help_feedback),
+            text = stringResource(id = R.string.feedback_features),
             modifier = Modifier.padding(bottom = 4.dp)
         )
 
@@ -215,10 +224,22 @@ private fun HelpAndFeedbackSection(
                 Icon(
                     modifier = Modifier.size(32.dp),
                     painter = painterResource(id = R.drawable.contact_support),
-                    contentDescription = stringResource(id = R.string.premium)
+                    contentDescription = stringResource(id = R.string.feature_request)
                 )
             }) {
             onFeatureRequestClick()
+        }
+
+        NavigationListItem(
+            title = stringResource(id = R.string.feature_request_list),
+            icon = {
+                Icon(
+                    modifier = Modifier.size(32.dp),
+                    painter = painterResource(id = R.drawable.list_alt_24),
+                    contentDescription = stringResource(id = R.string.feature_request_list)
+                )
+            }) {
+            onFeatureListClick()
         }
     }
 }
@@ -444,7 +465,7 @@ fun CurrenciesDropDown(
     }
 }
 
-@Preview
+@Preview(showBackground = true, heightDp = 1160)
 @Composable
 private fun PreviewSettingsScreenContent() {
     FCCTheme {

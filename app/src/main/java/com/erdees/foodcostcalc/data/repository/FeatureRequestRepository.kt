@@ -22,7 +22,6 @@ class FeatureRequestRepositoryImpl : FeatureRequestRepository, KoinComponent {
     override fun getFeatureRequests(): Flow<List<FeatureRequestEntity>> =
         featureRequestDao.getFeatureRequests()
 
-
     override fun getUpvotedFeatureRequests(): Flow<List<UpvotedFeatureRequest>> =
         featureRequestDao.getUpvotedFeatureRequests()
 

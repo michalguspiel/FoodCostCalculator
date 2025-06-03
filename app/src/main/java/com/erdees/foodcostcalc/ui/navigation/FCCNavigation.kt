@@ -18,6 +18,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDish.CreateDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishScreen
 import com.erdees.foodcostcalc.ui.screens.featureRequest.FeatureRequestScreen
+import com.erdees.foodcostcalc.ui.screens.featureRequestList.FeatureRequestListScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.addItemToHalfProduct.AddItemToHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfProductScreen
@@ -116,6 +117,10 @@ fun FCCNavigation(
 
         composable<FCCScreen.FeatureRequest> {
             FeatureRequestScreen(navController)
+        }
+
+        composable<FCCScreen.FeatureRequestList> {
+            FeatureRequestListScreen(navController)
         }
     }
 }

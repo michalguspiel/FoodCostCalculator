@@ -16,6 +16,8 @@ import com.erdees.foodcostcalc.data.model.local.joined.ProductAndProductDish
 import com.erdees.foodcostcalc.data.model.local.joined.ProductUsedInHalfProduct
 import com.erdees.foodcostcalc.data.model.local.joined.RecipeWithSteps
 import com.erdees.foodcostcalc.data.model.remote.FeatureRequest
+import com.erdees.foodcostcalc.data.model.remote.FeatureRequestStatus
+import com.erdees.foodcostcalc.domain.model.FeatureRequestDomain
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
@@ -25,6 +27,7 @@ import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
+import com.erdees.foodcostcalc.utils.Formatter
 import java.util.Date
 
 object Mapper {
@@ -239,4 +242,39 @@ object Mapper {
             timestamp = timeStamp
         )
     }
+
+    fun FeatureRequest.toFeatureRequestDomain(): FeatureRequestDomain? {
+        val safeId = id
+        val safeTimeStamp = timestamp
+
+        return if (safeId == null || safeTimeStamp == null) {
+            null
+        } else {
+            FeatureRequestDomain(
+                id = safeId,
+                title = title,
+                description = description,
+                status = getStatusEnum(),
+                upVotes = upVotes,
+                formattedTimeStamp = Formatter.formatTimeStamp(safeTimeStamp)
+            )
+        }
+    }
+
+    /**
+     * Maps FeatureRequestEntity to FeatureRequest.
+     * Approved defaults to false, status to PENDING, upVotes to 0, since essentially
+     * these are values of remote object that isn't approved and displayed from remote.
+     * */
+    fun FeatureRequestEntity.toFeatureRequestDomain(): FeatureRequestDomain {
+        return FeatureRequestDomain(
+            id = id,
+            title = title,
+            description = description,
+            formattedTimeStamp = Formatter.formatTimeStamp(timestamp),
+            status = FeatureRequestStatus.PENDING,
+            upVotes = 0
+        )
+    }
+
 }

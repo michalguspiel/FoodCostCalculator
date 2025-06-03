@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.domain.usecase
 
 import com.erdees.foodcostcalc.data.model.remote.FeatureRequest
+import com.erdees.foodcostcalc.data.model.remote.FeatureRequestStatus
 import com.erdees.foodcostcalc.data.model.remote.FirestoreResult
 import com.erdees.foodcostcalc.data.remote.FeatureRequestService
 import com.erdees.foodcostcalc.data.repository.FeatureRequestRepository
@@ -25,7 +26,11 @@ class SubmitFeatureRequestUseCase(
             try {
                 val now = ZonedDateTime.now(ZoneId.systemDefault())
                 val timestamp = Date.from(now.toInstant())
-                val featureRequest = FeatureRequest(title = title, description = description)
+                val featureRequest = FeatureRequest(
+                    title = title,
+                    description = description,
+                    status = FeatureRequestStatus.PENDING.name
+                )
 
                 when (val response = featureRequestService.submitFeatureRequest(featureRequest)) {
                     is FirestoreResult.Success -> {
