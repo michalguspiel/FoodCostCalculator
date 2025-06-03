@@ -66,6 +66,7 @@ object Constants {
         const val PREFERRED_CURRENCY_CODE = "preferred_currency"
         const val SUBSCRIPTION_STATE = "subscription_state"
         const val SHOW_HALF_PRODUCTS = "show_half_products"
+        const val ONBOARDING_COMPLETED = "onboarding_completed"
     }
 
 

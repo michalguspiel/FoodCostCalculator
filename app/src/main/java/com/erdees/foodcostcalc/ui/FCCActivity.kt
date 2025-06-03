@@ -5,12 +5,16 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.ui.screens.hostScreen.FCCHostScreen
+import com.erdees.foodcostcalc.ui.screens.onboardingscreen.OnboardingScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import com.google.android.gms.ads.MobileAds
@@ -61,7 +65,20 @@ class FCCActivity : AppCompatActivity() {
         }
         setContent {
             FCCTheme {
-                FCCHostScreen()
+                val coroutineScope = rememberCoroutineScope()
+                val onboardingCompleted by preferences.onboardingCompleted
+                    .collectAsState(initial = false) // Assume false initially until DataStore loads
+
+                if (onboardingCompleted) {
+                    FCCHostScreen()
+                } else {
+                    OnboardingScreen(onComplete = {
+                        coroutineScope.launch {
+                            preferences.setOnboardingCompleted(true)
+                            // The screen will recompose due to state change, showing FCCHostScreen
+                        }
+                    })
+                }
             }
         }
     }

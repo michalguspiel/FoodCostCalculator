@@ -28,6 +28,8 @@ timber = "5.0.1"
 junit = "4.13.2"
 androidx_test = "1.6.1"
 mockk = "1.13.12"
+mockk_android = "1.13.12" # Same version as mockk
+koin_test = "4.0.1" # Same version as koin
 kotest = "5.9.0"
 detekt = "1.23.7"
 compose_rules_detekt = "0.4.12"
@@ -97,6 +99,9 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "androidx_test" }
 androidx-test-rules = { group = "androidx.test", name = "rules", version.ref = "androidx_test" }
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk_android" }
+koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koin_test" }
+koin-test-junit4 = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koin_test" }
 kotest-assertions-core = { group = "io.kotest", name = "kotest-assertions-core", version.ref = "kotest" }
 detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 compose-rules-detekt = { group = "io.nlopez.compose.rules", name = "detekt", version.ref = "compose_rules_detekt" }

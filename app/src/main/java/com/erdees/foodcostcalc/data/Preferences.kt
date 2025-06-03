@@ -34,6 +34,9 @@ interface Preferences {
 
     val showHalfProducts: Flow<Boolean>
     suspend fun setShowHalfProducts(value: Boolean)
+
+    val onboardingCompleted: Flow<Boolean>
+    suspend fun setOnboardingCompleted(value: Boolean)
 }
 
 
@@ -52,6 +55,7 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val METRIC = booleanPreferencesKey(Constants.Preferences.METRIC)
         val IMPERIAL = booleanPreferencesKey(Constants.Preferences.IMPERIAL)
         val SHOW_HALF_PRODUCTS = booleanPreferencesKey(Constants.Preferences.SHOW_HALF_PRODUCTS)
+        val ONBOARDING_COMPLETED = booleanPreferencesKey(Constants.Preferences.ONBOARDING_COMPLETED)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -121,5 +125,12 @@ class PreferencesImpl(private val context: Context) : Preferences {
 
     override suspend fun setShowHalfProducts(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] = value }
+    }
+
+    override val onboardingCompleted: Flow<Boolean> =
+        context.dataStore.data.map { prefs -> prefs[Keys.ONBOARDING_COMPLETED] ?: false }
+
+    override suspend fun setOnboardingCompleted(value: Boolean) {
+        context.dataStore.edit { prefs -> prefs[Keys.ONBOARDING_COMPLETED] = value }
     }
 }

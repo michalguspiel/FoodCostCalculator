@@ -224,7 +224,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
     testImplementation(libs.mockk)
+    androidTestImplementation(libs.mockk.android) // For Android specific mocking if needed
     testImplementation(libs.kotest.assertions.core)
+    androidTestImplementation(libs.koin.test) // Koin testing
+    androidTestImplementation(libs.koin.test.junit4) // Koin testing JUnit4 integration
 
     // Detekt
     detektPlugins(libs.detekt.formatting)
