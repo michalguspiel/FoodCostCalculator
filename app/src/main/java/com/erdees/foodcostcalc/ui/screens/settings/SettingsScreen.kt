@@ -209,8 +209,8 @@ private fun SettingsScreenContent(
 @Composable
 private fun FeedbackFeaturesSection(
     modifier: Modifier = Modifier,
-    onFeatureRequestClick: () -> Unit,
-    onFeatureListClick: () -> Unit,
+    onFeatureRequestClick: () -> Unit = {},
+    onFeatureListClick: () -> Unit = {},
 ) {
     Section(modifier) {
         SectionLabel(

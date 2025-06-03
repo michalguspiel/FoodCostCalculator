@@ -77,7 +77,7 @@ private fun FeatureRequestListContent(
             } else {
                 LazyColumn(modifier = Modifier.padding(paddingValues)) {
                     items(items = featureRequests, key = { it.id }) { featureRequest ->
-                        FeatureRequestCard(Modifier.padding(8.dp), featureRequest)
+                        FeatureRequestCard(featureRequest, Modifier.padding(8.dp))
                     }
                 }
             }
@@ -89,8 +89,8 @@ private fun FeatureRequestListContent(
 
 @Composable
 private fun FeatureRequestCard(
+    featureRequest: FeatureRequestDomain,
     modifier: Modifier = Modifier,
-    featureRequest: FeatureRequestDomain
 ) {
     val status = when (featureRequest.status) {
         FeatureRequestStatus.IN_PROGRESS -> stringResource(id = R.string.feature_request_status_in_progress)
@@ -102,9 +102,17 @@ private fun FeatureRequestCard(
 
     Card(modifier = modifier) {
         Column(Modifier.padding(horizontal = 12.dp, vertical = 8.dp)) {
-            Text(text = featureRequest.title, style = MaterialTheme.typography.headlineSmall, color = MaterialTheme.colorScheme.onSurface)
+            Text(
+                text = featureRequest.title,
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             Spacer(Modifier.size(6.dp))
-            Text(text = featureRequest.description, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(
+                text = featureRequest.description,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
             Spacer(Modifier.size(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -129,6 +137,7 @@ private fun FeatureRequestCard(
     }
 }
 
+@Preview
 @PreviewLightDark
 @Composable
 private fun FeatureRequestCardPreview() {
@@ -147,6 +156,7 @@ private fun FeatureRequestCardPreview() {
     }
 }
 
+@SuppressWarnings("MagicNumber")
 @Preview(showBackground = true, name = "Feature Request List Content")
 @Composable
 private fun FeatureRequestListPreview() {

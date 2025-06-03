@@ -244,16 +244,21 @@ object Mapper {
     }
 
     fun FeatureRequest.toFeatureRequestDomain(): FeatureRequestDomain? {
-        val safeId = id ?: return null
-        val safeTimestamp = timestamp ?: return null
-        return FeatureRequestDomain(
-            id = safeId,
-            title = title,
-            description = description,
-            status = getStatusEnum(),
-            upVotes = upVotes,
-            formattedTimeStamp = Formatter.formatTimeStamp(safeTimestamp)
-        )
+        val safeId = id
+        val safeTimeStamp = timestamp
+
+        return if (safeId == null || safeTimeStamp == null) {
+            null
+        } else {
+            FeatureRequestDomain(
+                id = safeId,
+                title = title,
+                description = description,
+                status = getStatusEnum(),
+                upVotes = upVotes,
+                formattedTimeStamp = Formatter.formatTimeStamp(safeTimeStamp)
+            )
+        }
     }
 
     /**
