@@ -496,7 +496,7 @@ private fun UsedItemPreview() {
 @Preview(name = "Edit Dish Screen States", showBackground = true)
 @PreviewLightDark
 @Composable
-fun EditDishScreenContentPreview(
+private fun EditDishScreenContentPreview(
     @PreviewParameter(EditDishScreenStateProvider::class) state: EditDishScreenState
 ) {
     // You need a NavController for the preview, even if it doesn't navigate.

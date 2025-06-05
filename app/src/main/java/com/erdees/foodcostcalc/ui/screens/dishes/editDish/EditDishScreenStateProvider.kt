@@ -10,6 +10,7 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 
+@Suppress("MagicNumber")
 private fun createDishModel(): CompleteDish {
     return CompleteDish(
         dish = DishBase(0L, "Broccoli Chicken", 200.0, 10.0, null),
@@ -37,7 +38,7 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableTax = "10",
             editableMargin = "150",
             editableName = sampleDish.name,
-            editableTotalPrice = String.format("%.2f", sampleDish.totalPrice),
+            editableTotalPrice = "120",
             currency = sampleCurrency,
             screenState = ScreenState.Idle // or ScreenState.Idle if you have one
         ),
