@@ -225,6 +225,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
     testImplementation(libs.mockk)
     testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.coroutines.test)
 
     // Detekt
     detektPlugins(libs.detekt.formatting)

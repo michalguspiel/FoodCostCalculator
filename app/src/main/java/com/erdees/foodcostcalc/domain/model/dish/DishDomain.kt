@@ -9,6 +9,7 @@ import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.serialization.Serializable
 import timber.log.Timber
+import kotlin.math.round
 
 @Keep
 @Serializable
@@ -51,10 +52,23 @@ data class DishDomain(
         return Utils.formatPrice(finalPricePerServing(amountOfServings), currency)
     }
 
+    @Suppress("MagicNumber")
     fun withUpdatedTotalPrice(newTotalPrice: Double): DishDomain {
-        val priceBeforeTax = newTotalPrice / (1 + taxPercent / 100)
-        val marginAmount = priceBeforeTax - foodCost
-        val newMarginPercent = if (foodCost == 0.0) 0.0 else (marginAmount / foodCost) * 100
-        return this.copy(marginPercent = newMarginPercent)
+        val taxFactor = 1 + taxPercent / 100.0
+
+        val targetSellingPriceBeforeTax = newTotalPrice / taxFactor
+        val newCalculatedMarginPercent: Double = if (foodCost == 0.0) {
+            if (targetSellingPriceBeforeTax == 0.0) {
+                100.0
+            } else {
+                if (targetSellingPriceBeforeTax > 0) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
+            }
+        } else {
+            (targetSellingPriceBeforeTax / foodCost) * 100.0
+        }
+
+        val roundedMarginPercent = round(newCalculatedMarginPercent * 100.0) / 100.0
+
+        return this.copy(marginPercent = roundedMarginPercent)
     }
 }

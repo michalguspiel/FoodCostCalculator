@@ -4,6 +4,7 @@ import android.content.res.Resources
 import com.erdees.foodcostcalc.R
 import java.math.RoundingMode
 import java.text.DecimalFormat
+import java.text.DecimalFormatSymbols
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale
@@ -61,7 +62,11 @@ object Utils {
     }
 
     /**Get units preferred by the user.*/
-    fun getUnitsSet(resources: Resources, isMetricUsed: Boolean, isImperialUsed: Boolean): Set<String> {
+    fun getUnitsSet(
+        resources: Resources,
+        isMetricUsed: Boolean,
+        isImperialUsed: Boolean
+    ): Set<String> {
         var chosenUnits = resources.getStringArray(R.array.piece)
         if (isMetricUsed) {
             chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
@@ -99,5 +104,45 @@ object Utils {
             }
         }
         return units
+    }
+
+
+    fun formatPriceWithoutSymbol(
+        number: Double?,
+        currencyCode: String?
+    ): String {
+        if (number == null) return ""
+        if (!number.isFinite()) return number.toString()
+
+        val javaUtilCurrency = currencyCode?.let {
+            try {
+                Currency.getInstance(it)
+            } catch (e: Exception) {
+                null
+            }
+        }
+
+        // Determine the number of decimal places
+        val fractionDigits = javaUtilCurrency?.defaultFractionDigits ?: 2
+
+        // Create DecimalFormatSymbols to control separators
+        val customSymbols = DecimalFormatSymbols(Locale.US) // Start with US to get dot as decimal
+
+        // Example for 3 fraction digits: "0.000"
+        // Example for 2 fraction digits: "0.00"
+        // Example for 0 fraction digits: "0"
+        val pattern = buildString {
+            append("0") // At least one digit before decimal
+            if (fractionDigits > 0) {
+                append(".")
+                repeat(fractionDigits) {
+                    append("0")
+                }
+            }
+        }
+
+        val numberFormatter = DecimalFormat(pattern, customSymbols)
+        numberFormatter.isGroupingUsed = false
+        return numberFormatter.format(number)
     }
 }
