@@ -44,10 +44,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
@@ -68,13 +71,43 @@ import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Utils
 
-@OptIn(ExperimentalMaterial3Api::class)
+data class EditDishScreenCallbacks(
+    val saveDish: () -> Unit,
+    val shareDish: (Context) -> Unit,
+    val setInteraction: (InteractionType) -> Unit,
+    val deleteDish: (Long) -> Unit,
+    val removeItem: (UsedItem) -> Unit,
+    val updateQuantity: (String) -> Unit,
+    val saveQuantity: () -> Unit,
+    val updateTax: (String) -> Unit,
+    val saveTax: () -> Unit,
+    val updateMargin: (String) -> Unit,
+    val saveMargin: () -> Unit,
+    val updateName: (String) -> Unit,
+    val saveName: () -> Unit,
+    val updateTotalPrice: (String) -> Unit,
+    val saveTotalPrice: () -> Unit,
+    val resetScreenState: () -> Unit
+)
+
+data class EditDishScreenState(
+    val dishId: Long,
+    val usedItems: List<UsedItem>,
+    val modifiedDishDomain: DishDomain?,
+    val editableQuantity: String,
+    val editableTax: String,
+    val editableMargin: String,
+    val editableName: String,
+    val editableTotalPrice: String,
+    val currency: Currency?,
+    val screenState: ScreenState,
+)
+
 @Screen
 @Composable
 fun EditDishScreen(
     dishId: Long, navController: NavController, viewModel: DishDetailsViewModel = viewModel()
 ) {
-
     val screenState by viewModel.screenState.collectAsState()
     val usedItems: List<UsedItem> by viewModel.items.collectAsState()
     val modifiedDishDomain by viewModel.dish.collectAsStateWithLifecycle()
@@ -82,6 +115,7 @@ fun EditDishScreen(
     val editableTax by viewModel.editableTax.collectAsState()
     val editableMargin by viewModel.editableMargin.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
+    val editableTotalPrice by viewModel.editableTotalPrice.collectAsState()
     val currency by viewModel.currency.collectAsState()
 
     LaunchedEffect(screenState) {
@@ -95,137 +129,197 @@ fun EditDishScreen(
         }
     }
 
-    Scaffold(topBar = {
-        TopAppBar(title = {
-            Text(text = modifiedDishDomain?.name ?: dishId.toString(),
-                modifier = Modifier.clickable {
-                    viewModel.setInteraction(InteractionType.EditName)
-                })
-        }, actions = {
-            IconButton(onClick = { viewModel.deleteDish(dishId) }) {
-                Icon(
-                    imageVector = Icons.Sharp.Delete,
-                    contentDescription = stringResource(R.string.remove_dish)
-                )
-            }
-        }, navigationIcon = {
-            IconButton(onClick = { navController.popBackStack() }) {
-                Icon(
-                    Icons.AutoMirrored.Sharp.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
-                )
-            }
-        })
-    }) { paddingValues ->
-        Box(modifier = Modifier.padding(paddingValues)) {
-            Column {
-                LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
-                    items(usedItems, key = { item ->
-                        item::class.simpleName + item.id.toString()
-                    }) { item ->
-                        UsedItem(usedItem = item, onRemove = viewModel::removeItem, onEdit = {
-                            viewModel.setInteraction(
-                                InteractionType.EditItem(it)
-                            )
+    EditDishScreenContent(
+        navController = navController,
+        state = EditDishScreenState(
+            dishId = dishId,
+            usedItems = usedItems,
+            modifiedDishDomain = modifiedDishDomain,
+            editableQuantity = editableQuantity,
+            editableTax = editableTax,
+            editableMargin = editableMargin,
+            editableName = editableName,
+            editableTotalPrice = editableTotalPrice,
+            currency = currency,
+            screenState = screenState
+        ),
+        callbacks = EditDishScreenCallbacks(
+            saveDish = viewModel::saveDish,
+            shareDish = viewModel::shareDish,
+            setInteraction = viewModel::setInteraction,
+            deleteDish = viewModel::deleteDish,
+            removeItem = viewModel::removeItem,
+            updateQuantity = viewModel::updateQuantity,
+            saveQuantity = viewModel::updateItemQuantity,
+            updateTax = viewModel::updateTax,
+            saveTax = viewModel::saveDishTax,
+            updateMargin = viewModel::updateMargin,
+            saveMargin = viewModel::saveDishMargin,
+            updateName = viewModel::updateName,
+            saveName = viewModel::saveDishName,
+            updateTotalPrice = viewModel::updateTotalPrice,
+            saveTotalPrice = viewModel::saveDishTotalPrice,
+            resetScreenState = viewModel::resetScreenState
+        )
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditDishScreenContent(
+    state: EditDishScreenState,
+    navController: NavController,
+    callbacks: EditDishScreenCallbacks,
+    modifier: Modifier = Modifier,
+) {
+    with(state) {
+        Scaffold(
+            modifier = modifier,
+            topBar = {
+                TopAppBar(title = {
+                    Text(
+                        text = modifiedDishDomain?.name ?: dishId.toString(),
+                        modifier = Modifier.clickable {
+                            callbacks.setInteraction(InteractionType.EditName)
                         })
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                            thickness = 1.dp
+                }, actions = {
+                    IconButton(onClick = { callbacks.deleteDish(dishId) }) {
+                        Icon(
+                            imageVector = Icons.Sharp.Delete,
+                            contentDescription = stringResource(R.string.remove_dish)
+                        )
+                    }
+                }, navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.AutoMirrored.Sharp.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                })
+            }) { paddingValues ->
+            Box(modifier = Modifier.padding(paddingValues)) {
+                Column {
+                    LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
+                        items(usedItems, key = { item ->
+                            item::class.simpleName + item.id.toString()
+                        }) { item ->
+                            UsedItem(
+                                usedItem = item,
+                                onRemove = { callbacks.removeItem(it) },
+                                onEdit = {
+                                    callbacks.setInteraction(
+                                        InteractionType.EditItem(it)
+                                    )
+                                })
+                            HorizontalDivider(
+                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                                thickness = 1.dp
+                            )
+                        }
+                    }
+
+                    Column(Modifier) {
+                        modifiedDishDomain?.let {
+                            DishDetails(it, currency, onTaxClick = {
+                                callbacks.setInteraction(InteractionType.EditTax)
+                            }, onMarginClick = {
+                                callbacks.setInteraction(InteractionType.EditMargin)
+                            }, onTotalPriceClick = {
+                                callbacks.setInteraction(InteractionType.EditTotalPrice)
+                            })
+                        }
+
+                        Buttons(
+                            modifier = Modifier.padding(top = 16.dp),
+                            saveDish = { callbacks.saveDish() },
+                            shareDish = { callbacks.shareDish(it) },
+                            navigate = {
+                                navController.navigate(FCCScreen.Recipe)
+                            }
                         )
                     }
                 }
 
-                Column(Modifier) {
-                    modifiedDishDomain?.let {
-                        DishDetails(it, currency, onTaxClick = {
-                            viewModel.setInteraction(InteractionType.EditTax)
-                        }, onMarginClick = {
-                            viewModel.setInteraction(InteractionType.EditMargin)
-                        }, onTotalPriceClick = {
-                            viewModel.setInteraction(InteractionType.EditTotalPrice)
-                        })
+                when (screenState) {
+                    is ScreenState.Loading -> ScreenLoadingOverlay()
+                    is ScreenState.Success -> {} // NOTHING
+
+                    is ScreenState.Error -> {
+                        ErrorDialog {
+                            callbacks.resetScreenState()
+                        }
                     }
 
-                    Buttons(
-                        modifier = Modifier.padding(top = 16.dp),
-                        saveDish = viewModel::saveDish,
-                        shareDish = viewModel::shareDish,
-                        navigate = {
-                            navController.navigate(FCCScreen.Recipe)
-                        }
-                    )
-                }
-            }
-
-            when (screenState) {
-                is ScreenState.Loading -> ScreenLoadingOverlay()
-                is ScreenState.Success -> {} // NOTHING
-
-                is ScreenState.Error -> {
-                    ErrorDialog {
-                        viewModel.resetScreenState()
-                    }
-                }
-
-                is ScreenState.Interaction -> {
-                    when ((screenState as ScreenState.Interaction).interaction) {
-                        InteractionType.EditTax -> {
-                            ValueEditDialog(
-                                title = stringResource(R.string.edit_tax),
-                                value = editableTax,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                updateValue = viewModel::updateTax,
-                                onSave = viewModel::saveDishTax,
-                                onDismiss = viewModel::resetScreenState
-                            )
-                        }
-
-                        InteractionType.EditMargin -> {
-                            ValueEditDialog(
-                                title = stringResource(R.string.edit_margin),
-                                value = editableMargin,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                updateValue = viewModel::updateMargin,
-                                onSave = viewModel::saveDishMargin,
-                                onDismiss = viewModel::resetScreenState
-                            )
-                        }
-
-                        InteractionType.EditTotalPrice -> {} // TODO
-
-                        InteractionType.EditName -> {
-                            ValueEditDialog(
-                                title = stringResource(R.string.edit_name),
-                                value = editableName,
-                                updateValue = viewModel::updateName,
-                                onSave = viewModel::saveDishName,
-                                onDismiss = viewModel::resetScreenState,
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Text,
-                                    capitalization = KeyboardCapitalization.Words
+                    is ScreenState.Interaction -> {
+                        when (screenState.interaction) {
+                            InteractionType.EditTax -> {
+                                ValueEditDialog(
+                                    title = stringResource(R.string.edit_tax),
+                                    value = editableTax,
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    updateValue = { callbacks.updateTax(it) },
+                                    onSave = { callbacks.saveTax() },
+                                    onDismiss = { callbacks.resetScreenState() }
                                 )
-                            )
-                        }
+                            }
 
-                        is InteractionType.EditItem -> {
-                            ValueEditDialog(
-                                title = stringResource(R.string.edit_quantity),
-                                value = editableQuantity,
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
-                                    capitalization = KeyboardCapitalization.Words
-                                ),
-                                updateValue = viewModel::updateQuantity,
-                                onSave = viewModel::updateItemQuantity,
-                                onDismiss = viewModel::resetScreenState
-                            )
-                        }
+                            InteractionType.EditMargin -> {
+                                ValueEditDialog(
+                                    title = stringResource(R.string.edit_margin),
+                                    value = editableMargin,
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    updateValue = { callbacks.updateMargin(it) },
+                                    onSave = { callbacks.saveMargin() },
+                                    onDismiss = { callbacks.resetScreenState() }
+                                )
+                            }
 
-                        else -> {}
+                            InteractionType.EditTotalPrice -> {
+                                ValueEditDialog(
+                                    title = stringResource(R.string.edit_total_price),
+                                    value = editableTotalPrice,
+                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                    updateValue = { callbacks.updateTotalPrice(it) },
+                                    onSave = { callbacks.saveTotalPrice() },
+                                    onDismiss = { callbacks.resetScreenState() }
+                                )
+                            }
+
+                            InteractionType.EditName -> {
+                                ValueEditDialog(
+                                    title = stringResource(R.string.edit_name),
+                                    value = editableName,
+                                    updateValue = { callbacks.updateName(it) },
+                                    onSave = { callbacks.saveName() },
+                                    onDismiss = { callbacks.resetScreenState() },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        capitalization = KeyboardCapitalization.Words
+                                    )
+                                )
+                            }
+
+                            is InteractionType.EditItem -> {
+                                ValueEditDialog(
+                                    title = stringResource(R.string.edit_quantity),
+                                    value = editableQuantity,
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                        capitalization = KeyboardCapitalization.Words
+                                    ),
+                                    updateValue = { callbacks.updateQuantity(it) },
+                                    onSave = { callbacks.saveQuantity() },
+                                    onDismiss = { callbacks.resetScreenState() }
+                                )
+                            }
+
+                            else -> {}
+                        }
                     }
-                }
 
-                is ScreenState.Idle -> {}
+                    is ScreenState.Idle -> {}
+                }
             }
         }
     }
@@ -237,9 +331,10 @@ private fun Buttons(
     shareDish: (Context) -> Unit,
     navigate: () -> Unit,
     modifier: Modifier = Modifier,
-    ) {
+) {
     val context = LocalContext.current
-    ButtonRow(modifier = modifier.padding(end = 12.dp),
+    ButtonRow(
+        modifier = modifier.padding(end = 12.dp),
         primaryButton = {
             FCCPrimaryButton(text = stringResource(R.string.save)) {
                 saveDish()
@@ -269,7 +364,8 @@ fun DishDetails(
 ) {
     Column(modifier) {
         Row {
-            DetailItem(label = stringResource(R.string.margin),
+            DetailItem(
+                label = stringResource(R.string.margin),
                 value = "${dishDomain.marginPercent}%",
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
@@ -277,7 +373,8 @@ fun DishDetails(
                     .clickable {
                         onMarginClick()
                     })
-            DetailItem(label = stringResource(R.string.tax),
+            DetailItem(
+                label = stringResource(R.string.tax),
                 value = "${dishDomain.taxPercent}%",
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
@@ -302,7 +399,10 @@ fun DishDetails(
                 value = Utils.formatPrice(dishDomain.totalPrice, currency),
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
-                    .weight(1f),
+                    .weight(1f)
+                    .clickable(enabled = dishDomain.foodCost != 0.0) {
+                        onTotalPriceClick()
+                    },
                 bolder = true
             )
         }
@@ -319,7 +419,8 @@ fun UsedItem(
 ) {
     val swipeState = rememberSwipeToDismissBoxState()
 
-    SwipeToDismissBox(modifier = modifier.animateContentSize(),
+    SwipeToDismissBox(
+        modifier = modifier.animateContentSize(),
         state = swipeState,
         backgroundContent = {
             Box(
@@ -338,7 +439,8 @@ fun UsedItem(
         enableDismissFromStartToEnd = false,
         enableDismissFromEndToStart = true,
         content = {
-            ListItem(colors = (ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background)),
+            ListItem(
+                colors = (ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background)),
                 headlineContent = {
                     Text(text = usedItem.item.name)
                 },
@@ -388,3 +490,30 @@ private fun UsedItemPreview() {
         )
     }
 }
+
+// --- Main Preview Function using the Provider ---
+
+@Preview(name = "Edit Dish Screen States", showBackground = true)
+@PreviewLightDark
+@Composable
+private fun EditDishScreenContentPreview(
+    @PreviewParameter(EditDishScreenStateProvider::class) state: EditDishScreenState
+) {
+    // You need a NavController for the preview, even if it doesn't navigate.
+    // rememberNavController() is fine for previews.
+    val navController = rememberNavController()
+    val emptyCallbacks = createEmptyEditDishScreenCallbacks()
+
+    FCCTheme { // Replace FCCTheme with your actual app theme
+        EditDishScreenContent(
+            state = state,
+            navController = navController,
+            callbacks = emptyCallbacks,
+            modifier = Modifier // Add any desired modifiers for preview sizing if needed
+        )
+    }
+}
+
+private fun createEmptyEditDishScreenCallbacks() = EditDishScreenCallbacks(
+    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
+)

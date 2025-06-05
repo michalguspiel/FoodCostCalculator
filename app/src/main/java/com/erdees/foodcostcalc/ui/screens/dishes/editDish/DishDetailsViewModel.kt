@@ -26,6 +26,8 @@ import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
 import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.MyDispatchers
+import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,6 +54,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
+    private val myDispatchers: MyDispatchers by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -62,7 +65,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
 
-    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
+    private var _editableTotalPrice: MutableStateFlow<String> = MutableStateFlow("")
+    val editableTotalPrice: StateFlow<String> = _editableTotalPrice
+
+    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val recipeHandler: RecipeHandler = RecipeHandler(
         viewModelScope = viewModelScope,
@@ -93,7 +99,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         viewModelScope.launch {
             try {
                 val id = savedStateHandle.get<Long>(DISH_ID_KEY) ?: throw NullPointerException("Failed to fetch dish due to missing id in savedStateHandle")
-                val dish = dishRepository.getDish(id).flowOn(Dispatchers.IO).first()
+                val dish = dishRepository.getDish(id).flowOn(myDispatchers.ioDispatcher).first()
                 with(dish.toDishDomain()) {
                     Timber.i("Fetched dish: $this")
                     if (this.recipe == null) {
@@ -136,6 +142,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         onNumericValueChange(value, _editableMargin)
     }
 
+    fun updateTotalPrice(value: String) {
+        onNumericValueChange(value, _editableTotalPrice)
+    }
+
     private var currentlyEditedItem: MutableStateFlow<UsedItem?> = MutableStateFlow(null)
 
     fun setInteraction(interaction: InteractionType) {
@@ -151,6 +161,14 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 dish.value?.marginPercent.toString()
 
             is InteractionType.EditName -> _editableName.value = dish.value?.name ?: ""
+
+            is InteractionType.EditTotalPrice -> {
+                if (_dish.value?.foodCost == 0.00) {
+                    return
+                }
+                val price = Utils.formatPriceWithoutSymbol(dish.value?.totalPrice, currency.value?.currencyCode)
+                _editableTotalPrice.value = price
+            }
 
             else -> {}
         }
@@ -209,6 +227,25 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             return
         }
         _dish.value = _dish.value?.copy(marginPercent = value)
+        resetScreenState()
+    }
+
+    fun saveDishTotalPrice() {
+        val newTotalPriceString = _editableTotalPrice.value
+        val currentDish = _dish.value
+        if (currentDish == null) {
+            Timber.e("Current dish is null, cannot save total price.")
+            resetScreenState() // Or handle error appropriately
+            return
+        }
+        val newTotalPrice = newTotalPriceString.toDoubleOrNull()
+        if (newTotalPrice == null) {
+            Timber.e("Invalid total price format: $newTotalPriceString")
+            _screenState.value = ScreenState.Error(Error("Invalid total price format.")) // Example error handling
+            // Optionally, reset _editableTotalPrice.value or keep it for user correction
+            return
+        }
+        _dish.value = currentDish.withUpdatedTotalPrice(newTotalPrice)
         resetScreenState()
     }
 
