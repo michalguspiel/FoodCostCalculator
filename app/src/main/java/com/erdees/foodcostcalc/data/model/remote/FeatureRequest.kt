@@ -1,11 +1,13 @@
 package com.erdees.foodcostcalc.data.model.remote
 
+import androidx.annotation.Keep
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.ServerTimestamp
 import timber.log.Timber
 import java.util.Date
 
+@Keep
 data class FeatureRequest(
     @DocumentId var id: String? = null,
     val title: String = "",
