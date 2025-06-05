@@ -172,6 +172,7 @@
     <string name="edit_margin">Edit margin</string>
     <string name="edit_tax">Edit tax</string>
     <string name="share">Share</string>
+    <string name="edit_total_price">Edit Final Price</string>
 
     <!-- Recipe Sharing -->
     <string name="recipe_sharing_prep_time">Preparation time: %1$s minutes.</string>
@@ -263,7 +264,5 @@
     <string name="active_subscription_thank_you">Thank you for subscribing!</string>
     <string name="star">star</string>
     <string name="products_missing_error">Can\'t load products, please come back again later.</string>
-    <string name="edit_total_price">Edit Total Price</string>
-
 
 </resources>
