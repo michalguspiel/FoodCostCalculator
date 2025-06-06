@@ -117,7 +117,7 @@ class PreferencesImpl(private val context: Context) : Preferences {
     }
 
     override val showHalfProducts: Flow<Boolean> =
-        context.dataStore.data.map { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] ?: true }
+        context.dataStore.data.map { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] ?: false }
 
     override suspend fun setShowHalfProducts(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] = value }
