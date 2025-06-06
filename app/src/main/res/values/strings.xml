@@ -38,15 +38,15 @@
 
     <string name="empty_dish_list_content_title">Let\'s get cooking</string>
     <string name="empty_dish_list_content_description">Tap button below to add your first dish and start building your menu magic.</string>
-    <string name="empty_product_list_content_title">Stock the pantry</string>
+    <string name="empty_product_list_content_title">Stock the pantry with ingredients</string>
     <string name="empty_product_list_content_description">Tap button below to add some ingredients so you’ve got something to cook with!</string>
     <string name="empty_half_product_list_content_title">Prep like a pro</string>
     <string name="empty_half_product_list_content_description">Create reusable parts like sauces or dough to speed things up later.</string>
-    <string name="cd_icon_products">Shopping basket icon</string>
+    <string name="cd_icon_products">Ingredients icon</string>
     <string name="cd_icon_half_products">Bakery preparation icon</string>
     <string name="cd_icon_dishes">Restaurant plate icon</string>
     <!-- Navigation -->
-    <string name="products">Products</string>
+    <string name="products">Ingredients</string>
     <string name="half_products">Half Products</string>
     <string name="dishes">Dishes</string>
     <string name="navigate_to">navigate to %1$s</string>
@@ -77,8 +77,8 @@
     <string name="something_went_wrong">Something went wrong</string>
 
     <string name="half_product">Half Product</string>
-    <string name="product">Product</string>
-    <string name="select_product">Select product</string>
+    <string name="product">Ingredient</string>
+    <string name="select_product">Select ingredient</string>
     <string name="select_half_product">Select half product</string>
 
     <string name="quantity">Quantity</string>
@@ -101,9 +101,9 @@
 
     <string name="netto_price">Net price %1$s</string>
     <string name="total_price">Total price %1$s</string>
-    <string name="content_description_create_product">Create product</string>
-    <string name="create_product">Create product</string>
-    <string name="product_name">Product name</string>
+    <string name="content_description_create_product">Create ingredient</string>
+    <string name="create_product">Create ingredient</string>
+    <string name="product_name">Ingredient name</string>
     <string name="price">Price</string>
     <string name="tax_percent">Tax %</string>
     <string name="percent_of_waste">% of waste</string>
@@ -114,7 +114,7 @@
     <string name="calculate_price_per_piece">Calculate price per piece</string>
     <string name="box_price">Box price</string>
     <string name="box_quantity">Units in box</string>
-    <string name="content_description_remove_product">remove product</string>
+    <string name="content_description_remove_product">remove ingredient</string>
     <string name="values_per_unit">Values %1$s</string>
 
     <!-- HALF PRODUCTS FEATURE -->
@@ -122,7 +122,7 @@
     <string name="create_half_product">Create half product</string>
     <string name="price_per_unit">Price %1$s</string>
     <string name="price_per_recipe">Price per recipe</string>
-    <string name="recipe_per_quantity">Recipe per %1$s %2$s of product.</string>
+    <string name="recipe_per_quantity">Recipe per %1$s %2$s of ingredient.</string>
     <string name="content_description_create_half_product">Create half product</string>
     <string name="tip">Tip</string>
     <string name="half_product_tip_content">To get the most accurate results, use the same unit as the half product. If you mix weight and volume, products will be converted to the half product unit using the density of water at 4°C.</string>
@@ -146,7 +146,7 @@
     <string name="app_icon">app icon</string>
     <string name="content_description_create_dish">Create dish</string>
     <string name="create_dish">Create Dish</string>
-    <string name="add_product">Add Product</string>
+    <string name="add_product">Add Ingredient</string>
     <string name="add_half_product">Add Half Product</string>
     <string name="item_added">Item added</string>
     <string name="remove_dish">Remove dish</string>
@@ -263,6 +263,6 @@
     <string name="active_subscription">Your Premium subscription is active!</string>
     <string name="active_subscription_thank_you">Thank you for subscribing!</string>
     <string name="star">star</string>
-    <string name="products_missing_error">Can\'t load products, please come back again later.</string>
+    <string name="products_missing_error">Can\'t load ingredients, please come back again later.</string>
 
 </resources>
