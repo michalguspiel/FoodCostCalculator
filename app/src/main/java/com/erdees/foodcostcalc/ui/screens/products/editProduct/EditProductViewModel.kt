@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.ui.screens.products.editProduct
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableProductDomain
@@ -28,6 +29,7 @@ import org.koin.core.component.inject
 class EditProductViewModel : ViewModel(), KoinComponent {
 
     private val productRepository: ProductRepository by inject()
+    private val preferences: Preferences by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -41,6 +43,12 @@ class EditProductViewModel : ViewModel(), KoinComponent {
 
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
+
+    val showTaxPercent: StateFlow<Boolean> = preferences.showProductTax.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        false
+    )
 
     fun initializeWith(productId: Long) {
         _screenState.update { ScreenState.Loading() }

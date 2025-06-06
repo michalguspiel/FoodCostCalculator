@@ -71,6 +71,7 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
     val screenState by viewModel.screenState.collectAsState()
     val addButtonEnabled by viewModel.addButtonEnabled.collectAsState()
     val countPiecePriceEnabled by viewModel.countPiecePriceEnabled.collectAsState()
+    val showTaxPercent by viewModel.showTaxPercent.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val focusRequester = remember { FocusRequester() }
@@ -128,7 +129,6 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
                             .onGloballyPositioned {
                                 if (!textFieldLoaded) {
                                     focusRequester.requestFocus()
-                                    // Prevent the focusRequester from being called again
                                     textFieldLoaded = true
                                 }
                             },
@@ -148,14 +148,16 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
                             imeAction = ImeAction.Next
                         ),
                         onValueChange = { viewModel.updateProductPrice(it) })
-                    FCCTextField(
-                        title = stringResource(id = R.string.tax_percent),
-                        value = productTax,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        ),
-                        onValueChange = { viewModel.updateProductTax(it) })
+                    if (showTaxPercent) {
+                        FCCTextField(
+                            title = stringResource(id = R.string.tax_percent),
+                            value = productTax,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
+                            onValueChange = { viewModel.updateProductTax(it) })
+                    }
                     FCCTextField(
                         title = stringResource(id = R.string.percent_of_waste),
                         value = productWaste,
@@ -182,47 +184,56 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
             }
 
 
-            when (screenState) {
-                is ScreenState.Success -> {}
-                is ScreenState.Error -> {}
-                is ScreenState.Loading -> {
-                    ScreenLoadingOverlay()
+            ScreenStateHandler(
+                screenState,
+                viewModel::resetScreenState,
+                viewModel::calculateWaste,
+                viewModel::calculatePricePerPiece
+            )
+        }
+    }
+}
+
+@Composable
+private fun ScreenStateHandler(
+    screenState: ScreenState,
+    resetScreenState: () -> Unit,
+    calculateWaste: (Double?, Double?) -> Unit,
+    calculatePricePerPiece: (Double?, Int?) -> Unit,
+) {
+    when (screenState) {
+        is ScreenState.Success -> {}
+        is ScreenState.Error -> {}
+        is ScreenState.Loading -> {
+            ScreenLoadingOverlay()
+        }
+
+        is ScreenState.Interaction -> {
+            when (screenState.interaction) {
+                InteractionType.CalculateWaste -> {
+                    CalculateWasteDialog(
+                        onDismiss = { resetScreenState() },
+                        onSave = { totalQuantity, wasteQuantity ->
+                            calculateWaste(totalQuantity, wasteQuantity)
+                        }
+                    )
                 }
 
-                is ScreenState.Interaction -> {
-                    when ((screenState as ScreenState.Interaction).interaction) {
-                        InteractionType.CalculateWaste -> {
-                            CalculateWasteDialog(
-                                onDismiss = { viewModel.resetScreenState() },
-                                onSave = { totalQuantity, wasteQuantity ->
-                                    viewModel.calculateWaste(
-                                        totalQuantity = totalQuantity,
-                                        wasteQuantity = wasteQuantity
-                                    )
-                                }
-                            )
+                InteractionType.CalculatePiecePrice -> {
+                    CalculatePiecePriceDialog(
+                        onDismiss = { resetScreenState() },
+                        onSave = { boxPrice, quantityInBox ->
+                            calculatePricePerPiece(boxPrice, quantityInBox)
                         }
-
-                        InteractionType.CalculatePiecePrice -> {
-                            CalculatePiecePriceDialog(
-                                onDismiss = { viewModel.resetScreenState() },
-                                onSave = { boxPrice, quantityInBox ->
-                                    viewModel.calculatePricePerPiece(
-                                        boxPrice = boxPrice,
-                                        quantityInBox = quantityInBox
-                                    )
-                                }
-                            )
-                        }
-
-                        else -> {}
-                    }
+                    )
                 }
 
                 else -> {}
-
             }
         }
+
+        else -> {}
+
     }
 }
 

@@ -206,6 +206,7 @@
     <string name="currencies_failed_to_load">Failed to load currencies</string>
     <string name="personalize">Personalize</string>
     <string name="use_half_products">Use half products</string>
+    <string name="use_product_tax">Provide tax per ingredient</string>
 
     <!-- FEATURE REQUEST -->
     <string name="feature_request">Feature Request</string>

@@ -33,6 +33,12 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
 
+    val showTaxPercent: StateFlow<Boolean> = preferences.showProductTax.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        false
+    )
+
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> get() = _screenState
 
@@ -58,7 +64,9 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     val productTax: StateFlow<String> get() = _productTax
 
     fun updateProductTax(tax: String) {
-        onNumericValueChange(tax, _productTax)
+        if (showTaxPercent.value) {
+            onNumericValueChange(tax, _productTax)
+        }
     }
 
     private val _productWaste = MutableStateFlow("")
@@ -85,37 +93,63 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         _selectedUnit.value = unit
     }
 
-    val addButtonEnabled: StateFlow<Boolean> = combine(
-        productName,
-        productPrice,
-        productTax,
-        productWaste,
-        selectedUnit
-    ) { name, price, tax, waste, unit ->
-        name.isNotBlank() &&
+    @Suppress("MagicNumber")
+    private fun computeIsAddButtonEnabled(
+        name: String, price: String, tax: String, waste: String, unit: String, showTax: Boolean
+    ): Boolean {
+        return name.isNotBlank() &&
                 unit.isNotBlank() &&
                 price.toDoubleOrNull() != null &&
-                tax.toDoubleOrNull() != null &&
+                (if (showTax) tax.toDoubleOrNull() != null else true) &&
                 waste.toDoubleOrNull() != null
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+    }
+
+    @Suppress("MagicNumber")
+    val addButtonEnabled: StateFlow<Boolean> = combine(
+        productName, productPrice, productTax, productWaste, selectedUnit, showTaxPercent
+    ) { values ->
+        val name = values[0] as String
+        val price = values[1] as String
+        val tax = values[2] as String
+        val waste = values[3] as String
+        val unit = values[4] as String
+        val showTax = values[5] as Boolean
+        computeIsAddButtonEnabled(name, price, tax, waste, unit, showTax)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        computeIsAddButtonEnabled(
+            productName.value,
+            productPrice.value,
+            productTax.value,
+            productWaste.value,
+            selectedUnit.value,
+            showTaxPercent.value
+        )
+    )
 
     val countPiecePriceEnabled: StateFlow<Boolean> = selectedUnit.map {
         it == "per piece"
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
+    init {
+        viewModelScope.launch {
+            showTaxPercent.collect { show ->
+                if (!show) {
+                    _productTax.value = "0.0"
+                }
+            }
+        }
+    }
+
     fun addProduct() {
 
         val price = productPrice.value.toDoubleOrNull() ?: return
-        val tax = productTax.value.toDoubleOrNull() ?: return
+        val tax = productTax.value.toDoubleOrNull() ?: 0.0
         val waste = productWaste.value.toDoubleOrNull() ?: return
 
         val product = ProductBase(
-            0,
-            productName.value,
-            price,
-            tax,
-            waste,
-            selectedUnit.value
+            0, productName.value, price, tax, waste, selectedUnit.value
         )
         addProduct(product)
         sendDataAboutProduct(product)
@@ -139,10 +173,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         bundle.putString(Constants.Analytics.PRODUCT_TAX, product.tax.toString())
         bundle.putString(Constants.Analytics.PRODUCT_WASTE, product.waste.toString())
         bundle.putString(Constants.Analytics.PRODUCT_UNIT, product.unit)
-        bundle.putString(
-            Constants.Analytics.PRODUCT_PRICE_PER_UNIT,
-            product.pricePerUnit.toString()
-        )
+        bundle.putString(Constants.Analytics.PRODUCT_PRICE_PER_UNIT, product.pricePerUnit.toString())
         analyticsRepository.logEvent(Constants.Analytics.PRODUCT_CREATED, bundle)
     }
 

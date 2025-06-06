@@ -40,6 +40,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
             preferences.metricUsed,
             preferences.imperialUsed,
             preferences.showHalfProducts,
+            preferences.showProductTax,
         ) { array ->
             UserSettings(
                 array[0] as String,
@@ -48,6 +49,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
                 array[3] as Boolean,
                 array[4] as Boolean,
                 array[5] as Boolean,
+                array[6] as Boolean,
             )
         }.first()
     }
@@ -100,6 +102,10 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         _settingsModel.value = _settingsModel.value?.copy(showHalfProducts = newSetting)
     }
 
+    fun updateShowProductTax(newSetting: Boolean) {
+        _settingsModel.value = _settingsModel.value?.copy(showProductTax = newSetting)
+    }
+
     /** Saves settings to preferences. */
     fun saveSettings() {
         _screenState.value = ScreenState.Loading()
@@ -113,6 +119,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
                 preferences.setMetricUsed(settingsModel.metricUsed)
                 preferences.setImperialUsed(settingsModel.imperialUsed)
                 preferences.setShowHalfProducts(settingsModel.showHalfProducts)
+                preferences.setShowProductTax(settingsModel.showProductTax)
             }
 
         }
