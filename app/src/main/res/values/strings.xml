@@ -83,6 +83,9 @@
 
     <string name="quantity">Quantity</string>
     <string name="unit">Unit</string>
+    <string name="quantity_short">Qty</string>
+    <string name="unit_short">Unit</string>
+
 
     <string name="add">Add</string>
     <string name="name">Name</string>
@@ -173,6 +176,20 @@
     <string name="edit_tax">Edit tax</string>
     <string name="share">Share</string>
     <string name="edit_total_price">Edit Final Price</string>
+    <string name="ingredients_subheader">Ingredients</string>
+    <string name="add_ingredient">Add ingredient</string>
+    <string name="add_ingredient_icon_desc">Add ingredient icon</string>
+    <string name="no_ingredients_added">No ingredients added yet.</string>
+    <string name="summary_subheader">Summary</string>
+    <string name="food_cost_label">Food Cost: %1$s</string>
+    <string name="final_price_label">Final Price: %1$s</string>
+    <string name="remove_ingredient_desc">Remove ingredient</string>
+    <string name="dialog_title_add_new_ingredient">Add New Ingredient</string>
+    <string name="ingredient_name_label">Ingredient Name</string>
+    <string name="purchase_price_label">Purchase Price</string>
+    <string name="purchase_unit_label">Purchase Unit</string>
+    <string name="waste_percentage_label">Waste %</string>
+
 
     <!-- Recipe Sharing -->
     <string name="recipe_sharing_prep_time">Preparation time: %1$s minutes.</string>

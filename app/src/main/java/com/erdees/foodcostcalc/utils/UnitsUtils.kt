@@ -6,6 +6,66 @@ import com.erdees.foodcostcalc.R
 
 object UnitsUtils {
 
+    // Standard unit abbreviations - these should match what's stored in ProductDomain.unit
+    // and what's used in DishIngredient.dishUnit and DishIngredient.originalProductUnit
+    const val GRAM = "g"
+    const val KILOGRAM = "kg"
+    const val POUND = "lb"
+    const val OUNCE = "oz"
+    const val MILLILITER = "ml"
+    const val LITER = "l"
+    const val FLUID_OUNCE = "fl oz"
+    const val GALLON = "gal"
+    const val PIECE = "pcs" // Assuming "pcs" is the standard for pieces
+
+    private val weightToBase: Map<String, Double> = mapOf(
+        GRAM to 1.0,
+        KILOGRAM to 1000.0,
+        POUND to 453.592,
+        OUNCE to 28.3495
+    )
+
+    private val volumeToBase: Map<String, Double> = mapOf(
+        MILLILITER to 1.0,
+        LITER to 1000.0,
+        FLUID_OUNCE to 29.5735, // US fluid ounce
+        GALLON to 3785.41    // US gallon
+    )
+
+    /**
+     * Converts a quantity from a source unit to a target unit.
+     * Returns null if conversion is not possible (e.g., incompatible types or unknown units).
+     */
+    fun convertUnits(quantity: Double, sourceUnit: String, targetUnit: String): Double? {
+        if (sourceUnit == targetUnit) return quantity
+
+        // Handle piece-to-piece conversion or if units are identical
+        if (sourceUnit == PIECE && targetUnit == PIECE) return quantity
+        if (sourceUnit == targetUnit) return quantity
+
+
+        val sourceInBase: Double?
+        val targetFromBase: Double?
+
+        // Determine unit type and convert to base
+        if (weightToBase.containsKey(sourceUnit) && weightToBase.containsKey(targetUnit)) {
+            sourceInBase = quantity * (weightToBase[sourceUnit] ?: return null)
+            targetFromBase = weightToBase[targetUnit]?.let { if (it == 0.0) null else sourceInBase / it }
+            return targetFromBase
+        } else if (volumeToBase.containsKey(sourceUnit) && volumeToBase.containsKey(targetUnit)) {
+            sourceInBase = quantity * (volumeToBase[sourceUnit] ?: return null)
+            targetFromBase = volumeToBase[targetUnit]?.let { if (it == 0.0) null else sourceInBase / it }
+            return targetFromBase
+        } else if (sourceUnit == PIECE || targetUnit == PIECE) {
+            // Conversion between "pcs" and weight/volume is not directly possible without density
+            return null
+        }
+
+        // Unknown unit or incompatible types (e.g. weight to volume)
+        return null
+    }
+
+
     @Composable
     fun getPerUnitAbbreviation(unit: String): String {
         return when (unit) {
