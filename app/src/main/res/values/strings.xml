@@ -122,7 +122,7 @@
     <string name="create_half_product">Create half product</string>
     <string name="price_per_unit">Price %1$s</string>
     <string name="price_per_recipe">Price per recipe</string>
-    <string name="recipe_per_quantity">Recipe per %1$s %2$s of ingredient.</string>
+    <string name="recipe_per_quantity">Recipe per %1$s %2$s of product</string>
     <string name="content_description_create_half_product">Create half product</string>
     <string name="tip">Tip</string>
     <string name="half_product_tip_content">To get the most accurate results, use the same unit as the half product. If you mix weight and volume, products will be converted to the half product unit using the density of water at 4°C.</string>
