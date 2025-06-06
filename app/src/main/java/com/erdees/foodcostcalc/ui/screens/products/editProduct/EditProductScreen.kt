@@ -59,6 +59,7 @@ fun EditProductScreen(
     val editableName by viewModel.editableName.collectAsState()
     val saveButtonEnabled by viewModel.saveButtonEnabled.collectAsState()
     val saveNameButtonEnabled by viewModel.saveNameButtonEnabled.collectAsState()
+    val showTaxPercent by viewModel.showTaxPercent.collectAsState()
 
     LaunchedEffect(Unit) {
         viewModel.initializeWith(productId)
@@ -146,15 +147,17 @@ fun EditProductScreen(
                         )
                     )
 
-                    FCCTextField(
-                        title = stringResource(id = R.string.tax_percent),
-                        value = product?.tax.toString(),
-                        onValueChange = viewModel::updateTax,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
+                    if (showTaxPercent || product?.tax?.toDoubleOrNull() != 0.0) {
+                        FCCTextField(
+                            title = stringResource(id = R.string.tax_percent),
+                            value = product?.tax.toString(),
+                            onValueChange = viewModel::updateTax,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            )
                         )
-                    )
+                    }
 
                     FCCTextField(
                         title = stringResource(id = R.string.percent_of_waste),

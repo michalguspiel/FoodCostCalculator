@@ -72,6 +72,7 @@ data class SettingsScreenCallbacks(
     val updateImperialUsed: (Boolean) -> Unit = {},
     val updateDefaultCurrencyCode: (Currency) -> Unit = {},
     val updateShowHalfProducts: (Boolean) -> Unit = {},
+    val updateShowProductTax: (Boolean) -> Unit = {},
     val saveSettings: () -> Unit = {},
     val resetScreenState: () -> Unit = {},
 )
@@ -117,6 +118,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
             updateImperialUsed = viewModel::updateImperialUsed,
             updateDefaultCurrencyCode = viewModel::updateDefaultCurrencyCode,
             updateShowHalfProducts = viewModel::updateShowHalfProducts,
+            updateShowProductTax = viewModel::updateShowProductTax,
             saveSettings = viewModel::saveSettings,
             resetScreenState = viewModel::resetScreenState,
         )
@@ -366,6 +368,12 @@ private fun Defaults(
             onValueChange = { settingsScreenCallbacks.updateShowHalfProducts(it) }
         )
 
+        CheckBoxField(
+            title = stringResource(id = R.string.use_product_tax),
+            value = settings?.showProductTax == true,
+            onValueChange = { settingsScreenCallbacks.updateShowProductTax(it) }
+        )
+
         Column {
             FieldLabel(text = stringResource(id = R.string.default_currency))
             Spacer(Modifier.size(2.dp))
@@ -478,7 +486,8 @@ private fun PreviewSettingsScreenContent() {
                 currency = Currency.getInstance("USD"),
                 metricUsed = true,
                 imperialUsed = false,
-                showHalfProducts = true
+                showHalfProducts = true,
+                showProductTax = true
             ),
             currencies = Currency.getAvailableCurrencies(),
             saveButtonEnabled = true,
@@ -500,7 +509,8 @@ private fun PreviewDefaults() {
                 currency = Currency.getInstance("USD"),
                 metricUsed = true,
                 imperialUsed = false,
-                showHalfProducts = false
+                showHalfProducts = false,
+                showProductTax = true
             ),
             currencies = Currency.getAvailableCurrencies(),
             saveButtonEnabled = true,

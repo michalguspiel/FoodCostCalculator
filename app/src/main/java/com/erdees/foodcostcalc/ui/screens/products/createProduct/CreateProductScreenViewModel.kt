@@ -15,6 +15,7 @@ import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.Utils.formatResultAndCheckCommas
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -22,7 +23,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -33,8 +33,11 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
 
-    val showTaxPercent: StateFlow<Boolean> = preferences.showTaxPercent
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val showTaxPercent: StateFlow<Boolean> = preferences.showProductTax.stateIn(
+        viewModelScope,
+        SharingStarted.WhileSubscribed(5000),
+        false
+    )
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> get() = _screenState
@@ -90,20 +93,38 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         _selectedUnit.value = unit
     }
 
-    val addButtonEnabled: StateFlow<Boolean> = combine(
-        productName,
-        productPrice,
-        productTax,
-        productWaste,
-        selectedUnit,
-        showTaxPercent
-    ) { name, price, tax, waste, unit, showTax ->
-        name.isNotBlank() &&
+    private fun computeIsAddButtonEnabled(
+        name: String, price: String, tax: String, waste: String, unit: String, showTax: Boolean
+    ): Boolean {
+        return name.isNotBlank() &&
                 unit.isNotBlank() &&
                 price.toDoubleOrNull() != null &&
                 (if (showTax) tax.toDoubleOrNull() != null else true) &&
                 waste.toDoubleOrNull() != null
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+    }
+
+    val addButtonEnabled: StateFlow<Boolean> = combine(
+        productName, productPrice, productTax, productWaste, selectedUnit, showTaxPercent
+    ) { values ->
+        val name = values[0] as String
+        val price = values[1] as String
+        val tax = values[2] as String
+        val waste = values[3] as String
+        val unit = values[4] as String
+        val showTax = values[5] as Boolean
+        computeIsAddButtonEnabled(name, price, tax, waste, unit, showTax)
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        computeIsAddButtonEnabled(
+            productName.value,
+            productPrice.value,
+            productTax.value,
+            productWaste.value,
+            selectedUnit.value,
+            showTaxPercent.value
+        )
+    )
 
     val countPiecePriceEnabled: StateFlow<Boolean> = selectedUnit.map {
         it == "per piece"
@@ -122,16 +143,11 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     fun addProduct() {
 
         val price = productPrice.value.toDoubleOrNull() ?: return
-        val tax = if (showTaxPercent.value) productTax.value.toDoubleOrNull() ?: return else 0.0
+        val tax = productTax.value.toDoubleOrNull() ?: 0.0
         val waste = productWaste.value.toDoubleOrNull() ?: return
 
         val product = ProductBase(
-            0,
-            productName.value,
-            price,
-            tax,
-            waste,
-            selectedUnit.value
+            0, productName.value, price, tax, waste, selectedUnit.value
         )
         addProduct(product)
         sendDataAboutProduct(product)
@@ -155,10 +171,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         bundle.putString(Constants.Analytics.PRODUCT_TAX, product.tax.toString())
         bundle.putString(Constants.Analytics.PRODUCT_WASTE, product.waste.toString())
         bundle.putString(Constants.Analytics.PRODUCT_UNIT, product.unit)
-        bundle.putString(
-            Constants.Analytics.PRODUCT_PRICE_PER_UNIT,
-            product.pricePerUnit.toString()
-        )
+        bundle.putString(Constants.Analytics.PRODUCT_PRICE_PER_UNIT, product.pricePerUnit.toString())
         analyticsRepository.logEvent(Constants.Analytics.PRODUCT_CREATED, bundle)
     }
 

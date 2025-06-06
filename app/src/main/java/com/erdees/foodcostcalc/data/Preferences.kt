@@ -35,8 +35,8 @@ interface Preferences {
     val showHalfProducts: Flow<Boolean>
     suspend fun setShowHalfProducts(value: Boolean)
 
-    val showTaxPercent: Flow<Boolean>
-    suspend fun setShowTaxPercent(value: Boolean)
+    val showProductTax: Flow<Boolean>
+    suspend fun setShowProductTax(value: Boolean)
 }
 
 
@@ -55,7 +55,7 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val METRIC = booleanPreferencesKey(Constants.Preferences.METRIC)
         val IMPERIAL = booleanPreferencesKey(Constants.Preferences.IMPERIAL)
         val SHOW_HALF_PRODUCTS = booleanPreferencesKey(Constants.Preferences.SHOW_HALF_PRODUCTS)
-        val SHOW_TAX_PERCENT = booleanPreferencesKey("show_tax_percent")
+        val SHOW_PRODUCT_TAX = booleanPreferencesKey(Constants.Preferences.SHOW_PRODUCT_TAX_PERCENT)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -127,10 +127,10 @@ class PreferencesImpl(private val context: Context) : Preferences {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] = value }
     }
 
-    override val showTaxPercent: Flow<Boolean> =
-        context.dataStore.data.map { prefs -> prefs[Keys.SHOW_TAX_PERCENT] ?: false }
+    override val showProductTax: Flow<Boolean> =
+        context.dataStore.data.map { prefs -> prefs[Keys.SHOW_PRODUCT_TAX] ?: false }
 
-    override suspend fun setShowTaxPercent(value: Boolean) {
-        context.dataStore.edit { prefs -> prefs[Keys.SHOW_TAX_PERCENT] = value }
+    override suspend fun setShowProductTax(value: Boolean) {
+        context.dataStore.edit { prefs -> prefs[Keys.SHOW_PRODUCT_TAX] = value }
     }
 }
