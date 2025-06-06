@@ -5,7 +5,6 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
 import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.PendingPurchasesParams
@@ -28,10 +27,9 @@ class FCCActivity : AppCompatActivity() {
     private val premiumUtil: PremiumUtil by inject(PremiumUtil::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
         installSplashScreen()
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
         Timber.i("onCreate")
 
         premiumUtil.billingClient = BillingClient.newBuilder(this)
