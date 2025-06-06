@@ -68,10 +68,7 @@ fun EditProductScreen(
     LaunchedEffect(screenState) {
         when (screenState) {
             is ScreenState.Success -> {
-                Timber.i(
-                    "Success, popping backstack \n" +
-                            "Previous backstack entry: ${navController.previousBackStackEntry?.destination?.route} \n"
-                )
+                Timber.i("Success, popping backstack")
                 viewModel.resetScreenState()
                 navController.popBackStack()
             }

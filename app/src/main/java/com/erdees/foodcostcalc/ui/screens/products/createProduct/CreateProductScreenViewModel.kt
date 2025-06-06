@@ -93,6 +93,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         _selectedUnit.value = unit
     }
 
+    @Suppress("MagicNumber")
     private fun computeIsAddButtonEnabled(
         name: String, price: String, tax: String, waste: String, unit: String, showTax: Boolean
     ): Boolean {
@@ -103,6 +104,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
                 waste.toDoubleOrNull() != null
     }
 
+    @Suppress("MagicNumber")
     val addButtonEnabled: StateFlow<Boolean> = combine(
         productName, productPrice, productTax, productWaste, selectedUnit, showTaxPercent
     ) { values ->
