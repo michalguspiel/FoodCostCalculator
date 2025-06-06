@@ -71,6 +71,7 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
     val screenState by viewModel.screenState.collectAsState()
     val addButtonEnabled by viewModel.addButtonEnabled.collectAsState()
     val countPiecePriceEnabled by viewModel.countPiecePriceEnabled.collectAsState()
+    val showTaxPercent by viewModel.showTaxPercent.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     val focusRequester = remember { FocusRequester() }
@@ -148,14 +149,16 @@ fun CreateProductScreen(modifier: Modifier = Modifier, navController: NavControl
                             imeAction = ImeAction.Next
                         ),
                         onValueChange = { viewModel.updateProductPrice(it) })
-                    FCCTextField(
-                        title = stringResource(id = R.string.tax_percent),
-                        value = productTax,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        ),
-                        onValueChange = { viewModel.updateProductTax(it) })
+                    if (showTaxPercent) {
+                        FCCTextField(
+                            title = stringResource(id = R.string.tax_percent),
+                            value = productTax,
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Number,
+                                imeAction = ImeAction.Next
+                            ),
+                            onValueChange = { viewModel.updateProductTax(it) })
+                    }
                     FCCTextField(
                         title = stringResource(id = R.string.percent_of_waste),
                         value = productWaste,

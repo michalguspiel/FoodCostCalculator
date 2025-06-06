@@ -15,7 +15,6 @@ import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.Utils.formatResultAndCheckCommas
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -23,6 +22,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -32,6 +32,9 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     private val productRepository: ProductRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
+
+    val showTaxPercent: StateFlow<Boolean> = preferences.showTaxPercent
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> get() = _screenState
@@ -58,7 +61,9 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     val productTax: StateFlow<String> get() = _productTax
 
     fun updateProductTax(tax: String) {
-        onNumericValueChange(tax, _productTax)
+        if (showTaxPercent.value) {
+            onNumericValueChange(tax, _productTax)
+        }
     }
 
     private val _productWaste = MutableStateFlow("")
@@ -90,12 +95,13 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         productPrice,
         productTax,
         productWaste,
-        selectedUnit
-    ) { name, price, tax, waste, unit ->
+        selectedUnit,
+        showTaxPercent
+    ) { name, price, tax, waste, unit, showTax ->
         name.isNotBlank() &&
                 unit.isNotBlank() &&
                 price.toDoubleOrNull() != null &&
-                tax.toDoubleOrNull() != null &&
+                (if (showTax) tax.toDoubleOrNull() != null else true) &&
                 waste.toDoubleOrNull() != null
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
@@ -103,10 +109,20 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         it == "per piece"
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
+    init {
+        viewModelScope.launch {
+            showTaxPercent.collect { show ->
+                if (!show) {
+                    _productTax.value = "0.0"
+                }
+            }
+        }
+    }
+
     fun addProduct() {
 
         val price = productPrice.value.toDoubleOrNull() ?: return
-        val tax = productTax.value.toDoubleOrNull() ?: return
+        val tax = if (showTaxPercent.value) productTax.value.toDoubleOrNull() ?: return else 0.0
         val waste = productWaste.value.toDoubleOrNull() ?: return
 
         val product = ProductBase(
