@@ -3,7 +3,6 @@ package com.erdees.foodcostcalc.ui.screens.onlineBackup
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.room.RoomDatabase
@@ -39,6 +38,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -117,7 +117,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
     }
 
     fun signOut(googleSignInClient: GoogleSignInClient) {
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         googleSignInClient.signOut()
             .addOnSuccessListener {
                 resetScreenState()
@@ -167,7 +167,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
             return
         }
         val database = fileList.files.first()
-        Log.i(TAG, "onQueryFilesSuccess: ${database.id}, ${database.name}, ${database.size}")
+        Timber.i( "onQueryFilesSuccess: ${database.id}, ${database.name}, ${database.size}")
         val result = downloadFile(file, database.id)
         when {
             result.isSuccess -> swapDatabaseFiles(file, context)
@@ -191,11 +191,11 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
      * @param applicationContext The application context used to access the database and restart Koin.
      */
     private fun swapDatabaseFiles(file: File, applicationContext: Context) {
-        Log.i(TAG, "Swapping database files $file, ${file.length()}")
+        Timber.i( "Swapping database files $file, ${file.length()}")
         val roomDatabaseCallback = object : RoomDatabase.Callback() {
             override fun onOpen(db: SupportSQLiteDatabase) {
                 super.onOpen(db)
-                Log.i("AppRoomDataBase", "Database opened successfully.")
+                Timber.i( "Database opened successfully.")
                 handleSuccess(applicationContext, Operation.DB_LOAD)
             }
         }
@@ -222,7 +222,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
         }
 
         val fileList = result.getOrNull()
-        Log.i(TAG, "fileList: ${fileList?.files?.size}")
+        Timber.i( "fileList: ${fileList?.files?.size}")
 
         // Close database before uploading, so that the checkpoint is performed
         // If we fail after this point we need to destroy db instance and restart koin
@@ -250,7 +250,7 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
         file: com.google.api.services.drive.model.File,
         context: Context
     ) {
-        Log.i(TAG, "Updating database in Google Drive")
+        Timber.i( "Updating database in Google Drive")
         val result = deleteFolderFile(file.id)
         when {
             result.isSuccess -> saveDataBaseInDrive(context)
@@ -259,13 +259,12 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
     }
 
     private suspend fun DriveServiceHelper.saveDataBaseInDrive(context: Context) {
-        Log.i(TAG, "Saving database in Google Drive")
+        Timber.i( "Saving database in Google Drive")
         val result = uploadFile(getDatabaseFile(context), null, null)
         when {
             result.isSuccess -> {
                 result.getOrNull()?.let {
-                    Log.i(
-                        TAG,
+                    Timber.i(
                         "onSuccess of save database ${it.id}, ${it.name}, ${it.size}, ${it.createdTime}"
                     )
                 }
@@ -308,12 +307,12 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
 
     private fun getDatabaseFile(context: Context): File {
         return context.getDatabasePath(AppRoomDataBase.NAME).absoluteFile.also {
-            Log.i(TAG, "getDatabaseFile file path: $it")
+            Timber.i( "getDatabaseFile file path: $it")
         }
     }
 
     private fun copyFile(inputPath: String, outputPath: String) {
-        Log.i(TAG, "Copying file from $inputPath to $outputPath")
+        Timber.i( "Copying file from $inputPath to $outputPath")
         val inputStream: InputStream?
         val out: OutputStream?
         try {
@@ -329,14 +328,13 @@ class OnlineBackupViewModel : ViewModel(), KoinComponent {
             out.flush()
             out.close()
         } catch (e: FileNotFoundException) {
-            Log.e(TAG, e.message ?: "Unknown error")
+            Timber.e( e.message ?: "Unknown error")
         } catch (e: Exception) {
-            Log.e(TAG, e.message ?: "Unknown error")
+            Timber.e( e.message ?: "Unknown error")
         }
     }
 
     companion object {
         private const val RC_SIGN_IN = 213
-        private const val TAG = "OnlineBackupViewModel"
     }
 }

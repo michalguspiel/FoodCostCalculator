@@ -138,7 +138,7 @@ fun HalfProductsScreen(
 
         when (screenState) {
 
-            is ScreenState.Loading -> {
+            is ScreenState.Loading<*> -> {
                 ScreenLoadingOverlay()
             }
 

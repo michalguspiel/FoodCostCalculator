@@ -120,7 +120,7 @@ fun EditDishScreen(
 
     LaunchedEffect(screenState) {
         when (screenState) {
-            is ScreenState.Success -> {
+            is ScreenState.Success<*> -> {
                 viewModel.resetScreenState()
                 navController.popBackStack()
             }
@@ -242,8 +242,8 @@ private fun EditDishScreenContent(
                 }
 
                 when (screenState) {
-                    is ScreenState.Loading -> ScreenLoadingOverlay()
-                    is ScreenState.Success -> {} // NOTHING
+                    is ScreenState.Loading<*> -> ScreenLoadingOverlay()
+                    is ScreenState.Success<*> -> {} // NOTHING
 
                     is ScreenState.Error -> {
                         ErrorDialog {

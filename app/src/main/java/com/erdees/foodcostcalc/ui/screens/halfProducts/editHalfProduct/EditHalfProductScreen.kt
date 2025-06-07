@@ -64,11 +64,8 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
 
     LaunchedEffect(screenState) {
         when (screenState) {
-            is ScreenState.Success -> {
-                Timber.i(
-                    "Success, popping backstack \n" +
-                            "Previous backstack entry: ${navController.previousBackStackEntry?.destination?.route} \n"
-                )
+            is ScreenState.Success<*> -> {
+                Timber.i("Success, popping backstack")
                 viewModel.resetScreenState()
                 navController.popBackStack()
             }
@@ -150,7 +147,7 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
             }
 
             when (screenState) {
-                is ScreenState.Loading -> {
+                is ScreenState.Loading<*> -> {
                     ScreenLoadingOverlay()
                 }
 
@@ -160,7 +157,7 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
                     }
                 }
 
-                is ScreenState.Success -> {}
+                is ScreenState.Success<*> -> {}
 
                 is ScreenState.Interaction -> {
                     when ((screenState as ScreenState.Interaction).interaction) {

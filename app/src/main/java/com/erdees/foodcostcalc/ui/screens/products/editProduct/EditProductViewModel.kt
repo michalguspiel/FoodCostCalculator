@@ -51,7 +51,7 @@ class EditProductViewModel : ViewModel(), KoinComponent {
     )
 
     fun initializeWith(productId: Long) {
-        _screenState.update { ScreenState.Loading() }
+        _screenState.update { ScreenState.Loading<Nothing>() }
         viewModelScope.launch {
             try {
                 val product = productRepository.getProduct(productId)
@@ -113,11 +113,11 @@ class EditProductViewModel : ViewModel(), KoinComponent {
     }
 
     fun deleteProduct(id: Long) {
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         try {
             viewModelScope.launch(Dispatchers.IO) {
                 productRepository.deleteProduct(id)
-                _screenState.value = ScreenState.Success()
+                _screenState.value = ScreenState.Success<Nothing>()
             }
         } catch (e: Exception) {
             _screenState.value = ScreenState.Error(Error(e))
@@ -132,7 +132,7 @@ class EditProductViewModel : ViewModel(), KoinComponent {
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     fun save() {
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         try {
             viewModelScope.launch(Dispatchers.Default) {
                 val newProduct = product.value?.toProductBase()
@@ -141,7 +141,7 @@ class EditProductViewModel : ViewModel(), KoinComponent {
                     return@launch
                 }
                 updateProductInRepository(newProduct)
-                _screenState.value = ScreenState.Success()
+                _screenState.value = ScreenState.Success<Nothing>()
             }
         } catch (e: Exception) {
             _screenState.value = ScreenState.Error(Error(e))

@@ -53,7 +53,7 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableName = "",
             editableTotalPrice = "",
             currency = sampleCurrency,
-            screenState = ScreenState.Loading()
+            screenState = ScreenState.Loading<Nothing>()
         ),
         // Error State
         EditDishScreenState(

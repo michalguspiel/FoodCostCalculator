@@ -30,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -69,13 +70,14 @@ fun AddItemToDishScreen(
     val screenState by viewModel.screenState.collectAsState()
     val showHalfProducts by viewModel.showHalfProducts.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val itemAddedText = stringResource(id = R.string.item_added)
+    val context = LocalContext.current
 
     LaunchedEffect(screenState) {
         when (screenState) {
-            is ScreenState.Success -> {
-                snackbarHostState.showSnackbar(itemAddedText, duration = SnackbarDuration.Short)
+            is ScreenState.Success<*> -> {
+                val addedItemName = (screenState as ScreenState.Success<*>).data as? String
+                val message = context.getString(R.string.item_added, addedItemName)
+                snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Short)
                 viewModel.resetScreenState()
             }
 
@@ -84,7 +86,6 @@ fun AddItemToDishScreen(
     }
 
     Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(title = {
                 Text(text = dishName)
@@ -159,18 +160,25 @@ fun AddItemToDishScreen(
 
                     Spacer(Modifier.weight(1f))
 
-                    ButtonRow(primaryButton = {
-                        FCCPrimaryButton(
-                            onClick = { viewModel.addItem(dishId) },
-                            text = stringResource(id = R.string.add),
-                            enabled = addButtonEnabled
-                        )
-                    })
+                    Column {
+                        SnackbarHost(hostState = snackbarHostState)
+                        ButtonRow(
+                            modifier = Modifier.padding(bottom = 24.dp, top = 12.dp),
+                            applyDefaultPadding = false,
+                            primaryButton = {
+                            FCCPrimaryButton(
+                                onClick = { viewModel.addItem(dishId) },
+                                text = stringResource(id = R.string.add),
+                                enabled = addButtonEnabled
+                            )
+                        })
+                    }
+
                 }
             } // Column
 
             when (screenState) {
-                is ScreenState.Loading -> ScreenLoadingOverlay()
+                is ScreenState.Loading<*> -> ScreenLoadingOverlay()
                 is ScreenState.Error -> {
                     AlertDialog(
                         onDismissRequest = { viewModel.resetScreenState() },

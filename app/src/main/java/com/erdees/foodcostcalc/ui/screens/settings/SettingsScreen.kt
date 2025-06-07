@@ -92,7 +92,7 @@ fun SettingsScreen(navController: NavController, viewModel: SettingsViewModel = 
 
     LaunchedEffect(screenState) {
         when (screenState) {
-            is ScreenState.Success -> {
+            is ScreenState.Success<*> -> {
                 snackbarHostState.showSnackbar(
                     message = settingsSaved,
                     duration = SnackbarDuration.Short
@@ -190,11 +190,11 @@ private fun SettingsScreenContent(
 
 
             when (screenState) {
-                is ScreenState.Loading -> {
+                is ScreenState.Loading<*> -> {
                     ScreenLoadingOverlay()
                 }
 
-                is ScreenState.Success -> {}
+                is ScreenState.Success<*> -> {}
 
                 is ScreenState.Error -> {
                     ErrorDialog {

@@ -67,7 +67,7 @@ fun EditProductScreen(
 
     LaunchedEffect(screenState) {
         when (screenState) {
-            is ScreenState.Success -> {
+            is ScreenState.Success<*> -> {
                 Timber.i("Success, popping backstack")
                 viewModel.resetScreenState()
                 navController.popBackStack()
@@ -200,7 +200,7 @@ fun EditProductScreen(
                     }
                 }
 
-                is ScreenState.Loading -> {
+                is ScreenState.Loading<*> -> {
                     ScreenLoadingOverlay()
                 }
 

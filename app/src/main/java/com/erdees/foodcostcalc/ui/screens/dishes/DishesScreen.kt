@@ -164,7 +164,7 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                     }
                 }
 
-                is ScreenState.Loading -> {
+                is ScreenState.Loading<*> -> {
                     ScreenLoadingOverlay()
                 }
 

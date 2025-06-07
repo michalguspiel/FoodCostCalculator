@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -81,8 +82,7 @@ fun AddItemToHalfProductScreen(
     val tooltipState = rememberTooltipState(isPersistent = true)
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
-
-    val itemAddedText = stringResource(id = R.string.item_added)
+    val context = LocalContext.current
 
     LaunchedEffect(halfProductUnit) {
         viewModel.initializeWith(halfProductUnit)
@@ -90,8 +90,10 @@ fun AddItemToHalfProductScreen(
 
     LaunchedEffect(screenState) {
         when (screenState) {
-            is ScreenState.Success -> {
-                snackbarHostState.showSnackbar(itemAddedText, duration = SnackbarDuration.Short)
+            is ScreenState.Success<*> -> {
+                val addedItemName = (screenState as? ScreenState.Success<*>)?.data as String
+                val message = context.getString(R.string.item_added, addedItemName)
+                snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Short)
                 viewModel.resetScreenState()
             }
 
@@ -99,32 +101,30 @@ fun AddItemToHalfProductScreen(
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        topBar = {
-            TopAppBar(title = {
-                Text(text = halfProductName)
-            }, navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Sharp.ArrowBack,
-                        contentDescription = stringResource(id = R.string.back)
-                    )
-                }
-            }, actions = {
-                IconButton(onClick = {
-                    scope.launch {
-                        tooltipState.show(MutatePriority.PreventUserInput)
-                    }
-                }) {
-                    Icon(
-                        imageVector = Icons.Sharp.Info,
-                        contentDescription = stringResource(id = R.string.content_description_half_product_tip)
-                    )
-                }
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(text = halfProductName)
+        }, navigationIcon = {
+            IconButton(onClick = { navController.popBackStack() }) {
+                Icon(
+                    Icons.AutoMirrored.Sharp.ArrowBack,
+                    contentDescription = stringResource(id = R.string.back)
+                )
             }
-            )
-        }) { paddingValues: PaddingValues ->
+        }, actions = {
+            IconButton(onClick = {
+                scope.launch {
+                    tooltipState.show(MutatePriority.PreventUserInput)
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Sharp.Info,
+                    contentDescription = stringResource(id = R.string.content_description_half_product_tip)
+                )
+            }
+        }
+        )
+    }) { paddingValues: PaddingValues ->
         Box(Modifier.padding(paddingValues), contentAlignment = Alignment.Center) {
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
@@ -158,25 +158,32 @@ fun AddItemToHalfProductScreen(
 
                 TooltipBox(
                     positionProvider =
-                    TooltipDefaults.rememberPlainTooltipPositionProvider(), tooltip = {
+                        TooltipDefaults.rememberPlainTooltipPositionProvider(), tooltip = {
                         RichTooltip(
                             title = { Text(stringResource(id = R.string.tip)) },
                             text = { Text(text = stringResource(id = R.string.half_product_tip_content)) }
                         )
                     }, state = tooltipState
                 ) {
-                    ButtonRow(primaryButton = {
-                        FCCPrimaryButton(
-                            enabled = addButtonEnabled,
-                            onClick = { viewModel.addHalfProduct(halfProductId) },
-                            text = stringResource(id = R.string.add)
-                        )
-                    })
+                    Column {
+                        SnackbarHost(hostState = snackbarHostState)
+                        ButtonRow(
+                            modifier = Modifier.padding(bottom = 24.dp, top = 12.dp),
+                            applyDefaultPadding = false,
+                            primaryButton = {
+                            FCCPrimaryButton(
+                                enabled = addButtonEnabled,
+                                onClick = { viewModel.addHalfProduct(halfProductId) },
+                                text = stringResource(id = R.string.add)
+                            )
+                        })
+                    }
+
                 }
             }
 
             when (screenState) {
-                is ScreenState.Loading -> ScreenLoadingOverlay()
+                is ScreenState.Loading<*> -> ScreenLoadingOverlay()
                 is ScreenState.Error -> {
                     AlertDialog(
                         onDismissRequest = { viewModel.resetScreenState() },

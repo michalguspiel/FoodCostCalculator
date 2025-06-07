@@ -148,7 +148,7 @@
     <string name="create_dish">Create Dish</string>
     <string name="add_product">Add Ingredient</string>
     <string name="add_half_product">Add Half Product</string>
-    <string name="item_added">Item added</string>
+    <string name="item_added">%1$s added</string>
     <string name="remove_dish">Remove dish</string>
     <string name="recipe">Recipe</string>
     <string name="recipe_button_title">Recipe</string>

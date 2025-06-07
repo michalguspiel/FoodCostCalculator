@@ -84,7 +84,7 @@ class EditHalfProductViewModel : ViewModel(), KoinComponent {
     }.stateIn(viewModelScope, SharingStarted.Lazily, listOf())
 
     fun initializeWith(id: Long) {
-        _screenState.update { ScreenState.Loading() }
+        _screenState.update { ScreenState.Loading<Nothing>() }
         viewModelScope.launch {
             try {
                 val halfProduct = halfProductRepository.getCompleteHalfProduct(id)
@@ -118,11 +118,11 @@ class EditHalfProductViewModel : ViewModel(), KoinComponent {
     }
 
     fun deleteHalfProduct(id: Long) {
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 halfProductRepository.deleteHalfProduct(id)
-                _screenState.value = ScreenState.Success()
+                _screenState.value = ScreenState.Success<Nothing>()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
@@ -146,7 +146,7 @@ class EditHalfProductViewModel : ViewModel(), KoinComponent {
 
     fun saveHalfProduct() {
         val halfProduct = halfProduct.value ?: return
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch(Dispatchers.Default) {
             val editedProducts =
                 halfProduct.products.filterNot { it in originalProducts }
@@ -161,7 +161,7 @@ class EditHalfProductViewModel : ViewModel(), KoinComponent {
 
                     halfProductRepository.updateHalfProduct(halfProduct.toHalfProductBase())
                 }
-                _screenState.value = ScreenState.Success()
+                _screenState.value = ScreenState.Success<Nothing>()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
