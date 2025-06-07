@@ -40,6 +40,20 @@ jobs:
         working-directory: ./
         run: ./gradlew build
 
+      - name: Upload Build Failure Reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-failure-reports
+          path: app/build/reports/
+
       - name: Unit Test
         working-directory: ./
         run: ./gradlew test
+
+      - name: Upload Test Reports
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: app/build/reports/tests/
