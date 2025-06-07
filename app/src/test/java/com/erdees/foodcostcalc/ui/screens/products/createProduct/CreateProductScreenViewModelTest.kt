@@ -16,7 +16,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -31,8 +31,7 @@ import org.koin.dsl.module
 @ExperimentalCoroutinesApi
 class CreateProductScreenViewModelTestJUnitStyleWithMockK {
 
-
-    private val testDispatcher = UnconfinedTestDispatcher()
+    private val testDispatcher = StandardTestDispatcher()
 
     private lateinit var productRepository: ProductRepository
     private lateinit var preferences: Preferences
@@ -111,7 +110,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
             viewModel.selectUnit("kg")
             advanceUntilIdle()
 
-            viewModel.addButtonEnabled.first() shouldBe true
+            viewModel.addButtonEnabled.value shouldBe true
         }
 
     @Test
@@ -133,15 +132,15 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
     fun `addButtonEnabled when showTaxPercent is true and all fields valid`() = runTest(testDispatcher) {
         every { preferences.showProductTax } returns MutableStateFlow(true)
         initializeViewModel()
+        advanceUntilIdle()
         viewModel.updateProductName("Test Product")
         viewModel.updateProductPrice("10.0")
         viewModel.updateProductTax("20.0")
         viewModel.updateProductWaste("5.0")
         viewModel.selectUnit("kg")
         advanceUntilIdle()
-        val result = viewModel.addButtonEnabled.first()
 
-        result shouldBe true
+        viewModel.addButtonEnabled.value shouldBe true
     }
 
     @Test
@@ -155,9 +154,10 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
             viewModel.updateProductPrice("10.0")
             viewModel.updateProductWaste("5.0")
             viewModel.selectUnit("kg")
+            viewModel.updateProductTax("")
             advanceUntilIdle()
 
-            viewModel.addButtonEnabled.value shouldBe false
+            viewModel.addButtonEnabled.first() shouldBe false
         }
 
     @Test
@@ -208,7 +208,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
 
     @Test
     fun `addProduct when showTaxPercent is false uses 0 as tax`() =
-        runTest(testDispatcher) {
+        runTest(StandardTestDispatcher()) {
             every { preferences.showProductTax } returns MutableStateFlow(false)
             coEvery { productRepository.addProduct(any()) } returns Unit
 

@@ -36,7 +36,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     val showTaxPercent: StateFlow<Boolean> = preferences.showProductTax.stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        false
+        true
     )
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
@@ -117,7 +117,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         computeIsAddButtonEnabled(name, price, tax, waste, unit, showTax)
     }.stateIn(
         viewModelScope,
-        SharingStarted.Lazily,
+        SharingStarted.Eagerly,
         computeIsAddButtonEnabled(
             productName.value,
             productPrice.value,
