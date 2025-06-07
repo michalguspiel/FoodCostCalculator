@@ -182,12 +182,12 @@ private fun RecipeScreenContent(
         }
 
         when (screenState) {
-            is ScreenState.Success -> {
+            is ScreenState.Success<*> -> {
                 recipeScreenCallbacks.toggleRecipeViewMode()
             }
 
             is ScreenState.Error -> {}
-            is ScreenState.Loading -> ScreenLoadingOverlay()
+            is ScreenState.Loading<*> -> ScreenLoadingOverlay()
             is ScreenState.Interaction -> {
                 if (screenState.interaction == InteractionType.ChangeServings) {
                     val editable = remember { mutableStateOf(servings.toString()) }

@@ -95,7 +95,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     private fun fetchDish() {
         Timber.i("fetchDish() \n SavedStateHandle: $savedStateHandle, ${savedStateHandle.get<Long>("dishId")}")
-        _screenState.update { ScreenState.Loading() }
+        _screenState.update { ScreenState.Loading<Nothing>() }
         viewModelScope.launch {
             try {
                 val id = savedStateHandle.get<Long>(DISH_ID_KEY) ?: throw NullPointerException("Failed to fetch dish due to missing id in savedStateHandle")
@@ -281,11 +281,11 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun deleteDish(dishId: Long) {
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 dishRepository.deleteDish(dishId)
-                _screenState.value = ScreenState.Success()
+                _screenState.value = ScreenState.Success<Nothing>()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
@@ -315,7 +315,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      */
     fun saveDish() {
         val dish = dish.value ?: return
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch(Dispatchers.Default) {
 
             val editedProducts =
@@ -342,7 +342,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
                     dishRepository.updateDish(this@DishDetailsViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
                 }
-                _screenState.value = ScreenState.Success()
+                _screenState.value = ScreenState.Success<Nothing>()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }

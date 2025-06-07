@@ -18,7 +18,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import java.util.Locale
 
-class ProductsFragmentViewModel : FCCBaseViewModel(), KoinComponent {
+class ProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
     private val productRepository: ProductRepository by inject()
     private val analyticsRepository: AnalyticsRepository by inject()

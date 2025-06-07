@@ -10,11 +10,11 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toRecipeStep
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
+import com.erdees.foodcostcalc.domain.model.errors.DishNotFound
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeStepDomain
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.domain.model.errors.DishNotFound
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -159,7 +159,7 @@ class RecipeHandler(
     fun cancelRecipeEdit(currentRecipe: RecipeDomain?) {
         Timber.i("cancelRecipeEdit()")
         if (currentRecipe == null) {
-            updateScreenState(ScreenState.Loading())
+            updateScreenState(ScreenState.Loading<Nothing>())
             viewModelScope.launch {
                 _recipeEvent.trySend(RecipeEvent.CancelEditRecipeMissing)
             }
@@ -173,7 +173,7 @@ class RecipeHandler(
 
     fun saveRecipe(dish: DishDomain?) {
         Timber.i("saveRecipe()")
-        updateScreenState(ScreenState.Loading())
+        updateScreenState(ScreenState.Loading<Nothing>())
         viewModelScope.launch(Dispatchers.Default) {
             val existingRecipeIdInDish = dish?.recipe?.recipeId
             val editableRecipe = _recipe.value
@@ -189,7 +189,7 @@ class RecipeHandler(
                 }
             }.onSuccess {
                 Timber.i("saveRecipe() Success")
-                updateScreenState(ScreenState.Success())
+                updateScreenState(ScreenState.Success<Nothing>())
             }.onFailure {
                 Timber.e("saveRecipe() failure: $it")
             }

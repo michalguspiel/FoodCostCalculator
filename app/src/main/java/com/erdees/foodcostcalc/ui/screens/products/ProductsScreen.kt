@@ -56,7 +56,7 @@ import java.util.Locale
 @Screen
 fun ProductsScreen(
     navController: NavController,
-    viewModel: ProductsFragmentViewModel = viewModel()
+    viewModel: ProductsScreenViewModel = viewModel()
 ) {
     val searchKey by viewModel.searchKey.collectAsState()
     val listItems by viewModel.filteredProductsInjectedWithAds.collectAsState()

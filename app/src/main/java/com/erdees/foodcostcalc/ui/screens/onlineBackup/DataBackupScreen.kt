@@ -1,6 +1,5 @@
 package com.erdees.foodcostcalc.ui.screens.onlineBackup
 
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -46,6 +45,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import timber.log.Timber
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -78,7 +78,7 @@ fun DataBackupScreen(navController: NavController, viewModel: OnlineBackupViewMo
                 viewModel.checkForGooglePermissions(context, googleSignInAccount)
                 viewModel.driveSetUp(context)
             } catch (e: ApiException) {
-                Log.w("OnlineDataScreen", "signInResult:failed code=" + e.statusCode)
+                Timber.w("signInResult:failed code=" + e.statusCode)
             }
         }
 
@@ -209,8 +209,8 @@ fun DataBackupScreen(navController: NavController, viewModel: OnlineBackupViewMo
 
         is ScreenState.Interaction -> {}
 
-        is ScreenState.Loading -> {
-            val loadingText = when ((screenState as ScreenState.Loading).operation) {
+        is ScreenState.Loading<*> -> {
+            val loadingText = when ((screenState as ScreenState.Loading<*>).data) {
                 Operation.DB_LOAD -> stringResource(id = R.string.db_loading_in_progress)
                 Operation.DB_SAVE -> stringResource(id = R.string.db_saving_in_progress)
                 else -> stringResource(id = R.string.operation_in_progress)
@@ -218,8 +218,8 @@ fun DataBackupScreen(navController: NavController, viewModel: OnlineBackupViewMo
             ScreenLoadingOverlay(loadingText = loadingText)
         }
 
-        is ScreenState.Success -> {
-            val successText = when ((screenState as ScreenState.Success).operation) {
+        is ScreenState.Success<*> -> {
+            val successText = when ((screenState as ScreenState.Success<*>).data) {
                 Operation.DB_LOAD -> stringResource(id = R.string.db_loaded_successfully)
                 Operation.DB_SAVE -> stringResource(id = R.string.db_saved_successfully)
                 else -> stringResource(id = R.string.operation_successful)

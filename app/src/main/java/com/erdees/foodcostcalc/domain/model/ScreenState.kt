@@ -15,15 +15,10 @@ sealed class InteractionType {
     data object CreateHalfProduct : InteractionType()
 }
 
-enum class Operation {
-    DB_LOAD,
-    DB_SAVE
-}
-
 sealed class ScreenState {
-    data class Loading(val operation: Operation? = null) : ScreenState()
+    data class Loading<T>(val data: T? = null) : ScreenState()
     data object Idle : ScreenState()
     data class Error(val error: kotlin.Error) : ScreenState()
-    data class Success(val operation: Operation? = null) : ScreenState()
+    data class Success<T>(val data: T? = null) : ScreenState()
     data class Interaction(val interaction: InteractionType) : ScreenState()
 }

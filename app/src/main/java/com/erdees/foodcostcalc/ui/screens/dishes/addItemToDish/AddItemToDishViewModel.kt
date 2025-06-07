@@ -172,11 +172,11 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
             quantity = quantity.value.toDouble(),
             quantityUnit = selectedUnit.value
         )
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 productRepository.addProductDish(productDish)
-                _screenState.value = ScreenState.Success()
+                _screenState.value = ScreenState.Success(selectedItem.value?.name)
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
@@ -191,11 +191,11 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
             quantity = quantity.value.toDouble(),
             quantityUnit = selectedUnit.value
         )
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 halfProductRepository.addHalfProductDish(halfProductDish)
-                _screenState.value = ScreenState.Success()
+                _screenState.value = ScreenState.Success(selectedItem.value?.name)
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }

@@ -32,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -53,7 +54,6 @@ fun CreateDishScreen(
     navController: NavController,
     viewModel: CreateDishScreenViewModel = viewModel()
 ) {
-
     val addedDish by viewModel.addedDish.collectAsState()
     val dishName by viewModel.dishName.collectAsState()
     val margin by viewModel.margin.collectAsState()
@@ -62,20 +62,20 @@ fun CreateDishScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     val focusRequester = remember { FocusRequester() }
-    val itemAddedText = stringResource(id = R.string.item_added)
-
     var textFieldLoaded by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     LaunchedEffect(addedDish) {
         addedDish?.let {
-            snackbarHostState.showSnackbar(itemAddedText)
+            snackbarHostState.showSnackbar(context.getString(R.string.item_added, addedDish?.name))
             viewModel.resetAddedDish()
         }
     }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = stringResource(id = R.string.create_dish)) },
+            TopAppBar(
+                title = { Text(text = stringResource(id = R.string.create_dish)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
@@ -85,10 +85,7 @@ fun CreateDishScreen(
                         )
                     }
                 })
-        },
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
+        }
     ) { paddingValues ->
 
         Column(
@@ -175,13 +172,19 @@ fun CreateDishScreen(
                     )
                 }
             }
-            ButtonRow(primaryButton = {
-                FCCPrimaryButton(
-                    enabled = addButtonEnabled,
-                    onClick = { viewModel.addDish() },
-                    text = stringResource(id = R.string.add)
-                )
-            })
+            Column {
+                SnackbarHost(hostState = snackbarHostState)
+                ButtonRow(
+                    modifier = Modifier.padding(bottom = 24.dp, top = 12.dp),
+                    applyDefaultPadding = false,
+                    primaryButton = {
+                        FCCPrimaryButton(
+                            enabled = addButtonEnabled,
+                            onClick = { viewModel.addDish() },
+                            text = stringResource(id = R.string.add)
+                        )
+                    })
+            }
         }
     }
 }

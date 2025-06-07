@@ -108,7 +108,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
 
     /** Saves settings to preferences. */
     fun saveSettings() {
-        _screenState.value = ScreenState.Loading()
+        _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch {
             _settingsModel.value?.let {  settingsModel ->
                 preferences.setDefaultMargin(settingsModel.defaultMargin)
@@ -123,7 +123,7 @@ class SettingsViewModel : ViewModel(), KoinComponent {
             }
 
         }
-        _screenState.value = ScreenState.Success()
+        _screenState.value = ScreenState.Success<Nothing>()
     }
 
     val saveButtonEnabled = _settingsModel.map {
