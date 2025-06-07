@@ -34,3 +34,6 @@ App follows Material 3 Design. Icons are sharp with weight of 200, grade 0, and 
 
 ### TODO 
 - Printing recipe
+
+## License
+This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
