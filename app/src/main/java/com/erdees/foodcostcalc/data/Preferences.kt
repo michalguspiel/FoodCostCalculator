@@ -7,8 +7,10 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.erdees.foodcostcalc.ext.dataStore
 import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.FeatureVisibilityByInstallDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
 import java.util.Locale
 
@@ -42,6 +44,9 @@ interface Preferences {
 
 class PreferencesImpl(private val context: Context) : Preferences {
 
+    private val featureVisibilityByInstallDate by inject<FeatureVisibilityByInstallDate>(
+        FeatureVisibilityByInstallDate::class.java
+    )
     private val defaultLocale: Locale = Locale.getDefault()
     private val localeDefaultCurrencyCode: String? =
         Currency.getInstance(defaultLocale)?.currencyCode
@@ -121,14 +126,24 @@ class PreferencesImpl(private val context: Context) : Preferences {
     }
 
     override val showHalfProducts: Flow<Boolean> =
-        context.dataStore.data.map { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] ?: false }
+        context.dataStore.data.map { prefs ->
+            prefs[Keys.SHOW_HALF_PRODUCTS]
+                ?: featureVisibilityByInstallDate.isDefaultVisibleForPreCutoffUser(
+                    false
+                )
+        }
 
     override suspend fun setShowHalfProducts(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] = value }
     }
 
     override val showProductTax: Flow<Boolean> =
-        context.dataStore.data.map { prefs -> prefs[Keys.SHOW_PRODUCT_TAX] ?: false }
+        context.dataStore.data.map { prefs ->
+            prefs[Keys.SHOW_PRODUCT_TAX]
+                ?: featureVisibilityByInstallDate.isDefaultVisibleForPreCutoffUser(
+                    false
+                )
+        }
 
     override suspend fun setShowProductTax(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_PRODUCT_TAX] = value }
