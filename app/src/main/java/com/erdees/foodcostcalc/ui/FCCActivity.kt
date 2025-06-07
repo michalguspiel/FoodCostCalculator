@@ -27,9 +27,9 @@ class FCCActivity : AppCompatActivity() {
     private val premiumUtil: PremiumUtil by inject(PremiumUtil::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         installSplashScreen()
         enableEdgeToEdge()
+        super.onCreate(savedInstanceState)
         Timber.i("onCreate")
 
         premiumUtil.billingClient = BillingClient.newBuilder(this)
