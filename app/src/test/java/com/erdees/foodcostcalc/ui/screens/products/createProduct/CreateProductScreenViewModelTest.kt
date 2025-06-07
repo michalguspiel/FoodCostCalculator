@@ -207,8 +207,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
         }
 
     @Test
-    fun `addProduct when showTaxPercent is false uses 0 as tax`() =
-        runTest(StandardTestDispatcher()) {
+    fun `addProduct when showTaxPercent is false uses 0 as tax`() = runTest(testDispatcher) {
             every { preferences.showProductTax } returns MutableStateFlow(false)
             coEvery { productRepository.addProduct(capture(productBaseSlot)) } returns Unit
 
