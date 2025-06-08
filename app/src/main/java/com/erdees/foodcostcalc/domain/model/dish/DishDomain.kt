@@ -70,27 +70,43 @@ data class DishDomain(
     }
 
     private fun adjustMarginWithCorrectDecimals(
-        marginPercent: Double,
-        totalPrice: Double
+        initialRawMarginPercent: Double,
+        targetTotalPrice: Double
     ): DishDomain {
-        var adjustedDish = this.copy(marginPercent = marginPercent)
-        var precision = 1
-        repeat(MAX_ITERATIONS) {
-            val roundedMarginPercent = Utils.formatDouble(precision, marginPercent)
-            adjustedDish = this.copy(marginPercent = roundedMarginPercent)
+        var currentPrecision = 1
+        var bestAttemptDish = this.copy(marginPercent = initialRawMarginPercent)
+        var closestDifference = abs(bestAttemptDish.totalPrice - targetTotalPrice)
 
-            if (abs(adjustedDish.totalPrice - totalPrice) <= TOLERANCE) {
-                Timber.d("Converged: totalPrice=$totalPrice, result.totalPrice=${adjustedDish.totalPrice}, margin=${adjustedDish.marginPercent}, decimals=$precision")
-                return adjustedDish
-            }
-            precision++
+        if (closestDifference <= TOLERANCE) {
+            Timber.d("Initial raw margin is sufficient: targetTotalPrice=$targetTotalPrice, result.totalPrice=${bestAttemptDish.totalPrice}, margin=${bestAttemptDish.marginPercent}")
+            return bestAttemptDish
         }
-        Timber.w(
-            "Could not achieve exact total price. " + "Target: $totalPrice, Achieved: ${adjustedDish.totalPrice} with margin ${adjustedDish.marginPercent} at $precision decimal points."
-        )
-        return adjustedDish
-    }
 
+        repeat(MAX_ITERATIONS) {
+            val roundedMarginPercent = Utils.formatDouble(currentPrecision, initialRawMarginPercent)
+            val candidateDish = this.copy(marginPercent = roundedMarginPercent)
+            val currentDifference = abs(candidateDish.totalPrice - targetTotalPrice)
+
+            if (currentDifference <= TOLERANCE) {
+                Timber.d("Converged: targetTotalPrice=$targetTotalPrice, result.totalPrice=${candidateDish.totalPrice}, margin=${candidateDish.marginPercent}, precision=$currentPrecision")
+                return candidateDish
+            }
+
+            if (currentDifference < closestDifference) {
+                closestDifference = currentDifference
+                bestAttemptDish = candidateDish
+                Timber.v("New best attempt: totalPrice=${candidateDish.totalPrice}, margin=${candidateDish.marginPercent}, precision=$currentPrecision, diff=$currentDifference")
+            }
+            currentPrecision++
+        }
+
+        Timber.w(
+            "Could not achieve exact total price within TOLERANCE. " +
+                    "Target: $targetTotalPrice, Best Achieved: ${bestAttemptDish.totalPrice} " +
+                    "with margin ${bestAttemptDish.marginPercent} (tried up to ${currentPrecision - 1} decimal points for margin)."
+        )
+        return bestAttemptDish
+    }
     companion object {
         private const val MAX_ITERATIONS = 5
         private const val TOLERANCE = 0.001
