@@ -9,7 +9,7 @@ import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.serialization.Serializable
 import timber.log.Timber
-import kotlin.math.round
+import kotlin.math.abs
 
 @Keep
 @Serializable
@@ -22,16 +22,15 @@ data class DishDomain(
     val halfProducts: List<UsedHalfProductDomain>,
     val recipe: RecipeDomain?,
 ) : Item {
-    val foodCost: Double =
-        products.sumOf {
-            it.totalPrice.also { totalPrice ->
-                Timber.v("Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
-            }
-        } + halfProducts.sumOf {
-            it.totalPrice.also { totalPrice ->
-                Timber.v("Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
-            }
+    val foodCost: Double = products.sumOf {
+        it.totalPrice.also { totalPrice ->
+            Timber.v("Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
         }
+    } + halfProducts.sumOf {
+        it.totalPrice.also { totalPrice ->
+            Timber.v("Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
+        }
+    }
 
     fun formattedFoodCostPerServings(amountOfServings: Int, currency: Currency?): String {
         return Utils.formatPrice(foodCost * amountOfServings, currency)
@@ -54,21 +53,63 @@ data class DishDomain(
 
     @Suppress("MagicNumber")
     fun withUpdatedTotalPrice(newTotalPrice: Double): DishDomain {
-        val taxFactor = 1 + taxPercent / 100.0
+        val taxFactor = 1 + taxPercent / PERCENT_MULTIPLIER
 
-        val targetSellingPriceBeforeTax = newTotalPrice / taxFactor
-        val newCalculatedMarginPercent: Double = if (foodCost == 0.0) {
-            if (targetSellingPriceBeforeTax == 0.0) {
-                100.0
+        val sellingPriceBeforeTax = newTotalPrice / taxFactor
+        val calculatedMarginPercent: Double = if (foodCost == 0.0) {
+            if (sellingPriceBeforeTax == 0.0) {
+                PERCENT_MULTIPLIER
             } else {
-                if (targetSellingPriceBeforeTax > 0) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
+                if (sellingPriceBeforeTax > 0) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
             }
         } else {
-            (targetSellingPriceBeforeTax / foodCost) * 100.0
+            (sellingPriceBeforeTax / foodCost) * PERCENT_MULTIPLIER
         }
 
-        val roundedMarginPercent = round(newCalculatedMarginPercent * 100.0) / 100.0
+        return adjustMarginWithCorrectDecimals(calculatedMarginPercent, newTotalPrice)
+    }
 
-        return this.copy(marginPercent = roundedMarginPercent)
+    private fun adjustMarginWithCorrectDecimals(
+        initialRawMarginPercent: Double,
+        targetTotalPrice: Double
+    ): DishDomain {
+        var currentPrecision = 1
+        var bestAttemptDish = this.copy(marginPercent = initialRawMarginPercent)
+        var closestDifference = abs(bestAttemptDish.totalPrice - targetTotalPrice)
+
+        if (closestDifference <= TOLERANCE) {
+            Timber.d("Initial raw margin is sufficient: targetTotalPrice=$targetTotalPrice, result.totalPrice=${bestAttemptDish.totalPrice}, margin=${bestAttemptDish.marginPercent}")
+            return bestAttemptDish
+        }
+
+        repeat(MAX_ITERATIONS) {
+            val roundedMarginPercent = Utils.formatDouble(currentPrecision, initialRawMarginPercent)
+            val candidateDish = this.copy(marginPercent = roundedMarginPercent)
+            val currentDifference = abs(candidateDish.totalPrice - targetTotalPrice)
+
+            if (currentDifference <= TOLERANCE) {
+                Timber.d("Converged: targetTotalPrice=$targetTotalPrice, result.totalPrice=${candidateDish.totalPrice}, margin=${candidateDish.marginPercent}, precision=$currentPrecision")
+                return candidateDish
+            }
+
+            if (currentDifference < closestDifference) {
+                closestDifference = currentDifference
+                bestAttemptDish = candidateDish
+                Timber.v("New best attempt: totalPrice=${candidateDish.totalPrice}, margin=${candidateDish.marginPercent}, precision=$currentPrecision, diff=$currentDifference")
+            }
+            currentPrecision++
+        }
+
+        Timber.w(
+            "Could not achieve exact total price within TOLERANCE. " +
+                    "Target: $targetTotalPrice, Best Achieved: ${bestAttemptDish.totalPrice} " +
+                    "with margin ${bestAttemptDish.marginPercent} (tried up to ${currentPrecision - 1} decimal points for margin)."
+        )
+        return bestAttemptDish
+    }
+    companion object {
+        private const val MAX_ITERATIONS = 5
+        private const val TOLERANCE = 0.001
+        private const val PERCENT_MULTIPLIER = 100.0
     }
 }
