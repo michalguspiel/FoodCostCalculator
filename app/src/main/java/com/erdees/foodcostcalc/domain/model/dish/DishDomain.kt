@@ -75,7 +75,7 @@ data class DishDomain(
     ): DishDomain {
         var adjustedDish = this.copy(marginPercent = marginPercent)
         var precision = 1
-        for (iterationCount in 0 until MAX_ITERATIONS) {
+        repeat(MAX_ITERATIONS) {
             val roundedMarginPercent = Utils.formatDouble(precision, marginPercent)
             adjustedDish = this.copy(marginPercent = roundedMarginPercent)
 
