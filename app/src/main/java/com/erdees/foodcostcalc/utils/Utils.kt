@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.utils
 
 import android.content.res.Resources
 import com.erdees.foodcostcalc.R
+import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
@@ -144,5 +145,9 @@ object Utils {
         val numberFormatter = DecimalFormat(pattern, customSymbols)
         numberFormatter.isGroupingUsed = false
         return numberFormatter.format(number)
+    }
+
+    fun formatDouble(decimals: Int, value: Double): Double {
+        return BigDecimal(value).setScale(decimals, RoundingMode.HALF_UP).toDouble()
     }
 }

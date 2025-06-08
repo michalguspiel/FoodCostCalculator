@@ -25,6 +25,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -67,14 +68,14 @@ class DishDetailsViewModelTest {
      * Created dish with a food cost of 20, single product,
      * total price of 44.0 (40.0 (food cost + 200% margin) + 10% tax).
      * */
-    private fun createDishModel(): CompleteDish {
+    private fun createDishModel(dishTax: Double = 10.0, productPrice: Double = 10.0): CompleteDish {
         return CompleteDish(
-            dish = DishBase(testDishId, testDishName, 200.0, 10.0, null),
+            dish = DishBase(testDishId, testDishName, 200.0, dishTax, null),
             recipe = null,
             products = listOf(
                 ProductAndProductDish(
                     productDish = ProductDish(0L, 0L, testDishId, 1.0, "kilogram"),
-                    product = ProductBase(0L, "Broccoli", 10.0, 0.0, 50.0, "per kilogram")
+                    product = ProductBase(0L, "Broccoli", productPrice, 0.0, 50.0, "per kilogram")
                 )
             ),
             halfProducts = emptyList(),
@@ -180,5 +181,47 @@ class DishDetailsViewModelTest {
         updatedDishInViewModel.shouldNotBeNull()
         updatedDishInViewModel.totalPrice shouldBe 22.0
         updatedDishInViewModel.marginPercent shouldBe 100.0
+    }
+
+    @Test
+    fun `saveDishTotalPrice updates dish margin to match price`() = runTest {
+        // prepare viewmodel, fetch dish
+
+        val pricesToVerify =
+            mapOf(
+                56.99 to 12.12,
+                100.99 to 12.00,
+                123.45 to 24.50,
+                45.00 to 23.00,
+                89.00 to 12.00,
+                123.00 to 10.00,
+                500.99 to 13.00,
+                1000.23 to 8.00,
+                5000.69 to 10.0
+            )
+        pricesToVerify.forEach {
+            actAndVerifySetMargin(it.key, it.value)
+        }
+    }
+
+
+    private suspend fun TestScope.actAndVerifySetMargin(newPrice: Double, dishTax: Double) {
+        coEvery { mockDishRepository.getDish(any()) }.returns(flowOf(createDishModel(dishTax, newPrice / dishTax * 3.66)))
+        viewModel = DishDetailsViewModel(savedStateHandle)
+        advanceUntilIdle()
+        // act
+        val newPriceFormatted = Utils.formatPriceWithoutSymbol(
+            newPrice, mockPreferences.currency.first()?.currencyCode
+        )
+        viewModel.updateTotalPrice(newPriceFormatted)
+        viewModel.saveDishTotalPrice()
+
+        // verify
+        val updatedDishInViewModel = viewModel.dish.first()
+        updatedDishInViewModel.shouldNotBeNull()
+        println(newPriceFormatted)
+        newPriceFormatted shouldBe Utils.formatPriceWithoutSymbol(
+            updatedDishInViewModel.totalPrice, mockPreferences.currency.first()?.currencyCode
+        )
     }
 }
