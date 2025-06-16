@@ -17,7 +17,7 @@ interface ProductDao {
     fun getProduct(id: Long): Flow<ProductBase>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun addProduct(product: ProductBase)
+    suspend fun addProduct(product: ProductBase) : Long
 
     @Update
     suspend fun editProduct(newProduct: ProductBase)

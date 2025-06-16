@@ -105,7 +105,7 @@ class DishDetailsViewModelTest {
         coEvery { mockDishRepository.getDish(any()) }.returns(flowOf(testDish))
         viewModel = DishDetailsViewModel(savedStateHandle)
         println(testDish.toDishDomain().foodCost)
-        println(testDish.toDishDomain().products.map { it.totalPrice })
+        println(testDish.toDishDomain().products.map { it.foodCost })
         viewModel.updateTotalPrice("123.45")
         viewModel.editableTotalPrice.first() shouldBe "123.45"
     }

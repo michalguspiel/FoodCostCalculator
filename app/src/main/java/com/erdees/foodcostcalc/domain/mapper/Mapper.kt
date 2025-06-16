@@ -22,6 +22,7 @@ import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
+import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
@@ -277,4 +278,15 @@ object Mapper {
         )
     }
 
+    fun ProductAddedToDish.toProductDish(dishId: Long): ProductDish {
+        return ProductDish(
+            productId = item.id,
+            dishId = dishId,
+            quantity = quantity,
+            quantityUnit = quantityUnit,
+            productDishId = AUTO_GENERATED_ID,
+        )
+    }
+
+    private const val AUTO_GENERATED_ID = 0L
 }

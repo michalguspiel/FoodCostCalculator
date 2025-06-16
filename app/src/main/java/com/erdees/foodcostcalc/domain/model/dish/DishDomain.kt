@@ -23,11 +23,11 @@ data class DishDomain(
     val recipe: RecipeDomain?,
 ) : Item {
     val foodCost: Double = products.sumOf {
-        it.totalPrice.also { totalPrice ->
+        it.foodCost.also { totalPrice ->
             Timber.v("Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
         }
     } + halfProducts.sumOf {
-        it.totalPrice.also { totalPrice ->
+        it.foodCost.also { totalPrice ->
             Timber.v("Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
         }
     }
@@ -37,11 +37,8 @@ data class DishDomain(
     }
 
     val totalPrice: Double
-        get() {
-            val priceWithMargin = foodCost * marginPercent / 100
-            val amountOfTax = priceWithMargin * taxPercent / 100
-            return priceWithMargin + amountOfTax
-        }
+        get() = Utils.getDishFinalPrice(foodCost, marginPercent, taxPercent)
+
 
     private fun finalPricePerServing(amountOfServings: Int): Double {
         return totalPrice * amountOfServings

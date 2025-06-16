@@ -73,6 +73,7 @@ lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-view
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity_ktx" }
 play-review = { group = "com.google.android.play", name = "review", version.ref = "review" }
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "review" }

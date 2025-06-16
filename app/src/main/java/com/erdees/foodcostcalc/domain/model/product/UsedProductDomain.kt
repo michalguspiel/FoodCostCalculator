@@ -20,7 +20,7 @@ data class UsedProductDomain(
     override val quantityUnit: String,
     val weightPiece: Double?
 ) : UsedItem {
-    override val totalPrice = calculatePrice(
+    override val foodCost = calculatePrice(
         item.priceAfterWasteAndTax,
         quantity,
         item.unit,
@@ -33,7 +33,7 @@ data class UsedProductDomain(
         currency: Currency?
     ): String {
         val percentageOfBaseQuantity = targetQuantity * 100 / baseQuantity
-        val adjustedPrice = totalPrice * (percentageOfBaseQuantity / 100)
+        val adjustedPrice = foodCost * (percentageOfBaseQuantity / 100)
         return Utils.formatPrice(adjustedPrice, currency)
     }
 }

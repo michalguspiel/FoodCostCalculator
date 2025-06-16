@@ -168,6 +168,7 @@ dependencies {
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
+    androidTestImplementation(libs.room.testing)
     ksp(libs.room.compiler)
 
     // Activity KTX

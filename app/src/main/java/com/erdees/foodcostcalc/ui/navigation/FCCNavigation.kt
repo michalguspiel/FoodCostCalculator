@@ -15,6 +15,9 @@ import androidx.navigation.toRoute
 import com.erdees.foodcostcalc.ui.screens.dishes.DishesScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDish.CreateDishScreen
+import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishStartScreen
+import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishSummary.CreateDishSummaryScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishScreen
 import com.erdees.foodcostcalc.ui.screens.featureRequest.FeatureRequestScreen
@@ -82,7 +85,7 @@ fun FCCNavigation(
             EditDishScreen(dishId = route.dishId, navController = navController)
         }
 
-         composable<FCCScreen.Recipe> { backStackEntry ->
+        composable<FCCScreen.Recipe> { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(navController.previousBackStackEntry?.destination?.route.toString())
             }
@@ -104,6 +107,19 @@ fun FCCNavigation(
         }
         composable<FCCScreen.CreateDish> {
             CreateDishScreen(navController = navController)
+        }
+
+        composable<FCCScreen.CreateDishStart> {
+            CreateDishStartScreen(navController = navController)
+        }
+
+        composable<FCCScreen.CreateDishSummary> { backStackEntry ->
+            val parentEntry = remember(backStackEntry) {
+                navController.getBackStackEntry(navController.previousBackStackEntry?.destination?.route.toString())
+            }
+
+            val viewModel = viewModel<CreateDishV2ViewModel>(parentEntry)
+            CreateDishSummaryScreen(navController, viewModel)
         }
 
         composable<FCCScreen.EditProduct> { backStackEntry ->

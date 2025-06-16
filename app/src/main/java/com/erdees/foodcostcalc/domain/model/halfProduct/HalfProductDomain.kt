@@ -16,7 +16,7 @@ data class HalfProductDomain(
     val halfProductUnit: String,
     val products: List<UsedProductDomain>
 ) : Item {
-    private val singleRecipePrice = products.sumOf { it.totalPrice }
+    private val singleRecipePrice = products.sumOf { it.foodCost }
 
     val totalQuantity =
         if (halfProductUnit == "per piece") 1.0

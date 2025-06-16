@@ -24,25 +24,46 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UnitField(
     units: Set<String>,
     selectedUnit: String,
     modifier: Modifier = Modifier,
-    selectUnit: (String) -> Unit
+    selectUnit: (String) -> Unit,
+    label: String = stringResource(id = R.string.unit)
 ) {
     var expanded by remember { mutableStateOf(false) }
+    UnitField(
+        expanded = expanded,
+        units = units,
+        label = label,
+        selectedUnit = selectedUnit,
+        modifier = modifier,
+        selectUnit = selectUnit,
+        onExpandChange = { expanded = it },
+    )
+}
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun UnitField(
+    expanded: Boolean,
+    units: Set<String>,
+    selectedUnit: String,
+    modifier: Modifier = Modifier,
+    onExpandChange: (Boolean) -> Unit,
+    selectUnit: (String) -> Unit,
+    label: String = stringResource(id = R.string.unit)
+){
     Column(modifier = modifier) {
         FieldLabel(
-            text = stringResource(id = R.string.unit),
+            text = label,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
         )
         Box {
             ExposedDropdownMenuBox(
                 expanded = expanded,
-                onExpandedChange = { expanded = it },
+                onExpandedChange = { onExpandChange(it) },
             ) {
 
                 TextField(
@@ -60,11 +81,11 @@ fun UnitField(
                 DropdownMenu(
                     modifier = Modifier.exposedDropdownSize(true),
                     expanded = expanded,
-                    onDismissRequest = { expanded = false }) {
+                    onDismissRequest = { onExpandChange(false)}) {
                     units.forEach { unit ->
                         DropdownMenuItem(onClick = {
                             selectUnit(unit)
-                            expanded = false
+                            onExpandChange(false)
                         }, text = {
                             Text(unit)
                         })

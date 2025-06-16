@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
@@ -17,7 +18,9 @@ fun FCCTextField(
     value: String,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = true,
+    suffix: @Composable (() -> Unit)? = null,
     maxLines: Int = 1,
     onValueChange: (String) -> Unit,
 ) {
@@ -36,8 +39,10 @@ fun FCCTextField(
             value = value,
             singleLine = singleLine,
             maxLines = maxLines,
+            suffix = suffix,
             onValueChange = { onValueChange(it) },
-            keyboardOptions = keyboardOptions
+            keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions
         )
     }
 }

@@ -16,3 +16,11 @@ fun FCCSecondaryHorizontalDivider(modifier: Modifier = Modifier) {
     )
 }
 
+@Composable
+fun FCCThickSecondaryHorizontalDivider(modifier: Modifier = Modifier) {
+    HorizontalDivider(
+        modifier.fillMaxWidth(),
+        thickness = (1.5).dp,
+        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.7f)
+    )
+}
