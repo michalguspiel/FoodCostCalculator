@@ -12,5 +12,5 @@ data class CreateDishStartScreenState(
     val suggestedProducts: List<ProductDomain>? = listOf(),
     val selectedSuggestedProduct: ProductDomain? = null,
     val currency: Currency?,
-    val operation: CreateDishIntent? = null
+    val isFirstDish: Boolean
 )

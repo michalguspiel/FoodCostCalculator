@@ -53,16 +53,18 @@ import androidx.compose.ui.window.PopupProperties
  */
 @Composable
 fun <T> FCCTextFieldWithSuggestions(
-    title: String,
+    title: String?,
     value: String,
     onValueChange: (String) -> Unit,
     suggestions: List<T>,
+    shouldShowSuggestions: Boolean,
     onSuggestionSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    placeholder: String? = null,
     suggestionItemContent: @Composable (T) -> Unit,
-    shouldShowSuggestions: Boolean,
+
     onDismissSuggestions: () -> Unit,
     focusRequester: FocusRequester = remember { FocusRequester() }
 ) {
@@ -84,6 +86,7 @@ fun <T> FCCTextFieldWithSuggestions(
                 },
             title = title,
             value = value,
+            placeholder = placeholder,
             onValueChange = onValueChange,
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,

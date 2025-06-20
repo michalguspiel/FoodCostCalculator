@@ -110,6 +110,8 @@ fun ExistingProductForm(
         Spacer(modifier = Modifier.height(16.dp))
 
         ButtonRow(
+            modifier = Modifier.padding(vertical = 12.dp),
+            applyDefaultPadding = false,
             primaryButton = {
                 FCCPrimaryButton(
                     text = "Add Ingredient",

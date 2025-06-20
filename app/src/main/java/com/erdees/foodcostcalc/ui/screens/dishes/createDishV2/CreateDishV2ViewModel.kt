@@ -57,6 +57,10 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
     private var _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
 
+    val isFirstDish: StateFlow<Boolean> = dishRepository.dishes.map {
+        it.isEmpty()
+    }.stateIn(viewModelScope, Eagerly, true)
+
     @StringRes
     private var _errorRes: MutableStateFlow<Int?> = MutableStateFlow(null)
 

@@ -2,10 +2,16 @@ package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart
 
 import android.icu.util.Currency
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -19,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -26,7 +33,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -50,7 +60,6 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextFieldWithSuggestions
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
-import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
@@ -58,6 +67,9 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.ex
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm.ExistingProductFormViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductForm
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormViewModel
+import com.erdees.foodcostcalc.ui.theme.FCCTheme
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,7 +80,6 @@ fun CreateDishStartScreen(
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
     existingProductFormViewModel: ExistingProductFormViewModel = viewModel(),
 ) {
-
     val dishName by viewModel.dishName.collectAsState()
     val newProductName by viewModel.newProductName.collectAsState()
     val addedProducts by viewModel.addedProducts.collectAsState()
@@ -77,9 +88,26 @@ fun CreateDishStartScreen(
     val currency by viewModel.currency.collectAsState()
     val shouldShowSuggestedProducts by viewModel.shouldShowSuggestedProducts.collectAsState()
     val userIntent by viewModel.intent.collectAsState()
+    val isFirstDish by viewModel.isFirstDish.collectAsState()
 
+    val scope = rememberCoroutineScope()
     val newProductFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
-    val existingProductFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = false)
+    val existingProductFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+
+    var allowIngredientListAnimation by remember { mutableStateOf(false) }
+
+    LaunchedEffect(
+        newProductFormSheetState.currentValue,
+        existingProductFormSheetState.currentValue
+    ) { if (newProductFormSheetState.currentValue == SheetValue.Hidden &&
+            existingProductFormSheetState.currentValue == SheetValue.Hidden
+        ) {
+            allowIngredientListAnimation = true
+        } else {
+            allowIngredientListAnimation = false
+        }
+    }
+
 
     val context = LocalContext.current
 
@@ -102,8 +130,10 @@ fun CreateDishStartScreen(
             addedProducts,
             suggestedProducts,
             selectedProduct,
-            currency
+            currency,
+            isFirstDish,
         ),
+        allowIngredientListAnimation,
         viewModel::updateDishName,
         viewModel::updateNewProductName,
         viewModel::onAddIngredientClick,
@@ -139,9 +169,13 @@ fun CreateDishStartScreen(
                         },
                         productAdditionDropdownExpanded = newProductFormViewModel.productAdditionUnitDropdownExpanded.collectAsState().value,
                         onFormDataUpdate = newProductFormViewModel::updateFormData,
-                        onSaveProduct = {
-                            viewModel.onAddNewProductClick(it)
-                            newProductFormViewModel.onAddIngredientClick()
+                        onSaveProduct = { data ->
+                            scope.launch {
+                                newProductFormSheetState.hide()
+                            }.invokeOnCompletion {
+                                viewModel.onAddNewProductClick(data)
+                                newProductFormViewModel.onAddIngredientClick()
+                            }
                         },
                     )
                 }
@@ -165,9 +199,13 @@ fun CreateDishStartScreen(
                         onUnitForDishDropdownExpandedChange = {
                             existingProductFormViewModel.unitForDishDropdownExpanded.value = it
                         },
-                        onSaveIngredient = {
-                            viewModel.onAddExistingProductClick(it)
-                            existingProductFormViewModel.onAddIngredientClick()
+                        onSaveIngredient = { data ->
+                            scope.launch {
+                                existingProductFormSheetState.hide()
+                            }.invokeOnCompletion {
+                                viewModel.onAddExistingProductClick(data)
+                                existingProductFormViewModel.onAddIngredientClick()
+                            }
                         },
                         onDismiss = {
                             viewModel.onModalDismissed()
@@ -187,6 +225,7 @@ fun CreateDishStartScreen(
 private fun CreateDishStartScreenContent(
     navController: NavController,
     createDishStartScreenState: CreateDishStartScreenState,
+    allowAnimation: Boolean,
     updateDishName: (String) -> Unit,
     updateNewProductName: (String) -> Unit,
     onAddIngredientClick: () -> Unit,
@@ -195,13 +234,25 @@ private fun CreateDishStartScreenContent(
     onContinueClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dishNameFocusRequester = remember { FocusRequester() }
     with(createDishStartScreenState) {
+        val dishNameFocusRequester = remember { FocusRequester() }
+        val sectionVisible by remember(allowAnimation) {
+            mutableStateOf(addedProducts.isNotEmpty())
+        }
+
         Scaffold(
             modifier = modifier,
             topBar = {
                 TopAppBar(
-                    title = { Text(text = stringResource(id = R.string.price_your_first_dish)) },
+                    title = {
+                        Text(
+                            text = stringResource(
+                                id =
+                                    if (isFirstDish) R.string.price_your_first_dish
+                                    else R.string.create_new_dish
+                            )
+                        )
+                    },
                     navigationIcon = {
                         IconButton(onClick = { navController.popBackStack() }) {
                             Icon(
@@ -222,69 +273,99 @@ private fun CreateDishStartScreenContent(
                     .verticalScroll(rememberScrollState())
                     .padding(paddingValues)
             ) {
-
-                Column(Modifier.padding(horizontal = 12.dp)) {
-                    FCCTextField(
-                        modifier = Modifier.focusRequester(dishNameFocusRequester),
-                        title = stringResource(R.string.dish_name),
-                        value = dishName,
-                        onValueChange = { updateDishName(it) },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            capitalization = KeyboardCapitalization.Words,
-                            imeAction = ImeAction.Next
+                Column(
+                    Modifier
+                        .padding(horizontal = 12.dp)
+                        .padding(bottom = 48.dp),
+                    verticalArrangement = Arrangement.spacedBy(24.dp)
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(id = R.string.dish_name),
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(bottom = 8.dp)
                         )
-                    )
-
-                    Spacer(Modifier.size(24.dp))
-                    Text(
-                        if (addedProducts.isEmpty()) stringResource(R.string.add_first_ingredient) else stringResource(
-                            R.string.add_next_ingredient
-                        ),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-
-                    FCCTextFieldWithSuggestions(
-                        title = stringResource(R.string.product_name),
-                        value = newProductName,
-                        onValueChange = { updateNewProductName(it) },
-                        suggestions = suggestedProducts?.take(3) ?: emptyList(),
-                        shouldShowSuggestions = shouldShowSuggestedProducts,
-                        onSuggestionSelected = {
-                            onSuggestedProductClick(it)
-                        },
-                        onDismissSuggestions = {
-                            onDismissSuggestions()
-                        },
-                        suggestionItemContent = { product ->
-                            Text(text = product.name, modifier = Modifier.padding(8.dp))
-                        },
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Text,
-                            capitalization = KeyboardCapitalization.Words,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-
-                    ButtonRow(
-                        primaryButton = {
-                            FCCPrimaryButton(
-                                stringResource(R.string.add_product),
-                                onClick = { onAddIngredientClick() }
+                        FCCTextField(
+                            modifier = Modifier.focusRequester(dishNameFocusRequester),
+                            title = null,
+                            value = dishName,
+                            onValueChange = { updateDishName(it) },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                capitalization = KeyboardCapitalization.Words,
+                                imeAction = ImeAction.Next
                             )
-                        }
+                        )
+                    }
+
+                    Column {
+                        Text(
+                            if (addedProducts.isEmpty()) stringResource(R.string.add_first_ingredient) else stringResource(
+                                R.string.add_next_ingredient
+                            ),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(bottom = 8.dp)
+                        )
+
+                        FCCTextFieldWithSuggestions(
+                            title = null,
+                            value = newProductName,
+                            placeholder = stringResource(R.string.product_name),
+                            onValueChange = { updateNewProductName(it) },
+                            suggestions = suggestedProducts?.take(3) ?: emptyList(),
+                            shouldShowSuggestions = shouldShowSuggestedProducts,
+                            onSuggestionSelected = {
+                                onSuggestedProductClick(it)
+                            },
+                            onDismissSuggestions = {
+                                onDismissSuggestions()
+                            },
+                            suggestionItemContent = { product ->
+                                Text(text = product.name, modifier = Modifier.padding(8.dp))
+                            },
+                            keyboardOptions = KeyboardOptions(
+                                keyboardType = KeyboardType.Text,
+                                capitalization = KeyboardCapitalization.Words,
+                                imeAction = ImeAction.Done
+                            )
+                        )
+                    }
+
+                    FCCPrimaryButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        text = stringResource(R.string.add_product),
+                        onClick = { onAddIngredientClick() },
+                        enabled = newProductName.isNotEmpty()
                     )
                 }
 
-                Section {
-                    SectionLabel(stringResource(R.string.added_ingredients))
-                    Ingredients(addedProducts, listOf(), SingleServing, currency)
-                    ButtonRow(
-                        applyDefaultPadding = false,
-                        primaryButton = {
-                            FCCPrimaryButton(stringResource(R.string.continue_dish_creation), onClick = {
-                                onContinueClick()
-                            })
+                Section(Modifier.animateContentSize(tween())) {
+                    AnimatedVisibility(
+                        visible = sectionVisible,
+                        enter = fadeIn(animationSpec = tween()) + slideInHorizontally(),
+                        exit = ExitTransition.None
+                    ) {
+                        Column {
+                            SectionLabel(stringResource(R.string.added_ingredients))
+                            Spacer(Modifier.size(8.dp))
+                            Ingredients(
+                                addedProducts,
+                                persistentListOf(),
+                                SingleServing,
+                                currency,
+                            )
+                        }
+                    }
+                    FCCPrimaryButton(
+                        enabled = dishName.isNotBlank(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp),
+                        text = stringResource(R.string.continue_dish_creation),
+                        onClick = {
+                            onContinueClick()
                         })
                 }
             }
@@ -295,25 +376,29 @@ private fun CreateDishStartScreenContent(
 @Preview
 @Composable
 private fun CreateDishStartScreenContentPreview() {
-    CreateDishStartScreenContent(
-        navController = rememberNavController(),
-        createDishStartScreenState = CreateDishStartScreenState(
-            dishName = "Spaghetti Bolognese",
-            newProductName = "",
-            shouldShowSuggestedProducts = false,
-            addedProducts = listOf(
-                ProductAddedToDish(
-                    ProductDomain(0L, "Tomato", 3.99, 0.0, 10.0, "kg"),
-                    0.5,
-                    "kg",
-                )
+    FCCTheme {
+        CreateDishStartScreenContent(
+            navController = rememberNavController(),
+            createDishStartScreenState = CreateDishStartScreenState(
+                dishName = "Spaghetti Bolognese",
+                newProductName = "",
+                shouldShowSuggestedProducts = false,
+                addedProducts = persistentListOf(
+                    ProductAddedToDish(
+                        ProductDomain(0L, "Tomato", 3.99, 0.0, 10.0, "kg"),
+                        0.5,
+                        "kg",
+                    )
+                ),
+                currency = Currency.getInstance("PLN"),
+                isFirstDish = false,
             ),
-            currency = Currency.getInstance("PLN")
-        ),
-        updateDishName = {},
-        updateNewProductName = {},
-        onAddIngredientClick = {},
-        onContinueClick = {},
-        onSuggestedProductClick = {},
-        onDismissSuggestions = {})
+            allowAnimation = true,
+            updateDishName = {},
+            updateNewProductName = {},
+            onAddIngredientClick = {},
+            onContinueClick = {},
+            onSuggestedProductClick = {},
+            onDismissSuggestions = {})
+    }
 }

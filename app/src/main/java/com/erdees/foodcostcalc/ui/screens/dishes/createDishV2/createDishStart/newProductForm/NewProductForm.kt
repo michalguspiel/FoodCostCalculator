@@ -134,6 +134,8 @@ fun NewProductForm(
             })
 
         ButtonRow(
+            modifier = Modifier.padding(vertical = 12.dp),
+            applyDefaultPadding = false,
             primaryButton = {
                 FCCPrimaryButton("Add Ingredient", enabled = isAddButtonEnabled) {
                     onSaveProduct(formData)

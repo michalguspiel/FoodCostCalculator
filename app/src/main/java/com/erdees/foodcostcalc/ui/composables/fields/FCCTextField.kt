@@ -6,7 +6,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -14,13 +16,14 @@ import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 
 @Composable
 fun FCCTextField(
-    title: String,
+    title: String?,
     value: String,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = true,
     suffix: @Composable (() -> Unit)? = null,
+    placeholder: String? = null,
     maxLines: Int = 1,
     onValueChange: (String) -> Unit,
 ) {
@@ -30,16 +33,27 @@ fun FCCTextField(
         Modifier.fillMaxSize()
     }
     Column(modifier) {
-        FieldLabel(
-            text = title,
-            modifier = Modifier.padding(bottom = 4.dp)
-        )
+        title?.let {
+            FieldLabel(
+                text = title,
+                modifier = Modifier.padding(bottom = 4.dp)
+            )
+        }
+
         OutlinedTextField(
             modifier = outlinedTextFieldModifier,
             value = value,
             singleLine = singleLine,
             maxLines = maxLines,
             suffix = suffix,
+            placeholder = {
+                placeholder?.let {
+                    Text(
+                        text = it,
+                        color = LocalContentColor.current.copy(alpha = 0.5f)
+                    )
+                }
+            },
             onValueChange = { onValueChange(it) },
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions

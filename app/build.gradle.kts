@@ -159,8 +159,9 @@ dependencies {
     implementation(libs.material)
     implementation(libs.core.ktx)
 
-    // KotlinX coroutines
+    // KotlinX
     implementation(libs.coroutines.android)
+    implementation(libs.kotlinx.immutable.collections)
 
     // Lifecycle
     implementation(libs.lifecycle.viewmodel.ktx)

@@ -176,16 +176,17 @@
 
     <!-- DISHES V2 REVAMP   -->
     <string name="price_your_first_dish">Price your first dish</string>
+    <string name="create_new_dish">Create New Dish</string>
     <string name="dish_name">Dish name</string>
     <string name="final_sell_price">Final Selling Price</string>
     <string name="create_dish_food_cost">Food Cost</string>
     <string name="save_dish">Save Dish</string>
-    <string name="add_more_ingredients">Add More Ingredients Dish</string>
+    <string name="add_more_ingredients">Add More Ingredients</string>
     <string name="dish_cost_and_price">%1$s - Cost &amp; Price</string>
     <string name="add_first_ingredient">Add First Ingredient</string>
     <string name="add_next_ingredient">Add Next Ingredient</string>
     <string name="added_ingredients">Added Ingredients</string>
-    <string name="continue_dish_creation">Continue Dish Creation</string>
+    <string name="continue_dish_creation">Next: Pricing</string>
 
     <string name="invalid_margin_format_error">Invalid margin format. Please enter a valid number.</string>
     <string name="invalid_tax_format_error">Invalid tax format. Please enter a valid number.</string>
