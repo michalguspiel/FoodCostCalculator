@@ -1,15 +1,17 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishSummary
 
 import android.icu.util.Currency
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -26,8 +28,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -90,6 +95,9 @@ fun CreateDishSummaryContent(
     onTaxChange: (String) -> Unit = {},
     onErrorDismiss: () -> Unit = {}
 ) {
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val focusManager = LocalFocusManager.current // Get FocusManager instance
+    val interactionSource = remember { MutableInteractionSource() }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -111,7 +119,9 @@ fun CreateDishSummaryContent(
                 .padding(paddingValues)
                 .padding(16.dp)
                 .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .imePadding()
+            ,
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -125,6 +135,10 @@ fun CreateDishSummaryContent(
             )
 
             CalculationCard(
+                modifier = Modifier.clickable(indication = null, interactionSource = interactionSource) {
+                    keyboardController?.hide()
+                    focusManager.clearFocus()
+                },
                 state = state,
                 onMarginChanged = { onMarginChange(it) },
                 onTaxChanged = { onTaxChange(it) }
@@ -166,11 +180,12 @@ fun CreateDishSummaryContent(
 @Composable
 fun CalculationCard(
     state: CreateDishSummaryScreenState,
+    modifier: Modifier = Modifier,
     onMarginChanged: (String) -> Unit,
     onTaxChanged: (String) -> Unit
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
@@ -191,7 +206,7 @@ fun CalculationCard(
                         imeAction = ImeAction.Next
                     ),
                     singleLine = true,
-                    modifier = Modifier.width(150.dp)
+                    modifier = Modifier.weight(1f)
                 )
 
                 Spacer(Modifier.size(12.dp))
@@ -206,7 +221,7 @@ fun CalculationCard(
                         imeAction = ImeAction.Done
                     ),
                     singleLine = true,
-                    modifier = Modifier.width(150.dp)
+                    modifier = Modifier.weight(1f)
                 )
             }
 
