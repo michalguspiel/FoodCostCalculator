@@ -441,4 +441,12 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
     fun dismissError() {
         _errorRes.value = null
     }
+
+    /**
+     * Resets the save dish success state to prevent re-navigation.
+     * Call this after navigation has been handled.
+     */
+    fun resetSaveDishSuccess() {
+        _saveDishSuccess.value = null
+    }
 }

@@ -1,6 +1,9 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishSummary
 
 import android.icu.util.Currency
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -27,7 +30,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,6 +60,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
+import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
@@ -65,6 +71,19 @@ fun CreateDishSummaryScreen(
     navController: NavController,
     viewModel: CreateDishV2ViewModel,
 ) {
+    val successfullySavedDishId by viewModel.saveDishSuccess.collectAsState()
+
+    LaunchedEffect(successfullySavedDishId) {
+        successfullySavedDishId?.let {
+            navController.navigate(FCCScreen.EditDish(it)) {
+                popUpTo(FCCScreen.Dishes) {
+                    inclusive = false
+                }
+            }
+            viewModel.resetSaveDishSuccess()
+        }
+    }
+
     CreateDishSummaryContent(
         CreateDishSummaryScreenState(
             dishName = viewModel.dishName.collectAsState().value,
@@ -96,7 +115,7 @@ fun CreateDishSummaryContent(
     onErrorDismiss: () -> Unit = {}
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current // Get FocusManager instance
+    val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
     Scaffold(
         topBar = {
@@ -120,8 +139,7 @@ fun CreateDishSummaryContent(
                 .padding(16.dp)
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .imePadding()
-            ,
+                .imePadding(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -135,7 +153,10 @@ fun CreateDishSummaryContent(
             )
 
             CalculationCard(
-                modifier = Modifier.clickable(indication = null, interactionSource = interactionSource) {
+                modifier = Modifier.clickable(
+                    indication = null,
+                    interactionSource = interactionSource
+                ) {
                     keyboardController?.hide()
                     focusManager.clearFocus()
                 },
@@ -164,7 +185,7 @@ fun CreateDishSummaryContent(
                 },
             )
         }
-        if (state.isLoading) {
+        AnimatedVisibility(state.isLoading, enter = fadeIn(), exit = fadeOut()) {
             ScreenLoadingOverlay(Modifier.fillMaxSize())
         }
 
