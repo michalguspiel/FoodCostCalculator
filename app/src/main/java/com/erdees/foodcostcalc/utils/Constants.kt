@@ -30,7 +30,7 @@ object Constants {
         const val DISH_SHARE = "dish_share_click"
         const val DISH_NAME = "dish_name"
 
-        const val AD_FAILED_TO_LOAD =  "ad_failed_to_load"
+        const val AD_FAILED_TO_LOAD = "ad_failed_to_load"
 
         const val LOAD_DATABASE = "load_database"
         const val SAVE_DATABASE = "save_database"
@@ -51,6 +51,38 @@ object Constants {
             const val EVENT = "caught_logged_exception"
             const val MESSAGE = "exception_message"
         }
+
+        object DishV2 {
+            const val PRODUCT_CREATED = "product_created_dishv2"
+            const val DISH_CREATION_STARTED =
+                "dish_creation_started" // When the screen is first entered
+            const val DISH_SAVE_ATTEMPT = "dish_save_attempt"
+            const val DISH_SAVE_SUCCESS =
+                "dish_save_success"       // Already have DISH_CREATED, this is more specific to save action
+            const val DISH_SAVE_FAILURE = "dish_save_failure"
+            const val DISH_INGREDIENT_ADDED = "dish_ingredient_added"
+            const val DISH_INGREDIENT_TYPE = "dish_ingredient_type" // "new" or "existing"
+            const val DISH_INGREDIENT_NAME = "dish_ingredient_name"
+            const val DISH_INGREDIENT_QUANTITY = "dish_ingredient_quantity"
+            const val DISH_INGREDIENT_UNIT = "dish_ingredient_unit"
+            const val NEW_PRODUCT_SAVE_ATTEMPT_FROM_DISH =
+                "new_product_save_attempt_from_dish" // When trying to save a new product *during* dish creation
+            const val NEW_PRODUCT_SAVE_SUCCESS_FROM_DISH = "new_product_save_success_from_dish"
+            const val NEW_PRODUCT_SAVE_FAILURE_FROM_DISH = "new_product_save_failure_from_dish"
+            const val ERROR_DISPLAYED_USER =
+                "error_displayed_user" // When an error is shown to the user
+            const val ERROR_TYPE =
+                "error_type"                     // e.g., "InvalidMargin", "Unexpected"
+            const val ERROR_MESSAGE_RES_ID =
+                "error_message_res_id"       // Resource ID of the error string
+            const val SUGGESTION_SELECTED = "suggestion_selected"
+            const val SUGGESTIONS_MANUALLY_DISMISSED = "suggestions_manually_dismissed"
+
+            // Parameter names (some might overlap with existing ones, which is fine)
+            const val NUMBER_OF_INGREDIENTS = "number_of_ingredients"
+            const val DISH_MARGIN = "dish_margin"
+            const val DISH_TAX = "dish_tax"
+        }
     }
 
     object UI {
@@ -68,7 +100,6 @@ object Constants {
         const val SHOW_HALF_PRODUCTS = "show_half_products"
         const val SHOW_PRODUCT_TAX_PERCENT = "show_product_tax_percent"
     }
-
 
 
     const val BASIC_MARGIN = 100

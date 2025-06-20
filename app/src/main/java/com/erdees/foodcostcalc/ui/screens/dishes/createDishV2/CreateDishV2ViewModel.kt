@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2
 
+import android.os.Bundle
 import androidx.annotation.StringRes
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.R
@@ -21,6 +22,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.Cr
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm.ExistingProductFormData
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormData
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Constants.UI.SEARCH_DEBOUNCE_MS
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.Utils
@@ -68,6 +70,10 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
     val errorRes = _errorRes.asStateFlow()
 
     private var _saveDishSuccess: MutableStateFlow<Long?> = MutableStateFlow(null)
+
+    init { // Log when the ViewModel is created (which usually means the screen/flow has started)
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.DISH_CREATION_STARTED, null)
+    }
 
     /**
      * Emits the ID of the dish if it was successfully saved to the database, otherwise null.
@@ -146,6 +152,7 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
     fun onSuggestionsManuallyDismissed() {
         suggestionsManuallyDismissed.value = true
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.SUGGESTIONS_MANUALLY_DISMISSED, null)
     }
 
     @OptIn(FlowPreview::class)
@@ -208,6 +215,9 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
     fun onSuggestionSelected(product: ProductDomain) {
         newProductName.value = product.name
         selectedSuggestedProduct.value = product
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.SUGGESTION_SELECTED, Bundle().apply {
+            putString(Constants.Analytics.PRODUCT_NAME, product.name)
+        })
     }
 
     /**
@@ -230,9 +240,23 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      */
     fun onAddNewProductClick(newProductFormData: NewProductFormData) {
         _isLoading.update { true }
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.NEW_PRODUCT_SAVE_ATTEMPT_FROM_DISH, Bundle().apply {
+            putString(Constants.Analytics.PRODUCT_NAME, _newProductName.value)
+        })
         viewModelScope.launch(dispatchers.ioDispatcher) {
             try {
                 val newlyCreatedProduct = addNewProductToRepository(newProductFormData)
+
+                analyticsRepository.logEvent(Constants.Analytics.DishV2.NEW_PRODUCT_SAVE_SUCCESS_FROM_DISH, Bundle().apply {
+                    putString(Constants.Analytics.PRODUCT_NAME, newlyCreatedProduct.name)
+                })
+
+                analyticsRepository.logEvent(Constants.Analytics.DishV2.PRODUCT_CREATED, Bundle().apply {
+                    putString(Constants.Analytics.PRODUCT_NAME, newlyCreatedProduct.name)
+                    putString(Constants.Analytics.PRODUCT_UNIT, newlyCreatedProduct.unit)
+                    putDouble(Constants.Analytics.PRODUCT_WASTE, newlyCreatedProduct.waste)
+                    putDouble(Constants.Analytics.PRODUCT_PRICE_PER_UNIT, newlyCreatedProduct.pricePerUnit)
+                })
 
                 addProductToDishList(
                     newlyCreatedProduct,
@@ -242,6 +266,9 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
                 resetProductAdditionState()
             } catch (e: Exception) {
+                analyticsRepository.logEvent(Constants.Analytics.DishV2.NEW_PRODUCT_SAVE_FAILURE_FROM_DISH, Bundle().apply {
+                    putString(Constants.Analytics.PRODUCT_NAME, _newProductName.value)
+                })
                 handleError(e)
             }
         }
@@ -317,6 +344,13 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         _addedProducts.update { currentList ->
             currentList + productAddedToDish
         }
+
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.DISH_INGREDIENT_ADDED, Bundle().apply {
+            putString(Constants.Analytics.DishV2.DISH_INGREDIENT_NAME, product.name)
+            putString(Constants.Analytics.DishV2.DISH_INGREDIENT_TYPE, if (product.id == 0L || selectedSuggestedProduct.value?.id != product.id) "new_in_context" else "existing") // Crude way to check if it was 'just' created vs selected. Improve if possible.
+            putDouble(Constants.Analytics.DishV2.DISH_INGREDIENT_QUANTITY, quantityAddedToDish)
+            putString(Constants.Analytics.DishV2.DISH_INGREDIENT_UNIT, unit)
+        })
     }
 
 
@@ -344,8 +378,6 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         _intent.value = null
     }
 
-    // In CreateDishV2ViewModel.kt
-
     /**
      * Handles the logic for saving the currently constructed dish and its ingredients to the database.
      * It first saves the main dish entity, then iterates through the added products
@@ -353,6 +385,12 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      */
     fun onSaveDish() {
         _isLoading.update { true }
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.DISH_SAVE_ATTEMPT, Bundle().apply {
+            putString(Constants.Analytics.DISH_NAME, dishName.value)
+            putInt(Constants.Analytics.DishV2.NUMBER_OF_INGREDIENTS, _addedProducts.value.size)
+            putString(Constants.Analytics.DishV2.DISH_MARGIN, marginPercentInput.value)
+            putString(Constants.Analytics.DishV2.DISH_TAX, taxPercentInput.value)
+        })
         viewModelScope.launch(dispatchers.ioDispatcher) {
             try {
                 val dishId = saveDishBase()
@@ -361,8 +399,18 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
                 _isLoading.update { false }
                 _saveDishSuccess.update { dishId }
+                analyticsRepository.logEvent(Constants.Analytics.DishV2.DISH_SAVE_SUCCESS, Bundle().apply {
+                    putString(Constants.Analytics.DISH_NAME, dishName.value)
+                    putInt(Constants.Analytics.DishV2.NUMBER_OF_INGREDIENTS, _addedProducts.value.size)
+                })
+                // Also log the general DISH_CREATED event
+                analyticsRepository.logEvent(Constants.Analytics.DISH_CREATED, Bundle().apply {
+                    putString(Constants.Analytics.DISH_NAME, dishName.value)
+                })
             } catch (e: Exception) {
-                Timber.e(e, "Error parsing margin or tax for saving dish.")
+                analyticsRepository.logEvent(Constants.Analytics.DishV2.DISH_SAVE_FAILURE, Bundle().apply {
+                    putString(Constants.Analytics.DISH_NAME, dishName.value)
+                })
                 handleError(e)
             }
         }
@@ -413,14 +461,14 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      */
     private fun handleError(throwable: Throwable) {
         Timber.e(throwable)
-        _errorRes.update {
-            if (throwable is UserReportableError) {
-                throwable.errorRes
-            } else {
-                R.string.unexpected_error_occurred
-            }
-        }
-        _isLoading.update { false }
+        val errorResId = if (throwable is UserReportableError) throwable.errorRes else R.string.unexpected_error_occurred
+
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.ERROR_DISPLAYED_USER, Bundle().apply {
+            putString(Constants.Analytics.DishV2.ERROR_TYPE, throwable::class.java.simpleName)
+            putInt(Constants.Analytics.DishV2.ERROR_MESSAGE_RES_ID, errorResId)
+            // Note: logException in AnalyticsRepositoryImpl already adds the exception message.
+        })
+        _errorRes.update { errorResId }
     }
 
     fun dismissError(){
