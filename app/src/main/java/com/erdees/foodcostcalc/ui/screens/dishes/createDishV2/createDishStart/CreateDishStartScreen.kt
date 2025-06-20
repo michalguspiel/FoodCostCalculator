@@ -57,6 +57,7 @@ import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.Section
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextFieldWithSuggestions
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
@@ -89,6 +90,7 @@ fun CreateDishStartScreen(
     val shouldShowSuggestedProducts by viewModel.shouldShowSuggestedProducts.collectAsState()
     val userIntent by viewModel.intent.collectAsState()
     val isFirstDish by viewModel.isFirstDish.collectAsState()
+    val errorRes by viewModel.errorRes.collectAsState()
 
     val scope = rememberCoroutineScope()
     val newProductFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -97,17 +99,12 @@ fun CreateDishStartScreen(
     var allowIngredientListAnimation by remember { mutableStateOf(false) }
 
     LaunchedEffect(
-        newProductFormSheetState.currentValue,
-        existingProductFormSheetState.currentValue
-    ) { if (newProductFormSheetState.currentValue == SheetValue.Hidden &&
-            existingProductFormSheetState.currentValue == SheetValue.Hidden
-        ) {
-            allowIngredientListAnimation = true
-        } else {
-            allowIngredientListAnimation = false
-        }
+        newProductFormSheetState.currentValue, existingProductFormSheetState.currentValue
+    ) {
+        allowIngredientListAnimation =
+            newProductFormSheetState.currentValue == SheetValue.Hidden &&
+                existingProductFormSheetState.currentValue == SheetValue.Hidden
     }
-
 
     val context = LocalContext.current
 
@@ -132,6 +129,7 @@ fun CreateDishStartScreen(
             selectedProduct,
             currency,
             isFirstDish,
+            errorRes
         ),
         allowIngredientListAnimation,
         viewModel::updateDishName,
@@ -139,10 +137,10 @@ fun CreateDishStartScreen(
         viewModel::onAddIngredientClick,
         viewModel::onSuggestionSelected,
         viewModel::onSuggestionsManuallyDismissed,
+        viewModel::dismissError,
         onContinueClick = {
             navController.navigate(FCCScreen.CreateDishSummary)
-        }
-    )
+        })
 
     AnimatedVisibility(userIntent != null) {
         when (userIntent) {
@@ -150,8 +148,7 @@ fun CreateDishStartScreen(
                 ModalBottomSheet(
                     onDismissRequest = {
                         viewModel.onModalDismissed()
-                    },
-                    sheetState = newProductFormSheetState
+                    }, sheetState = newProductFormSheetState
                 ) {
                     NewProductForm(
                         productName = newProductName,
@@ -185,8 +182,7 @@ fun CreateDishStartScreen(
                 ModalBottomSheet(
                     onDismissRequest = {
                         viewModel.onModalDismissed()
-                    },
-                    sheetState = existingProductFormSheetState
+                    }, sheetState = existingProductFormSheetState
                 ) {
                     ExistingProductForm(
                         formData = existingProductFormViewModel.formData.collectAsState().value,
@@ -231,6 +227,7 @@ private fun CreateDishStartScreenContent(
     onAddIngredientClick: () -> Unit,
     onSuggestedProductClick: (ProductDomain) -> Unit,
     onDismissSuggestions: () -> Unit,
+    onErrorDismiss: () -> Unit,
     onContinueClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -241,30 +238,25 @@ private fun CreateDishStartScreenContent(
         }
 
         Scaffold(
-            modifier = modifier,
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = stringResource(
-                                id =
-                                    if (isFirstDish) R.string.price_your_first_dish
-                                    else R.string.create_new_dish
+            modifier = modifier, topBar = {
+                TopAppBar(title = {
+                    Text(
+                        text = stringResource(
+                            id = if (isFirstDish) R.string.price_your_first_dish
+                            else R.string.create_new_dish
+                        )
+                    )
+                }, navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            Icons.AutoMirrored.Sharp.ArrowBack,
+                            contentDescription = stringResource(
+                                id = R.string.back
                             )
                         )
-                    },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(
-                                Icons.AutoMirrored.Sharp.ArrowBack,
-                                contentDescription = stringResource(
-                                    id = R.string.back
-                                )
-                            )
-                        }
-                    })
-            }
-        ) { paddingValues ->
+                    }
+                })
+            }) { paddingValues ->
             Column(
                 verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -369,6 +361,12 @@ private fun CreateDishStartScreenContent(
                         })
                 }
             }
+            if (errorRes != null) {
+                ErrorDialog(
+                    content = stringResource(errorRes),
+                    onDismiss = { onErrorDismiss() },
+                )
+            }
         }
     }
 }
@@ -392,12 +390,14 @@ private fun CreateDishStartScreenContentPreview() {
                 ),
                 currency = Currency.getInstance("PLN"),
                 isFirstDish = false,
+                errorRes = null
             ),
             allowAnimation = true,
             updateDishName = {},
             updateNewProductName = {},
             onAddIngredientClick = {},
             onContinueClick = {},
+            onErrorDismiss = {},
             onSuggestedProductClick = {},
             onDismissSuggestions = {})
     }

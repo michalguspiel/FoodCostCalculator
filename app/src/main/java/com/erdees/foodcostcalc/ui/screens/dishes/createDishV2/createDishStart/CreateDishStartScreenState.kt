@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart
 
 import android.icu.util.Currency
+import androidx.annotation.StringRes
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 
@@ -12,5 +13,6 @@ data class CreateDishStartScreenState(
     val suggestedProducts: List<ProductDomain>? = listOf(),
     val selectedSuggestedProduct: ProductDomain? = null,
     val currency: Currency?,
-    val isFirstDish: Boolean
+    val isFirstDish: Boolean,
+    @StringRes val errorRes: Int?,
 )
