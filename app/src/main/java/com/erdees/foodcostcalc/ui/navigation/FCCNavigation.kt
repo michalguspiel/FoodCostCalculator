@@ -1,5 +1,7 @@
 package com.erdees.foodcostcalc.ui.navigation
 
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
@@ -109,11 +111,18 @@ fun FCCNavigation(
             CreateDishScreen(navController = navController)
         }
 
-        composable<FCCScreen.CreateDishStart> {
+        composable<FCCScreen.CreateDishStart>(
+            exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
+            popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
+            popExitTransition = null
+        ) {
             CreateDishStartScreen(navController = navController)
         }
 
-        composable<FCCScreen.CreateDishSummary> { backStackEntry ->
+        composable<FCCScreen.CreateDishSummary>(
+            enterTransition = { slideInHorizontally { it } },
+            popExitTransition = { slideOutHorizontally { it }}
+        ) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(navController.previousBackStackEntry?.destination?.route.toString())
             }
