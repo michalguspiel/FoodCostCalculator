@@ -82,6 +82,9 @@ object Constants {
             const val NUMBER_OF_INGREDIENTS = "number_of_ingredients"
             const val DISH_MARGIN = "dish_margin"
             const val DISH_TAX = "dish_tax"
+
+            const val ADD_INGREDIENT_CLICKED = "add_ingredient_clicked"
+            const val ADD_INGREDIENT_TYPE_INTENT = "add_ingredient_type_intent"
         }
     }
 
