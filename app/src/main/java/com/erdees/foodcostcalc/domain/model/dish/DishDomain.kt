@@ -74,11 +74,6 @@ data class DishDomain(
         var bestAttemptDish = this.copy(marginPercent = initialRawMarginPercent)
         var closestDifference = abs(bestAttemptDish.totalPrice - targetTotalPrice)
 
-        if (closestDifference <= TOLERANCE) {
-            Timber.d("Initial raw margin is sufficient: targetTotalPrice=$targetTotalPrice, result.totalPrice=${bestAttemptDish.totalPrice}, margin=${bestAttemptDish.marginPercent}")
-            return bestAttemptDish
-        }
-
         repeat(MAX_ITERATIONS) {
             val roundedMarginPercent = Utils.formatDouble(currentPrecision, initialRawMarginPercent)
             val candidateDish = this.copy(marginPercent = roundedMarginPercent)
