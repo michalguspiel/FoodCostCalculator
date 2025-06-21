@@ -24,6 +24,10 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
         viewModelScope, SharingStarted.Eagerly, null
     )
 
+    val hasSeenExampleDishOnboarding: StateFlow<Boolean> =
+        preferences.hasSeenExampleDishOnboarding
+            .stateIn(viewModelScope, SharingStarted.Eagerly, false)
+
     private val bottomNavScreens =
         listOf(FCCScreen.Products, FCCScreen.HalfProducts, FCCScreen.Dishes, FCCScreen.Settings)
     val filteredBottomNavScreens: StateFlow<List<FCCScreen>?> =

@@ -39,6 +39,10 @@ interface Preferences {
 
     val showProductTax: Flow<Boolean>
     suspend fun setShowProductTax(value: Boolean)
+
+    // Onboarding: Has the user seen the example dish onboarding?
+    val hasSeenExampleDishOnboarding: Flow<Boolean>
+    suspend fun setHasSeenExampleDishOnboarding(value: Boolean)
 }
 
 
@@ -61,6 +65,7 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val IMPERIAL = booleanPreferencesKey(Constants.Preferences.IMPERIAL)
         val SHOW_HALF_PRODUCTS = booleanPreferencesKey(Constants.Preferences.SHOW_HALF_PRODUCTS)
         val SHOW_PRODUCT_TAX = booleanPreferencesKey(Constants.Preferences.SHOW_PRODUCT_TAX_PERCENT)
+        val HAS_SEEN_EXAMPLE_DISH_ONBOARDING = booleanPreferencesKey(Constants.Preferences.HAS_SEEN_EXAMPLE_DISH_ONBOARDING)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -147,5 +152,12 @@ class PreferencesImpl(private val context: Context) : Preferences {
 
     override suspend fun setShowProductTax(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_PRODUCT_TAX] = value }
+    }
+
+    override val hasSeenExampleDishOnboarding: Flow<Boolean> =
+        context.dataStore.data.map { prefs -> prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] ?: false }
+
+    override suspend fun setHasSeenExampleDishOnboarding(value: Boolean) {
+        context.dataStore.edit { prefs -> prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] = value }
     }
 }

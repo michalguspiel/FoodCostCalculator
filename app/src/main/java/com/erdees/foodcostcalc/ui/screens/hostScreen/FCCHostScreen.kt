@@ -42,6 +42,8 @@ fun FCCHostScreen(
         mutableStateOf(viewModel.showNavBar(currentDestination))
     }
     val bottomNavigationScreens by viewModel.filteredBottomNavScreens.collectAsState()
+    val hasSeenExampleDishOnboarding by viewModel.hasSeenExampleDishOnboarding.collectAsState()
+    val startDestination = if (hasSeenExampleDishOnboarding) com.erdees.foodcostcalc.ui.navigation.FCCScreen.Products else com.erdees.foodcostcalc.ui.navigation.FCCScreen.Onboarding
 
     LaunchedEffect(Unit) {
         navController.addOnDestinationChangedListener { _, destination, _ ->
@@ -90,7 +92,12 @@ fun FCCHostScreen(
                 }
             }
         ) { paddingValues ->
-            FCCNavigation(paddingValues = paddingValues, navController = navController)
+            FCCNavigation(
+                paddingValues = paddingValues,
+                navController = navController,
+                modifier = Modifier.fillMaxSize(),
+                startDestination = startDestination
+            )
         }
     }
 }
