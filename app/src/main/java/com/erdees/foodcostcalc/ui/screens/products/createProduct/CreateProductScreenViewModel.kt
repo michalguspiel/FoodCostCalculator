@@ -47,21 +47,21 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     }
 
     private val _productName = MutableStateFlow("")
-    val productName: StateFlow<String> get() = _productName
+    val productName: StateFlow<String> = _productName
 
     fun updateProductName(name: String) {
         _productName.value = name
     }
 
     private val _productPrice = MutableStateFlow("")
-    val productPrice: StateFlow<String> get() = _productPrice
+    val productPrice: StateFlow<String> = _productPrice
 
     fun updateProductPrice(price: String) {
         onNumericValueChange(price, _productPrice)
     }
 
     private val _productTax = MutableStateFlow("")
-    val productTax: StateFlow<String> get() = _productTax
+    val productTax: StateFlow<String> = _productTax
 
     fun updateProductTax(tax: String) {
         if (showTaxPercent.value) {
@@ -70,7 +70,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     }
 
     private val _productWaste = MutableStateFlow("")
-    val productWaste: StateFlow<String> get() = _productWaste
+    val productWaste: StateFlow<String> = _productWaste
 
     fun updateProductWaste(waste: String) {
         onNumericValueChange(waste, _productWaste)
