@@ -103,6 +103,7 @@ fun CreateDishSummaryScreen(
 @Composable
 fun CreateDishSummaryContent(
     state: CreateDishSummaryScreenState,
+    modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
     onSaveDish: () -> Unit = {},
     onMarginChange: (String) -> Unit = {},
@@ -114,6 +115,7 @@ fun CreateDishSummaryContent(
     val focusManager = LocalFocusManager.current
     val interactionSource = remember { MutableInteractionSource() }
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 title = { Text(stringResource(R.string.dish_cost_and_price, state.dishName)) },
@@ -157,8 +159,8 @@ fun CreateDishSummaryContent(
                     focusManager.clearFocus()
                 },
                 state = state,
-                onMarginChanged = { onMarginChange(it) },
-                onTaxChanged = { onTaxChange(it) }
+                onMarginChange = { onMarginChange(it) },
+                onTaxChange = { onTaxChange(it) }
             )
 
             ButtonRow(
@@ -205,8 +207,8 @@ fun CreateDishSummaryContent(
 fun CalculationCard(
     state: CreateDishSummaryScreenState,
     modifier: Modifier = Modifier,
-    onMarginChanged: (String) -> Unit,
-    onTaxChanged: (String) -> Unit
+    onMarginChange: (String) -> Unit = {},
+    onTaxChange: (String) -> Unit = {}
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -223,7 +225,7 @@ fun CalculationCard(
                 FCCTextField(
                     title = stringResource(R.string.margin),
                     value = state.marginPercent,
-                    onValueChange = onMarginChanged,
+                    onValueChange = onMarginChange,
                     suffix = { Text("%") },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
@@ -238,7 +240,7 @@ fun CalculationCard(
                 FCCTextField(
                     title = stringResource(R.string.tax),
                     value = state.taxPercent,
-                    onValueChange = onTaxChanged,
+                    onValueChange = onTaxChange,
                     suffix = { Text("%") },
                     keyboardOptions = KeyboardOptions(
                         keyboardType = KeyboardType.Decimal,
@@ -298,7 +300,7 @@ private fun FoodCost(state: CreateDishSummaryScreenState) {
 @Preview
 @PreviewLightDark
 @Composable
-fun CreateDishSummaryScreenPreview() {
+private fun CreateDishSummaryScreenPreview() {
     FCCTheme {
         val sampleProduct1 = ProductAddedToDish(
             item = ProductDomain(

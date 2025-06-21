@@ -22,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,6 +45,7 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
+@Suppress("MagicNumber")
 @Composable
 fun ConfirmAndNavigate(
     visible: Boolean,
@@ -57,6 +59,7 @@ fun ConfirmAndNavigate(
     val screenHeight = configuration.containerSize.height.dp
     val checkmarkProgress = remember { Animatable(progress) }
     val animationDuration = 300
+    val currentNavigate by rememberUpdatedState(newValue = navigate)
 
     val cornerRadius by animateIntAsState(
         targetValue = if (visible) 0 else 100,
@@ -65,14 +68,14 @@ fun ConfirmAndNavigate(
 
     val width by animateDpAsState(
         targetValue = if (visible) screenWidth else 100.dp,
-        animationSpec = tween(durationMillis = animationDuration  * 2, easing = EaseIn)
+        animationSpec = tween(durationMillis = animationDuration * 2, easing = EaseIn)
     )
 
     val height by animateDpAsState(
         targetValue = if (visible) screenHeight else 100.dp,
         animationSpec = tween(durationMillis = animationDuration * 2, easing = EaseIn)
     )
-    
+
     LaunchedEffect(visible) {
         if (visible) {
             context.vibrateForConfirmation()
@@ -84,7 +87,7 @@ fun ConfirmAndNavigate(
                 )
             )
             delay(animationDuration * 2L)
-            navigate()
+            currentNavigate()
         }
     }
 
@@ -108,11 +111,12 @@ fun ConfirmAndNavigate(
     }
 }
 
+@Suppress("MagicNumber")
 @Composable
-fun CheckmarkAnimation(progress: Float) {
+fun CheckmarkAnimation(progress: Float, modifier: Modifier = Modifier) {
     val cookieColor = MaterialTheme.colorScheme.primaryContainer
     val checkmarkColor = MaterialTheme.colorScheme.primary
-    Canvas(modifier = Modifier.size(120.dp)) { // Increased size slightly for cookie shape padding
+    Canvas(modifier = modifier.size(120.dp)) {
         val canvasWidth = size.width
         val canvasHeight = size.height
         val center = Offset(canvasWidth / 2, canvasHeight / 2)
@@ -188,8 +192,9 @@ class ProgressPreviewParameterProvider : PreviewParameterProvider<Float> {
 }
 
 @PreviewLightDark
+@Preview
 @Composable
-fun ConfirmAndNavigate_ProgressPreview(
+private fun ConfirmAndNavigate_ProgressPreview(
     @PreviewParameter(ProgressPreviewParameterProvider::class) progress: Float
 ) {
     FCCTheme {
@@ -204,7 +209,7 @@ fun ConfirmAndNavigate_ProgressPreview(
  */
 @Preview(name = "Interactive ConfirmAndNavigate")
 @Composable
-fun InteractiveConfirmAndNavigatePreview() {
+private fun InteractiveConfirmAndNavigatePreview() {
     FCCTheme {
         ConfirmAndNavigate(true)
     }

@@ -36,7 +36,7 @@ import androidx.compose.ui.window.PopupProperties
  * @param onValueChange Callback invoked when the text value of the text field changes.
  *                      The new text value is provided as a parameter.
  * @param suggestions A list of items of type `T` to be displayed as suggestions.
- * @param onSuggestionSelected Callback invoked when a suggestion is selected from the dropdown.
+ * @param onSuggestionSelect Callback invoked when a suggestion is selected from the dropdown.
  *                             The selected suggestion of type `T` is provided as a parameter.
  * @param modifier Optional [Modifier] to be applied to the root Box composable.
  * @param keyboardOptions Optional [KeyboardOptions] to configure the software keyboard.
@@ -58,15 +58,14 @@ fun <T> FCCTextFieldWithSuggestions(
     onValueChange: (String) -> Unit,
     suggestions: List<T>,
     shouldShowSuggestions: Boolean,
-    onSuggestionSelected: (T) -> Unit,
     modifier: Modifier = Modifier,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     placeholder: String? = null,
-    suggestionItemContent: @Composable (T) -> Unit,
-
-    onDismissSuggestions: () -> Unit,
-    focusRequester: FocusRequester = remember { FocusRequester() }
+    focusRequester: FocusRequester = remember { FocusRequester() },
+    onSuggestionSelect: (T) -> Unit  = {},
+    suggestionItemContent: @Composable (T) -> Unit = {},
+    onDismissSuggestions: () -> Unit = {},
 ) {
     var textFieldWidth by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
@@ -114,7 +113,7 @@ fun <T> FCCTextFieldWithSuggestions(
                             suggestionItemContent(suggestion)
                         },
                         onClick = {
-                            onSuggestionSelected(suggestion)
+                            onSuggestionSelect(suggestion)
                             focusManager.clearFocus()
                         }
                     )

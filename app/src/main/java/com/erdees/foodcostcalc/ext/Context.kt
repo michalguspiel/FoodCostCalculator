@@ -35,5 +35,7 @@ fun Context.vibrateForConfirmation() {
         @Suppress("DEPRECATION")
         getSystemService(VIBRATOR_SERVICE) as Vibrator
     }
-    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+    vibrator.vibrate(VibrationEffect.createOneShot(ShortVibration, VibrationEffect.DEFAULT_AMPLITUDE))
 }
+
+private const val ShortVibration = 200L

@@ -29,119 +29,125 @@ import com.erdees.foodcostcalc.ui.composables.fields.UnitField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onNumericValueChange
+data class NewProductFormState(
+    val productName: String,
+    val dishName: String,
+    val productCreationUnits: Set<String>,
+    val productAdditionUnits: Set<String>,
+    val formData: NewProductFormData,
+    val isAddButtonEnabled: Boolean,
+    val productCreationDropdownExpanded: Boolean,
+    val productAdditionDropdownExpanded: Boolean,
+)
 
 @Composable
 fun NewProductForm(
-    productName: String,
-    dishName: String,
-    productCreationUnits: Set<String>,
-    productAdditionUnits: Set<String>,
-    formData: NewProductFormData,
-    isAddButtonEnabled: Boolean,
-    productCreationDropdownExpanded: Boolean,
-    onProductCreationDropdownExpandedChange: (Boolean) -> Unit,
-    productAdditionDropdownExpanded: Boolean,
-    onProductAdditionDropdownExpandedChange: (Boolean) -> Unit,
-    onFormDataUpdate: (NewProductFormData) -> Unit,
-    onSaveProduct: (NewProductFormData) -> Unit,
+    state: NewProductFormState,
+    modifier: Modifier = Modifier,
+    onProductCreationDropdownExpandedChange: (Boolean) -> Unit = {},
+    onProductAdditionDropdownExpandedChange: (Boolean) -> Unit = {},
+    onFormDataUpdate: (NewProductFormData) -> Unit = {},
+    onSaveProduct: (NewProductFormData) -> Unit = {},
 ) {
     val purchaseUnitFocusRequester = remember { FocusRequester() }
     val productAdditionUnitFocusRequester = remember { FocusRequester() }
     val wastePercentFocusRequester = remember { FocusRequester() }
     val scrollState = rememberScrollState()
-    Column(
-        modifier = Modifier
-            .padding(16.dp)
-            .fillMaxWidth()
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        Text("New Ingredient: $productName", style = MaterialTheme.typography.titleMedium)
-        Spacer(modifier = Modifier.height(8.dp))
+    with(state) {
+        Column(
+            modifier = modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Text("New Ingredient: $productName", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.height(8.dp))
 
-        FCCTextField(
-            title = "Purchase Price",
-            value = formData.purchasePrice,
-            onValueChange = {
-                val newValue = onNumericValueChange(formData.purchasePrice, it)
-                onFormDataUpdate(formData.copy(purchasePrice = newValue))
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Decimal,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                purchaseUnitFocusRequester.requestFocus()
-                onProductCreationDropdownExpandedChange(true)
-            })
-        )
-
-        UnitField(
-            modifier = Modifier.focusRequester(purchaseUnitFocusRequester),
-            label = "Purchase unit",
-            expanded = productCreationDropdownExpanded,
-            onExpandChange = { onProductCreationDropdownExpandedChange(it) },
-            units = productCreationUnits,
-            selectedUnit = formData.purchaseUnit,
-            selectUnit = {
-                onFormDataUpdate(formData.copy(purchaseUnit = it))
-                wastePercentFocusRequester.requestFocus()
-            }
-        )
-
-        // Waste %
-        FCCTextField(
-            modifier = Modifier.focusRequester(wastePercentFocusRequester),
-            value = formData.wastePercent,
-            title = "Waste % (Optional)",
-            onValueChange = {
-                val newValue = onNumericValueChange(formData.wastePercent, it)
-                onFormDataUpdate(formData.copy(wastePercent = newValue))
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
+            FCCTextField(
+                title = "Purchase Price",
+                value = formData.purchasePrice,
+                onValueChange = {
+                    val newValue = onNumericValueChange(formData.purchasePrice, it)
+                    onFormDataUpdate(formData.copy(purchasePrice = newValue))
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(onNext = {
+                    purchaseUnitFocusRequester.requestFocus()
+                    onProductCreationDropdownExpandedChange(true)
+                })
             )
-        )
 
-        FCCTextField(
-            value = formData.quantityAddedToDish,
-            title = "Quantity for '$dishName'",
-            onValueChange = {
-                val newValue = onNumericValueChange(formData.quantityAddedToDish, it)
-                onFormDataUpdate(formData.copy(quantityAddedToDish = newValue))
-            },
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Decimal,
-                imeAction = ImeAction.Next
-            ),
-            keyboardActions = KeyboardActions(onNext = {
-                productAdditionUnitFocusRequester.requestFocus()
-                onProductAdditionDropdownExpandedChange(true)
-            })
-        )
-
-        UnitField(
-            modifier = Modifier.focusRequester(productAdditionUnitFocusRequester),
-            label = "Unit for dish",
-            units = productAdditionUnits,
-            expanded = productAdditionDropdownExpanded,
-            onExpandChange = { onProductAdditionDropdownExpandedChange(it) },
-            selectedUnit = formData.unitForDish,
-            selectUnit = {
-                onFormDataUpdate(formData.copy(unitForDish = it))
-            })
-
-        ButtonRow(
-            modifier = Modifier.padding(vertical = 12.dp),
-            applyDefaultPadding = false,
-            primaryButton = {
-                FCCPrimaryButton("Add Ingredient", enabled = isAddButtonEnabled) {
-                    onSaveProduct(formData)
+            UnitField(
+                modifier = Modifier.focusRequester(purchaseUnitFocusRequester),
+                label = "Purchase unit",
+                expanded = productCreationDropdownExpanded,
+                onExpandChange = { onProductCreationDropdownExpandedChange(it) },
+                units = productCreationUnits,
+                selectedUnit = formData.purchaseUnit,
+                selectUnit = {
+                    onFormDataUpdate(formData.copy(purchaseUnit = it))
+                    wastePercentFocusRequester.requestFocus()
                 }
-            }
-        )
+            )
+
+            // Waste %
+            FCCTextField(
+                modifier = Modifier.focusRequester(wastePercentFocusRequester),
+                value = formData.wastePercent,
+                title = "Waste % (Optional)",
+                onValueChange = {
+                    val newValue = onNumericValueChange(formData.wastePercent, it)
+                    onFormDataUpdate(formData.copy(wastePercent = newValue))
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                )
+            )
+
+            FCCTextField(
+                value = formData.quantityAddedToDish,
+                title = "Quantity for '$dishName'",
+                onValueChange = {
+                    val newValue = onNumericValueChange(formData.quantityAddedToDish, it)
+                    onFormDataUpdate(formData.copy(quantityAddedToDish = newValue))
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Decimal,
+                    imeAction = ImeAction.Next
+                ),
+                keyboardActions = KeyboardActions(onNext = {
+                    productAdditionUnitFocusRequester.requestFocus()
+                    onProductAdditionDropdownExpandedChange(true)
+                })
+            )
+
+            UnitField(
+                modifier = Modifier.focusRequester(productAdditionUnitFocusRequester),
+                label = "Unit for dish",
+                units = productAdditionUnits,
+                expanded = productAdditionDropdownExpanded,
+                onExpandChange = { onProductAdditionDropdownExpandedChange(it) },
+                selectedUnit = formData.unitForDish,
+                selectUnit = {
+                    onFormDataUpdate(formData.copy(unitForDish = it))
+                })
+
+            ButtonRow(
+                modifier = Modifier.padding(vertical = 12.dp),
+                applyDefaultPadding = false,
+                primaryButton = {
+                    FCCPrimaryButton("Add Ingredient", enabled = isAddButtonEnabled) {
+                        onSaveProduct(formData)
+                    }
+                }
+            )
+        }
     }
 }
 
@@ -151,26 +157,28 @@ fun NewProductForm(
 private fun NewProductIngredientModalContentDarkPreview() {
     FCCTheme {
         NewProductForm(
-            productName = "Sugar",
-            dishName = "Cake",
+            NewProductFormState(
+                productName = "Sugar",
+                dishName = "Cake",
+                productAdditionUnits = setOf("kg", "g", "l", "ml"),
+                productCreationUnits = setOf("per kilogram", "per liter"),
+                productAdditionDropdownExpanded = false,
+                productCreationDropdownExpanded = false,
+                formData = NewProductFormData(
+                    purchasePrice = "12.99",
+                    purchaseUnit = "per kilogram",
+                    "10",
+                    "200",
+                    "gram"
+                ),
+                isAddButtonEnabled = true,
+            ),
             onSaveProduct = {
                 println("Preview (Dark): Add Ingredient Clicked with data:")
             },
-            productAdditionUnits = setOf("kg", "g", "l", "ml"),
-            productCreationUnits = setOf("per kilogram", "per liter"),
-            productAdditionDropdownExpanded = false,
-            productCreationDropdownExpanded = false,
             onProductAdditionDropdownExpandedChange = {},
             onProductCreationDropdownExpandedChange = {},
-            isAddButtonEnabled = true,
             onFormDataUpdate = {},
-            formData = NewProductFormData(
-                purchasePrice = "12.99",
-                purchaseUnit = "per kilogram",
-                "10",
-                "200",
-                "gram"
-            )
         )
     }
 }

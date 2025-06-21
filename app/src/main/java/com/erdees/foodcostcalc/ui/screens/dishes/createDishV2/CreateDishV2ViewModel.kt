@@ -292,7 +292,7 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         viewModelScope.launch {
             try {
                 val productDomain = selectedSuggestedProduct.value
-                    ?: throw IllegalStateException("Attempted to add existing product but no product was selected.")
+                    ?: error("Attempted to add existing product but no product was selected.")
 
                 addProductToDishList(
                     product = productDomain,
@@ -318,7 +318,7 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      */
     private fun addProductToDishList(product: ProductDomain, quantityStr: String, unit: String) {
         val quantityAddedToDish = quantityStr.toDoubleOrNull()
-            ?: throw IllegalStateException("Quantity for the product in the dish cannot be empty or invalid.")
+            ?: error("Quantity for the product in the dish cannot be empty or invalid.")
 
         val productAddedToDish = ProductAddedToDish(
             item = product,

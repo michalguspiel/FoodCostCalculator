@@ -42,9 +42,10 @@ fun ExistingProductForm(
     unitForDishDropdownExpanded: Boolean,
     selectedProduct: ProductDomain,
     dishName: String,
-    onFormDataChange: (ExistingProductFormData) -> Unit, // More generic callback for form data changes
-    onUnitForDishDropdownExpandedChange: (Boolean) -> Unit,
-    onSaveIngredient: (ExistingProductFormData) -> Unit,
+    modifier: Modifier = Modifier,
+    onFormDataChange: (ExistingProductFormData) -> Unit = {},
+    onUnitForDishDropdownExpandedChange: (Boolean) -> Unit = {},
+    onSaveIngredient: (ExistingProductFormData) -> Unit = {},
     onDismiss: () -> Unit,
 ) {
     val quantityFocusRequester = remember { FocusRequester() }
@@ -53,7 +54,7 @@ fun ExistingProductForm(
     val localFocusManager = LocalFocusManager.current
 
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(16.dp)
             .fillMaxWidth()
             .verticalScroll(scrollState),

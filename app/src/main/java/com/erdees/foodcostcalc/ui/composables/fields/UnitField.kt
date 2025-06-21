@@ -29,8 +29,8 @@ fun UnitField(
     units: Set<String>,
     selectedUnit: String,
     modifier: Modifier = Modifier,
-    selectUnit: (String) -> Unit,
-    label: String = stringResource(id = R.string.unit)
+    label: String = stringResource(id = R.string.unit),
+    selectUnit: (String) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     UnitField(
@@ -51,9 +51,9 @@ fun UnitField(
     units: Set<String>,
     selectedUnit: String,
     modifier: Modifier = Modifier,
-    onExpandChange: (Boolean) -> Unit,
-    selectUnit: (String) -> Unit,
-    label: String = stringResource(id = R.string.unit)
+    label: String = stringResource(id = R.string.unit),
+    onExpandChange: (Boolean) -> Unit = {},
+    selectUnit: (String) -> Unit = {},
 ){
     Column(modifier = modifier) {
         FieldLabel(

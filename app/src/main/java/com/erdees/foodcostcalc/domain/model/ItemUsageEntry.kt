@@ -21,6 +21,7 @@ interface ItemUsageEntry {
     fun formatQuantityForTargetServing(servings: Double): String =
         DecimalFormat("#.##").format(quantity * servings)
 
+    @Suppress("MagicNumber")
     fun formatQuantityForTargetServing(
         baseQuantity: Double,
         targetQuantity: Double

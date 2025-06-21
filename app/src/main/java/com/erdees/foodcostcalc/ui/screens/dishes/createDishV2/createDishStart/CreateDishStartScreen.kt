@@ -67,11 +67,13 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm.ExistingProductForm
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm.ExistingProductFormViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductForm
+import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormState
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormViewModel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
 
+private const val MaxSuggestedProducts = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -151,20 +153,22 @@ fun CreateDishStartScreen(
                     }, sheetState = newProductFormSheetState
                 ) {
                     NewProductForm(
-                        productName = newProductName,
-                        dishName = dishName,
-                        productCreationUnits = newProductFormViewModel.productCreationUnits.collectAsState().value,
-                        productAdditionUnits = newProductFormViewModel.productAdditionUnits.collectAsState().value,
-                        formData = newProductFormViewModel.formData.collectAsState().value,
-                        isAddButtonEnabled = newProductFormViewModel.isAddButtonEnabled.collectAsState().value,
-                        productCreationDropdownExpanded = newProductFormViewModel.productCreationUnitDropdownExpanded.collectAsState().value,
+                        NewProductFormState(
+                            productName = newProductName,
+                            dishName = dishName,
+                            productCreationUnits = newProductFormViewModel.productCreationUnits.collectAsState().value,
+                            productAdditionUnits = newProductFormViewModel.productAdditionUnits.collectAsState().value,
+                            formData = newProductFormViewModel.formData.collectAsState().value,
+                            isAddButtonEnabled = newProductFormViewModel.isAddButtonEnabled.collectAsState().value,
+                            productCreationDropdownExpanded = newProductFormViewModel.productCreationUnitDropdownExpanded.collectAsState().value,
+                            productAdditionDropdownExpanded = newProductFormViewModel.productAdditionUnitDropdownExpanded.collectAsState().value,
+                            ),
                         onProductCreationDropdownExpandedChange = {
                             newProductFormViewModel.productCreationUnitDropdownExpanded.value = it
                         },
                         onProductAdditionDropdownExpandedChange = {
                             newProductFormViewModel.productAdditionUnitDropdownExpanded.value = it
                         },
-                        productAdditionDropdownExpanded = newProductFormViewModel.productAdditionUnitDropdownExpanded.collectAsState().value,
                         onFormDataUpdate = newProductFormViewModel::updateFormData,
                         onSaveProduct = { data ->
                             scope.launch {
@@ -304,9 +308,9 @@ private fun CreateDishStartScreenContent(
                             value = newProductName,
                             placeholder = stringResource(R.string.product_name),
                             onValueChange = { updateNewProductName(it) },
-                            suggestions = suggestedProducts?.take(3) ?: emptyList(),
+                            suggestions = suggestedProducts?.take(MaxSuggestedProducts) ?: emptyList(),
                             shouldShowSuggestions = shouldShowSuggestedProducts,
-                            onSuggestionSelected = {
+                            onSuggestionSelect = {
                                 onSuggestedProductClick(it)
                             },
                             onDismissSuggestions = {
@@ -371,6 +375,7 @@ private fun CreateDishStartScreenContent(
     }
 }
 
+@Suppress("MagicNumber")
 @Preview
 @Composable
 private fun CreateDishStartScreenContentPreview() {

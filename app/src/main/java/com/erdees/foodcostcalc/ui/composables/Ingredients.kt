@@ -43,20 +43,20 @@ fun Ingredients(
     Column(
         modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        (products + halfProducts).forEachIndexed { index, it ->
+        (products + halfProducts).forEachIndexed { index, itemUsageEntry ->
             val needsExtraSpace = index != 0 && spacious
             IngredientRow(
                 modifier = Modifier.padding(
                     bottom = if (spacious) 8.dp else 4.dp,
                     top = if (needsExtraSpace) 8.dp else 0.dp
                 ),
-                description = it.item.name,
+                description = itemUsageEntry.item.name,
                 quantity = stringResource(
                     R.string.formatted_quantity,
-                    it.formatQuantityForTargetServing(servings),
-                    UnitsUtils.getUnitAbbreviation(it.quantityUnit)
+                    itemUsageEntry.formatQuantityForTargetServing(servings),
+                    UnitsUtils.getUnitAbbreviation(itemUsageEntry.quantityUnit)
                 ),
-                price = it.formattedTotalPricePerServing(servings, currency),
+                price = itemUsageEntry.formattedTotalPricePerServing(servings, currency),
                 showPrice = showPrices
             )
             if (spacious) FCCThickSecondaryHorizontalDivider()
