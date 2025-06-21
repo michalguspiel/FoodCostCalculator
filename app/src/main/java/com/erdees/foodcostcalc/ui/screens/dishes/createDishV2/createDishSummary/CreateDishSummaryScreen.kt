@@ -30,7 +30,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -60,6 +59,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
+import com.erdees.foodcostcalc.ui.navigation.ConfirmAndNavigate
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
@@ -73,17 +73,6 @@ fun CreateDishSummaryScreen(
 ) {
     val successfullySavedDishId by viewModel.saveDishSuccess.collectAsState()
 
-    LaunchedEffect(successfullySavedDishId) {
-        successfullySavedDishId?.let {
-            navController.navigate(FCCScreen.EditDish(it)) {
-                popUpTo(FCCScreen.Dishes) {
-                    inclusive = false
-                }
-            }
-            viewModel.resetSaveDishSuccess()
-        }
-    }
-
     CreateDishSummaryContent(
         CreateDishSummaryScreenState(
             dishName = viewModel.dishName.collectAsState().value,
@@ -96,11 +85,20 @@ fun CreateDishSummaryScreen(
             isLoading = viewModel.isLoading.collectAsState().value,
             errorRes = viewModel.errorRes.collectAsState().value,
         ),
+        successfullySavedDishId = successfullySavedDishId,
         onBackClick = { navController.popBackStack() },
         onSaveDish = { viewModel.onSaveDish() },
         onMarginChange = { viewModel.updateMarginPercentInput(it) },
         onTaxChange = { viewModel.updateTaxPercentInput(it) },
-        onErrorDismiss = { viewModel.dismissError() }
+        onErrorDismiss = { viewModel.dismissError() },
+        successNavigate = {
+                navController.navigate(FCCScreen.EditDish(it)) {
+                    popUpTo(FCCScreen.Dishes) {
+                        inclusive = false
+                    }
+                }
+                viewModel.resetSaveDishSuccess()
+        }
     )
 }
 
@@ -108,11 +106,13 @@ fun CreateDishSummaryScreen(
 @Composable
 fun CreateDishSummaryContent(
     state: CreateDishSummaryScreenState,
+    successfullySavedDishId: Long?,
     onBackClick: () -> Unit = {},
     onSaveDish: () -> Unit = {},
     onMarginChange: (String) -> Unit = {},
     onTaxChange: (String) -> Unit = {},
-    onErrorDismiss: () -> Unit = {}
+    onErrorDismiss: () -> Unit = {},
+    successNavigate: (Long) -> Unit=  {}
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -194,6 +194,10 @@ fun CreateDishSummaryContent(
                 content = stringResource(state.errorRes),
                 onDismiss = { onErrorDismiss() },
             )
+        }
+
+        if (successfullySavedDishId != null) {
+            ConfirmAndNavigate(navigate = { successNavigate(successfullySavedDishId) })
         }
     }
 }
@@ -336,10 +340,12 @@ fun CreateDishSummaryScreenPreview() {
 
         CreateDishSummaryContent(
             state = previewState,
+            successfullySavedDishId = 1L,
             onBackClick = {},
             onSaveDish = {},
             onMarginChange = {},
-            onTaxChange = {}
+            onTaxChange = {},
+            successNavigate = {}
         )
     }
 }

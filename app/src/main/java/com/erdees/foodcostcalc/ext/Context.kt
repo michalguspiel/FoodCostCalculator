@@ -1,7 +1,12 @@
 package com.erdees.foodcostcalc.ext
 
 import android.content.Context
+import android.content.Context.VIBRATOR_SERVICE
 import android.content.ContextWrapper
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
+import android.os.VibratorManager
 import androidx.activity.ComponentActivity
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.SharedPreferencesMigration
@@ -20,3 +25,15 @@ val Context.dataStore: DataStore<Preferences> by preferencesDataStore(
         listOf(SharedPreferencesMigration(context, "settings"))
     }
 )
+
+fun Context.vibrateForConfirmation() {
+    val vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        val vibratorManager =
+            getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+        vibratorManager.defaultVibrator
+    } else {
+        @Suppress("DEPRECATION")
+        getSystemService(VIBRATOR_SERVICE) as Vibrator
+    }
+    vibrator.vibrate(VibrationEffect.createOneShot(200, VibrationEffect.DEFAULT_AMPLITUDE))
+}
