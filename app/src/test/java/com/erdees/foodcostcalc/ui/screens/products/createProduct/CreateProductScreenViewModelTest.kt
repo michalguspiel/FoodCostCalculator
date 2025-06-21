@@ -4,6 +4,7 @@ import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
+import com.erdees.foodcostcalc.utils.MyDispatchers
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -36,7 +37,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
     private lateinit var productRepository: ProductRepository
     private lateinit var preferences: Preferences
     private lateinit var analyticsRepository: AnalyticsRepository
-
+    private lateinit var dispatchers: MyDispatchers
     private lateinit var viewModel: CreateProductScreenViewModel
 
     @Before
@@ -45,6 +46,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
 
         productRepository = mockk(relaxed = true)
         preferences = mockk()
+        dispatchers = mockk()
         analyticsRepository = mockk(relaxed = true)
 
         every { preferences.metricUsed } returns flowOf(true)
@@ -53,12 +55,14 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
         every { preferences.defaultMargin } returns flowOf("10")
         every { preferences.defaultTax } returns flowOf("10")
         every { preferences.defaultCurrencyCode } returns flowOf("USD")
+        every { dispatchers.ioDispatcher } returns testDispatcher
 
         startKoin {
             modules(module {
                 single { productRepository }
                 single { preferences }
                 single { analyticsRepository }
+                single { dispatchers }
             })
         }
     }
