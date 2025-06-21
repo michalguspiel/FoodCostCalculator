@@ -4,6 +4,7 @@ import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
+import com.erdees.foodcostcalc.utils.MyDispatchers
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -36,10 +37,8 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
     private lateinit var productRepository: ProductRepository
     private lateinit var preferences: Preferences
     private lateinit var analyticsRepository: AnalyticsRepository
-
+    private lateinit var dispatchers: MyDispatchers
     private lateinit var viewModel: CreateProductScreenViewModel
-
-    private val productBaseSlot = slot<ProductBase>()
 
     @Before
     fun setUp() {
@@ -47,6 +46,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
 
         productRepository = mockk(relaxed = true)
         preferences = mockk()
+        dispatchers = mockk()
         analyticsRepository = mockk(relaxed = true)
 
         every { preferences.metricUsed } returns flowOf(true)
@@ -55,12 +55,14 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
         every { preferences.defaultMargin } returns flowOf("10")
         every { preferences.defaultTax } returns flowOf("10")
         every { preferences.defaultCurrencyCode } returns flowOf("USD")
+        every { dispatchers.ioDispatcher } returns testDispatcher
 
         startKoin {
             modules(module {
                 single { productRepository }
                 single { preferences }
                 single { analyticsRepository }
+                single { dispatchers }
             })
         }
     }
@@ -129,19 +131,20 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
         }
 
     @Test
-    fun `addButtonEnabled when showTaxPercent is true and all fields valid`() = runTest(testDispatcher) {
-        every { preferences.showProductTax } returns MutableStateFlow(true)
-        initializeViewModel()
-        advanceUntilIdle()
-        viewModel.updateProductName("Test Product")
-        viewModel.updateProductPrice("10.0")
-        viewModel.updateProductTax("20.0")
-        viewModel.updateProductWaste("5.0")
-        viewModel.selectUnit("kg")
-        advanceUntilIdle()
+    fun `addButtonEnabled when showTaxPercent is true and all fields valid`() =
+        runTest(testDispatcher) {
+            every { preferences.showProductTax } returns MutableStateFlow(true)
+            initializeViewModel()
+            advanceUntilIdle()
+            viewModel.updateProductName("Test Product")
+            viewModel.updateProductPrice("10.0")
+            viewModel.updateProductTax("20.0")
+            viewModel.updateProductWaste("5.0")
+            viewModel.selectUnit("kg")
+            advanceUntilIdle()
 
-        viewModel.addButtonEnabled.value shouldBe true
-    }
+            viewModel.addButtonEnabled.value shouldBe true
+        }
 
     @Test
     fun `addButtonEnabled when showTaxPercent is true and tax is missing`() =
@@ -174,8 +177,9 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
     @Test
     fun `addProduct when showTaxPercent is true uses entered tax value`() =
         runTest(testDispatcher) {
+            val productBaseSlot = slot<ProductBase>()
             every { preferences.showProductTax } returns MutableStateFlow(true)
-            coEvery { productRepository.addProduct(any()) } returns Unit
+            coEvery { productRepository.addProduct(any()) } returns 1L
 
             initializeViewModel()
             advanceUntilIdle()
@@ -208,33 +212,34 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
 
     @Test
     fun `addProduct when showTaxPercent is false uses 0 as tax`() = runTest(testDispatcher) {
-            every { preferences.showProductTax } returns MutableStateFlow(false)
-            coEvery { productRepository.addProduct(capture(productBaseSlot)) } returns Unit
+        val productBaseSlot = slot<ProductBase>()
+        every { preferences.showProductTax } returns MutableStateFlow(false)
+        coEvery { productRepository.addProduct(capture(productBaseSlot)) } returns 1L
 
-            initializeViewModel()
-            advanceUntilIdle()
+        initializeViewModel()
+        advanceUntilIdle()
 
-            viewModel.updateProductName("Test Product")
-            viewModel.updateProductPrice("10.0")
-            viewModel.updateProductWaste("5.0")
-            viewModel.selectUnit("kg")
-            advanceUntilIdle()
-            viewModel.addProduct()
-            advanceUntilIdle()
+        viewModel.updateProductName("Test Product")
+        viewModel.updateProductPrice("10.0")
+        viewModel.updateProductWaste("5.0")
+        viewModel.selectUnit("kg")
+        advanceUntilIdle()
+        viewModel.addProduct()
+        advanceUntilIdle()
 
-            coVerify { productRepository.addProduct(any()) }
-            val capturedProduct = productBaseSlot.captured
-            capturedProduct.name shouldBe "Test Product"
-            capturedProduct.pricePerUnit shouldBe 10.0
-            capturedProduct.tax shouldBe 0.0
-            capturedProduct.waste shouldBe 5.0
-            capturedProduct.unit shouldBe "kg"
+        coVerify { productRepository.addProduct(any()) }
+        val capturedProduct = productBaseSlot.captured
+        capturedProduct.name shouldBe "Test Product"
+        capturedProduct.pricePerUnit shouldBe 10.0
+        capturedProduct.tax shouldBe 0.0
+        capturedProduct.waste shouldBe 5.0
+        capturedProduct.unit shouldBe "kg"
 
-            coVerify(exactly = 1) {
-                analyticsRepository.logEvent(
-                    any(),
-                    any()
-                )
-            }
+        coVerify(exactly = 1) {
+            analyticsRepository.logEvent(
+                any(),
+                any()
+            )
         }
+    }
 }

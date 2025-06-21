@@ -21,7 +21,7 @@ interface DishDao {
     fun getCompleteDish(id: Long): Flow<CompleteDish>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addDish(dish: DishBase)
+    suspend fun addDish(dish: DishBase): Long
 
     @Update
     suspend fun editDish(dish: DishBase)

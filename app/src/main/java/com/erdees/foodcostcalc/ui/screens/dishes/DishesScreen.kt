@@ -130,7 +130,7 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                 isVisible = isVisible.value,
                 contentDescription = stringResource(id = R.string.content_description_create_dish)
             ) {
-                navController.navigate(FCCScreen.CreateDish)
+                navController.navigate(FCCScreen.CreateDishStart)
             }
         }
     }) { paddingValues ->
@@ -141,7 +141,7 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
             listItems?.let { listItems ->
                 if (isEmptyListContentVisible) {
                     EmptyListContent(screen = FCCScreen.Dishes) {
-                        navController.navigate(FCCScreen.CreateDish)
+                        navController.navigate(FCCScreen.CreateDishStart)
                     }
                 } else {
                     DishesScreenContent(

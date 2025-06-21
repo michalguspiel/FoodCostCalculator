@@ -150,4 +150,11 @@ object Utils {
     fun formatDouble(decimals: Int, value: Double): Double {
         return BigDecimal(value).setScale(decimals, RoundingMode.HALF_UP).toDouble()
     }
+
+    @Suppress("MagicNumber")
+    fun getDishFinalPrice(foodCost: Double, marginPercent: Double, taxPercent: Double) : Double{
+        val priceWithMargin = foodCost * marginPercent / 100
+        val amountOfTax = priceWithMargin * taxPercent / 100
+        return priceWithMargin + amountOfTax
+    }
 }

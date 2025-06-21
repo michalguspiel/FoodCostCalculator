@@ -51,6 +51,12 @@ sealed class FCCScreen(
     data object CreateDish : FCCScreen()
 
     @Serializable
+    data object CreateDishStart : FCCScreen()
+
+    @Serializable
+    data object CreateDishSummary : FCCScreen()
+
+    @Serializable
     data class EditHalfProduct(val halfProductId: Long) : FCCScreen()
 
     @Serializable

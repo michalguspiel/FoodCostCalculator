@@ -11,10 +11,10 @@ import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.utils.Constants
+import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.Utils.formatResultAndCheckCommas
 import com.erdees.foodcostcalc.utils.onNumericValueChange
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -32,10 +32,11 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     private val productRepository: ProductRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
+    private val myDispatchers: MyDispatchers by inject()
 
     val showTaxPercent: StateFlow<Boolean> = preferences.showProductTax.stateIn(
         viewModelScope,
-        SharingStarted.WhileSubscribed(5000),
+        SharingStarted.Eagerly,
         true
     )
 
@@ -47,21 +48,21 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     }
 
     private val _productName = MutableStateFlow("")
-    val productName: StateFlow<String> get() = _productName
+    val productName: StateFlow<String> = _productName
 
     fun updateProductName(name: String) {
         _productName.value = name
     }
 
     private val _productPrice = MutableStateFlow("")
-    val productPrice: StateFlow<String> get() = _productPrice
+    val productPrice: StateFlow<String> = _productPrice
 
     fun updateProductPrice(price: String) {
         onNumericValueChange(price, _productPrice)
     }
 
     private val _productTax = MutableStateFlow("")
-    val productTax: StateFlow<String> get() = _productTax
+    val productTax: StateFlow<String> = _productTax
 
     fun updateProductTax(tax: String) {
         if (showTaxPercent.value) {
@@ -70,7 +71,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     }
 
     private val _productWaste = MutableStateFlow("")
-    val productWaste: StateFlow<String> get() = _productWaste
+    val productWaste: StateFlow<String> = _productWaste
 
     fun updateProductWaste(waste: String) {
         onNumericValueChange(waste, _productWaste)
@@ -157,7 +158,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
 
     private fun addProduct(product: ProductBase) {
         _screenState.value = ScreenState.Loading<Nothing>()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(myDispatchers.ioDispatcher) {
             try {
                 productRepository.addProduct(product)
                 _screenState.value = ScreenState.Success(product.name)

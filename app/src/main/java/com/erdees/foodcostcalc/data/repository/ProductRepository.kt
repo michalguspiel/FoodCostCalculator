@@ -11,7 +11,7 @@ import org.koin.core.component.inject
 interface ProductRepository {
   val products: Flow<List<ProductBase>>
   suspend fun getProduct(id: Long) : Flow<ProductBase>
-  suspend fun addProduct(product: ProductBase)
+  suspend fun addProduct(product: ProductBase): Long
   suspend fun addProductDish(productDish: ProductDish)
   suspend fun editProduct(newProduct: ProductBase)
   suspend fun deleteProduct(id: Long)

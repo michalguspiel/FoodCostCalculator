@@ -18,7 +18,7 @@ fun DishDomain.toShareableText(
     products.forEach { product ->
         builder.append("${product.item.name} ${product.quantity * portions} ${product.quantityUnit}.")
         if (showIngredientPrices) {
-            builder.append(" ${product.totalPrice}.")
+            builder.append(" ${product.foodCost}.")
         }
         builder.appendLine()
     }
@@ -26,7 +26,7 @@ fun DishDomain.toShareableText(
     halfProducts.forEach { halfProduct ->
         builder.append("${halfProduct.item.name} ${halfProduct.quantity * portions} ${halfProduct.quantityUnit}.")
         if (showIngredientPrices) {
-            builder.append(" ${halfProduct.totalPrice}.")
+            builder.append(" ${halfProduct.foodCost}.")
         }
         builder.appendLine()
     }

@@ -15,7 +15,7 @@ data class UsedHalfProductDomain(
     override val quantityUnit: String
 ) : UsedItem {
 
-    override val totalPrice = UnitsUtils.calculatePrice(
+    override val foodCost = UnitsUtils.calculatePrice(
         item.pricePerUnit,
         quantity,
         item.halfProductUnit,
