@@ -31,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,8 +70,6 @@ fun CreateDishSummaryScreen(
     navController: NavController,
     viewModel: CreateDishV2ViewModel,
 ) {
-    val successfullySavedDishId by viewModel.saveDishSuccess.collectAsState()
-
     CreateDishSummaryContent(
         CreateDishSummaryScreenState(
             dishName = viewModel.dishName.collectAsState().value,
@@ -84,20 +81,20 @@ fun CreateDishSummaryScreen(
             currency = viewModel.currency.collectAsState().value,
             isLoading = viewModel.isLoading.collectAsState().value,
             errorRes = viewModel.errorRes.collectAsState().value,
+            successfullySavedDishId = viewModel.saveDishSuccess.collectAsState().value
         ),
-        successfullySavedDishId = successfullySavedDishId,
         onBackClick = { navController.popBackStack() },
         onSaveDish = { viewModel.onSaveDish() },
         onMarginChange = { viewModel.updateMarginPercentInput(it) },
         onTaxChange = { viewModel.updateTaxPercentInput(it) },
         onErrorDismiss = { viewModel.dismissError() },
         successNavigate = {
-                navController.navigate(FCCScreen.EditDish(it)) {
-                    popUpTo(FCCScreen.Dishes) {
-                        inclusive = false
-                    }
+            navController.navigate(FCCScreen.EditDish(it)) {
+                popUpTo(FCCScreen.Dishes) {
+                    inclusive = false
                 }
-                viewModel.resetSaveDishSuccess()
+            }
+            viewModel.resetSaveDishSuccess()
         }
     )
 }
@@ -106,13 +103,12 @@ fun CreateDishSummaryScreen(
 @Composable
 fun CreateDishSummaryContent(
     state: CreateDishSummaryScreenState,
-    successfullySavedDishId: Long?,
     onBackClick: () -> Unit = {},
     onSaveDish: () -> Unit = {},
     onMarginChange: (String) -> Unit = {},
     onTaxChange: (String) -> Unit = {},
     onErrorDismiss: () -> Unit = {},
-    successNavigate: (Long) -> Unit=  {}
+    successNavigate: (Long) -> Unit = {}
 ) {
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current
@@ -196,9 +192,12 @@ fun CreateDishSummaryContent(
             )
         }
 
-        if (successfullySavedDishId != null) {
-            ConfirmAndNavigate(navigate = { successNavigate(successfullySavedDishId) })
-        }
+        ConfirmAndNavigate(
+            visible = state.successfullySavedDishId != null,
+            navigate = {
+                state.successfullySavedDishId?.let { successNavigate(it) }
+            }
+        )
     }
 }
 
@@ -335,12 +334,12 @@ fun CreateDishSummaryScreenPreview() {
             finalSellingPrice = 3.60,
             currency = Currency.getInstance("GBP"),
             isLoading = false,
-            errorRes = null
+            errorRes = null,
+            successfullySavedDishId = 1L,
         )
 
         CreateDishSummaryContent(
             state = previewState,
-            successfullySavedDishId = 1L,
             onBackClick = {},
             onSaveDish = {},
             onMarginChange = {},

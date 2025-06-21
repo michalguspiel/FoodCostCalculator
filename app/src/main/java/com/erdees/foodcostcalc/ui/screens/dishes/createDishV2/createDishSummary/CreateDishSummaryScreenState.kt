@@ -13,5 +13,6 @@ data class CreateDishSummaryScreenState(
     val finalSellingPrice: Double = 0.0,
     val currency: Currency?,
     val isLoading : Boolean,
-    @StringRes val errorRes: Int?
+    @StringRes val errorRes: Int?,
+    val successfullySavedDishId: Long?
 )
