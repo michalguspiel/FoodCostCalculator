@@ -5,10 +5,12 @@ import android.icu.util.Currency
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.ext.dataStore
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.FeatureVisibilityByInstallDate
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
@@ -154,8 +156,10 @@ class PreferencesImpl(private val context: Context) : Preferences {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_PRODUCT_TAX] = value }
     }
 
-    override val hasSeenExampleDishOnboarding: Flow<Boolean> =
-        context.dataStore.data.map { prefs -> prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] ?: false }
+    override val hasSeenExampleDishOnboarding: Flow<Boolean>
+        get() = if (BuildConfig.DEBUG) flowOf(true) else context.dataStore.data.map { prefs ->
+            prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] ?: false
+        }
 
     override suspend fun setHasSeenExampleDishOnboarding(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] = value }

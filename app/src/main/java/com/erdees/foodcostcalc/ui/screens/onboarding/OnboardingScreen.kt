@@ -24,12 +24,12 @@ fun OnboardingScreen(navController: NavController, viewModel: OnboardingViewMode
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState) {
-        (uiState as? OnboardingUiState.Success)?.dishId?.let {
-            navController.navigate(FCCScreen.EditDish(it)) {
+        (uiState as? OnboardingUiState.Success)?.let {
+            navController.navigate(FCCScreen.Dishes) {
                 popUpTo(FCCScreen.Onboarding) { inclusive = true }
             }
             viewModel.resetUiState() // Reset after navigation
-        } ?: return@LaunchedEffect
+        }
     }
 
     OnboardingScreenContent(
