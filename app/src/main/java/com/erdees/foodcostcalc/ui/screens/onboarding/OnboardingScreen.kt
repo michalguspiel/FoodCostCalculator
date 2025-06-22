@@ -28,7 +28,7 @@ fun OnboardingScreen(navController: NavController, viewModel: OnboardingViewMode
             navController.navigate(FCCScreen.Dishes) {
                 popUpTo(FCCScreen.Onboarding) { inclusive = true }
             }
-            viewModel.resetUiState() // Reset after navigation
+            viewModel.resetUiState()
         }
     }
 

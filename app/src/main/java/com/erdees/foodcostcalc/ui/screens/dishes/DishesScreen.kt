@@ -77,6 +77,10 @@ import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
+import com.erdees.foodcostcalc.ui.spotlight.SpotlightController
+import com.erdees.foodcostcalc.ui.spotlight.SpotlightOverlay
+import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlightController
+import com.erdees.foodcostcalc.ui.spotlight.spotlightTarget
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
@@ -98,8 +102,11 @@ data class DishesScreenCallbacks(
 
 @Composable
 @Screen
-fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel = viewModel()) {
-
+fun DishesScreen(
+    navController: NavController,
+    isOnboarding: Boolean = false,
+    viewModel: DishesScreenViewModel = viewModel()
+) {
     val isVisible = rememberSaveable { mutableStateOf(true) }
     val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
     val searchKey by viewModel.searchKey.collectAsState()
@@ -109,6 +116,14 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
     val currency by viewModel.currency.collectAsState()
     val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
     val askForReview by viewModel.askForReview.collectAsState()
+
+    val spotlightController = rememberSpotlightController()
+
+    LaunchedEffect(listItems) {
+        if (isOnboarding && (listItems?.filterIsInstance<DishDomain>()?.size == 1)) {
+            spotlightController.start()
+        }
+    }
 
     val callbacks = DishesScreenCallbacks(
         viewModel::onAdFailedToLoad,
@@ -144,16 +159,19 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                         navController.navigate(FCCScreen.CreateDishStart)
                     }
                 } else {
-                    DishesScreenContent(
-                        nestedScrollConnection,
-                        listItems,
-                        itemsPresentationState,
-                        currency,
-                        navController,
-                        isVisible.value,
-                        searchKey,
-                        callbacks
-                    )
+                    SpotlightOverlay(controller = spotlightController) {
+                        DishesScreenContent(
+                            nestedScrollConnection,
+                            listItems,
+                            itemsPresentationState,
+                            currency,
+                            navController,
+                            isVisible.value,
+                            searchKey,
+                            callbacks,
+                            spotlightController
+                        )
+                    }
                 }
             } ?: ScreenLoadingOverlay(Modifier.fillMaxSize())
 
@@ -254,7 +272,8 @@ private fun DishesScreenContent(
     navController: NavController,
     isVisible: Boolean,
     searchKey: String,
-    callbacks: DishesScreenCallbacks
+    callbacks: DishesScreenCallbacks,
+    spotlightController: SpotlightController
 ) {
     Box(
         contentAlignment = Alignment.TopCenter
@@ -304,7 +323,10 @@ private fun DishesScreenContent(
                                 },
                                 onEditClick = {
                                     navController.navigate(FCCScreen.EditDish(item.id))
-                                })
+                                },
+                                spotlightController = spotlightController,
+                                isFirstDish = i == 0
+                            )
                         }
                     }
                 }
@@ -331,12 +353,23 @@ private fun DishItem(
     onExpandToggle: () -> Unit,
     onChangeServingsClick: () -> Unit,
     onAddItemsClick: () -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
+    spotlightController: SpotlightController? = null,
+    isFirstDish: Boolean = false
 ) {
 
     Card(
         modifier
             .fillMaxWidth()
+            .then(
+                if (isFirstDish) {
+                    Modifier.spotlightTarget(
+                        order = 0,
+                        info = "Here's your example dish! Tap it to see more details and try adding ingredients.",
+                        controller = spotlightController
+                    )
+                } else Modifier
+            )
             .clickable { onExpandToggle() }, content = {
             Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
                 TitleRow(dishDomain.name, isExpanded)
@@ -457,7 +490,10 @@ private fun DishItemPreview() {
                 isExpanded = true,
                 onExpandToggle = { },
                 onChangeServingsClick = { },
-                onAddItemsClick = { }) {}
+                onAddItemsClick = { },
+                spotlightController = rememberSpotlightController(),
+                onEditClick = {}
+                )
 
             DishItem(
                 dishDomain = DishDomain(
@@ -474,7 +510,11 @@ private fun DishItemPreview() {
                 isExpanded = false,
                 onExpandToggle = { },
                 onChangeServingsClick = { },
-                onAddItemsClick = { }) {}
+                onAddItemsClick = { },
+                modifier = Modifier,
+                onEditClick = {},
+                spotlightController = rememberSpotlightController()
+            )
         }
     }
 }

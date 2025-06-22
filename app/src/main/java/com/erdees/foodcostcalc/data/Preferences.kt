@@ -157,7 +157,7 @@ class PreferencesImpl(private val context: Context) : Preferences {
     }
 
     override val hasSeenExampleDishOnboarding: Flow<Boolean>
-        get() = if (BuildConfig.DEBUG) flowOf(true) else context.dataStore.data.map { prefs ->
+        get() = if (BuildConfig.DEBUG) flowOf(false) else context.dataStore.data.map { prefs ->
             prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] ?: false
         }
 
