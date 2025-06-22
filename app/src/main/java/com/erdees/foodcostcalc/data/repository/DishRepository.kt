@@ -15,7 +15,7 @@ interface DishRepository {
     val dishes: Flow<List<CompleteDish>>
     suspend fun getDish(id: Long): Flow<CompleteDish>
 
-    suspend fun addDish(dish: DishBase)
+    suspend fun addDish(dish: DishBase) : Long
     suspend fun deleteDish(dishId: Long)
     suspend fun updateDish(dish: DishBase)
     suspend fun updateDishRecipe(recipeId: Long, dishId: Long)
