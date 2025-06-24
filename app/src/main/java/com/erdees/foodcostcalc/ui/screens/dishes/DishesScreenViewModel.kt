@@ -22,8 +22,10 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 class DishesScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
@@ -109,5 +111,12 @@ class DishesScreenViewModel : FCCBaseViewModel(), KoinComponent {
             putString(Constants.Analytics.REVIEW_FAILURE, null)
         }
         analyticsRepository.logException(exception, bundle)
+    }
+
+    fun onboardingComplete() {
+        viewModelScope.launch {
+            Timber.i("DishesScreenViewModel: Onboarding complete.")
+            preferences.setHasSeenExampleDishOnboarding(true)
+        }
     }
 }

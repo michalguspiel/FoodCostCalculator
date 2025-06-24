@@ -20,12 +20,15 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 
 @Composable
-fun OnboardingScreen(navController: NavController, viewModel: OnboardingViewModel = viewModel()) {
+fun OnboardingScreen(
+    navController: NavController,
+    viewModel: OnboardingViewModel = viewModel()
+) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState) {
         (uiState as? OnboardingUiState.Success)?.let {
-            navController.navigate(FCCScreen.Dishes) {
+            navController.navigate(FCCScreen.Dishes(onboarding = true)) {
                 popUpTo(FCCScreen.Onboarding) { inclusive = true }
             }
             viewModel.resetUiState()

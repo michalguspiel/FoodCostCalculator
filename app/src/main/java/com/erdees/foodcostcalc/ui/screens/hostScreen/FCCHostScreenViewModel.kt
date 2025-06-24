@@ -29,7 +29,7 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
             .stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
     private val bottomNavScreens =
-        listOf(FCCScreen.Products, FCCScreen.HalfProducts, FCCScreen.Dishes, FCCScreen.Settings)
+        listOf(FCCScreen.Products, FCCScreen.HalfProducts, FCCScreen.Dishes(), FCCScreen.Settings)
     val filteredBottomNavScreens: StateFlow<List<FCCScreen>?> =
         showHalfProducts.filterNotNull().map { show ->
             if (show) bottomNavScreens

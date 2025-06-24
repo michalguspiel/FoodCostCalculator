@@ -157,11 +157,17 @@ class PreferencesImpl(private val context: Context) : Preferences {
     }
 
     override val hasSeenExampleDishOnboarding: Flow<Boolean>
-        get() = if (BuildConfig.DEBUG) flowOf(false) else context.dataStore.data.map { prefs ->
-            prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] ?: false
+        get() = if (BuildConfig.DEBUG) {
+            Timber.i("Preferences: hasSeenExampleDishOnboarding returning false for DEBUG build.")
+            flowOf(false)
+        } else context.dataStore.data.map { prefs ->
+            val value = prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] ?: false
+            Timber.i("Preferences: hasSeenExampleDishOnboarding read as $value")
+            value
         }
 
     override suspend fun setHasSeenExampleDishOnboarding(value: Boolean) {
+        Timber.i("Preferences: Setting hasSeenExampleDishOnboarding to $value")
         context.dataStore.edit { prefs -> prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] = value }
     }
 }

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 sealed class OnboardingUiState {
     data object Idle : OnboardingUiState()
@@ -37,6 +38,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
     fun createSampleDishAndNavigate() {
         viewModelScope.launch {
             _uiState.value = OnboardingUiState.Loading
+            Timber.i("Creating sample dish...")
             try {
                 val addedProducts = sampleIngredients().map { ingredient ->
                     val id = productRepository.addProduct(ingredient)
@@ -76,8 +78,10 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
                 // Mark onboarding as seen
                 preferences.setHasSeenExampleDishOnboarding(true)
                 _uiState.value = OnboardingUiState.Success(dishId)
+                Timber.i("Sample dish created successfully with id $dishId. Navigating...")
             } catch (e: Exception) {
                 _uiState.value = OnboardingUiState.Error(e.message ?: "Unknown error")
+                Timber.e(e, "Error creating sample dish.")
             }
         }
     }

@@ -101,6 +101,6 @@ private fun PreviewEmptyListContentHalfProducts() {
 @Composable
 private fun PreviewEmptyListContentDishes() {
     FCCTheme {
-        EmptyListContent(screen = FCCScreen.Dishes)
+        EmptyListContent(screen = FCCScreen.Dishes())
     }
 }

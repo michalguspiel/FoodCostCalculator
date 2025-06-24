@@ -35,6 +35,7 @@ import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
 import com.erdees.foodcostcalc.ui.screens.subscriptionScreen.SubscriptionScreen
+import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 
 @Composable
 fun FCCNavigation(
@@ -42,6 +43,7 @@ fun FCCNavigation(
     modifier: Modifier = Modifier,
     startDestination: FCCScreen,
     navController: NavHostController = rememberNavController(),
+    spotlight: Spotlight
 ) {
     NavHost(
         navController = navController,
@@ -56,8 +58,14 @@ fun FCCNavigation(
         composable<FCCScreen.HalfProducts> {
             HalfProductsScreen(navController = navController)
         }
-        composable<FCCScreen.Dishes> {
-            DishesScreen(navController = navController)
+        composable<FCCScreen.Dishes> { backStackEntry ->
+            val route: FCCScreen.Dishes = backStackEntry.toRoute()
+
+            DishesScreen(
+                navController = navController,
+                spotlight = spotlight,
+                isOnboarding = route.onboarding
+            )
         }
         composable<FCCScreen.Settings> {
             SettingsScreen(navController = navController)
