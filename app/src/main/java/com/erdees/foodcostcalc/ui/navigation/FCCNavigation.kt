@@ -125,8 +125,13 @@ fun FCCNavigation(
             exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
             popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
             popExitTransition = null
-        ) {
-            CreateDishStartScreen(navController = navController)
+        ) { backStackEntry ->
+            val route: FCCScreen.CreateDishStart = backStackEntry.toRoute()
+            CreateDishStartScreen(
+                navController = navController,
+                isOnboarding = route.onboarding,
+                spotlight = spotlight
+            )
         }
 
         composable<FCCScreen.CreateDishSummary>(

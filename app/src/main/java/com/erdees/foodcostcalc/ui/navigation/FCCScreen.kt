@@ -51,7 +51,7 @@ sealed class FCCScreen(
     data object CreateDish : FCCScreen()
 
     @Serializable
-    data object CreateDishStart : FCCScreen()
+    data class CreateDishStart(val onboarding: Boolean = false) : FCCScreen()
 
     @Serializable
     data object CreateDishSummary : FCCScreen()

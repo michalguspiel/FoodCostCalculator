@@ -30,6 +30,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -58,6 +59,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ext.conditionally
 import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.Ingredients
@@ -77,6 +79,7 @@ import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
+import com.erdees.foodcostcalc.ui.screens.onboarding.OnboardingCompletedDialog
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
 import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlight
@@ -118,10 +121,16 @@ fun DishesScreen(
     val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
     val askForReview by viewModel.askForReview.collectAsState()
 
+    // State to track whether to show the onboarding completion dialog
+    var showOnboardingCompletedDialog by remember { mutableStateOf(false) }
+
     LaunchedEffect(listItems) {
         if (isOnboarding) {
             Timber.i("DishesScreen: Starting spotlight for onboarding.")
             spotlight.start(SpotlightStep.entries.map { it.toSpotlightTarget() }) {
+                // Show the completion dialog when spotlight tour finishes
+                showOnboardingCompletedDialog = true
+                // Mark onboarding as complete in ViewModel
                 viewModel.onboardingComplete()
             }
         }
@@ -135,6 +144,15 @@ fun DishesScreen(
         viewModel::userCanBeAskedForReview
     )
 
+    // Show the onboarding completed dialog if needed
+    if (showOnboardingCompletedDialog) {
+        OnboardingCompletedDialog(
+            onDismiss = {
+                showOnboardingCompletedDialog = false
+            }
+        )
+    }
+
     AskForReviewEffect(
         askForReview = askForReview,
         onReviewLaunch = { viewModel.reviewSuccess() },
@@ -144,10 +162,18 @@ fun DishesScreen(
     Scaffold(modifier = Modifier, floatingActionButton = {
         if (!isEmptyListContentVisible) {
             FCCAnimatedFAB(
+                modifier = Modifier.conditionally(isOnboarding) {
+                    spotlightTarget(
+                        SpotlightStep.CreateDishFAB.toSpotlightTarget {
+                            navController.navigate(FCCScreen.CreateDishStart(onboarding = true))
+                        },
+                        spotlight
+                    )
+                },
                 isVisible = isVisible.value,
                 contentDescription = stringResource(id = R.string.content_description_create_dish)
             ) {
-                navController.navigate(FCCScreen.CreateDishStart)
+                navController.navigate(FCCScreen.CreateDishStart())
             }
         }
     }) { paddingValues ->
@@ -158,7 +184,7 @@ fun DishesScreen(
             listItems?.let { listItems ->
                 if (isEmptyListContentVisible) {
                     EmptyListContent(screen = FCCScreen.Dishes()) {
-                        navController.navigate(FCCScreen.CreateDishStart)
+                        navController.navigate(FCCScreen.CreateDishStart())
                     }
                 } else {
                     DishesScreenContent(
@@ -360,45 +386,79 @@ private fun DishItem(
     Card(
         modifier
             .fillMaxWidth()
-            .then(
-                if (isFirstDish) {
-                    Modifier.spotlightTarget(
-                        SpotlightStep.ExampleDishCard.toSpotlightTarget({ onExpandToggle() }),
-                        spotlight
-                    )
-                } else Modifier
-            )
+            .conditionally(isFirstDish) {
+                spotlightTarget(
+                    SpotlightStep.ExampleDishCard.toSpotlightTarget(onClickAction = {
+                        if (!isExpanded) {
+                            onExpandToggle()
+                        }
+                    }),
+                    spotlight
+                )
+            }
             .clickable { onExpandToggle() }, content = {
             Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
                 TitleRow(dishDomain.name, isExpanded)
 
-                DishDetails(dishDomain, onChangeServingsClick, servings)
+                DishDetails(
+                    dishDomain,
+                    modifier = Modifier.conditionally(isFirstDish) {
+                        spotlightTarget(
+                            SpotlightStep.DishDetails.toSpotlightTarget(),
+                            spotlight
+                        )
+                    },
+                    onChangeServingsClicked = onChangeServingsClick,
+                    servings = servings
+                )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 if (isExpanded) {
-                    Ingredients(dishDomain, servings, currency)
+                    Ingredients(
+                        dishDomain, servings, currency, modifier = Modifier.conditionally(isFirstDish) {
+                            spotlightTarget(
+                                SpotlightStep.IngredientsList.toSpotlightTarget(),
+                                spotlight
+                            )
+                        }
+                    )
                 }
+
                 PriceSummary(
                     dishDomain = dishDomain,
                     servings = servings.toInt(),
-                    currency = currency
+                    currency = currency,
+                    modifier = Modifier.conditionally(isFirstDish) {
+                        spotlightTarget(
+                            SpotlightStep.PriceSummary.toSpotlightTarget(),
+                            spotlight
+                        )
+                    }
                 )
 
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
                 ButtonRow(applyDefaultPadding = false, primaryButton = {
                     FCCPrimaryButton(
-                        modifier = if (isFirstDish) {
-                            Modifier.spotlightTarget(
+                        modifier = Modifier.conditionally(isFirstDish) {
+                            spotlightTarget(
                                 SpotlightStep.AddIngredientsButton.toSpotlightTarget(),
                                 spotlight
                             )
-                        } else Modifier,
+                        },
                         text = stringResource(id = R.string.add_items)
                     ) { onAddItemsClick() }
                 }, secondaryButton = {
-                    FCCTextButton(text = stringResource(id = R.string.details)) { onEditClick() }
+                    FCCTextButton(
+                        modifier = Modifier.conditionally(isFirstDish) {
+                            spotlightTarget(
+                                SpotlightStep.DetailsButton.toSpotlightTarget(),
+                                spotlight
+                            )
+                        },
+                        text = stringResource(id = R.string.details)
+                    ) { onEditClick() }
                 })
             }
         })
@@ -407,10 +467,11 @@ private fun DishItem(
 @Composable
 private fun DishDetails(
     dishDomain: DishDomain,
+    modifier: Modifier = Modifier,
     onChangeServingsClicked: () -> Unit,
     servings: Double
 ) {
-    Row(Modifier, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
         DetailItem(
             divider = false,
             label = stringResource(id = R.string.margin),

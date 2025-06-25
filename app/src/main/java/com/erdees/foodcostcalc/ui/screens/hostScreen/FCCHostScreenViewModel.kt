@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 class FCCHostScreenViewModel : ViewModel(), KoinComponent {
     private val preferences: Preferences by inject()
@@ -39,14 +40,12 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
     fun showNavBar(
         currentDestination: String?,
     ): Boolean {
-        return when (currentDestination) {
-            FCCScreen.Products::class.qualifiedName,
-            FCCScreen.HalfProducts::class.qualifiedName,
-            FCCScreen.Dishes::class.qualifiedName,
-            FCCScreen.Settings::class.qualifiedName,
-                -> true
+        Timber.i("showNavBar called with currentDestination: $currentDestination")
+        if (currentDestination == null) return false
 
-            else -> false
+        return bottomNavScreens.any { screen ->
+            val qualifiedName = screen::class.qualifiedName
+            qualifiedName != null && currentDestination.startsWith(qualifiedName)
         }
     }
 

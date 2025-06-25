@@ -54,6 +54,7 @@ import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.ext.conditionally
 import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.Section
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -69,6 +70,10 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.ex
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductForm
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormState
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormViewModel
+import com.erdees.foodcostcalc.ui.spotlight.Spotlight
+import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
+import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlight
+import com.erdees.foodcostcalc.ui.spotlight.spotlightTarget
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -79,6 +84,8 @@ private const val MaxSuggestedProducts = 3
 @Composable
 fun CreateDishStartScreen(
     navController: NavController,
+    isOnboarding: Boolean,
+    spotlight: Spotlight,
     viewModel: CreateDishV2ViewModel = viewModel(),
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
     existingProductFormViewModel: ExistingProductFormViewModel = viewModel(),
@@ -142,7 +149,10 @@ fun CreateDishStartScreen(
         viewModel::dismissError,
         onContinueClick = {
             navController.navigate(FCCScreen.CreateDishSummary)
-        })
+        },
+        isOnboarding = isOnboarding,
+        spotlight = spotlight
+    )
 
     AnimatedVisibility(userIntent != null) {
         when (userIntent) {
@@ -233,7 +243,9 @@ private fun CreateDishStartScreenContent(
     onDismissSuggestions: () -> Unit,
     onErrorDismiss: () -> Unit,
     onContinueClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isOnboarding: Boolean,
+    spotlight: Spotlight
 ) {
     with(createDishStartScreenState) {
         val dishNameFocusRequester = remember { FocusRequester() }
@@ -282,7 +294,14 @@ private fun CreateDishStartScreenContent(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         FCCTextField(
-                            modifier = Modifier.focusRequester(dishNameFocusRequester),
+                            modifier = Modifier
+                                .focusRequester(dishNameFocusRequester)
+                                .conditionally(isOnboarding) {
+                                    spotlightTarget(
+                                        SpotlightStep.DishNameField.toSpotlightTarget(),
+                                        spotlight
+                                    )
+                                },
                             title = null,
                             value = dishName,
                             onValueChange = { updateDishName(it) },
@@ -304,6 +323,12 @@ private fun CreateDishStartScreenContent(
                         )
 
                         FCCTextFieldWithSuggestions(
+                            modifier = Modifier.conditionally(isOnboarding) {
+                                spotlightTarget(
+                                    SpotlightStep.IngredientNameField.toSpotlightTarget(),
+                                    spotlight
+                                )
+                            },
                             title = null,
                             value = newProductName,
                             placeholder = stringResource(R.string.product_name),
@@ -330,7 +355,13 @@ private fun CreateDishStartScreenContent(
                     FCCPrimaryButton(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
+                            .padding(horizontal = 24.dp)
+                            .conditionally(isOnboarding) {
+                                spotlightTarget(
+                                    SpotlightStep.AddIngredientButton.toSpotlightTarget(onAddIngredientClick),
+                                    spotlight
+                                )
+                            },
                         text = stringResource(R.string.add_product),
                         onClick = { onAddIngredientClick() },
                         enabled = newProductName.isNotEmpty()
@@ -351,6 +382,12 @@ private fun CreateDishStartScreenContent(
                                 persistentListOf(),
                                 SingleServing,
                                 currency,
+                                modifier = Modifier.conditionally(isOnboarding) {
+                                    spotlightTarget(
+                                        SpotlightStep.AddedIngredientsList.toSpotlightTarget(),
+                                        spotlight
+                                    )
+                                }
                             )
                         }
                     }
@@ -358,7 +395,13 @@ private fun CreateDishStartScreenContent(
                         enabled = dishName.isNotBlank(),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
+                            .padding(horizontal = 24.dp)
+                            .conditionally(isOnboarding) {
+                                spotlightTarget(
+                                    SpotlightStep.ContinueToSummaryButton.toSpotlightTarget(),
+                                    spotlight
+                                )
+                            },
                         text = stringResource(R.string.continue_dish_creation),
                         onClick = {
                             onContinueClick()
@@ -404,6 +447,9 @@ private fun CreateDishStartScreenContentPreview() {
             onContinueClick = {},
             onErrorDismiss = {},
             onSuggestedProductClick = {},
-            onDismissSuggestions = {})
+            onDismissSuggestions = {},
+            isOnboarding = true,
+            spotlight = rememberSpotlight()
+        )
     }
 }
