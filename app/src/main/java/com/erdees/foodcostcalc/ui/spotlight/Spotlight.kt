@@ -1,5 +1,8 @@
 package com.erdees.foodcostcalc.ui.spotlight
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.animateRectAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -50,19 +53,16 @@ enum class SpotlightShape {
 enum class SpotlightStep(
     val info: String,
     val shape: SpotlightShape = SpotlightShape.RoundedRectangle,
-    val cornerRadius: Dp = 16.dp,
     val hasNextButton: Boolean = false
 ) {
     ExampleDishCard(
         info = "Here's your example dish! Tap it to see more details.",
         shape = SpotlightShape.RoundedRectangle,
-        cornerRadius = 16.dp,
         hasNextButton = false
     ),
     AddIngredientsButton(
         info = "Add ingredients to your dish by clicking here!",
-        shape = SpotlightShape.Circle,
-        cornerRadius = 16.dp,
+        shape = SpotlightShape.RoundedRectangle,
         hasNextButton = false
     );
 
@@ -71,7 +71,6 @@ enum class SpotlightStep(
         info = info,
         rect = null,
         shape = shape,
-        cornerRadius = cornerRadius,
         hasNextButton = hasNextButton,
         onClickAction = onClickAction
     )
@@ -181,6 +180,19 @@ fun SpotlightOverlay(
     var boxSize by remember { mutableStateOf<Rect?>(null) }
     val density = LocalDensity.current
 
+    // Remember the target rect to animate to
+    var targetHighlightRect by remember { mutableStateOf<Rect?>(null) }
+
+    // Animate the highlight rect
+    val animatedHighlightRect by animateRectAsState(
+        targetValue = targetHighlightRect ?: Rect(0f, 0f, 0f, 0f),
+        animationSpec = SpringSpec(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMediumLow
+        ),
+        label = "spotlight_rect_animation"
+    )
+
     Box(
         Modifier
             .fillMaxSize()
@@ -192,127 +204,131 @@ fun SpotlightOverlay(
         val current = spotlight.currentTarget
         Timber.i("SpotlightOverlay recomposing. isActive: ${spotlight.isActive}, currentTarget: $current")
 
-        if (spotlight.isActive) {
-            if (current?.rect != null) {
-                val padPx = with(density) { highlightPadding.toPx() }
-                val rect = current.rect
-                val cornerRadiusPx = with(density) { current.cornerRadius.toPx() }
+        if (spotlight.isActive && current?.rect != null) {
+            val padPx = with(density) { highlightPadding.toPx() }
+            val rect = current.rect
+            val cornerRadiusPx = with(density) { current.cornerRadius.toPx() }
 
-                val highlightRect = when (current.shape) {
-                    SpotlightShape.Circle -> {
-                        val size = min(rect.width, rect.height)
-                        Rect(
-                            rect.center.x - size/2 - padPx,
-                            rect.center.y - size/2 - padPx,
-                            rect.center.x + size/2 + padPx,
-                            rect.center.y + size/2 + padPx
-                        )
-                    }
-                    else -> Rect(
-                        rect.left - padPx,
-                        rect.top - padPx,
-                        rect.right + padPx,
-                        rect.bottom + padPx
+            // Calculate the target highlight rect
+            val newHighlightRect = when (current.shape) {
+                SpotlightShape.Circle -> {
+                    val size = min(rect.width, rect.height)
+                    Rect(
+                        rect.center.x - size/2 - padPx,
+                        rect.center.y - size/2 - padPx,
+                        rect.center.x + size/2 + padPx,
+                        rect.center.y + size/2 + padPx
                     )
                 }
+                else -> Rect(
+                    rect.left - padPx,
+                    rect.top - padPx,
+                    rect.right + padPx,
+                    rect.bottom + padPx
+                )
+            }
 
-                // Draw the dimming overlay with a cutout for the spotlighted area
-                Canvas(Modifier.fillMaxSize()) {
-                    val holePath = Path().apply {
-                        when (current.shape) {
-                            SpotlightShape.Rectangle -> addRect(highlightRect)
-                            SpotlightShape.RoundedRectangle -> addRoundRect(RoundRect(highlightRect, cornerRadiusPx, cornerRadiusPx))
-                            SpotlightShape.Circle -> addOval(highlightRect)
-                        }
+            // Update the target rect for animation
+            LaunchedEffect(newHighlightRect) {
+                targetHighlightRect = newHighlightRect
+            }
+
+            // Draw the dimming overlay with a cutout for the spotlighted area
+            Canvas(Modifier.fillMaxSize()) {
+                val holePath = Path().apply {
+                    when (current.shape) {
+                        SpotlightShape.Rectangle -> addRect(animatedHighlightRect)
+                        SpotlightShape.RoundedRectangle -> addRoundRect(RoundRect(animatedHighlightRect, cornerRadiusPx, cornerRadiusPx))
+                        SpotlightShape.Circle -> addOval(animatedHighlightRect)
                     }
-
-                    val fullScreenPath = Path().apply {
-                        addRect(Rect(0f, 0f, size.width, size.height))
-                    }
-
-                    val dimPath = Path().apply {
-                        addPath(fullScreenPath)
-                        op(fullScreenPath, holePath, PathOperation.Difference)
-                    }
-
-                    drawPath(dimPath, dimColor)
                 }
 
-                // Add a clickable overlay that covers only the dimmed part (not the spotlight)
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .pointerInput(Unit) {
-                            detectTapGestures { offset ->
-                                // Only intercept taps outside the spotlight area
-                                val spotlightArea = when (current.shape) {
-                                    SpotlightShape.Circle -> {
-                                        val centerX = rect.center.x
-                                        val centerY = rect.center.y
-                                        val radius = min(rect.width, rect.height) / 2
-                                        val dx = offset.x - centerX
-                                        val dy = offset.y - centerY
-                                        (dx * dx + dy * dy) > (radius * radius)  // Outside circle
-                                    }
-                                    else -> {
-                                        offset.x < rect.left || offset.x > rect.right ||
-                                        offset.y < rect.top || offset.y > rect.bottom  // Outside rectangle
-                                    }
+                val fullScreenPath = Path().apply {
+                    addRect(Rect(0f, 0f, size.width, size.height))
+                }
+
+                val dimPath = Path().apply {
+                    addPath(fullScreenPath)
+                    op(fullScreenPath, holePath, PathOperation.Difference)
+                }
+
+                drawPath(dimPath, dimColor)
+            }
+
+            // Add a clickable overlay that covers only the dimmed part (not the spotlight)
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .pointerInput(current) { // re-compose on current target change
+                        detectTapGestures { offset ->
+                            // Only intercept taps outside the spotlight area
+                            val isOutsideSpotlight = when (current.shape) {
+                                SpotlightShape.Circle -> {
+                                    val centerX = animatedHighlightRect.center.x
+                                    val centerY = animatedHighlightRect.center.y
+                                    val radius = min(animatedHighlightRect.width, animatedHighlightRect.height) / 2
+                                    val dx = offset.x - centerX
+                                    val dy = offset.y - centerY
+                                    (dx * dx + dy * dy) > (radius * radius)  // Outside circle
                                 }
-
-                                if (spotlightArea) {
-                                    Timber.i("Clicked on dimmed area - intercepting click")
-                                    // Do nothing, just intercept the click
-                                } else {
-                                    Timber.i("Clicked on non-dimmed area - navigating to next target")
-                                    // Trigger the associated action first if available
-                                    current.onClickAction?.invoke()
-
-                                    // Then advance to the next spotlight step
-                                    spotlight.next()
+                                else -> {
+                                    offset.x < animatedHighlightRect.left ||
+                                    offset.x > animatedHighlightRect.right ||
+                                    offset.y < animatedHighlightRect.top ||
+                                    offset.y > animatedHighlightRect.bottom  // Outside rectangle
                                 }
                             }
+
+                            if (isOutsideSpotlight) {
+                                Timber.i("Clicked on dimmed area - intercepting click")
+                                // Do nothing, just intercept the click
+                            } else {
+                                Timber.i("Clicked on spotlight area - triggering action and navigating to next target")
+                                // Trigger the associated action first if available
+                                current.onClickAction?.invoke()
+
+                                // Then advance to the next spotlight step
+                                spotlight.next()
+                            }
                         }
-                )
-
-                var infoBoxPosition: IntOffset? = null
-
-                boxSize?.let { size ->
-                    val infoBoxPadding = with(density) { 16.dp.toPx() }
-                    val infoBoxHeight = with(density) { 64.dp.toPx() }
-
-                    val showBelow = (highlightRect.bottom + infoBoxPadding + infoBoxHeight) < size.bottom
-                    val infoBoxY = if (showBelow) {
-                        highlightRect.bottom + infoBoxPadding
-                    } else {
-                        highlightRect.top - infoBoxHeight - infoBoxPadding
                     }
+            )
 
-                    infoBoxPosition = IntOffset(
-                        x = highlightRect.left.roundToInt(),
-                        y = infoBoxY.roundToInt()
-                    )
+            // Calculate the info box position based on animated highlight rect
+            boxSize?.let { size ->
+                val infoBoxPadding = with(density) { 16.dp.toPx() }
+                val infoBoxHeight = with(density) { 64.dp.toPx() }
+
+                val showBelow = (animatedHighlightRect.bottom + infoBoxPadding + infoBoxHeight) < size.bottom
+                val infoBoxY = if (showBelow) {
+                    animatedHighlightRect.bottom + infoBoxPadding
+                } else {
+                    animatedHighlightRect.top - infoBoxHeight - infoBoxPadding
                 }
 
-                infoBoxPosition?.let { position ->
-                    Box(
-                        Modifier
-                            .offset { position }
-                            .width(with(density) { highlightRect.width.toDp() })
-                            .background(infoBackground, shape = MaterialTheme.shapes.medium)
-                            .padding(16.dp)
-                    ) {
-                        Column {
-                            Text(current.info, color = infoTextColor)
-                            if (current.hasNextButton) {
-                                Button(
-                                    onClick = {
-                                        spotlight.next()
-                                    },
-                                    modifier = Modifier.padding(top = 8.dp)
-                                ) {
-                                    Text(nextButtonText)
-                                }
+                val infoBoxPosition = IntOffset(
+                    x = animatedHighlightRect.left.roundToInt(),
+                    y = infoBoxY.roundToInt()
+                )
+
+                // Info box with explanation text and optional next button
+                Box(
+                    Modifier
+                        .offset { infoBoxPosition }
+                        .width(with(density) { animatedHighlightRect.width.toDp() })
+                        .background(infoBackground, shape = MaterialTheme.shapes.medium)
+                        .padding(16.dp)
+                ) {
+                    Column {
+                        Text(current.info, color = infoTextColor)
+                        if (current.hasNextButton) {
+                            Button(
+                                onClick = {
+                                    spotlight.next()
+                                },
+                                modifier = Modifier.padding(top = 8.dp)
+                            ) {
+                                Text(nextButtonText)
                             }
                         }
                     }
