@@ -363,10 +363,7 @@ private fun DishItem(
             .then(
                 if (isFirstDish) {
                     Modifier.spotlightTarget(
-                        SpotlightStep.ExampleDishCard.toSpotlightTarget(customAction = {
-                            onExpandToggle()
-                            spotlight.next()
-                        }),
+                        SpotlightStep.ExampleDishCard.toSpotlightTarget({ onExpandToggle() }),
                         spotlight
                     )
                 } else Modifier
@@ -394,10 +391,7 @@ private fun DishItem(
                     FCCPrimaryButton(
                         modifier = if (isFirstDish) {
                             Modifier.spotlightTarget(
-                                SpotlightStep.AddIngredientsButton.toSpotlightTarget(customAction = {
-                                    onAddItemsClick()
-                                    spotlight.next()
-                                }),
+                                SpotlightStep.AddIngredientsButton.toSpotlightTarget(),
                                 spotlight
                             )
                         } else Modifier,

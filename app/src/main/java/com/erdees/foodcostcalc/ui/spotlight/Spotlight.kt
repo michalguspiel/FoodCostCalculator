@@ -3,14 +3,13 @@ package com.erdees.foodcostcalc.ui.spotlight
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
@@ -29,10 +28,10 @@ import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -51,30 +50,30 @@ enum class SpotlightShape {
 enum class SpotlightStep(
     val info: String,
     val shape: SpotlightShape = SpotlightShape.RoundedRectangle,
-    val cornerRadius: Dp = 16.dp
+    val cornerRadius: Dp = 16.dp,
+    val hasNextButton: Boolean = false
 ) {
     ExampleDishCard(
         info = "Here's your example dish! Tap it to see more details.",
         shape = SpotlightShape.RoundedRectangle,
-        cornerRadius = 16.dp
+        cornerRadius = 16.dp,
+        hasNextButton = false
     ),
     AddIngredientsButton(
         info = "Add ingredients to your dish by clicking here!",
         shape = SpotlightShape.Circle,
-        cornerRadius = 16.dp
+        cornerRadius = 16.dp,
+        hasNextButton = false
     );
 
-    fun toSpotlightTarget(
-        customAction: (() -> Unit)? = null,
-        onNext: (() -> Unit)? = null
-    ) = SpotlightTarget(
+    fun toSpotlightTarget(onClickAction: (() -> Unit)? = null) = SpotlightTarget(
         order = ordinal,
         info = info,
         rect = null,
         shape = shape,
         cornerRadius = cornerRadius,
-        customAction = customAction,
-        onNext = onNext
+        hasNextButton = hasNextButton,
+        onClickAction = onClickAction
     )
 }
 
@@ -84,8 +83,8 @@ data class SpotlightTarget(
     val rect: Rect? = null,
     val shape: SpotlightShape = SpotlightShape.RoundedRectangle,
     val cornerRadius: Dp = 16.dp,
-    val customAction: (() -> Unit)? = null,
-    val onNext: (() -> Unit)? = null
+    val hasNextButton: Boolean,
+    val onClickAction: (() -> Unit)? = null
 )
 
 class Spotlight {
@@ -119,15 +118,29 @@ class Spotlight {
         targets = emptyList()
     }
 
-    fun updateTarget(order: Int, rect: Rect) {
-        val existing = targets.find { it.order == order }
-        if (existing != null && existing.rect != rect) {
-            Timber.i("Spotlight updating target $order with rect $rect")
-            targets = targets.map {
-                if (it.order == order) it.copy(rect = rect)
-                else it
+    fun updateTarget(target: SpotlightTarget) {
+        val index = targets.indexOfFirst { it.order == target.order }
+        if (index == -1) return
+
+        val currentTarget = targets[index]
+        // To prevent recomposition loops, we only update if the rect has changed,
+        // or if a new action is being set
+        if (currentTarget.rect != target.rect ||
+            (currentTarget.onClickAction == null && target.onClickAction != null)) {
+            Timber.i("Spotlight updating target ${target.order} with rect ${target.rect}")
+            targets = targets.toMutableList().apply {
+                this[index] = currentTarget.copy(
+                    rect = target.rect,
+                    hasNextButton = target.hasNextButton,
+                    onClickAction = target.onClickAction ?: currentTarget.onClickAction
+                )
             }
         }
+    }
+
+    // Helper method to trigger the action associated with the current target
+    fun triggerCurrentTargetAction() {
+        currentTarget?.onClickAction?.invoke()
     }
 }
 
@@ -142,13 +155,14 @@ fun Modifier.spotlightTarget(
         .onGloballyPositioned { coordinates ->
             val rect = coordinates.boundsInRoot()
             Timber.i("Spotlight target ${target.order} positioned at $rect")
-            spotlight?.updateTarget(target.order, rect)
+            spotlight?.updateTarget(target.copy(rect = rect))
         }
         .let { modifier ->
+            Timber.i("Spotlight target ${target.order} modifier created. Current target: ${spotlight?.currentTarget?.order}")
             if (spotlight?.currentTarget?.order == target.order) {
                 modifier.clickable {
                     Timber.i("Spotlight target ${target.order} clicked.")
-                    target.customAction?.invoke() ?: spotlight.next()
+                    spotlight.next()
                 }
             } else modifier
         }
@@ -157,7 +171,7 @@ fun Modifier.spotlightTarget(
 @Composable
 fun SpotlightOverlay(
     spotlight: Spotlight,
-    dimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.85f),
+    dimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.65f),
     highlightPadding: Dp = 8.dp,
     infoTextColor: Color = MaterialTheme.colorScheme.onBackground,
     infoBackground: Color = MaterialTheme.colorScheme.background,
@@ -165,8 +179,6 @@ fun SpotlightOverlay(
     content: @Composable BoxScope.() -> Unit
 ) {
     var boxSize by remember { mutableStateOf<Rect?>(null) }
-    val insets = WindowInsets.safeDrawing
-    val layoutDirection = LocalLayoutDirection.current
     val density = LocalDensity.current
 
     Box(
@@ -179,91 +191,128 @@ fun SpotlightOverlay(
         content()
         val current = spotlight.currentTarget
         Timber.i("SpotlightOverlay recomposing. isActive: ${spotlight.isActive}, currentTarget: $current")
-        if (spotlight.isActive && current?.rect != null) {
-            val topInsetPx = with(density) { insets.getTop(density).toDp().toPx() }
-            val leftInsetPx = with(density) { insets.getLeft(density, layoutDirection).toDp().toPx() }
-            val rightInsetPx = with(density) { insets.getRight(density, layoutDirection).toDp().toPx() }
-            val padPx = with(density) { highlightPadding.toPx() }
-            val rect = current.rect
-            val cornerRadiusPx = with(density) { current.cornerRadius.toPx() }
 
-            val highlightRect = when (current.shape) {
-                SpotlightShape.Circle -> {
-                    val size = min(rect.width, rect.height)
-                    Rect(
-                        rect.center.x - size/2 - padPx,
-                        rect.center.y - size/2 - padPx,
-                        rect.center.x + size/2 + padPx,
-                        rect.center.y + size/2 + padPx
+        if (spotlight.isActive) {
+            if (current?.rect != null) {
+                val padPx = with(density) { highlightPadding.toPx() }
+                val rect = current.rect
+                val cornerRadiusPx = with(density) { current.cornerRadius.toPx() }
+
+                val highlightRect = when (current.shape) {
+                    SpotlightShape.Circle -> {
+                        val size = min(rect.width, rect.height)
+                        Rect(
+                            rect.center.x - size/2 - padPx,
+                            rect.center.y - size/2 - padPx,
+                            rect.center.x + size/2 + padPx,
+                            rect.center.y + size/2 + padPx
+                        )
+                    }
+                    else -> Rect(
+                        rect.left - padPx,
+                        rect.top - padPx,
+                        rect.right + padPx,
+                        rect.bottom + padPx
                     )
                 }
-                else -> Rect(
-                    rect.left - padPx - leftInsetPx,
-                    rect.top - padPx - topInsetPx,
-                    rect.right + padPx + rightInsetPx,
-                    rect.bottom + padPx
-                )
-            }
 
-            var infoBoxPosition: IntOffset? = null
-
-            Canvas(Modifier.fillMaxSize()) {
-                val holePath = Path().apply {
-                    when (current.shape) {
-                        SpotlightShape.Rectangle -> addRect(highlightRect)
-                        SpotlightShape.RoundedRectangle -> addRoundRect(RoundRect(highlightRect, cornerRadiusPx, cornerRadiusPx))
-                        SpotlightShape.Circle -> addOval(highlightRect)
+                // Draw the dimming overlay with a cutout for the spotlighted area
+                Canvas(Modifier.fillMaxSize()) {
+                    val holePath = Path().apply {
+                        when (current.shape) {
+                            SpotlightShape.Rectangle -> addRect(highlightRect)
+                            SpotlightShape.RoundedRectangle -> addRoundRect(RoundRect(highlightRect, cornerRadiusPx, cornerRadiusPx))
+                            SpotlightShape.Circle -> addOval(highlightRect)
+                        }
                     }
+
+                    val fullScreenPath = Path().apply {
+                        addRect(Rect(0f, 0f, size.width, size.height))
+                    }
+
+                    val dimPath = Path().apply {
+                        addPath(fullScreenPath)
+                        op(fullScreenPath, holePath, PathOperation.Difference)
+                    }
+
+                    drawPath(dimPath, dimColor)
                 }
 
-                val fullScreenPath = Path().apply {
-                    addRect(Rect(0f, 0f, size.width, size.height))
-                }
-
-                val dimPath = Path().apply {
-                    addPath(fullScreenPath)
-                    op(fullScreenPath, holePath, PathOperation.Difference)
-                }
-
-                drawPath(dimPath, dimColor)
-            }
-
-            boxSize?.let { size ->
-                val infoBoxPadding = with(density) { 16.dp.toPx() }
-                val infoBoxHeight = with(density) { 64.dp.toPx() }
-
-                val showBelow = (highlightRect.bottom + infoBoxPadding + infoBoxHeight) < size.bottom
-                val infoBoxY = if (showBelow) {
-                    highlightRect.bottom + infoBoxPadding
-                } else {
-                    highlightRect.top - infoBoxHeight - infoBoxPadding
-                }
-
-                infoBoxPosition = IntOffset(
-                    x = highlightRect.left.roundToInt(),
-                    y = infoBoxY.roundToInt()
-                )
-            }
-
-            infoBoxPosition?.let { position ->
+                // Add a clickable overlay that covers only the dimmed part (not the spotlight)
                 Box(
-                    Modifier
-                        .offset { position }
-                        .width(with(density) { highlightRect.width.toDp() })
-                        .background(infoBackground, shape = MaterialTheme.shapes.medium)
-                        .padding(16.dp)
-                ) {
-                    Column {
-                        Text(current.info, color = infoTextColor)
-                        if (current.customAction == null) {
-                            Button(
-                                onClick = {
-                                    current.onNext?.invoke()
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectTapGestures { offset ->
+                                // Only intercept taps outside the spotlight area
+                                val spotlightArea = when (current.shape) {
+                                    SpotlightShape.Circle -> {
+                                        val centerX = rect.center.x
+                                        val centerY = rect.center.y
+                                        val radius = min(rect.width, rect.height) / 2
+                                        val dx = offset.x - centerX
+                                        val dy = offset.y - centerY
+                                        (dx * dx + dy * dy) > (radius * radius)  // Outside circle
+                                    }
+                                    else -> {
+                                        offset.x < rect.left || offset.x > rect.right ||
+                                        offset.y < rect.top || offset.y > rect.bottom  // Outside rectangle
+                                    }
+                                }
+
+                                if (spotlightArea) {
+                                    Timber.i("Clicked on dimmed area - intercepting click")
+                                    // Do nothing, just intercept the click
+                                } else {
+                                    Timber.i("Clicked on non-dimmed area - navigating to next target")
+                                    // Trigger the associated action first if available
+                                    current.onClickAction?.invoke()
+
+                                    // Then advance to the next spotlight step
                                     spotlight.next()
-                                },
-                                modifier = Modifier.padding(top = 8.dp)
-                            ) {
-                                Text(nextButtonText)
+                                }
+                            }
+                        }
+                )
+
+                var infoBoxPosition: IntOffset? = null
+
+                boxSize?.let { size ->
+                    val infoBoxPadding = with(density) { 16.dp.toPx() }
+                    val infoBoxHeight = with(density) { 64.dp.toPx() }
+
+                    val showBelow = (highlightRect.bottom + infoBoxPadding + infoBoxHeight) < size.bottom
+                    val infoBoxY = if (showBelow) {
+                        highlightRect.bottom + infoBoxPadding
+                    } else {
+                        highlightRect.top - infoBoxHeight - infoBoxPadding
+                    }
+
+                    infoBoxPosition = IntOffset(
+                        x = highlightRect.left.roundToInt(),
+                        y = infoBoxY.roundToInt()
+                    )
+                }
+
+                infoBoxPosition?.let { position ->
+                    Box(
+                        Modifier
+                            .offset { position }
+                            .width(with(density) { highlightRect.width.toDp() })
+                            .background(infoBackground, shape = MaterialTheme.shapes.medium)
+                            .padding(16.dp)
+                    ) {
+                        Column {
+                            Text(current.info, color = infoTextColor)
+                            if (current.hasNextButton) {
+                                Button(
+                                    onClick = {
+                                        spotlight.next()
+                                    },
+                                    modifier = Modifier.padding(top = 8.dp)
+                                ) {
+                                    Text(nextButtonText)
+                                }
                             }
                         }
                     }
@@ -291,7 +340,8 @@ fun SpotlightPreview() {
                         .spotlightTarget(
                             SpotlightTarget(
                                 order = 0,
-                                info = "This is the title!"
+                                info = "This is the title!",
+                                hasNextButton = true
                             ),
                             spotlight
                         )
@@ -304,7 +354,8 @@ fun SpotlightPreview() {
                         .spotlightTarget(
                             SpotlightTarget(
                                 order = 1,
-                                info = "Tap here to do something!"
+                                info = "Tap here to do something!",
+                                hasNextButton = false
                             ),
                             spotlight
                         )
