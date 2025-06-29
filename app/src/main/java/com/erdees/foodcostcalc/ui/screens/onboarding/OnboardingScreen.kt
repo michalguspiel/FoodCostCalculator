@@ -2,9 +2,10 @@ package com.erdees.foodcostcalc.ui.screens.onboarding
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -13,10 +14,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 
 @Composable
@@ -38,6 +44,11 @@ fun OnboardingScreen(
     OnboardingScreenContent(
         uiState = uiState,
         onShowExampleClick = { viewModel.createSampleDishAndNavigate() },
+        onSkipClick = {
+            navController.navigate(FCCScreen.Products) {
+                popUpTo(FCCScreen.Onboarding) { inclusive = true }
+            }
+        }
     )
 }
 
@@ -45,24 +56,35 @@ fun OnboardingScreen(
 fun OnboardingScreenContent(
     uiState: OnboardingUiState,
     onShowExampleClick: () -> Unit,
+    onSkipClick: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(24.dp),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Welcome to Food Cost Calculator!",
-            style = MaterialTheme.typography.headlineMedium
+            text = stringResource(id = R.string.onboarding_welcome_title),
+            style = MaterialTheme.typography.headlineMedium,
+            textAlign = TextAlign.Center
         )
         Text(
-            text = "See how the app works by viewing an example dish.",
+            text = stringResource(id = R.string.onboarding_welcome_subtitle),
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 16.dp, bottom = 32.dp)
+            modifier = Modifier.padding(top = 16.dp, bottom = 32.dp),
+            textAlign = TextAlign.Center
         )
-        Button(onClick = onShowExampleClick) {
-            Text("Show Me an Example Dish")
-        }
+        FCCPrimaryButton(
+            text = stringResource(id = R.string.onboarding_see_example),
+            onClick = onShowExampleClick
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        FCCTextButton(
+            text = stringResource(id = R.string.onboarding_skip),
+            onClick = onSkipClick
+        )
         if (uiState is OnboardingUiState.Loading) {
             Text("Loading example...", modifier = Modifier.padding(top = 16.dp))
         }
@@ -78,6 +100,7 @@ fun OnboardingScreenContentPreview_Idle() {
     OnboardingScreenContent(
         uiState = OnboardingUiState.Idle,
         onShowExampleClick = {},
+        onSkipClick = {}
     )
 }
 
@@ -87,6 +110,7 @@ fun OnboardingScreenContentPreview_Loading() {
     OnboardingScreenContent(
         uiState = OnboardingUiState.Loading,
         onShowExampleClick = {},
+        onSkipClick = {}
     )
 }
 
@@ -96,5 +120,6 @@ fun OnboardingScreenContentPreview_Error() {
     OnboardingScreenContent(
         uiState = OnboardingUiState.Error("Something went wrong!"),
         onShowExampleClick = {},
+        onSkipClick = {}
     )
 }

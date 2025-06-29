@@ -26,6 +26,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -54,7 +56,6 @@ import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
-import com.erdees.foodcostcalc.ext.conditionally
 import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.Section
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -70,10 +71,6 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.ex
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductForm
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormState
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormViewModel
-import com.erdees.foodcostcalc.ui.spotlight.Spotlight
-import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
-import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlight
-import com.erdees.foodcostcalc.ui.spotlight.spotlightTarget
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -84,8 +81,7 @@ private const val MaxSuggestedProducts = 3
 @Composable
 fun CreateDishStartScreen(
     navController: NavController,
-    isOnboarding: Boolean,
-    spotlight: Spotlight,
+    completedOnboarding: Boolean,
     viewModel: CreateDishV2ViewModel = viewModel(),
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
     existingProductFormViewModel: ExistingProductFormViewModel = viewModel(),
@@ -101,7 +97,18 @@ fun CreateDishStartScreen(
     val isFirstDish by viewModel.isFirstDish.collectAsState()
     val errorRes by viewModel.errorRes.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val snackbarMessage = stringResource(id = R.string.onboarding_complete_snackbar_text)
+
+    LaunchedEffect(completedOnboarding) {
+        if (completedOnboarding) {
+            scope.launch {
+                snackbarHostState.showSnackbar(snackbarMessage)
+            }
+        }
+    }
+
     val newProductFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val existingProductFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -141,6 +148,7 @@ fun CreateDishStartScreen(
             errorRes
         ),
         allowIngredientListAnimation,
+        snackbarHostState,
         viewModel::updateDishName,
         viewModel::updateNewProductName,
         viewModel::onAddIngredientClick,
@@ -149,9 +157,7 @@ fun CreateDishStartScreen(
         viewModel::dismissError,
         onContinueClick = {
             navController.navigate(FCCScreen.CreateDishSummary)
-        },
-        isOnboarding = isOnboarding,
-        spotlight = spotlight
+        }
     )
 
     AnimatedVisibility(userIntent != null) {
@@ -236,6 +242,7 @@ private fun CreateDishStartScreenContent(
     navController: NavController,
     createDishStartScreenState: CreateDishStartScreenState,
     allowAnimation: Boolean,
+    snackbarHostState: SnackbarHostState,
     updateDishName: (String) -> Unit,
     updateNewProductName: (String) -> Unit,
     onAddIngredientClick: () -> Unit,
@@ -243,9 +250,7 @@ private fun CreateDishStartScreenContent(
     onDismissSuggestions: () -> Unit,
     onErrorDismiss: () -> Unit,
     onContinueClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    isOnboarding: Boolean,
-    spotlight: Spotlight
+    modifier: Modifier = Modifier
 ) {
     with(createDishStartScreenState) {
         val dishNameFocusRequester = remember { FocusRequester() }
@@ -254,7 +259,8 @@ private fun CreateDishStartScreenContent(
         }
 
         Scaffold(
-            modifier = modifier, topBar = {
+            modifier = modifier,
+            topBar = {
                 TopAppBar(title = {
                     Text(
                         text = stringResource(
@@ -274,7 +280,6 @@ private fun CreateDishStartScreenContent(
                 })
             }) { paddingValues ->
             Column(
-                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
@@ -295,13 +300,7 @@ private fun CreateDishStartScreenContent(
                         )
                         FCCTextField(
                             modifier = Modifier
-                                .focusRequester(dishNameFocusRequester)
-                                .conditionally(isOnboarding) {
-                                    spotlightTarget(
-                                        SpotlightStep.DishNameField.toSpotlightTarget(),
-                                        spotlight
-                                    )
-                                },
+                                .focusRequester(dishNameFocusRequester),
                             title = null,
                             value = dishName,
                             onValueChange = { updateDishName(it) },
@@ -323,12 +322,7 @@ private fun CreateDishStartScreenContent(
                         )
 
                         FCCTextFieldWithSuggestions(
-                            modifier = Modifier.conditionally(isOnboarding) {
-                                spotlightTarget(
-                                    SpotlightStep.IngredientNameField.toSpotlightTarget(),
-                                    spotlight
-                                )
-                            },
+                            modifier = Modifier,
                             title = null,
                             value = newProductName,
                             placeholder = stringResource(R.string.product_name),
@@ -355,18 +349,16 @@ private fun CreateDishStartScreenContent(
                     FCCPrimaryButton(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp)
-                            .conditionally(isOnboarding) {
-                                spotlightTarget(
-                                    SpotlightStep.AddIngredientButton.toSpotlightTarget(onAddIngredientClick),
-                                    spotlight
-                                )
-                            },
+                            .padding(horizontal = 24.dp),
                         text = stringResource(R.string.add_product),
                         onClick = { onAddIngredientClick() },
                         enabled = newProductName.isNotEmpty()
                     )
                 }
+
+                Spacer(Modifier.weight(1f))
+
+                SnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(vertical = 12.dp))
 
                 Section(Modifier.animateContentSize(tween())) {
                     AnimatedVisibility(
@@ -382,12 +374,7 @@ private fun CreateDishStartScreenContent(
                                 persistentListOf(),
                                 SingleServing,
                                 currency,
-                                modifier = Modifier.conditionally(isOnboarding) {
-                                    spotlightTarget(
-                                        SpotlightStep.AddedIngredientsList.toSpotlightTarget(),
-                                        spotlight
-                                    )
-                                }
+                                modifier = Modifier
                             )
                         }
                     }
@@ -395,13 +382,7 @@ private fun CreateDishStartScreenContent(
                         enabled = dishName.isNotBlank(),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 24.dp)
-                            .conditionally(isOnboarding) {
-                                spotlightTarget(
-                                    SpotlightStep.ContinueToSummaryButton.toSpotlightTarget(),
-                                    spotlight
-                                )
-                            },
+                            .padding(horizontal = 24.dp),
                         text = stringResource(R.string.continue_dish_creation),
                         onClick = {
                             onContinueClick()
@@ -441,15 +422,14 @@ private fun CreateDishStartScreenContentPreview() {
                 errorRes = null
             ),
             allowAnimation = true,
+            snackbarHostState = remember { SnackbarHostState() },
             updateDishName = {},
             updateNewProductName = {},
             onAddIngredientClick = {},
             onContinueClick = {},
             onErrorDismiss = {},
             onSuggestedProductClick = {},
-            onDismissSuggestions = {},
-            isOnboarding = true,
-            spotlight = rememberSpotlight()
+            onDismissSuggestions = {}
         )
     }
 }

@@ -129,8 +129,7 @@ fun FCCNavigation(
             val route: FCCScreen.CreateDishStart = backStackEntry.toRoute()
             CreateDishStartScreen(
                 navController = navController,
-                isOnboarding = route.onboarding,
-                spotlight = spotlight
+                completedOnboarding = route.completedOnboarding,
             )
         }
 

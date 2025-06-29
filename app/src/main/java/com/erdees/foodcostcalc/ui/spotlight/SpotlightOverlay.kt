@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,12 +34,17 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -49,12 +55,13 @@ fun SpotlightOverlay(
     dimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.65f),
     highlightPadding: Dp = 8.dp,
     infoTextColor: Color = MaterialTheme.colorScheme.onBackground,
-    infoBackground: Color = MaterialTheme.colorScheme.background,
+    infoBackground: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     nextButtonText: String = "Next",
     content: @Composable BoxScope.() -> Unit
 ) {
     var boxSize by remember { mutableStateOf<Rect?>(null) }
     val density = LocalDensity.current
+    val scope = rememberCoroutineScope()
 
     // Remember the target rect to animate to
     var targetHighlightRect by remember { mutableStateOf<Rect?>(null) }
@@ -78,7 +85,6 @@ fun SpotlightOverlay(
     ) {
         content()
         val current = spotlight.currentTarget
-        Timber.i("SpotlightOverlay recomposing. isActive: ${spotlight.isActive}, currentTarget: $current")
 
         if (spotlight.isActive && current?.rect != null) {
             val padPx = with(density) { highlightPadding.toPx() }
@@ -172,11 +178,11 @@ fun SpotlightOverlay(
                                 // Do nothing, just intercept the click
                             } else {
                                 Timber.i("Clicked on spotlight area - triggering action and navigating to next target")
-                                // Trigger the associated action first if available
                                 current.onClickAction?.invoke()
-
-                                // Then advance to the next spotlight step
-                                spotlight.next()
+                                scope.launch {
+                                    delay(current.delayAfterActionInMillis)
+                                    spotlight.next()
+                                }
                             }
                         }
                     }
@@ -206,18 +212,16 @@ fun SpotlightOverlay(
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(
-                            text = current.info,
+                            text = stringResource(current.info),
                             color = infoTextColor,
                             textAlign = TextAlign.Center
                         )
                         if (current.hasNextButton) {
-                            Button(
-                                onClick = {
-                                    spotlight.next()
-                                },
+                            FCCPrimaryButton(
+                                nextButtonText,
                                 modifier = Modifier.padding(top = 8.dp)
                             ) {
-                                Text(nextButtonText)
+                                spotlight.next()
                             }
                         }
                     }
@@ -245,7 +249,7 @@ fun SpotlightPreview() {
                         .spotlightTarget(
                             SpotlightTarget(
                                 order = 0,
-                                info = "This is the title!",
+                                info = R.string.products,
                                 hasNextButton = true
                             ),
                             spotlight
@@ -259,7 +263,7 @@ fun SpotlightPreview() {
                         .spotlightTarget(
                             SpotlightTarget(
                                 order = 1,
-                                info = "Tap here to do something!",
+                                info = R.string.spotlight_details_button,
                                 hasNextButton = false
                             ),
                             spotlight

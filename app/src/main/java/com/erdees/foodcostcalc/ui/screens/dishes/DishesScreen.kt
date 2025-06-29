@@ -79,7 +79,6 @@ import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
-import com.erdees.foodcostcalc.ui.screens.onboarding.OnboardingCompletedDialog
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
 import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlight
@@ -144,15 +143,6 @@ fun DishesScreen(
         viewModel::userCanBeAskedForReview
     )
 
-    // Show the onboarding completed dialog if needed
-    if (showOnboardingCompletedDialog) {
-        OnboardingCompletedDialog(
-            onDismiss = {
-                showOnboardingCompletedDialog = false
-            }
-        )
-    }
-
     AskForReviewEffect(
         askForReview = askForReview,
         onReviewLaunch = { viewModel.reviewSuccess() },
@@ -165,7 +155,7 @@ fun DishesScreen(
                 modifier = Modifier.conditionally(isOnboarding) {
                     spotlightTarget(
                         SpotlightStep.CreateDishFAB.toSpotlightTarget {
-                            navController.navigate(FCCScreen.CreateDishStart(onboarding = true))
+                            navController.navigate(FCCScreen.CreateDishStart(completedOnboarding = true))
                         },
                         spotlight
                     )
