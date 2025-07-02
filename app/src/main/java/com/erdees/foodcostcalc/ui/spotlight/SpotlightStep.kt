@@ -7,13 +7,17 @@ enum class SpotlightStep(
     @StringRes val info: Int,
     val shape: SpotlightShape = SpotlightShape.RoundedRectangle,
     val hasNextButton: Boolean = false,
-    val delayAfterActionInMillis: Long = 0L
+    private val delayAfterActionInMillis: Long = 0L
 ) {
     ExampleDishCard(
         info = R.string.spotlight_example_dish_card,
         shape = SpotlightShape.RoundedRectangle,
         hasNextButton = false,
-        delayAfterActionInMillis = 800L
+    ),
+    ExampleDishCardExpanded(
+        info = R.string.spotlight_example_dish_card_expanded,
+        shape = SpotlightShape.RoundedRectangle,
+        hasNextButton = true
     ),
     DishDetails(
         info = R.string.spotlight_dish_details,

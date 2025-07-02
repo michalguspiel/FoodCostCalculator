@@ -9,16 +9,20 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -62,6 +66,7 @@ fun SpotlightOverlay(
     var boxSize by remember { mutableStateOf<Rect?>(null) }
     val density = LocalDensity.current
     val scope = rememberCoroutineScope()
+    var infoBoxHeight by remember { mutableFloatStateOf(0f) }
 
     // Remember the target rect to animate to
     var targetHighlightRect by remember { mutableStateOf<Rect?>(null) }
@@ -191,38 +196,52 @@ fun SpotlightOverlay(
             // Calculate the info box position based on animated highlight rect
             boxSize?.let { size ->
                 val infoBoxPadding = with(density) { 16.dp.toPx() }
-                val infoBoxHeight = with(density) { 64.dp.toPx() }
 
-                val showBelow =
-                    (animatedHighlightRect.bottom + infoBoxPadding + infoBoxHeight) < size.bottom
+                val safeInsets = WindowInsets.safeDrawing.asPaddingValues(density)
+                val topInset = with(density) { safeInsets.calculateTopPadding().toPx() }
+                val bottomInset = with(density) { safeInsets.calculateBottomPadding().toPx() }
+
+                val spaceBelow =
+                    size.bottom - bottomInset - animatedHighlightRect.bottom - infoBoxPadding
+                val spaceAbove = animatedHighlightRect.top - topInset - infoBoxPadding
+
+                val showBelow = (spaceBelow >= infoBoxHeight) || (spaceBelow > spaceAbove)
+
                 val infoBoxY = if (showBelow) {
                     animatedHighlightRect.bottom + infoBoxPadding
                 } else {
                     animatedHighlightRect.top - infoBoxHeight - infoBoxPadding
                 }
 
-                Box(
+                val finalInfoBoxY = infoBoxY.coerceIn(
+                    topInset,
+                    size.height - bottomInset - infoBoxHeight
+                )
+
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .padding(WindowInsets.safeDrawing.asPaddingValues())
                         .padding(horizontal = 16.dp)
-                        .offset { IntOffset(x = 0, y = infoBoxY.roundToInt()) }
+                        .offset { IntOffset(x = 0, y = (finalInfoBoxY - topInset).roundToInt()) }
+                        .onGloballyPositioned { layoutCoordinates ->
+                            infoBoxHeight = layoutCoordinates.size.height.toFloat()
+                        }
                         .background(infoBackground, shape = MaterialTheme.shapes.medium)
                         .padding(16.dp),
-                    contentAlignment = Alignment.Center
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = stringResource(current.info),
-                            color = infoTextColor,
-                            textAlign = TextAlign.Center
-                        )
-                        if (current.hasNextButton) {
-                            FCCPrimaryButton(
-                                nextButtonText,
-                                modifier = Modifier.padding(top = 8.dp)
-                            ) {
-                                spotlight.next()
-                            }
+                    Text(
+                        text = stringResource(current.info),
+                        color = infoTextColor,
+                        textAlign = TextAlign.Center
+                    )
+                    if (current.hasNextButton) {
+                        FCCPrimaryButton(
+                            nextButtonText,
+                            modifier = Modifier.padding(top = 8.dp)
+                        ) {
+                            spotlight.next()
                         }
                     }
                 }

@@ -377,14 +377,19 @@ private fun DishItem(
         modifier
             .fillMaxWidth()
             .conditionally(isFirstDish) {
-                spotlightTarget(
-                    SpotlightStep.ExampleDishCard.toSpotlightTarget(onClickAction = {
-                        if (!isExpanded) {
+                if (isExpanded) {
+                    spotlightTarget(
+                        SpotlightStep.ExampleDishCardExpanded.toSpotlightTarget(),
+                        spotlight
+                    )
+                } else {
+                    spotlightTarget(
+                        SpotlightStep.ExampleDishCard.toSpotlightTarget(onClickAction = {
                             onExpandToggle()
-                        }
-                    }),
-                    spotlight
-                )
+                        }),
+                        spotlight
+                    )
+                }
             }
             .clickable { onExpandToggle() }, content = {
             Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {

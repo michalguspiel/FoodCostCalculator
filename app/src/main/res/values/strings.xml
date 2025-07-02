@@ -297,11 +297,12 @@
     <string name="onboarding_completed_got_it">Got it!</string>
     <string name="spotlight_next">Next</string>
     <string name="spotlight_example_dish_card">We\'ve added a sample dish for you. Tap to expand and see the magic!</string>
+    <string name="spotlight_example_dish_card_expanded">Great! Here’s what’s inside your dish. Check out the details below!</string>
     <string name="spotlight_dish_details">This section shows key financial information for your dish. You can set margin and tax percentages, and adjust the number of portions.</string>
     <string name="spotlight_ingredients_list">Here you can see all the ingredients in your dish and their costs.</string>
     <string name="spotlight_price_summary">This shows the food cost and final price for your dish.</string>
     <string name="spotlight_add_ingredients_button">Add ingredients to your dish by clicking here!</string>
-    <string name="spotlight_details_button">View and edit all dish details by clicking here.</string>
+    <string name="spotlight_details_button">You can view and edit all dish details by clicking here.</string>
     <string name="spotlight_create_dish_fab">Ready to price your own dish? Tap here to start!</string>
     <string name="onboarding_create_dish_title">You\'re All Set!</string>
     <string name="onboarding_create_dish_text">You\'ve successfully learned the basics. Now you\'re ready to create your own dish—fill in the details below to get started!</string>
