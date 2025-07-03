@@ -13,5 +13,5 @@ data class SpotlightTarget(
     val cornerRadius: Dp = 16.dp,
     val hasNextButton: Boolean,
     val onClickAction: (() -> Unit)? = null,
-    val delayAfterActionInMillis: Long = 0L
+    val scrollToElement: (suspend () -> Unit)? = null
 )

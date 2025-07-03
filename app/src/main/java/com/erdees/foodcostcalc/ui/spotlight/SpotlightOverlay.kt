@@ -47,8 +47,7 @@ import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.CoroutineScope
 import timber.log.Timber
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -65,7 +64,6 @@ fun SpotlightOverlay(
 ) {
     var boxSize by remember { mutableStateOf<Rect?>(null) }
     val density = LocalDensity.current
-    val scope = rememberCoroutineScope()
     var infoBoxHeight by remember { mutableFloatStateOf(0f) }
 
     // Remember the target rect to animate to
@@ -183,11 +181,7 @@ fun SpotlightOverlay(
                                 // Do nothing, just intercept the click
                             } else {
                                 Timber.i("Clicked on spotlight area - triggering action and navigating to next target")
-                                current.onClickAction?.invoke()
-                                scope.launch {
-                                    delay(current.delayAfterActionInMillis)
-                                    spotlight.next()
-                                }
+                                spotlight.next()
                             }
                         }
                     }
@@ -254,7 +248,8 @@ fun SpotlightOverlay(
 @PreviewLightDark
 fun SpotlightPreview() {
     FCCTheme {
-        val spotlight = rememberSpotlight()
+        val scope = rememberCoroutineScope()
+        val spotlight = rememberSpotlight(scope)
         LaunchedEffect(Unit) { spotlight.start(SpotlightStep.entries.map { it.toSpotlightTarget() }) }
         SpotlightOverlay(spotlight = spotlight) {
             Column(
@@ -297,7 +292,8 @@ fun SpotlightPreview() {
 }
 
 @Composable
-fun rememberSpotlight() = remember { Spotlight() }
+fun rememberSpotlight(scope: CoroutineScope = rememberCoroutineScope()) = remember { Spotlight(scope) }
+
 fun Modifier.spotlightTarget(
     target: SpotlightTarget,
     spotlight: Spotlight? = null
@@ -305,7 +301,7 @@ fun Modifier.spotlightTarget(
     Modifier
         .onGloballyPositioned { coordinates ->
             val rect = coordinates.boundsInRoot()
-            Timber.i("Spotlight target ${target.order} positioned at $rect")
+            Timber.v("Spotlight target ${target.order} positioned at $rect")
             spotlight?.updateTarget(target.copy(rect = rect))
         }
 )

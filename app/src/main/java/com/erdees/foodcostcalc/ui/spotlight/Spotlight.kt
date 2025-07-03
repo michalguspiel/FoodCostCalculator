@@ -4,9 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class Spotlight {
+class Spotlight(
+    private val scope: CoroutineScope
+) {
     private var targets by mutableStateOf(listOf<SpotlightTarget>())
     private var currentIndex by mutableIntStateOf(-1)
     private var onCompleteCallback: (() -> Unit)? = null
@@ -19,18 +23,26 @@ class Spotlight {
         this.targets = targets
         this.onCompleteCallback = onComplete
         currentIndex = 0
+        scope.launch { currentTarget?.scrollToElement?.invoke() }
     }
 
     fun next() {
-        Timber.i("Spotlight next. Current index: $currentIndex, total targets: ${targets.size}")
+        Timber.i("Spotlight next. Current target: $currentIndex: ${targets.getOrNull(currentIndex)}, total targets: ${targets.size}")
+        // call the action of target before incrementing the index
+        currentTarget?.onClickAction?.invoke()
         if (currentIndex < targets.size - 1) {
+            // Increment the index to move to the next target
             currentIndex++
+            // scroll to the next target if it has a scroll action
+            scope.launch {
+                currentTarget?.scrollToElement?.invoke()
+            }
         } else {
             stop()
         }
     }
 
-    fun stop() {
+    private fun stop() {
         Timber.i("Spotlight stopping.")
         onCompleteCallback?.invoke()
         currentIndex = -1
@@ -45,13 +57,16 @@ class Spotlight {
         // To prevent recomposition loops, we only update if the rect has changed,
         // or if a new action is being set
         if (currentTarget.rect != target.rect ||
-            (currentTarget.onClickAction == null && target.onClickAction != null)) {
+            (currentTarget.onClickAction == null && target.onClickAction != null) ||
+            (currentTarget.scrollToElement == null && target.scrollToElement != null)
+            ) {
             Timber.i("Spotlight updating target ${target.order} with rect ${target.rect}")
             targets = targets.toMutableList().apply {
                 this[index] = currentTarget.copy(
                     rect = target.rect,
                     hasNextButton = target.hasNextButton,
-                    onClickAction = target.onClickAction ?: currentTarget.onClickAction
+                    onClickAction = target.onClickAction ?: currentTarget.onClickAction,
+                    scrollToElement = target.scrollToElement ?: currentTarget.scrollToElement
                 )
             }
         }

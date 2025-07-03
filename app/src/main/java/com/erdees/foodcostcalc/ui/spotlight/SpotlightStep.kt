@@ -6,8 +6,7 @@ import com.erdees.foodcostcalc.R
 enum class SpotlightStep(
     @StringRes val info: Int,
     val shape: SpotlightShape = SpotlightShape.RoundedRectangle,
-    val hasNextButton: Boolean = false,
-    private val delayAfterActionInMillis: Long = 0L
+    val hasNextButton: Boolean = false
 ) {
     ExampleDishCard(
         info = R.string.spotlight_example_dish_card,
@@ -50,13 +49,16 @@ enum class SpotlightStep(
         hasNextButton = false
     );
 
-    fun toSpotlightTarget(onClickAction: (() -> Unit)? = null) = SpotlightTarget(
+    fun toSpotlightTarget(
+        onClickAction: (() -> Unit)? = null,
+        scrollToElement: (suspend () -> Unit)? = null,
+    ) = SpotlightTarget(
         order = ordinal,
         info = info,
         rect = null,
         shape = shape,
         hasNextButton = hasNextButton,
         onClickAction = onClickAction,
-        delayAfterActionInMillis = delayAfterActionInMillis
+        scrollToElement = scrollToElement
     )
 }

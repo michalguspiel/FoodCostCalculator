@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -28,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -99,7 +102,8 @@ data class DishesScreenCallbacks(
     val onExpandToggle: (Item) -> Unit,
     val onChangeServingsClick: (Long) -> Unit,
     val updateSearchKey: (String) -> Unit,
-    val userCanBeAskedForReview: () -> Unit
+    val userCanBeAskedForReview: () -> Unit,
+    val makeFabVisible: () -> Unit
 )
 
 @Composable
@@ -110,8 +114,8 @@ fun DishesScreen(
     spotlight: Spotlight,
     viewModel: DishesScreenViewModel = viewModel()
 ) {
-    val isVisible = rememberSaveable { mutableStateOf(true) }
-    val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
+    val fullUiShown = rememberSaveable { mutableStateOf(true) }
+    val nestedScrollConnection = rememberNestedScrollConnection { fullUiShown.value = it }
     val searchKey by viewModel.searchKey.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
     val listItems by viewModel.filteredDishesInjectedWithAds.collectAsState()
@@ -122,6 +126,10 @@ fun DishesScreen(
 
     // State to track whether to show the onboarding completion dialog
     var showOnboardingCompletedDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(Unit) {
+        fullUiShown.value = true
+    }
 
     LaunchedEffect(listItems) {
         if (isOnboarding) {
@@ -141,7 +149,9 @@ fun DishesScreen(
         viewModel::onChangeServingsClick,
         viewModel::updateSearchKey,
         viewModel::userCanBeAskedForReview
-    )
+    ) {
+        fullUiShown.value = true
+    }
 
     AskForReviewEffect(
         askForReview = askForReview,
@@ -154,13 +164,13 @@ fun DishesScreen(
             FCCAnimatedFAB(
                 modifier = Modifier.conditionally(isOnboarding) {
                     spotlightTarget(
-                        SpotlightStep.CreateDishFAB.toSpotlightTarget {
+                        SpotlightStep.CreateDishFAB.toSpotlightTarget(onClickAction = {
                             navController.navigate(FCCScreen.CreateDishStart(completedOnboarding = true))
-                        },
+                        }),
                         spotlight
                     )
                 },
-                isVisible = isVisible.value,
+                isVisible = fullUiShown.value,
                 contentDescription = stringResource(id = R.string.content_description_create_dish)
             ) {
                 navController.navigate(FCCScreen.CreateDishStart())
@@ -183,7 +193,7 @@ fun DishesScreen(
                         itemsPresentationState,
                         currency,
                         navController,
-                        isVisible.value,
+                        fullUiShown.value,
                         searchKey,
                         callbacks,
                         spotlight
@@ -340,6 +350,9 @@ private fun DishesScreenContent(
                                 onEditClick = {
                                     navController.navigate(FCCScreen.EditDish(item.id))
                                 },
+                                makeFabVisible = {
+                                    callbacks.makeFabVisible()
+                                },
                                 spotlight = spotlight,
                                 isFirstDish = i == 0
                             )
@@ -370,9 +383,15 @@ private fun DishItem(
     onChangeServingsClick: () -> Unit,
     onAddItemsClick: () -> Unit,
     onEditClick: () -> Unit,
+    makeFabVisible: () -> Unit,
     spotlight: Spotlight,
     isFirstDish: Boolean = false
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val detailsRequester = remember { BringIntoViewRequester() }
+    val ingredientsRequester = remember { BringIntoViewRequester() }
+    val priceSummaryRequester = remember { BringIntoViewRequester() }
+    val buttonsRequester = remember { BringIntoViewRequester() }
     Card(
         modifier
             .fillMaxWidth()
@@ -397,12 +416,18 @@ private fun DishItem(
 
                 DishDetails(
                     dishDomain,
-                    modifier = Modifier.conditionally(isFirstDish) {
-                        spotlightTarget(
-                            SpotlightStep.DishDetails.toSpotlightTarget(),
-                            spotlight
-                        )
-                    },
+                    modifier = Modifier
+                        .bringIntoViewRequester(detailsRequester)
+                        .conditionally(isFirstDish) {
+                            spotlightTarget(
+                                SpotlightStep.DishDetails.toSpotlightTarget(scrollToElement = {
+                                    coroutineScope.launch {
+                                        detailsRequester.bringIntoView()
+                                    }
+                                }),
+                                spotlight
+                            )
+                        },
                     onChangeServingsClicked = onChangeServingsClick,
                     servings = servings
                 )
@@ -411,12 +436,16 @@ private fun DishItem(
 
                 if (isExpanded) {
                     Ingredients(
-                        dishDomain, servings, currency, modifier = Modifier.conditionally(isFirstDish) {
-                            spotlightTarget(
-                                SpotlightStep.IngredientsList.toSpotlightTarget(),
-                                spotlight
-                            )
-                        }
+                        dishDomain, servings, currency, modifier = Modifier
+                            .bringIntoViewRequester(ingredientsRequester)
+                            .conditionally(isFirstDish) {
+                                spotlightTarget(
+                                    SpotlightStep.IngredientsList.toSpotlightTarget(scrollToElement = {
+                                            ingredientsRequester.bringIntoView()
+                                    }),
+                                    spotlight
+                                )
+                            }
                     )
                 }
 
@@ -424,37 +453,52 @@ private fun DishItem(
                     dishDomain = dishDomain,
                     servings = servings.toInt(),
                     currency = currency,
-                    modifier = Modifier.conditionally(isFirstDish) {
-                        spotlightTarget(
-                            SpotlightStep.PriceSummary.toSpotlightTarget(),
-                            spotlight
-                        )
-                    }
+                    modifier = Modifier
+                        .bringIntoViewRequester(priceSummaryRequester)
+                        .conditionally(isFirstDish) {
+                            spotlightTarget(
+                                SpotlightStep.PriceSummary.toSpotlightTarget(scrollToElement = {
+                                        priceSummaryRequester.bringIntoView()
+                                }),
+                                spotlight
+                            )
+                        }
                 )
 
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
-                ButtonRow(applyDefaultPadding = false, primaryButton = {
-                    FCCPrimaryButton(
-                        modifier = Modifier.conditionally(isFirstDish) {
-                            spotlightTarget(
-                                SpotlightStep.AddIngredientsButton.toSpotlightTarget(),
-                                spotlight
-                            )
-                        },
-                        text = stringResource(id = R.string.add_items)
-                    ) { onAddItemsClick() }
-                }, secondaryButton = {
-                    FCCTextButton(
-                        modifier = Modifier.conditionally(isFirstDish) {
-                            spotlightTarget(
-                                SpotlightStep.DetailsButton.toSpotlightTarget(),
-                                spotlight
-                            )
-                        },
-                        text = stringResource(id = R.string.details)
-                    ) { onEditClick() }
-                })
+                ButtonRow(
+                    modifier = Modifier.bringIntoViewRequester(buttonsRequester),
+                    applyDefaultPadding = false, primaryButton = {
+                        FCCPrimaryButton(
+                            modifier = Modifier
+                                .conditionally(isFirstDish) {
+                                    spotlightTarget(
+                                        SpotlightStep.AddIngredientsButton.toSpotlightTarget(
+                                            onClickAction = makeFabVisible,
+                                            scrollToElement = {
+                                                    buttonsRequester.bringIntoView()
+                                            }),
+                                        spotlight
+                                    )
+                                },
+                            text = stringResource(id = R.string.add_items)
+                        ) { onAddItemsClick() }
+                    }, secondaryButton = {
+                        FCCTextButton(
+                            modifier = Modifier
+                                .conditionally(isFirstDish) {
+                                    spotlightTarget(
+                                        SpotlightStep.DetailsButton.toSpotlightTarget(
+                                            scrollToElement = {
+                                                    buttonsRequester.bringIntoView()
+                                            }),
+                                        spotlight
+                                    )
+                                },
+                            text = stringResource(id = R.string.details)
+                        ) { onEditClick() }
+                    })
             }
         })
 }
@@ -553,7 +597,8 @@ private fun DishItemPreview() {
                 onChangeServingsClick = { },
                 onAddItemsClick = { },
                 spotlight = rememberSpotlight(),
-                onEditClick = {}
+                onEditClick = {},
+                makeFabVisible = {}
             )
 
             DishItem(
@@ -574,6 +619,7 @@ private fun DishItemPreview() {
                 onAddItemsClick = { },
                 modifier = Modifier,
                 onEditClick = {},
+                makeFabVisible = {},
                 spotlight = rememberSpotlight()
             )
         }
