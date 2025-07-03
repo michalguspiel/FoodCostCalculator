@@ -15,7 +15,7 @@ class Spotlight(
     private var currentIndex by mutableIntStateOf(-1)
     private var onCompleteCallback: (() -> Unit)? = null
 
-    val isActive: Boolean get() = currentIndex >= 0 && currentIndex < targets.size
+    val isActive: Boolean get() = currentIndex >= 0 && currentIndex < targets.size && targets.isNotEmpty()
     val currentTarget: SpotlightTarget? get() = targets.getOrNull(currentIndex)
 
     fun start(targets: List<SpotlightTarget>, onComplete: () -> Unit = {}) {

@@ -6,7 +6,8 @@ import com.erdees.foodcostcalc.R
 enum class SpotlightStep(
     @StringRes val info: Int,
     val shape: SpotlightShape = SpotlightShape.RoundedRectangle,
-    val hasNextButton: Boolean = false
+    val hasNextButton: Boolean = false,
+    val canHideNavBar: Boolean = false
 ) {
     ExampleDishCard(
         info = R.string.spotlight_example_dish_card,
@@ -21,27 +22,32 @@ enum class SpotlightStep(
     DishDetails(
         info = R.string.spotlight_dish_details,
         shape = SpotlightShape.RoundedRectangle,
-        hasNextButton = true
+        hasNextButton = true,
+        canHideNavBar = true
     ),
     IngredientsList(
         info = R.string.spotlight_ingredients_list,
         shape = SpotlightShape.RoundedRectangle,
-        hasNextButton = true
+        hasNextButton = true,
+        canHideNavBar = true
     ),
     PriceSummary(
         info = R.string.spotlight_price_summary,
         shape = SpotlightShape.RoundedRectangle,
-        hasNextButton = true
+        hasNextButton = true,
+        canHideNavBar = true
     ),
     DetailsButton(
         info = R.string.spotlight_details_button,
         shape = SpotlightShape.RoundedRectangle,
-        hasNextButton = true
+        hasNextButton = true,
+        canHideNavBar = true
     ),
     AddIngredientsButton(
         info = R.string.spotlight_add_ingredients_button,
         shape = SpotlightShape.RoundedRectangle,
-        hasNextButton = true
+        hasNextButton = true,
+        canHideNavBar = true
     ),
     CreateDishFAB(
         info = R.string.spotlight_create_dish_fab,
@@ -59,6 +65,7 @@ enum class SpotlightStep(
         shape = shape,
         hasNextButton = hasNextButton,
         onClickAction = onClickAction,
-        scrollToElement = scrollToElement
+        scrollToElement = scrollToElement,
+        canHideNavBar = canHideNavBar
     )
 }

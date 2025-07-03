@@ -7,6 +7,7 @@ import androidx.navigation.NavDestination
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.utils.Constants
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -39,14 +40,32 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
 
     fun showNavBar(
         currentDestination: String?,
+        spotlight: Spotlight? = null,
+        isCompactHeight: Boolean = false
     ): Boolean {
         Timber.i("showNavBar called with currentDestination: $currentDestination")
         if (currentDestination == null) return false
 
-        return bottomNavScreens.any { screen ->
+        val shouldShowForDestination = bottomNavScreens.any { screen ->
             val qualifiedName = screen::class.qualifiedName
             qualifiedName != null && currentDestination.startsWith(qualifiedName)
         }
+
+        if (spotlight?.isActive == true && spotlight.currentTarget?.canHideNavBar == true && isCompactHeight) {
+            return false
+        }
+
+        return shouldShowForDestination
+    }
+
+    fun isCurrentDestinationSelected(
+        currentDestination: String?,
+        screen: FCCScreen
+    ): Boolean {
+        Timber.i("isCurrentDestinationSelected called with currentDestination: $currentDestination, screen: $screen")
+        if (currentDestination == null) return false
+        val qualifiedName = screen::class.qualifiedName
+        return qualifiedName != null && currentDestination.startsWith(qualifiedName)
     }
 
     private var lastLoggedRoute: String? = null

@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -45,19 +46,19 @@ fun FCCHostScreen(
     val currentDestination = navBackStackEntry?.destination?.route
     val spotlight = rememberSpotlight()
 
-    var isNavigationBarVisible by rememberSaveable {
-        mutableStateOf(viewModel.showNavBar(currentDestination))
+    val isCompactHeight = LocalWindowInfo.current.containerSize.height.dp < 400.dp
+
+    var isNavigationBarVisible by rememberSaveable(currentDestination, spotlight.currentTarget, isCompactHeight) {
+        mutableStateOf(viewModel.showNavBar(currentDestination, spotlight, isCompactHeight))
     }
     val bottomNavigationScreens by viewModel.filteredBottomNavScreens.collectAsState()
     val hasSeenExampleDishOnboarding by viewModel.hasSeenExampleDishOnboarding.collectAsState()
     val startDestination = if (hasSeenExampleDishOnboarding) FCCScreen.Products else FCCScreen.Onboarding
-    Timber.i("FCCHostScreen: hasSeenExampleDishOnboarding is $hasSeenExampleDishOnboarding, startDestination is $startDestination")
+    Timber.i("FCCHostScreen: hasSeenExampleDishOnboarding is $hasSeenExampleDishOnboarding, startDestination is $startDestination, spotlight active: ${spotlight.isActive}")
 
-    LaunchedEffect(Unit) {
-        navController.addOnDestinationChangedListener { _, destination, _ ->
-            isNavigationBarVisible = viewModel.showNavBar(destination.route)
-            viewModel.logNavigation(destination)
-        }
+    LaunchedEffect(currentDestination, spotlight.currentTarget, isCompactHeight) {
+        isNavigationBarVisible = viewModel.showNavBar(currentDestination, spotlight, isCompactHeight)
+        navBackStackEntry?.destination?.let { viewModel.logNavigation(it) }
     }
 
     if (bottomNavigationScreens == null) {
@@ -79,9 +80,9 @@ fun FCCHostScreen(
                             bottomNavigationScreens?.forEach { item ->
                                 NavigationBarItem(
                                     enabled = !spotlight.isActive,
-                                    selected = currentDestination == item::class.qualifiedName,
+                                    selected = viewModel.isCurrentDestinationSelected(currentDestination, item),
                                     onClick = {
-                                        if (currentDestination != item::class.qualifiedName) {
+                                        if (!viewModel.isCurrentDestinationSelected(currentDestination, item)) {
                                             navController.navigate(item) {
                                                 popUpTo(item) { inclusive = true }
                                                 launchSingleTop = true

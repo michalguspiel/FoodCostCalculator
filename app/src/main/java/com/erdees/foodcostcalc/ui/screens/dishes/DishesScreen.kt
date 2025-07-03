@@ -33,7 +33,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -124,9 +123,6 @@ fun DishesScreen(
     val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
     val askForReview by viewModel.askForReview.collectAsState()
 
-    // State to track whether to show the onboarding completion dialog
-    var showOnboardingCompletedDialog by remember { mutableStateOf(false) }
-
     LaunchedEffect(Unit) {
         fullUiShown.value = true
     }
@@ -135,8 +131,6 @@ fun DishesScreen(
         if (isOnboarding) {
             Timber.i("DishesScreen: Starting spotlight for onboarding.")
             spotlight.start(SpotlightStep.entries.map { it.toSpotlightTarget() }) {
-                // Show the completion dialog when spotlight tour finishes
-                showOnboardingCompletedDialog = true
                 // Mark onboarding as complete in ViewModel
                 viewModel.onboardingComplete()
             }
