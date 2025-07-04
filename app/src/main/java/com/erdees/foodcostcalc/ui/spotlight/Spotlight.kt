@@ -13,15 +13,13 @@ class Spotlight(
 ) {
     private var targets by mutableStateOf(listOf<SpotlightTarget>())
     private var currentIndex by mutableIntStateOf(-1)
-    private var onCompleteCallback: (() -> Unit)? = null
 
     val isActive: Boolean get() = currentIndex >= 0 && currentIndex < targets.size && targets.isNotEmpty()
     val currentTarget: SpotlightTarget? get() = targets.getOrNull(currentIndex)
 
-    fun start(targets: List<SpotlightTarget>, onComplete: () -> Unit = {}) {
+    fun start(targets: List<SpotlightTarget>) {
         Timber.i("Spotlight starting with ${targets.size} targets.")
         this.targets = targets
-        this.onCompleteCallback = onComplete
         currentIndex = 0
         scope.launch { currentTarget?.scrollToElement?.invoke() }
     }
@@ -44,7 +42,6 @@ class Spotlight(
 
     private fun stop() {
         Timber.i("Spotlight stopping.")
-        onCompleteCallback?.invoke()
         currentIndex = -1
         targets = emptyList()
     }

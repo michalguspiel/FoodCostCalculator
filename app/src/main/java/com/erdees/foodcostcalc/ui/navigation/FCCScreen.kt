@@ -24,7 +24,7 @@ sealed class FCCScreen(
 
     @Keep
     @Serializable
-    data class Dishes(val onboarding: Boolean = false) : FCCScreen(R.string.dishes, R.drawable.dishes)
+    data object Dishes : FCCScreen(R.string.dishes, R.drawable.dishes)
 
     @Keep
     @Serializable

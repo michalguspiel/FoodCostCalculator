@@ -30,11 +30,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.navigation.FCCNavigation
-import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightOverlay
 import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlight
-import timber.log.Timber
 
 @Composable
 @Screen
@@ -52,16 +50,15 @@ fun FCCHostScreen(
         mutableStateOf(viewModel.showNavBar(currentDestination, spotlight, isCompactHeight))
     }
     val bottomNavigationScreens by viewModel.filteredBottomNavScreens.collectAsState()
-    val hasSeenExampleDishOnboarding by viewModel.hasSeenExampleDishOnboarding.collectAsState()
-    val startDestination = if (hasSeenExampleDishOnboarding) FCCScreen.Products else FCCScreen.Onboarding
-    Timber.i("FCCHostScreen: hasSeenExampleDishOnboarding is $hasSeenExampleDishOnboarding, startDestination is $startDestination, spotlight active: ${spotlight.isActive}")
+    val startingDestination by viewModel.startingDestination.collectAsState()
+    val safeStartDestination = startingDestination
 
     LaunchedEffect(currentDestination, spotlight.currentTarget, isCompactHeight) {
         isNavigationBarVisible = viewModel.showNavBar(currentDestination, spotlight, isCompactHeight)
         navBackStackEntry?.destination?.let { viewModel.logNavigation(it) }
     }
 
-    if (bottomNavigationScreens == null) {
+    if (bottomNavigationScreens == null || safeStartDestination == null) {
         ScreenLoadingOverlay(Modifier.fillMaxSize())
     } else {
         SpotlightOverlay(spotlight = spotlight) {
@@ -113,7 +110,7 @@ fun FCCHostScreen(
                     paddingValues = paddingValues,
                     navController = navController,
                     modifier = Modifier.fillMaxSize(),
-                    startDestination = startDestination,
+                    startDestination = safeStartDestination,
                     spotlight = spotlight
                 )
             }

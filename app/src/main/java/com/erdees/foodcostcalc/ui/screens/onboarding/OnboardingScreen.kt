@@ -24,31 +24,42 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
+import com.erdees.foodcostcalc.ui.spotlight.Spotlight
+import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
 
 @Composable
 fun OnboardingScreen(
     navController: NavController,
+    spotlight: Spotlight,
     viewModel: OnboardingViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState) {
-        (uiState as? OnboardingUiState.Success)?.let {
-            navController.navigate(FCCScreen.Dishes(onboarding = true)) {
-                popUpTo(FCCScreen.Onboarding) { inclusive = true }
+        when (uiState) {
+            is OnboardingUiState.Success -> {
+                spotlight.start(SpotlightStep.entries.map { it.toSpotlightTarget() })
+                navController.navigate(FCCScreen.Dishes) {
+                    popUpTo(FCCScreen.Onboarding) { inclusive = true }
+                }
+                viewModel.resetUiState()
             }
-            viewModel.resetUiState()
+
+            is OnboardingUiState.Skipped -> {
+                navController.navigate(FCCScreen.Products) {
+                    popUpTo(FCCScreen.Onboarding) { inclusive = true }
+                }
+                viewModel.resetUiState()
+            }
+
+            else -> {}
         }
     }
 
     OnboardingScreenContent(
         uiState = uiState,
-        onShowExampleClick = { viewModel.createSampleDishAndNavigate() },
-        onSkipClick = {
-            navController.navigate(FCCScreen.Products) {
-                popUpTo(FCCScreen.Onboarding) { inclusive = true }
-            }
-        }
+        onShowExampleClick = { viewModel.startOnboardingCreateSampleDishAndNavigate() },
+        onSkipClick = { viewModel.onboardingSkipped() }
     )
 }
 

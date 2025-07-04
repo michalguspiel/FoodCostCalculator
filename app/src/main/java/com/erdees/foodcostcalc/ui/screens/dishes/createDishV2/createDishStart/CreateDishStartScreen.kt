@@ -54,6 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ingredients
@@ -74,6 +75,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.ne
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val MaxSuggestedProducts = 3
 
@@ -81,7 +83,6 @@ private const val MaxSuggestedProducts = 3
 @Composable
 fun CreateDishStartScreen(
     navController: NavController,
-    completedOnboarding: Boolean,
     viewModel: CreateDishV2ViewModel = viewModel(),
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
     existingProductFormViewModel: ExistingProductFormViewModel = viewModel(),
@@ -96,15 +97,20 @@ fun CreateDishStartScreen(
     val userIntent by viewModel.intent.collectAsState()
     val isFirstDish by viewModel.isFirstDish.collectAsState()
     val errorRes by viewModel.errorRes.collectAsState()
+    val onboardingState by viewModel.onboardingState.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val snackbarMessage = stringResource(id = R.string.onboarding_complete_snackbar_text)
 
-    LaunchedEffect(completedOnboarding) {
-        if (completedOnboarding) {
+
+    LaunchedEffect(onboardingState) {
+        Timber.i("CreateDishStartScreen LaunchedEffect: onboardingState = $onboardingState")
+        // If we are in this screen with OnboardingState.STARTED it means user has just completed it.
+        if (onboardingState == OnboardingState.STARTED) {
             scope.launch {
                 snackbarHostState.showSnackbar(snackbarMessage)
+                viewModel.onboardingComplete()
             }
         }
     }

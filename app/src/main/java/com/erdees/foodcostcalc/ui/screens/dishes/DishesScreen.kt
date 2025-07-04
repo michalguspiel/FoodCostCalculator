@@ -109,7 +109,6 @@ data class DishesScreenCallbacks(
 @Screen
 fun DishesScreen(
     navController: NavController,
-    isOnboarding: Boolean = false,
     spotlight: Spotlight,
     viewModel: DishesScreenViewModel = viewModel()
 ) {
@@ -125,16 +124,6 @@ fun DishesScreen(
 
     LaunchedEffect(Unit) {
         fullUiShown.value = true
-    }
-
-    LaunchedEffect(listItems) {
-        if (isOnboarding) {
-            Timber.i("DishesScreen: Starting spotlight for onboarding.")
-            spotlight.start(SpotlightStep.entries.map { it.toSpotlightTarget() }) {
-                // Mark onboarding as complete in ViewModel
-                viewModel.onboardingComplete()
-            }
-        }
     }
 
     val callbacks = DishesScreenCallbacks(
@@ -156,14 +145,13 @@ fun DishesScreen(
     Scaffold(modifier = Modifier, floatingActionButton = {
         if (!isEmptyListContentVisible) {
             FCCAnimatedFAB(
-                modifier = Modifier.conditionally(isOnboarding) {
-                    spotlightTarget(
+                modifier = Modifier.spotlightTarget(
                         SpotlightStep.CreateDishFAB.toSpotlightTarget(onClickAction = {
                             navController.navigate(FCCScreen.CreateDishStart(completedOnboarding = true))
                         }),
                         spotlight
                     )
-                },
+                ,
                 isVisible = fullUiShown.value,
                 contentDescription = stringResource(id = R.string.content_description_create_dish)
             ) {
@@ -177,7 +165,7 @@ fun DishesScreen(
         ) {
             listItems?.let { listItems ->
                 if (isEmptyListContentVisible) {
-                    EmptyListContent(screen = FCCScreen.Dishes()) {
+                    EmptyListContent(screen = FCCScreen.Dishes) {
                         navController.navigate(FCCScreen.CreateDishStart())
                     }
                 } else {

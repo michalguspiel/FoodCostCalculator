@@ -58,14 +58,8 @@ fun FCCNavigation(
         composable<FCCScreen.HalfProducts> {
             HalfProductsScreen(navController = navController)
         }
-        composable<FCCScreen.Dishes> { backStackEntry ->
-            val route: FCCScreen.Dishes = backStackEntry.toRoute()
-
-            DishesScreen(
-                navController = navController,
-                spotlight = spotlight,
-                isOnboarding = route.onboarding
-            )
+        composable<FCCScreen.Dishes> {
+            DishesScreen(navController = navController, spotlight = spotlight)
         }
         composable<FCCScreen.Settings> {
             SettingsScreen(navController = navController)
@@ -125,12 +119,8 @@ fun FCCNavigation(
             exitTransition = { slideOutHorizontally(targetOffsetX = { -it }) },
             popEnterTransition = { slideInHorizontally(initialOffsetX = { -it }) },
             popExitTransition = null
-        ) { backStackEntry ->
-            val route: FCCScreen.CreateDishStart = backStackEntry.toRoute()
-            CreateDishStartScreen(
-                navController = navController,
-                completedOnboarding = route.completedOnboarding,
-            )
+        ) {
+            CreateDishStartScreen(navController = navController)
         }
 
         composable<FCCScreen.CreateDishSummary>(
@@ -163,7 +153,7 @@ fun FCCNavigation(
         }
 
         composable<FCCScreen.Onboarding> {
-            OnboardingScreen(navController = navController)
+            OnboardingScreen(navController = navController, spotlight = spotlight)
         }
     }
 }

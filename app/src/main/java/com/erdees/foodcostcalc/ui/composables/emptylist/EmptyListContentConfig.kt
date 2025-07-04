@@ -28,7 +28,7 @@ fun FCCScreen.emptyListConfig(): EmptyListContentConfig = when (this) {
         buttonTextRes = R.string.add_half_product
     )
 
-    is FCCScreen.Dishes -> EmptyListContentConfig(
+    FCCScreen.Dishes -> EmptyListContentConfig(
         titleRes = R.string.empty_dish_list_content_title,
         descriptionRes = R.string.empty_dish_list_content_description,
         iconRes = R.drawable.restaurant_24px,

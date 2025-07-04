@@ -11,6 +11,7 @@ import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.data.repository.RecipeRepository
+import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,7 @@ sealed class OnboardingUiState {
     data object Idle : OnboardingUiState()
     data object Loading : OnboardingUiState()
     data class Success(val dishId: Long) : OnboardingUiState()
+    data object Skipped : OnboardingUiState()
     data class Error(val message: String) : OnboardingUiState()
 }
 
@@ -35,9 +37,10 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
     private val _uiState = MutableStateFlow<OnboardingUiState>(OnboardingUiState.Idle)
     val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
 
-    fun createSampleDishAndNavigate() {
+    fun startOnboardingCreateSampleDishAndNavigate() {
         viewModelScope.launch {
             _uiState.value = OnboardingUiState.Loading
+            preferences.setOnboardingState(OnboardingState.STARTED)
             Timber.i("Creating sample dish...")
             try {
                 val addedProducts = sampleIngredients().map { ingredient ->
@@ -75,14 +78,20 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
                 productDishes.forEach {
                     productRepository.addProductDish(it)
                 }
-                // Mark onboarding as seen
-                preferences.setHasSeenExampleDishOnboarding(true)
                 _uiState.value = OnboardingUiState.Success(dishId)
                 Timber.i("Sample dish created successfully with id $dishId. Navigating...")
             } catch (e: Exception) {
                 _uiState.value = OnboardingUiState.Error(e.message ?: "Unknown error")
                 Timber.e(e, "Error creating sample dish.")
             }
+        }
+    }
+
+    fun onboardingSkipped() {
+        viewModelScope.launch {
+            _uiState.value = OnboardingUiState.Loading
+            preferences.setOnboardingState(OnboardingState.SKIPPED)
+            _uiState.value = OnboardingUiState.Skipped
         }
     }
 

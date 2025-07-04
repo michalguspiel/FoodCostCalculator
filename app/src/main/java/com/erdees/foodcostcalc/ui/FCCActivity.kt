@@ -9,7 +9,9 @@ import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.QueryPurchasesParams
+import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.data.Preferences
+import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.ui.screens.hostScreen.FCCHostScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
@@ -31,6 +33,13 @@ class FCCActivity : AppCompatActivity() {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
         Timber.i("onCreate")
+
+        if (BuildConfig.DEBUG) {
+            // Reset onboarding state in debug builds
+            CoroutineScope(Dispatchers.IO).launch {
+                preferences.setOnboardingState(OnboardingState.NOT_STARTED)
+            }
+        }
 
         premiumUtil.billingClient = BillingClient.newBuilder(this)
             .setListener(premiumUtil.purchaseUpdateListener)

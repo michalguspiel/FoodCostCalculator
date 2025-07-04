@@ -5,12 +5,11 @@ import android.icu.util.Currency
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.erdees.foodcostcalc.BuildConfig
+import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.ext.dataStore
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.FeatureVisibilityByInstallDate
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
@@ -42,9 +41,8 @@ interface Preferences {
     val showProductTax: Flow<Boolean>
     suspend fun setShowProductTax(value: Boolean)
 
-    // Onboarding: Has the user seen the example dish onboarding?
-    val hasSeenExampleDishOnboarding: Flow<Boolean>
-    suspend fun setHasSeenExampleDishOnboarding(value: Boolean)
+    val onboardingState: Flow<OnboardingState>
+    suspend fun setOnboardingState(state: OnboardingState)
 }
 
 
@@ -67,7 +65,7 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val IMPERIAL = booleanPreferencesKey(Constants.Preferences.IMPERIAL)
         val SHOW_HALF_PRODUCTS = booleanPreferencesKey(Constants.Preferences.SHOW_HALF_PRODUCTS)
         val SHOW_PRODUCT_TAX = booleanPreferencesKey(Constants.Preferences.SHOW_PRODUCT_TAX_PERCENT)
-        val HAS_SEEN_EXAMPLE_DISH_ONBOARDING = booleanPreferencesKey(Constants.Preferences.HAS_SEEN_EXAMPLE_DISH_ONBOARDING)
+        val ONBOARDING_STATE = stringPreferencesKey(Constants.Preferences.ONBOARDING_STATE)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -156,18 +154,15 @@ class PreferencesImpl(private val context: Context) : Preferences {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_PRODUCT_TAX] = value }
     }
 
-    override val hasSeenExampleDishOnboarding: Flow<Boolean>
-        get() = if (BuildConfig.DEBUG) {
-            Timber.i("Preferences: hasSeenExampleDishOnboarding returning false for DEBUG build.")
-            flowOf(false)
-        } else context.dataStore.data.map { prefs ->
-            val value = prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] ?: false
-            Timber.i("Preferences: hasSeenExampleDishOnboarding read as $value")
-            value
-        }
+    override val onboardingState: Flow<OnboardingState> = context.dataStore.data.map { prefs ->
+        val stateName = prefs[Keys.ONBOARDING_STATE]
+        Timber.i("Fetching onboarding state from preferences $stateName")
+        stateName?.let { OnboardingState.valueOf(it) } ?: OnboardingState.NOT_STARTED
+    }
 
-    override suspend fun setHasSeenExampleDishOnboarding(value: Boolean) {
-        Timber.i("Preferences: Setting hasSeenExampleDishOnboarding to $value")
-        context.dataStore.edit { prefs -> prefs[Keys.HAS_SEEN_EXAMPLE_DISH_ONBOARDING] = value }
+    override suspend fun setOnboardingState(state: OnboardingState) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.ONBOARDING_STATE] = state.name
+        }
     }
 }

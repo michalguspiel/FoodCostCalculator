@@ -102,7 +102,7 @@ object Constants {
         const val SUBSCRIPTION_STATE = "subscription_state"
         const val SHOW_HALF_PRODUCTS = "show_half_products"
         const val SHOW_PRODUCT_TAX_PERCENT = "show_product_tax_percent"
-        const val HAS_SEEN_EXAMPLE_DISH_ONBOARDING = "has_seen_example_dish_onboarding"
+        const val ONBOARDING_STATE = "onboarding_state"
     }
 
 
