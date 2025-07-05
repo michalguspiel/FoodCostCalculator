@@ -8,66 +8,101 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-// TODO IMPLEMENT UNIT TESTS AND REFACTOR
-// CONSIDER MAKING THIS A SINGLETON AND INJECT VIA DI INSTEAD OF REMEMBERING
-class Spotlight(
-    private val scope: CoroutineScope
-) {
-    private var targets by mutableStateOf(listOf<SpotlightTarget>())
+/**
+ * Manages the state and flow of a spotlight tour.
+ * This class is responsible for orchestrating the display of spotlight targets in a sequential manner.
+ *
+ * @param scope The coroutine scope to launch animations and other async operations.
+ */
+class Spotlight(private val scope: CoroutineScope) {
+
+    /** The list of targets to be displayed in the spotlight tour. */
+    internal var targets by mutableStateOf<List<SpotlightTarget>>(emptyList())
+        private set
+
+    /** The index of the currently active target. */
     private var currentIndex by mutableIntStateOf(-1)
 
-    val isActive: Boolean get() = currentIndex >= 0 && currentIndex < targets.size && targets.isNotEmpty()
-    val currentTarget: SpotlightTarget? get() = targets.getOrNull(currentIndex)
+    /** Indicates whether the spotlight tour is currently active. */
+    val isActive: Boolean
+        get() = currentIndex in targets.indices
 
+    /** The currently active spotlight target. */
+    val currentTarget: SpotlightTarget?
+        get() = targets.getOrNull(currentIndex)
+
+    /**
+     * Starts the spotlight tour with a given list of targets.
+     * If the list is empty, the spotlight will not be activated.
+     *
+     * @param targets The list of [SpotlightTarget] to display.
+     */
     fun start(targets: List<SpotlightTarget>) {
         Timber.i("Spotlight starting with ${targets.size} targets.")
         this.targets = targets
-        currentIndex = 0
-        scope.launch { currentTarget?.scrollToElement?.invoke() }
+        if (targets.isNotEmpty()) {
+            currentIndex = 0
+            scrollToCurrentTarget()
+        }
     }
 
+    /**
+     * Moves to the next target in the tour.
+     * If the current target is the last one, the tour is stopped.
+     */
     fun next() {
-        Timber.i("Spotlight next. Current target: $currentIndex: ${targets.getOrNull(currentIndex)}, total targets: ${targets.size}")
-        // call the action of target before incrementing the index
+        if (!isActive) return
+        Timber.i("Spotlight next. Current target: $currentIndex: ${currentTarget}, total targets: ${targets.size}")
+
         currentTarget?.onClickAction?.invoke()
+
         if (currentIndex < targets.size - 1) {
-            // Increment the index to move to the next target
             currentIndex++
-            // scroll to the next target if it has a scroll action
-            scope.launch {
-                currentTarget?.scrollToElement?.invoke()
-            }
+            scrollToCurrentTarget()
         } else {
             stop()
         }
     }
 
+    /** Stops the spotlight tour and cleans up the state. */
     private fun stop() {
         Timber.i("Spotlight stopping.")
         currentIndex = -1
         targets = emptyList()
     }
 
-    fun updateTarget(target: SpotlightTarget) {
-        val index = targets.indexOfFirst { it.order == target.order }
+    /**
+     * Updates a target in the list with new properties.
+     * This is useful for updating a target's position or actions dynamically.
+     *
+     * @param newTarget The target containing the updated properties.
+     */
+    fun updateTarget(newTarget: SpotlightTarget) {
+        val index = targets.indexOfFirst { it.order == newTarget.order }
         if (index == -1) return
 
-        val currentTarget = targets[index]
-        // To prevent recomposition loops, we only update if the rect has changed,
-        // or if a new action is being set
-        if (currentTarget.rect != target.rect ||
-            (currentTarget.onClickAction == null && target.onClickAction != null) ||
-            (currentTarget.scrollToElement == null && target.scrollToElement != null)
-            ) {
-            Timber.i("Spotlight updating target ${target.order} with rect ${target.rect}")
+        val oldTarget = targets[index]
+
+        val needsUpdate = oldTarget.rect != newTarget.rect ||
+                (oldTarget.onClickAction == null && newTarget.onClickAction != null) ||
+                (oldTarget.scrollToElement == null && newTarget.scrollToElement != null)
+
+        if (needsUpdate) {
+            Timber.i("Spotlight updating target ${newTarget.order} with rect ${newTarget.rect}")
             targets = targets.toMutableList().apply {
-                this[index] = currentTarget.copy(
-                    rect = target.rect,
-                    hasNextButton = target.hasNextButton,
-                    onClickAction = target.onClickAction ?: currentTarget.onClickAction,
-                    scrollToElement = target.scrollToElement ?: currentTarget.scrollToElement
+                this[index] = oldTarget.copy(
+                    rect = newTarget.rect,
+                    hasNextButton = newTarget.hasNextButton,
+                    onClickAction = newTarget.onClickAction ?: oldTarget.onClickAction,
+                    scrollToElement = newTarget.scrollToElement ?: oldTarget.scrollToElement
                 )
             }
+        }
+    }
+
+    private fun scrollToCurrentTarget() {
+        scope.launch {
+            currentTarget?.scrollToElement?.invoke()
         }
     }
 }
