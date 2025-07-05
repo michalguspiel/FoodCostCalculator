@@ -37,6 +37,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -63,6 +65,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ext.bringIntoViewWithOffset
 import com.erdees.foodcostcalc.ext.conditionally
 import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.DetailItem
@@ -136,7 +139,7 @@ fun DishesScreen(
         updateSearchKey = viewModel::updateSearchKey,
         userCanBeAskedForReview = viewModel::userCanBeAskedForReview,
         makeFabVisible = { fullUiShown.value = true },
-        hideFab = {  fullUiShown.value = false }
+        hideFab = { fullUiShown.value = false }
     )
 
     AskForReviewEffect(
@@ -149,12 +152,11 @@ fun DishesScreen(
         if (!isEmptyListContentVisible) {
             FCCAnimatedFAB(
                 modifier = Modifier.spotlightTarget(
-                        SpotlightStep.CreateDishFAB.toSpotlightTarget(onClickAction = {
-                            navController.navigate(FCCScreen.CreateDishStart(completedOnboarding = true))
-                        }),
-                        spotlight
-                    )
-                ,
+                    SpotlightStep.CreateDishFAB.toSpotlightTarget(onClickAction = {
+                        navController.navigate(FCCScreen.CreateDishStart(completedOnboarding = true))
+                    }),
+                    spotlight
+                ),
                 isVisible = fullUiShown.value,
                 contentDescription = stringResource(id = R.string.content_description_create_dish)
             ) {
@@ -384,6 +386,14 @@ private fun DishItem(
     val ingredientsRequester = remember { BringIntoViewRequester() }
     val priceSummaryRequester = remember { BringIntoViewRequester() }
     val buttonsRequester = remember { BringIntoViewRequester() }
+
+    val detailsLayoutCoords = remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val ingredientsLayoutCoords = remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val priceSummaryLayoutCoords = remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val buttonsLayoutCoords = remember { mutableStateOf<LayoutCoordinates?>(null) }
+
+    val bringIntoViewOffset = with(LocalDensity.current) { 32.toDp().roundToPx() }
+
     Card(
         modifier
             .fillMaxWidth()
@@ -413,11 +423,15 @@ private fun DishItem(
                     dishDomain,
                     modifier = Modifier
                         .bringIntoViewRequester(detailsRequester)
+                        .onGloballyPositioned { detailsLayoutCoords.value = it }
                         .conditionally(isFirstDish) {
                             spotlightTarget(
                                 SpotlightStep.DishDetails.toSpotlightTarget(scrollToElement = {
+                                    detailsRequester.bringIntoViewWithOffset(
+                                        detailsLayoutCoords.value, bringIntoViewOffset
+                                    )
                                     coroutineScope.launch {
-                                        detailsRequester.bringIntoView()
+
                                     }
                                 }),
                                 spotlight
@@ -433,10 +447,15 @@ private fun DishItem(
                     Ingredients(
                         dishDomain, servings, currency, modifier = Modifier
                             .bringIntoViewRequester(ingredientsRequester)
+                            .onGloballyPositioned { ingredientsLayoutCoords.value = it }
                             .conditionally(isFirstDish) {
                                 spotlightTarget(
                                     SpotlightStep.IngredientsList.toSpotlightTarget(scrollToElement = {
-                                            ingredientsRequester.bringIntoView()
+                                        coroutineScope.launch {
+                                            ingredientsRequester.bringIntoViewWithOffset(
+                                                ingredientsLayoutCoords.value, bringIntoViewOffset
+                                            )
+                                        }
                                     }),
                                     spotlight
                                 )
@@ -450,10 +469,15 @@ private fun DishItem(
                     currency = currency,
                     modifier = Modifier
                         .bringIntoViewRequester(priceSummaryRequester)
+                        .onGloballyPositioned { priceSummaryLayoutCoords.value = it }
                         .conditionally(isFirstDish) {
                             spotlightTarget(
                                 SpotlightStep.PriceSummary.toSpotlightTarget(scrollToElement = {
-                                        priceSummaryRequester.bringIntoView()
+                                    coroutineScope.launch {
+                                        priceSummaryRequester.bringIntoViewWithOffset(
+                                            priceSummaryLayoutCoords.value, bringIntoViewOffset
+                                        )
+                                    }
                                 }),
                                 spotlight
                             )
@@ -463,7 +487,9 @@ private fun DishItem(
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
                 ButtonRow(
-                    modifier = Modifier.bringIntoViewRequester(buttonsRequester),
+                    modifier = Modifier
+                        .bringIntoViewRequester(buttonsRequester)
+                        .onGloballyPositioned { buttonsLayoutCoords.value = it },
                     applyDefaultPadding = false, primaryButton = {
                         FCCPrimaryButton(
                             modifier = Modifier
@@ -472,7 +498,12 @@ private fun DishItem(
                                         SpotlightStep.AddIngredientsButton.toSpotlightTarget(
                                             onClickAction = makeFabVisible,
                                             scrollToElement = {
-                                                    buttonsRequester.bringIntoView()
+                                                coroutineScope.launch {
+                                                    buttonsRequester.bringIntoViewWithOffset(
+                                                        buttonsLayoutCoords.value,
+                                                        bringIntoViewOffset
+                                                    )
+                                                }
                                             }),
                                         spotlight
                                     )
@@ -486,7 +517,12 @@ private fun DishItem(
                                     spotlightTarget(
                                         SpotlightStep.DetailsButton.toSpotlightTarget(
                                             scrollToElement = {
-                                                    buttonsRequester.bringIntoView()
+                                                coroutineScope.launch {
+                                                    buttonsRequester.bringIntoViewWithOffset(
+                                                        buttonsLayoutCoords.value,
+                                                        bringIntoViewOffset
+                                                    )
+                                                }
                                             }),
                                         spotlight
                                     )
