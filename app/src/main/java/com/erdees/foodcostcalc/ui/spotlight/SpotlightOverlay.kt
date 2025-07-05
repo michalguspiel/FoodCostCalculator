@@ -52,6 +52,7 @@ import timber.log.Timber
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+// TODO FIX INFO BOX VISUALLY
 @Composable
 fun SpotlightOverlay(
     spotlight: Spotlight,

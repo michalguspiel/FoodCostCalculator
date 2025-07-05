@@ -90,6 +90,7 @@ object Constants {
 
     object UI {
         const val SEARCH_DEBOUNCE_MS = 500L
+        const val COMPACT_HEIGHT_THRESHOLD_DP = 500
     }
 
     object Preferences {

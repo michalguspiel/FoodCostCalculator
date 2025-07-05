@@ -27,6 +27,7 @@ import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
 
+// TODO FIX THIS VIEW VISUALLY
 @Composable
 fun OnboardingScreen(
     navController: NavController,

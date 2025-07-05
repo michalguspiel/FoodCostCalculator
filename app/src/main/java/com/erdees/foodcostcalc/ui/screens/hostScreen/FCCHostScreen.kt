@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -33,7 +34,10 @@ import com.erdees.foodcostcalc.ui.navigation.FCCNavigation
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightOverlay
 import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlight
+import com.erdees.foodcostcalc.utils.Constants
 
+// TODO TEST PERFORMANCE WITH SPOTLIGHT ACTIVE
+// TODO TEST PERFORMANCE WITH SPOTLIGHT INACTIVE
 @Composable
 @Screen
 fun FCCHostScreen(
@@ -44,7 +48,9 @@ fun FCCHostScreen(
     val currentDestination = navBackStackEntry?.destination?.route
     val spotlight = rememberSpotlight()
 
-    val isCompactHeight = LocalWindowInfo.current.containerSize.height.dp < 400.dp
+    val isCompactHeight = with(LocalDensity.current) {
+        LocalWindowInfo.current.containerSize.height.toDp() < Constants.UI.COMPACT_HEIGHT_THRESHOLD_DP.dp
+    }
 
     var isNavigationBarVisible by rememberSaveable(currentDestination, spotlight.currentTarget, isCompactHeight) {
         mutableStateOf(viewModel.showNavBar(currentDestination, spotlight, isCompactHeight))

@@ -8,6 +8,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
+// TODO IMPLEMENT UNIT TESTS AND REFACTOR
+// CONSIDER MAKING THIS A SINGLETON AND INJECT VIA DI INSTEAD OF REMEMBERING
 class Spotlight(
     private val scope: CoroutineScope
 ) {
