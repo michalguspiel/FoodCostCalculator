@@ -10,7 +10,6 @@ import timber.log.Timber
 
 /**
  * TODO:
- *  - Work on Strings in SpotlightSteps
  *  - Add Analytics
  *  - Test Recompositions
  *  - Test Why Expanding Dish does flicker the UI

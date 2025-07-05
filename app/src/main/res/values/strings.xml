@@ -291,21 +291,29 @@
     <string name="onboarding_see_example">See an Example</string>
     <string name="onboarding_skip">Skip &amp; Start Fresh</string>
     <string name="onboarding_loading_example">Loading example…</string>
-    <string name="onboarding_completed_title">Onboarding Complete!</string>
-    <string name="onboarding_completed_text_1">You\'ve completed the guided tour of Food Cost Calculator. Feel free to explore the app and create your own dishes!</string>
-    <string name="onboarding_completed_text_2">You can always add more ingredients to your example dish or create new dishes from scratch.</string>
-    <string name="onboarding_completed_got_it">Got it!</string>
     <string name="spotlight_next">Next</string>
     <string name="spotlight_example_dish_card">Great! We\'ve added a sample dish for you. Tap to expand and see how it works!</string>
-    <string name="spotlight_example_dish_card_expanded">When expanded, you can see the breakdown of your dish.</string>
-    <string name="spotlight_dish_details">This shows the margin, tax, and number of portions used in the final calculation. You can tap on portions to adjust it.</string>
-    <string name="spotlight_ingredients_list">Here are all the ingredients in your dish. You can see cost breakdown on the right side.</string>
+    <string name="spotlight_example_dish_card_expanded">Let\'s take a look at the details. We\'ll start with the key financial info…</string>
+    <string name="spotlight_dish_details">Here are the key financial details for your dish. Tap \'1 Portion\' to adjust the number of servings.</string>
+    <string name="spotlight_ingredients_list">Each ingredient\'s cost is listed here. Together, they make up your total Food Cost.</string>
     <string name="spotlight_price_summary">This shows the food cost and final price for your dish.</string>
-    <string name="spotlight_add_ingredients_button">…and here to add more ingredients!</string>
-    <string name="spotlight_details_button">Tap here to view and edit dish details…</string>
-    <string name="spotlight_create_dish_fab">Ready to price your own dish? Tap here to start!</string>
-    <string name="onboarding_create_dish_title">You\'re All Set!</string>
-    <string name="onboarding_create_dish_text">You\'ve successfully learned the basics. Now you\'re ready to create your own dish—fill in the details below to get started!</string>
+    <string name="spotlight_details_button">Tap "Details" to edit the dish name, margin, tax, final cost or quantity of each ingredient…</string>
+    <string name="spotlight_add_ingredients_button">…and tap \"Add Items\" to add more ingredients!</string>
+    <string name="spotlight_create_dish_fab">Ready to price your own dish? Tap \'+\' button to start!</string>
     <string name="onboarding_complete_snackbar_text">Onboarding complete. Let\'s get cooking!</string>
     <string name="onboarding_icon_content_description">Onboarding icon</string>
+
+    <!-- Onboarding Sample Data -->
+    <string name="onboarding_recipe_description">A classic cheeseburger recipe.</string>
+    <string name="onboarding_recipe_tips">Use fresh beef for best results.</string>
+    <string name="onboarding_recipe_step1">Shape the beef into a patty.</string>
+    <string name="onboarding_recipe_step2">Grill the patty.</string>
+    <string name="onboarding_recipe_step3">Toast the bun.</string>
+    <string name="onboarding_recipe_step4">Assemble with cheese, lettuce, and bun.</string>
+    <string name="onboarding_unknown_error">Unknown error</string>
+    <string name="onboarding_ingredient_minced_beef">Minced Beef</string>
+    <string name="onboarding_ingredient_burger_bun">Burger Bun</string>
+    <string name="onboarding_ingredient_cheese_slice">Cheese Slice</string>
+    <string name="onboarding_ingredient_lettuce">Lettuce</string>
+    <string name="onboarding_dish_classic_cheeseburger">Classic Cheeseburger</string>
 </resources>
