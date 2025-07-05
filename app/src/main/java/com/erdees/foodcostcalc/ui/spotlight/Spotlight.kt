@@ -1,25 +1,30 @@
 package com.erdees.foodcostcalc.ui.spotlight
 
+import android.os.Bundle
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
+import com.erdees.foodcostcalc.utils.Constants
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 
 /**
  * TODO:
- *  - Add Analytics
  *  - Test Recompositions
  *  - Test Why Expanding Dish does flicker the UI
- *  - Test
  */
 /**
  * Manages the state and flow of a spotlight tour.
  * This class is responsible for orchestrating the display of spotlight targets in a sequential manner.
  */
-class Spotlight(private val scope: CoroutineScope) {
+class Spotlight(private val scope: CoroutineScope) : KoinComponent {
+
+    private val analyticsRepository by inject<AnalyticsRepository>()
 
     /** The list of targets to be displayed in the spotlight tour. */
     internal var targets by mutableStateOf<List<SpotlightTarget>>(emptyList())
@@ -48,6 +53,7 @@ class Spotlight(private val scope: CoroutineScope) {
         this.targets = targets
         if (targets.isNotEmpty()) {
             currentIndex = 0
+            logStepShown()
             scrollToCurrentTarget()
         }
     }
@@ -64,8 +70,10 @@ class Spotlight(private val scope: CoroutineScope) {
 
         if (currentIndex < targets.size - 1) {
             currentIndex++
+            logStepShown()
             scrollToCurrentTarget()
         } else {
+            logCompleted()
             stop()
         }
     }
@@ -107,6 +115,7 @@ class Spotlight(private val scope: CoroutineScope) {
     }
 
     fun clickedOutsideSpotlightArea(){
+        logClickedOutsideSpotlightArea()
         when(currentTarget?.order) {
             SpotlightStep.CreateDishFAB.ordinal -> {
                 stop()
@@ -118,5 +127,35 @@ class Spotlight(private val scope: CoroutineScope) {
         scope.launch {
             currentTarget?.scrollToElement?.invoke()
         }
+    }
+
+    private fun logStepShown() {
+        currentTarget?.let {
+            val bundle = Bundle().apply {
+                putInt(Constants.Analytics.Onboarding.STEP_INDEX, currentIndex)
+                putString(
+                    Constants.Analytics.Onboarding.STEP_NAME,
+                    SpotlightStep.entries.getOrNull(currentIndex)?.name ?: Constants.Analytics.Onboarding.UNKNOWN_STEP
+                )
+            }
+            analyticsRepository.logEvent(Constants.Analytics.Onboarding.STEP_SHOWN, bundle)
+        }
+    }
+
+    private fun logCompleted() {
+        analyticsRepository.logEvent(Constants.Analytics.Onboarding.COMPLETED, null)
+    }
+
+    private fun logClickedOutsideSpotlightArea() {
+        val bundle = Bundle().apply {
+            putInt(Constants.Analytics.Onboarding.STEP_INDEX, currentIndex)
+            putString(
+                Constants.Analytics.Onboarding.STEP_NAME,
+                SpotlightStep.entries.getOrNull(currentIndex)?.name ?: Constants.Analytics.Onboarding.UNKNOWN_STEP
+            )
+        }
+        analyticsRepository.logEvent(
+            Constants.Analytics.Onboarding.OUTSIDE_SPOTLIGHT_AREA_CLICKED, bundle
+        )
     }
 }

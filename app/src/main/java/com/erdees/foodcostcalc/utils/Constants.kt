@@ -41,6 +41,17 @@ object Constants {
         const val REVIEW_FAILURE = "review_failure"
         const val REVIEW_SUCCESS = "review_success"
 
+        object Onboarding {
+            const val STARTED = "onboarding_started"
+            const val SKIPPED = "onboarding_skipped"
+            const val STEP_SHOWN = "onboarding_step_shown"
+            const val STEP_INDEX = "onboarding_step_index"
+            const val STEP_NAME = "onboarding_step_name"
+            const val UNKNOWN_STEP = "unknown_step"
+            const val COMPLETED = "onboarding_completed"
+            const val OUTSIDE_SPOTLIGHT_AREA_CLICKED = "onboarding_outside_spotlight_area_clicked"
+        }
+
         object Buttons {
             const val DISHES_EDIT_DISPLAYED_PORTIONS = "dishes_edit_displayed_portions"
             const val RECIPE_EDIT_DISPLAYED_PORTIONS = "recipe_edit_displayed_portions"

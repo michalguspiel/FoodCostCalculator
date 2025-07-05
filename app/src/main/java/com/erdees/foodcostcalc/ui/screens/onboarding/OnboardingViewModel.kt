@@ -10,11 +10,13 @@ import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.model.local.Recipe
 import com.erdees.foodcostcalc.data.model.local.RecipeStep
 import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.data.repository.RecipeRepository
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
+import com.erdees.foodcostcalc.utils.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -37,6 +39,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
     private val recipeRepository: RecipeRepository by inject()
     private val preferences: Preferences by inject()
     val spotlight: Spotlight by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     private val _uiState = MutableStateFlow<OnboardingUiState>(OnboardingUiState.Idle)
     val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
@@ -44,6 +47,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
     fun startOnboardingCreateSampleDishAndNavigate(context: Context) {
         viewModelScope.launch {
             _uiState.value = OnboardingUiState.Loading
+            analyticsRepository.logEvent(Constants.Analytics.Onboarding.STARTED, null)
             preferences.setOnboardingState(OnboardingState.STARTED)
             Timber.i("Creating sample dish...")
             try {
@@ -94,6 +98,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
     fun onboardingSkipped() {
         viewModelScope.launch {
             _uiState.value = OnboardingUiState.Loading
+            analyticsRepository.logEvent(Constants.Analytics.Onboarding.SKIPPED, null)
             preferences.setOnboardingState(OnboardingState.SKIPPED)
             _uiState.value = OnboardingUiState.Skipped
         }
