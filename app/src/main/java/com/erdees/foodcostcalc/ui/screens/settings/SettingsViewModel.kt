@@ -17,10 +17,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class SettingsViewModel : ViewModel(), KoinComponent {
+class SettingsViewModel(
+    private val analyticsRepository: AnalyticsRepository
+) : ViewModel(), KoinComponent {
 
     private val preferences: Preferences by inject()
 
@@ -71,10 +74,16 @@ class SettingsViewModel : ViewModel(), KoinComponent {
         _settingsModel.value = getSettingsModel()
     }.stateIn(viewModelScope,SharingStarted.Lazily,null)
 
+import android.os.Bundle
+import com.erdees.foodcostcalc.utils.Constants
+
     fun updateDefaultTax(newTax: String) {
         val tax =
             onNumericValueChange(oldValue = _settingsModel.value?.defaultTax ?: "", newValue = newTax)
         _settingsModel.value = _settingsModel.value?.copy(defaultTax = tax)
+        analyticsRepository.logEvent(
+            Constants.Analytics.Settings.SETTINGS_TAX_CHANGED,
+            Bundle().apply { putString(Constants.Analytics.Settings.TAX_VALUE, tax) })
     }
 
     fun updateDefaultMargin(newMargin: String) {
@@ -84,33 +93,51 @@ class SettingsViewModel : ViewModel(), KoinComponent {
                 newValue = newMargin
             )
         _settingsModel.value = _settingsModel.value?.copy(defaultMargin = margin)
+        analyticsRepository.logEvent(
+            Constants.Analytics.Settings.SETTINGS_MARGIN_CHANGED,
+            Bundle().apply { putString(Constants.Analytics.Settings.MARGIN_VALUE, margin) })
     }
 
     fun updateDefaultCurrencyCode(currency: Currency) {
         _settingsModel.value = _settingsModel.value?.copy(currency = currency)
+        analyticsRepository.logEvent(
+            Constants.Analytics.Settings.SETTINGS_CURRENCY_CHANGED,
+            Bundle().apply { putString(Constants.Analytics.Settings.CURRENCY_CODE, currency.currencyCode) })
     }
 
     fun updateMetricUsed(newSetting: Boolean) {
         _settingsModel.value = _settingsModel.value?.copy(metricUsed = newSetting)
+        analyticsRepository.logEvent(
+            Constants.Analytics.Settings.SETTINGS_METRIC_UNITS_USED_CHANGED,
+            Bundle().apply { putBoolean(Constants.Analytics.Settings.IS_ENABLED, newSetting) })
     }
 
     fun updateImperialUsed(newSetting: Boolean) {
         _settingsModel.value = _settingsModel.value?.copy(imperialUsed = newSetting)
+        analyticsRepository.logEvent(
+            Constants.Analytics.Settings.SETTINGS_IMPERIAL_UNITS_USED_CHANGED,
+            Bundle().apply { putBoolean(Constants.Analytics.Settings.IS_ENABLED, newSetting) })
     }
 
     fun updateShowHalfProducts(newSetting: Boolean) {
         _settingsModel.value = _settingsModel.value?.copy(showHalfProducts = newSetting)
+        analyticsRepository.logEvent(
+            Constants.Analytics.Settings.SETTINGS_SHOW_HALF_PRODUCTS_CHANGED,
+            Bundle().apply { putBoolean(Constants.Analytics.Settings.IS_ENABLED, newSetting) })
     }
 
     fun updateShowProductTax(newSetting: Boolean) {
         _settingsModel.value = _settingsModel.value?.copy(showProductTax = newSetting)
+        analyticsRepository.logEvent(
+            Constants.Analytics.Settings.SETTINGS_SHOW_PRODUCT_TAX_CHANGED,
+            Bundle().apply { putBoolean(Constants.Analytics.Settings.IS_ENABLED, newSetting) })
     }
 
     /** Saves settings to preferences. */
     fun saveSettings() {
         _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch {
-            _settingsModel.value?.let {  settingsModel ->
+            _settingsModel.value?.let { settingsModel ->
                 preferences.setDefaultMargin(settingsModel.defaultMargin)
                 preferences.setDefaultTax(settingsModel.defaultTax)
                 settingsModel.currency?.currencyCode?.let {
@@ -120,6 +147,18 @@ class SettingsViewModel : ViewModel(), KoinComponent {
                 preferences.setImperialUsed(settingsModel.imperialUsed)
                 preferences.setShowHalfProducts(settingsModel.showHalfProducts)
                 preferences.setShowProductTax(settingsModel.showProductTax)
+
+                // Log analytics event for saving settings
+                val bundle = Bundle().apply {
+                    putString(Constants.Analytics.Settings.MARGIN_VALUE, settingsModel.defaultMargin)
+                    putString(Constants.Analytics.Settings.TAX_VALUE, settingsModel.defaultTax)
+                    putString(Constants.Analytics.Settings.CURRENCY_CODE, settingsModel.currency?.currencyCode)
+                    putBoolean(Constants.Analytics.Settings.IS_ENABLED + "_metric", settingsModel.metricUsed) // Suffix to distinguish
+                    putBoolean(Constants.Analytics.Settings.IS_ENABLED + "_imperial", settingsModel.imperialUsed) // Suffix to distinguish
+                    putBoolean(Constants.Analytics.Settings.IS_ENABLED + "_half_products", settingsModel.showHalfProducts) // Suffix to distinguish
+                    putBoolean(Constants.Analytics.Settings.IS_ENABLED + "_product_tax", settingsModel.showProductTax) // Suffix to distinguish
+                }
+                analyticsRepository.logEvent(Constants.Analytics.Settings.SETTINGS_SAVED, bundle)
             }
 
         }
