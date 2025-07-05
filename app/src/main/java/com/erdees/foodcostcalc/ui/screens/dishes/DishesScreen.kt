@@ -38,6 +38,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -102,7 +104,8 @@ data class DishesScreenCallbacks(
     val onChangeServingsClick: (Long) -> Unit,
     val updateSearchKey: (String) -> Unit,
     val userCanBeAskedForReview: () -> Unit,
-    val makeFabVisible: () -> Unit
+    val makeFabVisible: () -> Unit,
+    val hideFab: () -> Unit
 )
 
 @Composable
@@ -127,14 +130,14 @@ fun DishesScreen(
     }
 
     val callbacks = DishesScreenCallbacks(
-        viewModel::onAdFailedToLoad,
-        viewModel.listPresentationStateHandler::onExpandToggle,
-        viewModel::onChangeServingsClick,
-        viewModel::updateSearchKey,
-        viewModel::userCanBeAskedForReview
-    ) {
-        fullUiShown.value = true
-    }
+        onAdFailedToLoad = viewModel::onAdFailedToLoad,
+        onExpandToggle = viewModel.listPresentationStateHandler::onExpandToggle,
+        onChangeServingsClick = viewModel::onChangeServingsClick,
+        updateSearchKey = viewModel::updateSearchKey,
+        userCanBeAskedForReview = viewModel::userCanBeAskedForReview,
+        makeFabVisible = { fullUiShown.value = true },
+        hideFab = {  fullUiShown.value = false }
+    )
 
     AskForReviewEffect(
         askForReview = askForReview,
@@ -335,6 +338,9 @@ private fun DishesScreenContent(
                                 makeFabVisible = {
                                     callbacks.makeFabVisible()
                                 },
+                                hideFab = {
+                                    callbacks.hideFab()
+                                },
                                 spotlight = spotlight,
                                 isFirstDish = i == 0
                             )
@@ -366,9 +372,13 @@ private fun DishItem(
     onAddItemsClick: () -> Unit,
     onEditClick: () -> Unit,
     makeFabVisible: () -> Unit,
+    hideFab: () -> Unit,
     spotlight: Spotlight,
     isFirstDish: Boolean = false
 ) {
+    val isCompactHeight = with(LocalDensity.current) {
+        LocalWindowInfo.current.containerSize.height.toDp() < Constants.UI.COMPACT_HEIGHT_THRESHOLD_DP.dp
+    }
     val coroutineScope = rememberCoroutineScope()
     val detailsRequester = remember { BringIntoViewRequester() }
     val ingredientsRequester = remember { BringIntoViewRequester() }
@@ -386,6 +396,9 @@ private fun DishItem(
                 } else {
                     spotlightTarget(
                         SpotlightStep.ExampleDishCard.toSpotlightTarget(onClickAction = {
+                            if (isCompactHeight) {
+                                hideFab()
+                            }
                             onExpandToggle()
                         }),
                         spotlight
@@ -580,7 +593,8 @@ private fun DishItemPreview() {
                 onAddItemsClick = { },
                 spotlight = rememberSpotlight(),
                 onEditClick = {},
-                makeFabVisible = {}
+                makeFabVisible = {},
+                hideFab = {}
             )
 
             DishItem(
@@ -602,6 +616,7 @@ private fun DishItemPreview() {
                 modifier = Modifier,
                 onEditClick = {},
                 makeFabVisible = {},
+                hideFab = {},
                 spotlight = rememberSpotlight()
             )
         }
