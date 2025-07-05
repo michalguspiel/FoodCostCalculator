@@ -6,7 +6,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,9 +19,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -26,8 +32,8 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
+import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
-// TODO FIX THIS VIEW VISUALLY
 @Composable
 fun OnboardingScreen(
     navController: NavController,
@@ -67,27 +73,41 @@ fun OnboardingScreen(
 @Composable
 fun OnboardingScreenContent(
     uiState: OnboardingUiState,
+    modifier: Modifier = Modifier,
     onShowExampleClick: () -> Unit,
     onSkipClick: () -> Unit
 ) {
+    val scrollState = rememberScrollState()
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(24.dp),
+            .verticalScroll(scrollState)
+            .padding(horizontal = 24.dp)
+            .padding(bottom = 12.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Icon(
+            painter = painterResource(R.drawable.chef_hat_24px),
+            contentDescription = stringResource(id = R.string.onboarding_icon_content_description),
+            modifier = Modifier.size(100.dp),
+            tint = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(32.dp))
         Text(
             text = stringResource(id = R.string.onboarding_welcome_title),
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.displayMedium,
             textAlign = TextAlign.Center
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = stringResource(id = R.string.onboarding_welcome_subtitle),
-            style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.padding(top = 16.dp, bottom = 32.dp),
+            style = MaterialTheme.typography.headlineMedium.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
             textAlign = TextAlign.Center
         )
+        Spacer(modifier = Modifier.height(64.dp))
         FCCPrimaryButton(
             text = stringResource(id = R.string.onboarding_see_example),
             onClick = onShowExampleClick
@@ -106,32 +126,17 @@ fun OnboardingScreenContent(
     }
 }
 
-@Preview(showBackground = true)
+@PreviewLightDark
 @Composable
-fun OnboardingScreenContentPreview_Idle() {
-    OnboardingScreenContent(
-        uiState = OnboardingUiState.Idle,
-        onShowExampleClick = {},
-        onSkipClick = {}
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OnboardingScreenContentPreview_Loading() {
-    OnboardingScreenContent(
-        uiState = OnboardingUiState.Loading,
-        onShowExampleClick = {},
-        onSkipClick = {}
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun OnboardingScreenContentPreview_Error() {
-    OnboardingScreenContent(
-        uiState = OnboardingUiState.Error("Something went wrong!"),
-        onShowExampleClick = {},
-        onSkipClick = {}
-    )
+private fun OnboardingScreenContentPreview_Idle() {
+    FCCTheme {
+        Scaffold { padding ->
+            OnboardingScreenContent(
+                modifier = Modifier.padding(padding),
+                uiState = OnboardingUiState.Idle,
+                onShowExampleClick = {},
+                onSkipClick = {}
+            )
+        }
+    }
 }
