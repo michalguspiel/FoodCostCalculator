@@ -109,8 +109,8 @@ fun CreateDishStartScreen(
         // If we are in this screen with OnboardingState.STARTED it means user has just completed it.
         if (onboardingState == OnboardingState.STARTED) {
             scope.launch {
-                snackbarHostState.showSnackbar(snackbarMessage)
                 viewModel.onboardingComplete()
+                snackbarHostState.showSnackbar(snackbarMessage)
             }
         }
     }

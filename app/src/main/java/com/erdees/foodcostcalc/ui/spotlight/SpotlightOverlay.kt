@@ -59,7 +59,7 @@ fun SpotlightOverlay(
     dimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.65f),
     highlightPadding: Dp = 8.dp,
     nextButtonText: String = stringResource(R.string.spotlight_next),
-    content: @Composable() (BoxScope.() -> Unit)
+    content: @Composable (BoxScope.() -> Unit)
 ) {
     var boxSize by remember { mutableStateOf<Rect?>(null) }
     val density = LocalDensity.current

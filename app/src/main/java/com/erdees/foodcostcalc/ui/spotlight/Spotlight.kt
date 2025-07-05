@@ -97,7 +97,7 @@ class Spotlight(private val scope: CoroutineScope) : KoinComponent {
 
         val oldTarget = targets[index]
 
-        val needsUpdate = oldTarget.rect != newTarget.rect ||
+        val needsUpdate = oldTarget.rect != newTarget.rect && (oldTarget.order == currentTarget?.order || newTarget.order == currentTarget?.order) ||
                 (oldTarget.onClickAction == null && newTarget.onClickAction != null) ||
                 (oldTarget.scrollToElement == null && newTarget.scrollToElement != null)
 

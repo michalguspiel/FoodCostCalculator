@@ -18,7 +18,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalWindowInfo
@@ -49,15 +48,14 @@ fun FCCHostScreen(
         LocalWindowInfo.current.containerSize.height.toDp() < Constants.UI.COMPACT_HEIGHT_THRESHOLD_DP.dp
     }
 
-    var isNavigationBarVisible by rememberSaveable(currentDestination, spotlight.currentTarget, isCompactHeight) {
+    val isNavigationBarVisible by rememberSaveable(currentDestination, spotlight.currentTarget, isCompactHeight) {
         mutableStateOf(viewModel.showNavBar(currentDestination, isCompactHeight))
     }
     val bottomNavigationScreens by viewModel.filteredBottomNavScreens.collectAsState()
     val startingDestination by viewModel.startingDestination.collectAsState()
     val safeStartDestination = startingDestination
 
-    LaunchedEffect(currentDestination, spotlight.currentTarget, isCompactHeight) {
-        isNavigationBarVisible = viewModel.showNavBar(currentDestination, isCompactHeight)
+    LaunchedEffect(currentDestination) {
         navBackStackEntry?.destination?.let { viewModel.logNavigation(it) }
     }
 
@@ -79,7 +77,6 @@ fun FCCHostScreen(
                         NavigationBar {
                             bottomNavigationScreens?.forEach { item ->
                                 NavigationBarItem(
-                                    enabled = !spotlight.isActive,
                                     selected = viewModel.isCurrentDestinationSelected(currentDestination, item),
                                     onClick = {
                                         if (!viewModel.isCurrentDestinationSelected(currentDestination, item)) {

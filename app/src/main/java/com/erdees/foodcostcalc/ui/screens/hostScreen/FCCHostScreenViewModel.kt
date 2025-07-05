@@ -40,7 +40,7 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
     private val _startingDestination: MutableStateFlow<FCCScreen?> = MutableStateFlow(null)
     val startingDestination: StateFlow<FCCScreen?> = _startingDestination.onStart {
         getStartingDestination()
-    }.stateIn(viewModelScope, SharingStarted.Lazily, FCCScreen.Dishes)
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, FCCScreen.Dishes)
 
     private fun getStartingDestination() {
         viewModelScope.launch {
@@ -60,7 +60,7 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
         showHalfProducts.filterNotNull().map { show ->
             if (show) bottomNavScreens
             else bottomNavScreens.filterNot { it == FCCScreen.HalfProducts }
-        }.stateIn(viewModelScope, SharingStarted.Lazily, null)
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     fun showNavBar(
         currentDestination: String?,
@@ -70,8 +70,7 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
         if (currentDestination == null) return false
 
         val shouldShowForDestination = bottomNavScreens.any { screen ->
-            val qualifiedName = screen::class.qualifiedName
-            qualifiedName != null && currentDestination.startsWith(qualifiedName)
+            currentDestination == screen::class.qualifiedName
         }
 
         if (spotlight.isActive && spotlight.currentTarget?.canHideNavBar == true && isCompactHeight) {
@@ -86,9 +85,8 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
         screen: FCCScreen
     ): Boolean {
         Timber.i("isCurrentDestinationSelected called with currentDestination: $currentDestination, screen: $screen")
-        if (currentDestination == null) return false
-        val qualifiedName = screen::class.qualifiedName
-        return qualifiedName != null && currentDestination.startsWith(qualifiedName)
+        return if (currentDestination == null) return false
+        else currentDestination == screen::class.qualifiedName
     }
 
     private var lastLoggedRoute: String? = null

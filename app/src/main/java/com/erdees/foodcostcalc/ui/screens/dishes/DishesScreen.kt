@@ -107,7 +107,9 @@ data class DishesScreenCallbacks(
     val updateSearchKey: (String) -> Unit,
     val userCanBeAskedForReview: () -> Unit,
     val makeFabVisible: () -> Unit,
-    val hideFab: () -> Unit
+    val hideFab: () -> Unit,
+    val onAddItemClick: (dishId: Long, dishName: String) -> Unit,
+    val onEditClick: (dishId: Long) -> Unit
 )
 
 @Composable
@@ -131,15 +133,27 @@ fun DishesScreen(
         fullUiShown.value = true
     }
 
-    val callbacks = DishesScreenCallbacks(
-        onAdFailedToLoad = viewModel::onAdFailedToLoad,
-        onExpandToggle = viewModel.listPresentationStateHandler::onExpandToggle,
-        onChangeServingsClick = viewModel::onChangeServingsClick,
-        updateSearchKey = viewModel::updateSearchKey,
-        userCanBeAskedForReview = viewModel::userCanBeAskedForReview,
-        makeFabVisible = { fullUiShown.value = true },
-        hideFab = { fullUiShown.value = false }
-    )
+    val callbacks = remember {
+        DishesScreenCallbacks(
+            onAdFailedToLoad = viewModel::onAdFailedToLoad,
+            onExpandToggle = viewModel.listPresentationStateHandler::onExpandToggle,
+            onChangeServingsClick = viewModel::onChangeServingsClick,
+            updateSearchKey = viewModel::updateSearchKey,
+            userCanBeAskedForReview = viewModel::userCanBeAskedForReview,
+            makeFabVisible = { fullUiShown.value = true },
+            hideFab = { fullUiShown.value = false },
+            onAddItemClick = { dishId, dishName ->
+                navController.navigate(
+                    FCCScreen.AddItemsToDish(
+                        dishId, dishName
+                    )
+                )
+            },
+            onEditClick = { dishId ->
+                navController.navigate(FCCScreen.EditDish(dishId))
+            }
+        )
+    }
 
     AskForReviewEffect(
         askForReview = askForReview,
@@ -178,7 +192,6 @@ fun DishesScreen(
                         listItems,
                         itemsPresentationState,
                         currency,
-                        navController,
                         fullUiShown.value,
                         searchKey,
                         callbacks,
@@ -204,7 +217,7 @@ fun DishesScreen(
                         is InteractionType.EditQuantity -> {
                             val itemId = interactionType.itemId
                             val itemPresentationState =
-                                viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState().value[itemId]
+                                itemsPresentationState[itemId]
                                     ?: ItemPresentationState()
                             val editableQuantity = remember {
                                 mutableStateOf(
@@ -281,7 +294,6 @@ private fun DishesScreenContent(
     listItems: List<AdItem>,
     itemsPresentationState: Map<Long, ItemPresentationState>,
     currency: Currency?,
-    navController: NavController,
     isVisible: Boolean,
     searchKey: String,
     callbacks: DishesScreenCallbacks,
@@ -320,28 +332,7 @@ private fun DishesScreenContent(
                                 isExpanded = itemPresentationState.isExpanded,
                                 servings = itemPresentationState.quantity,
                                 currency = currency,
-                                onExpandToggle = {
-                                    callbacks.onExpandToggle(item)
-                                },
-                                onChangeServingsClick = {
-                                    callbacks.onChangeServingsClick(item.id)
-                                },
-                                onAddItemsClick = {
-                                    navController.navigate(
-                                        FCCScreen.AddItemsToDish(
-                                            item.id, item.name
-                                        )
-                                    )
-                                },
-                                onEditClick = {
-                                    navController.navigate(FCCScreen.EditDish(item.id))
-                                },
-                                makeFabVisible = {
-                                    callbacks.makeFabVisible()
-                                },
-                                hideFab = {
-                                    callbacks.hideFab()
-                                },
+                                callbacks = callbacks,
                                 spotlight = spotlight,
                                 isFirstDish = i == 0
                             )
@@ -367,13 +358,8 @@ private fun DishItem(
     isExpanded: Boolean,
     servings: Double,
     currency: Currency?,
+    callbacks: DishesScreenCallbacks,
     modifier: Modifier = Modifier,
-    onExpandToggle: () -> Unit,
-    onChangeServingsClick: () -> Unit,
-    onAddItemsClick: () -> Unit,
-    onEditClick: () -> Unit,
-    makeFabVisible: () -> Unit,
-    hideFab: () -> Unit,
     spotlight: Spotlight,
     isFirstDish: Boolean = false
 ) {
@@ -397,24 +383,20 @@ private fun DishItem(
         modifier
             .fillMaxWidth()
             .conditionally(isFirstDish) {
-                if (isExpanded) {
-                    spotlightTarget(
-                        SpotlightStep.ExampleDishCardExpanded.toSpotlightTarget(),
-                        spotlight
-                    )
-                } else {
-                    spotlightTarget(
-                        SpotlightStep.ExampleDishCard.toSpotlightTarget(onClickAction = {
-                            if (isCompactHeight) {
-                                hideFab()
-                            }
-                            onExpandToggle()
-                        }),
-                        spotlight
-                    )
-                }
+                spotlightTarget(
+                    SpotlightStep.ExampleDishCardExpanded.toSpotlightTarget(),
+                    spotlight
+                ).spotlightTarget(
+                    SpotlightStep.ExampleDishCard.toSpotlightTarget(onClickAction = {
+                        if (isCompactHeight) {
+                            callbacks.hideFab()
+                        }
+                        callbacks.onExpandToggle(dishDomain)
+                    }),
+                    spotlight
+                )
             }
-            .clickable { onExpandToggle() }, content = {
+            .clickable { callbacks.onExpandToggle(dishDomain) }, content = {
             Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
                 TitleRow(dishDomain.name, isExpanded)
 
@@ -429,14 +411,11 @@ private fun DishItem(
                                     detailsRequester.bringIntoViewWithOffset(
                                         detailsLayoutCoords.value, bringIntoViewOffset
                                     )
-                                    coroutineScope.launch {
-
-                                    }
                                 }),
                                 spotlight
                             )
                         },
-                    onChangeServingsClicked = onChangeServingsClick,
+                    onChangeServingsClicked = { callbacks.onChangeServingsClick(dishDomain.id) },
                     servings = servings
                 )
 
@@ -495,7 +474,7 @@ private fun DishItem(
                                 .conditionally(isFirstDish) {
                                     spotlightTarget(
                                         SpotlightStep.AddIngredientsButton.toSpotlightTarget(
-                                            onClickAction = makeFabVisible,
+                                            onClickAction = callbacks.makeFabVisible,
                                             scrollToElement = {
                                                 coroutineScope.launch {
                                                     buttonsRequester.bringIntoViewWithOffset(
@@ -508,7 +487,7 @@ private fun DishItem(
                                     )
                                 },
                             text = stringResource(id = R.string.add_items)
-                        ) { onAddItemsClick() }
+                        ) { callbacks.onAddItemClick(dishDomain.id, dishDomain.name) }
                     }, secondaryButton = {
                         FCCTextButton(
                             modifier = Modifier
@@ -527,7 +506,7 @@ private fun DishItem(
                                     )
                                 },
                             text = stringResource(id = R.string.details)
-                        ) { onEditClick() }
+                        ) { callbacks.onEditClick(dishDomain.id) }
                     })
             }
         })
@@ -623,13 +602,19 @@ private fun DishItemPreview() {
                 servings = 1.0,
                 currency = Currency.getInstance(Locale.getDefault()),
                 isExpanded = true,
-                onExpandToggle = { },
-                onChangeServingsClick = { },
-                onAddItemsClick = { },
+                callbacks = DishesScreenCallbacks(
+                    onAdFailedToLoad = {},
+                    onExpandToggle = {},
+                    onChangeServingsClick = {},
+                    updateSearchKey = {},
+                    userCanBeAskedForReview = {},
+                    makeFabVisible = {},
+                    hideFab = {},
+                    onAddItemClick = { _, _ -> },
+                    onEditClick = {}
+                ),
                 spotlight = Spotlight(rememberCoroutineScope()),
-                onEditClick = {},
-                makeFabVisible = {},
-                hideFab = {}
+                isFirstDish = true
             )
 
             DishItem(
@@ -645,13 +630,17 @@ private fun DishItemPreview() {
                 servings = 1.0,
                 currency = Currency.getInstance(Locale.getDefault()),
                 isExpanded = false,
-                onExpandToggle = { },
-                onChangeServingsClick = { },
-                onAddItemsClick = { },
-                modifier = Modifier,
-                onEditClick = {},
-                makeFabVisible = {},
-                hideFab = {},
+                callbacks = DishesScreenCallbacks(
+                    onAdFailedToLoad = {},
+                    onExpandToggle = {},
+                    onChangeServingsClick = {},
+                    updateSearchKey = {},
+                    userCanBeAskedForReview = {},
+                    makeFabVisible = {},
+                    hideFab = {},
+                    onAddItemClick = { _, _ -> },
+                    onEditClick = {}
+                ),
                 spotlight = Spotlight(rememberCoroutineScope())
             )
         }
