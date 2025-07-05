@@ -21,7 +21,8 @@ class Spotlight(private val scope: CoroutineScope) {
         private set
 
     /** The index of the currently active target. */
-    private var currentIndex by mutableIntStateOf(-1)
+    var currentIndex by mutableIntStateOf(-1)
+        private set
 
     /** Indicates whether the spotlight tour is currently active. */
     val isActive: Boolean

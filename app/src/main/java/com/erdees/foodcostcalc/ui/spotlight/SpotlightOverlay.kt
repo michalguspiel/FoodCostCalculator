@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.spotlight
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateRectAsState
@@ -48,6 +49,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -57,14 +59,13 @@ fun SpotlightOverlay(
     spotlight: Spotlight,
     dimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.65f),
     highlightPadding: Dp = 8.dp,
-    infoTextColor: Color = MaterialTheme.colorScheme.onBackground,
-    infoBackground: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
     nextButtonText: String = stringResource(R.string.spotlight_next),
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable() (BoxScope.() -> Unit)
 ) {
     var boxSize by remember { mutableStateOf<Rect?>(null) }
     val density = LocalDensity.current
     var infoBoxHeight by remember { mutableFloatStateOf(0f) }
+    var showInfoBox by remember { mutableStateOf(false) }
 
     // Remember the target rect to animate to
     var targetHighlightRect by remember { mutableStateOf<Rect?>(null) }
@@ -88,6 +89,15 @@ fun SpotlightOverlay(
     ) {
         content()
         val current = spotlight.currentTarget
+
+        LaunchedEffect(current) {
+            if (current != null) {
+                if (spotlight.currentIndex == 0) {
+                    delay(500)
+                }
+                showInfoBox = true
+            }
+        }
 
         if (spotlight.isActive && current?.rect != null) {
             val padPx = with(density) { highlightPadding.toPx() }
@@ -213,30 +223,32 @@ fun SpotlightOverlay(
                     size.height - bottomInset - infoBoxHeight
                 )
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(WindowInsets.safeDrawing.asPaddingValues())
-                        .padding(horizontal = 16.dp)
-                        .offset { IntOffset(x = 0, y = (finalInfoBoxY - topInset).roundToInt()) }
-                        .onGloballyPositioned { layoutCoordinates ->
-                            infoBoxHeight = layoutCoordinates.size.height.toFloat()
-                        }
-                        .background(infoBackground, shape = MaterialTheme.shapes.medium)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = stringResource(current.info),
-                        color = infoTextColor,
-                        textAlign = TextAlign.Center
-                    )
-                    if (current.hasNextButton) {
-                        FCCPrimaryButton(
-                            nextButtonText,
-                            modifier = Modifier.padding(top = 8.dp)
-                        ) {
-                            spotlight.next()
+                AnimatedVisibility(showInfoBox) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(WindowInsets.safeDrawing.asPaddingValues())
+                            .padding(horizontal = 16.dp)
+                            .offset { IntOffset(x = 0, y = (finalInfoBoxY - topInset).roundToInt()) }
+                            .onGloballyPositioned { layoutCoordinates ->
+                                infoBoxHeight = layoutCoordinates.size.height.toFloat()
+                            }
+                            .background(MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.medium)
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = stringResource(current.info),
+                            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+                            textAlign = TextAlign.Center
+                        )
+                        if (current.hasNextButton) {
+                            FCCPrimaryButton(
+                                nextButtonText,
+                                modifier = Modifier.padding(top = 8.dp)
+                            ) {
+                                spotlight.next()
+                            }
                         }
                     }
                 }
