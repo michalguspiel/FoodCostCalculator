@@ -9,10 +9,16 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
+ * TODO:
+ *  - Work on Strings in SpotlightSteps
+ *  - Add Analytics
+ *  - Test Recompositions
+ *  - Test Why Expanding Dish does flicker the UI
+ *  - Test
+ */
+/**
  * Manages the state and flow of a spotlight tour.
  * This class is responsible for orchestrating the display of spotlight targets in a sequential manner.
- *
- * @param scope The coroutine scope to launch animations and other async operations.
  */
 class Spotlight(private val scope: CoroutineScope) {
 

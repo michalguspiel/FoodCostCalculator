@@ -27,6 +27,7 @@ import timber.log.Timber
 class FCCHostScreenViewModel : ViewModel(), KoinComponent {
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
+    val spotlight: Spotlight by inject()
 
     private val showHalfProducts = preferences.showHalfProducts.stateIn(
         viewModelScope, SharingStarted.Eagerly, null
@@ -63,7 +64,6 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
 
     fun showNavBar(
         currentDestination: String?,
-        spotlight: Spotlight? = null,
         isCompactHeight: Boolean = false
     ): Boolean {
         Timber.i("showNavBar called with currentDestination: $currentDestination")
@@ -74,7 +74,7 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
             qualifiedName != null && currentDestination.startsWith(qualifiedName)
         }
 
-        if (spotlight?.isActive == true && spotlight.currentTarget?.canHideNavBar == true && isCompactHeight) {
+        if (spotlight.isActive && spotlight.currentTarget?.canHideNavBar == true && isCompactHeight) {
             return false
         }
 

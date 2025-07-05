@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import timber.log.Timber
 import kotlin.math.min
@@ -261,8 +260,7 @@ fun SpotlightOverlay(
 @PreviewLightDark
 fun SpotlightPreview() {
     FCCTheme {
-        val scope = rememberCoroutineScope()
-        val spotlight = rememberSpotlight(scope)
+        val spotlight = Spotlight(rememberCoroutineScope())
         LaunchedEffect(Unit) { spotlight.start(SpotlightStep.entries.map { it.toSpotlightTarget() }) }
         SpotlightOverlay(spotlight = spotlight) {
             Column(
@@ -303,9 +301,6 @@ fun SpotlightPreview() {
         }
     }
 }
-
-@Composable
-fun rememberSpotlight(scope: CoroutineScope = rememberCoroutineScope()) = remember { Spotlight(scope) }
 
 fun Modifier.spotlightTarget(
     target: SpotlightTarget,

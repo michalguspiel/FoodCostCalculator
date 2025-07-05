@@ -8,6 +8,7 @@ import com.erdees.foodcostcalc.data.di.dbModule
 import com.erdees.foodcostcalc.data.di.remoteDataModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
 import com.erdees.foodcostcalc.domain.usecase.di.useCaseModule
+import com.erdees.foodcostcalc.ui.di.appModule
 import com.erdees.foodcostcalc.utils.di.utilModule
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
@@ -26,7 +27,7 @@ class MyApplication : Application() {
 
     // modules that need to be restarted after database recreation
     private val reloadableModules = listOf(dbModule, repositoryModule)
-    private val otherModules = listOf(utilModule, remoteDataModule, useCaseModule)
+    private val otherModules = listOf(appModule, utilModule, remoteDataModule, useCaseModule)
 
     override fun onCreate() {
         super.onCreate()

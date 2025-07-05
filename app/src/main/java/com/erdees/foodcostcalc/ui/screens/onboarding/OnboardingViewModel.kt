@@ -12,6 +12,7 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.data.repository.RecipeRepository
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
+import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +34,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
     private val dishRepository: DishRepository by inject()
     private val recipeRepository: RecipeRepository by inject()
     private val preferences: Preferences by inject()
+    val spotlight: Spotlight by inject()
 
     private val _uiState = MutableStateFlow<OnboardingUiState>(OnboardingUiState.Idle)
     val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()

@@ -10,6 +10,7 @@ import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
+import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
 import com.erdees.foodcostcalc.utils.Constants
@@ -30,6 +31,7 @@ class DishesScreenViewModel : FCCBaseViewModel(), KoinComponent {
     private val dishRepository: DishRepository by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
     private val preferences: Preferences by inject()
+    val spotlight: Spotlight by inject()
 
     val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
     val listPresentationStateHandler = ListPresentationStateHandler { resetScreenState() }

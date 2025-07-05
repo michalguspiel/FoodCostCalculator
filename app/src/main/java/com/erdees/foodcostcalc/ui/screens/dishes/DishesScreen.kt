@@ -88,7 +88,6 @@ import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
-import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlight
 import com.erdees.foodcostcalc.ui.spotlight.spotlightTarget
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
@@ -115,7 +114,6 @@ data class DishesScreenCallbacks(
 @Screen
 fun DishesScreen(
     navController: NavController,
-    spotlight: Spotlight,
     viewModel: DishesScreenViewModel = viewModel()
 ) {
     val fullUiShown = rememberSaveable { mutableStateOf(true) }
@@ -127,6 +125,7 @@ fun DishesScreen(
     val currency by viewModel.currency.collectAsState()
     val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
     val askForReview by viewModel.askForReview.collectAsState()
+    val spotlight = viewModel.spotlight
 
     LaunchedEffect(Unit) {
         fullUiShown.value = true
@@ -627,7 +626,7 @@ private fun DishItemPreview() {
                 onExpandToggle = { },
                 onChangeServingsClick = { },
                 onAddItemsClick = { },
-                spotlight = rememberSpotlight(),
+                spotlight = Spotlight(rememberCoroutineScope()),
                 onEditClick = {},
                 makeFabVisible = {},
                 hideFab = {}
@@ -653,7 +652,7 @@ private fun DishItemPreview() {
                 onEditClick = {},
                 makeFabVisible = {},
                 hideFab = {},
-                spotlight = rememberSpotlight()
+                spotlight = Spotlight(rememberCoroutineScope())
             )
         }
     }

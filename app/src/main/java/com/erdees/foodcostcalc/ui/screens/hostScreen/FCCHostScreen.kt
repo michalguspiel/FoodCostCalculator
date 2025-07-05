@@ -33,11 +33,8 @@ import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.navigation.FCCNavigation
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightOverlay
-import com.erdees.foodcostcalc.ui.spotlight.rememberSpotlight
 import com.erdees.foodcostcalc.utils.Constants
 
-// TODO TEST PERFORMANCE WITH SPOTLIGHT ACTIVE
-// TODO TEST PERFORMANCE WITH SPOTLIGHT INACTIVE
 @Composable
 @Screen
 fun FCCHostScreen(
@@ -46,21 +43,21 @@ fun FCCHostScreen(
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination?.route
-    val spotlight = rememberSpotlight()
+    val spotlight = viewModel.spotlight
 
     val isCompactHeight = with(LocalDensity.current) {
         LocalWindowInfo.current.containerSize.height.toDp() < Constants.UI.COMPACT_HEIGHT_THRESHOLD_DP.dp
     }
 
     var isNavigationBarVisible by rememberSaveable(currentDestination, spotlight.currentTarget, isCompactHeight) {
-        mutableStateOf(viewModel.showNavBar(currentDestination, spotlight, isCompactHeight))
+        mutableStateOf(viewModel.showNavBar(currentDestination, isCompactHeight))
     }
     val bottomNavigationScreens by viewModel.filteredBottomNavScreens.collectAsState()
     val startingDestination by viewModel.startingDestination.collectAsState()
     val safeStartDestination = startingDestination
 
     LaunchedEffect(currentDestination, spotlight.currentTarget, isCompactHeight) {
-        isNavigationBarVisible = viewModel.showNavBar(currentDestination, spotlight, isCompactHeight)
+        isNavigationBarVisible = viewModel.showNavBar(currentDestination, isCompactHeight)
         navBackStackEntry?.destination?.let { viewModel.logNavigation(it) }
     }
 
@@ -117,7 +114,6 @@ fun FCCHostScreen(
                     navController = navController,
                     modifier = Modifier.fillMaxSize(),
                     startDestination = safeStartDestination,
-                    spotlight = spotlight
                 )
             }
         }

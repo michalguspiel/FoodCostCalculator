@@ -30,16 +30,15 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
-import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
 @Composable
 fun OnboardingScreen(
     navController: NavController,
-    spotlight: Spotlight,
     viewModel: OnboardingViewModel = viewModel()
 ) {
+    val spotlight = viewModel.spotlight
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState) {
