@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.spotlight
 
 import androidx.compose.ui.geometry.Rect
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
@@ -16,6 +17,9 @@ import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import org.koin.core.context.startKoin
+import org.koin.core.context.stopKoin
+import org.koin.dsl.module
 
 @ExperimentalCoroutinesApi
 class SpotlightTest {
@@ -25,15 +29,25 @@ class SpotlightTest {
 
     private lateinit var spotlight: Spotlight
 
+    private val analyticsRepository = mockk<AnalyticsRepository>(relaxed = true)
+
     @Before
     fun setUp() {
         testScope = TestScope(testDispatcher)
         spotlight = Spotlight(testScope)
+        startKoin {
+            modules(
+                module {
+                    single { analyticsRepository }
+                }
+            )
+        }
     }
 
     @After
     fun tearDown() {
         clearAllMocks()
+        stopKoin()
     }
 
     @Test
