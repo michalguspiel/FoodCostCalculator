@@ -52,7 +52,6 @@ import timber.log.Timber
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-// TODO FIX INFO BOX VISUALLY
 @Composable
 fun SpotlightOverlay(
     spotlight: Spotlight,
@@ -60,7 +59,7 @@ fun SpotlightOverlay(
     highlightPadding: Dp = 8.dp,
     infoTextColor: Color = MaterialTheme.colorScheme.onBackground,
     infoBackground: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
-    nextButtonText: String = "Next",
+    nextButtonText: String = stringResource(R.string.spotlight_next),
     content: @Composable BoxScope.() -> Unit
 ) {
     var boxSize by remember { mutableStateOf<Rect?>(null) }
@@ -179,6 +178,7 @@ fun SpotlightOverlay(
 
                             if (isOutsideSpotlight) {
                                 Timber.i("Clicked on dimmed area - intercepting click")
+                                spotlight.clickedOutsideSpotlightArea()
                                 // Do nothing, just intercept the click
                             } else {
                                 Timber.i("Clicked on spotlight area - triggering action and navigating to next target")

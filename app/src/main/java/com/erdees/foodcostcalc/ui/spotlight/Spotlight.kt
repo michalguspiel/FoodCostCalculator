@@ -100,6 +100,14 @@ class Spotlight(private val scope: CoroutineScope) {
         }
     }
 
+    fun clickedOutsideSpotlightArea(){
+        when(currentTarget?.order) {
+            SpotlightStep.CreateDishFAB.ordinal -> {
+                stop()
+            }
+        }
+    }
+
     private fun scrollToCurrentTarget() {
         scope.launch {
             currentTarget?.scrollToElement?.invoke()

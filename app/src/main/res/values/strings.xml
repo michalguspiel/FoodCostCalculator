@@ -296,7 +296,7 @@
     <string name="onboarding_completed_text_2">You can always add more ingredients to your example dish or create new dishes from scratch.</string>
     <string name="onboarding_completed_got_it">Got it!</string>
     <string name="spotlight_next">Next</string>
-    <string name="spotlight_example_dish_card">We\'ve added a sample dish for you. Tap to expand and see the magic!</string>
+    <string name="spotlight_example_dish_card">Great! We\'ve added a sample dish for you. Tap to expand and see how it works!</string>
     <string name="spotlight_example_dish_card_expanded">Great! Here’s what’s inside your dish. Check out the details below!</string>
     <string name="spotlight_dish_details">This section shows key financial information for your dish. You can set margin and tax percentages, and adjust the number of portions.</string>
     <string name="spotlight_ingredients_list">Here you can see all the ingredients in your dish and their costs.</string>
