@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
  */
 fun Modifier.conditionally(condition: Boolean, modifier: Modifier.() -> Modifier): Modifier {
     return if (condition) {
-        then(modifier(Modifier))
+        this.modifier()
     } else {
         this
     }
