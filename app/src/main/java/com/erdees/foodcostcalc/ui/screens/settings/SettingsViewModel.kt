@@ -23,11 +23,10 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class SettingsViewModel(
-    private val analyticsRepository: AnalyticsRepository
-) : ViewModel(), KoinComponent {
+class SettingsViewModel: ViewModel(), KoinComponent {
 
     private val preferences: Preferences by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     private var _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
     val screenState = _screenState
