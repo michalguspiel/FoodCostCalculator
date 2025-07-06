@@ -11,6 +11,7 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
+import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.errors.InvalidMarginFormatException
@@ -57,6 +58,9 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
     private var _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
+
+    val onboardingState: StateFlow<OnboardingState?> =
+        preferences.onboardingState.stateIn(viewModelScope, Eagerly, null)
 
     val isFirstDish: StateFlow<Boolean> = dishRepository.dishes.map {
         it.isEmpty()
@@ -448,5 +452,11 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      */
     fun resetSaveDishSuccess() {
         _saveDishSuccess.value = null
+    }
+
+    fun onboardingComplete() {
+        viewModelScope.launch {
+            preferences.setOnboardingState(OnboardingState.FINISHED)
+        }
     }
 }

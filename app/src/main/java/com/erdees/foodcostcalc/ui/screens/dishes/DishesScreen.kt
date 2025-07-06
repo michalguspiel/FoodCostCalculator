@@ -17,6 +17,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -28,13 +30,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -58,6 +65,8 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ext.bringIntoViewWithOffset
+import com.erdees.foodcostcalc.ext.conditionally
 import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.Ingredients
@@ -77,6 +86,9 @@ import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.composables.rows.PriceRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
+import com.erdees.foodcostcalc.ui.spotlight.Spotlight
+import com.erdees.foodcostcalc.ui.spotlight.SpotlightStep
+import com.erdees.foodcostcalc.ui.spotlight.spotlightTarget
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
@@ -93,15 +105,21 @@ data class DishesScreenCallbacks(
     val onExpandToggle: (Item) -> Unit,
     val onChangeServingsClick: (Long) -> Unit,
     val updateSearchKey: (String) -> Unit,
-    val userCanBeAskedForReview: () -> Unit
+    val userCanBeAskedForReview: () -> Unit,
+    val makeFabVisible: () -> Unit,
+    val hideFab: () -> Unit,
+    val onAddItemClick: (dishId: Long, dishName: String) -> Unit,
+    val onEditClick: (dishId: Long) -> Unit
 )
 
 @Composable
 @Screen
-fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel = viewModel()) {
-
-    val isVisible = rememberSaveable { mutableStateOf(true) }
-    val nestedScrollConnection = rememberNestedScrollConnection { isVisible.value = it }
+fun DishesScreen(
+    navController: NavController,
+    viewModel: DishesScreenViewModel = viewModel()
+) {
+    val fullUiShown = rememberSaveable { mutableStateOf(true) }
+    val nestedScrollConnection = rememberNestedScrollConnection { fullUiShown.value = it }
     val searchKey by viewModel.searchKey.collectAsState()
     val screenState by viewModel.screenState.collectAsState()
     val listItems by viewModel.filteredDishesInjectedWithAds.collectAsState()
@@ -109,14 +127,33 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
     val currency by viewModel.currency.collectAsState()
     val itemsPresentationState by viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState()
     val askForReview by viewModel.askForReview.collectAsState()
+    val spotlight = viewModel.spotlight
 
-    val callbacks = DishesScreenCallbacks(
-        viewModel::onAdFailedToLoad,
-        viewModel.listPresentationStateHandler::onExpandToggle,
-        viewModel::onChangeServingsClick,
-        viewModel::updateSearchKey,
-        viewModel::userCanBeAskedForReview
-    )
+    LaunchedEffect(Unit) {
+        fullUiShown.value = true
+    }
+
+    val callbacks = remember {
+        DishesScreenCallbacks(
+            onAdFailedToLoad = viewModel::onAdFailedToLoad,
+            onExpandToggle = viewModel.listPresentationStateHandler::onExpandToggle,
+            onChangeServingsClick = viewModel::onChangeServingsClick,
+            updateSearchKey = viewModel::updateSearchKey,
+            userCanBeAskedForReview = viewModel::userCanBeAskedForReview,
+            makeFabVisible = { fullUiShown.value = true },
+            hideFab = { fullUiShown.value = false },
+            onAddItemClick = { dishId, dishName ->
+                navController.navigate(
+                    FCCScreen.AddItemsToDish(
+                        dishId, dishName
+                    )
+                )
+            },
+            onEditClick = { dishId ->
+                navController.navigate(FCCScreen.EditDish(dishId))
+            }
+        )
+    }
 
     AskForReviewEffect(
         askForReview = askForReview,
@@ -127,7 +164,13 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
     Scaffold(modifier = Modifier, floatingActionButton = {
         if (!isEmptyListContentVisible) {
             FCCAnimatedFAB(
-                isVisible = isVisible.value,
+                modifier = Modifier.spotlightTarget(
+                    SpotlightStep.CreateDishFAB.toSpotlightTarget(onClickAction = {
+                        navController.navigate(FCCScreen.CreateDishStart)
+                    }),
+                    spotlight
+                ),
+                isVisible = fullUiShown.value,
                 contentDescription = stringResource(id = R.string.content_description_create_dish)
             ) {
                 navController.navigate(FCCScreen.CreateDishStart)
@@ -149,10 +192,10 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                         listItems,
                         itemsPresentationState,
                         currency,
-                        navController,
-                        isVisible.value,
+                        fullUiShown.value,
                         searchKey,
-                        callbacks
+                        callbacks,
+                        spotlight
                     )
                 }
             } ?: ScreenLoadingOverlay(Modifier.fillMaxSize())
@@ -174,7 +217,7 @@ fun DishesScreen(navController: NavController, viewModel: DishesScreenViewModel 
                         is InteractionType.EditQuantity -> {
                             val itemId = interactionType.itemId
                             val itemPresentationState =
-                                viewModel.listPresentationStateHandler.itemsPresentationState.collectAsState().value[itemId]
+                                itemsPresentationState[itemId]
                                     ?: ItemPresentationState()
                             val editableQuantity = remember {
                                 mutableStateOf(
@@ -251,10 +294,10 @@ private fun DishesScreenContent(
     listItems: List<AdItem>,
     itemsPresentationState: Map<Long, ItemPresentationState>,
     currency: Currency?,
-    navController: NavController,
     isVisible: Boolean,
     searchKey: String,
-    callbacks: DishesScreenCallbacks
+    callbacks: DishesScreenCallbacks,
+    spotlight: Spotlight
 ) {
     Box(
         contentAlignment = Alignment.TopCenter
@@ -289,22 +332,10 @@ private fun DishesScreenContent(
                                 isExpanded = itemPresentationState.isExpanded,
                                 servings = itemPresentationState.quantity,
                                 currency = currency,
-                                onExpandToggle = {
-                                    callbacks.onExpandToggle(item)
-                                },
-                                onChangeServingsClick = {
-                                    callbacks.onChangeServingsClick(item.id)
-                                },
-                                onAddItemsClick = {
-                                    navController.navigate(
-                                        FCCScreen.AddItemsToDish(
-                                            item.id, item.name
-                                        )
-                                    )
-                                },
-                                onEditClick = {
-                                    navController.navigate(FCCScreen.EditDish(item.id))
-                                })
+                                callbacks = callbacks,
+                                spotlight = spotlight,
+                                isFirstDish = i == 0
+                            )
                         }
                     }
                 }
@@ -327,41 +358,156 @@ private fun DishItem(
     isExpanded: Boolean,
     servings: Double,
     currency: Currency?,
+    callbacks: DishesScreenCallbacks,
     modifier: Modifier = Modifier,
-    onExpandToggle: () -> Unit,
-    onChangeServingsClick: () -> Unit,
-    onAddItemsClick: () -> Unit,
-    onEditClick: () -> Unit
+    spotlight: Spotlight,
+    isFirstDish: Boolean = false
 ) {
+    val isCompactHeight = with(LocalDensity.current) {
+        LocalWindowInfo.current.containerSize.height.toDp() < Constants.UI.COMPACT_HEIGHT_THRESHOLD_DP.dp
+    }
+    val coroutineScope = rememberCoroutineScope()
+    val detailsRequester = remember { BringIntoViewRequester() }
+    val ingredientsRequester = remember { BringIntoViewRequester() }
+    val priceSummaryRequester = remember { BringIntoViewRequester() }
+    val buttonsRequester = remember { BringIntoViewRequester() }
+
+    val detailsLayoutCoords = remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val ingredientsLayoutCoords = remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val priceSummaryLayoutCoords = remember { mutableStateOf<LayoutCoordinates?>(null) }
+    val buttonsLayoutCoords = remember { mutableStateOf<LayoutCoordinates?>(null) }
+
+    val bringIntoViewOffset = with(LocalDensity.current) { 32.toDp().roundToPx() }
 
     Card(
         modifier
             .fillMaxWidth()
-            .clickable { onExpandToggle() }, content = {
+            .conditionally(isFirstDish) {
+                spotlightTarget(
+                    SpotlightStep.ExampleDishCardExpanded.toSpotlightTarget(),
+                    spotlight
+                ).spotlightTarget(
+                    SpotlightStep.ExampleDishCard.toSpotlightTarget(onClickAction = {
+                        if (isCompactHeight) {
+                            callbacks.hideFab()
+                        }
+                        callbacks.onExpandToggle(dishDomain)
+                    }),
+                    spotlight
+                )
+            }
+            .clickable { callbacks.onExpandToggle(dishDomain) }, content = {
             Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
                 TitleRow(dishDomain.name, isExpanded)
 
-                DishDetails(dishDomain, onChangeServingsClick, servings)
+                DishDetails(
+                    dishDomain,
+                    modifier = Modifier
+                        .bringIntoViewRequester(detailsRequester)
+                        .onGloballyPositioned { detailsLayoutCoords.value = it }
+                        .conditionally(isFirstDish) {
+                            spotlightTarget(
+                                SpotlightStep.DishDetails.toSpotlightTarget(scrollToElement = {
+                                    detailsRequester.bringIntoViewWithOffset(
+                                        detailsLayoutCoords.value, bringIntoViewOffset
+                                    )
+                                }),
+                                spotlight
+                            )
+                        },
+                    onChangeServingsClicked = { callbacks.onChangeServingsClick(dishDomain.id) },
+                    servings = servings
+                )
 
                 Spacer(modifier = Modifier.height(6.dp))
 
                 if (isExpanded) {
-                    Ingredients(dishDomain, servings, currency)
+                    Ingredients(
+                        dishDomain, servings, currency, modifier = Modifier
+                            .bringIntoViewRequester(ingredientsRequester)
+                            .onGloballyPositioned { ingredientsLayoutCoords.value = it }
+                            .conditionally(isFirstDish) {
+                                spotlightTarget(
+                                    SpotlightStep.IngredientsList.toSpotlightTarget(scrollToElement = {
+                                        coroutineScope.launch {
+                                            ingredientsRequester.bringIntoViewWithOffset(
+                                                ingredientsLayoutCoords.value, bringIntoViewOffset
+                                            )
+                                        }
+                                    }),
+                                    spotlight
+                                )
+                            }
+                    )
                 }
 
                 PriceSummary(
                     dishDomain = dishDomain,
                     servings = servings.toInt(),
-                    currency = currency
+                    currency = currency,
+                    modifier = Modifier
+                        .bringIntoViewRequester(priceSummaryRequester)
+                        .onGloballyPositioned { priceSummaryLayoutCoords.value = it }
+                        .conditionally(isFirstDish) {
+                            spotlightTarget(
+                                SpotlightStep.PriceSummary.toSpotlightTarget(scrollToElement = {
+                                    coroutineScope.launch {
+                                        priceSummaryRequester.bringIntoViewWithOffset(
+                                            priceSummaryLayoutCoords.value, bringIntoViewOffset
+                                        )
+                                    }
+                                }),
+                                spotlight
+                            )
+                        }
                 )
 
                 FCCPrimaryHorizontalDivider(Modifier.padding(top = 8.dp, bottom = 12.dp))
 
-                ButtonRow(applyDefaultPadding = false, primaryButton = {
-                    FCCPrimaryButton(text = stringResource(id = R.string.add_items)) { onAddItemsClick() }
-                }, secondaryButton = {
-                    FCCTextButton(text = stringResource(id = R.string.details)) { onEditClick() }
-                })
+                ButtonRow(
+                    modifier = Modifier
+                        .bringIntoViewRequester(buttonsRequester)
+                        .onGloballyPositioned { buttonsLayoutCoords.value = it },
+                    applyDefaultPadding = false, primaryButton = {
+                        FCCPrimaryButton(
+                            modifier = Modifier
+                                .conditionally(isFirstDish) {
+                                    spotlightTarget(
+                                        SpotlightStep.AddIngredientsButton.toSpotlightTarget(
+                                            onClickAction = callbacks.makeFabVisible,
+                                            scrollToElement = {
+                                                coroutineScope.launch {
+                                                    buttonsRequester.bringIntoViewWithOffset(
+                                                        buttonsLayoutCoords.value,
+                                                        bringIntoViewOffset
+                                                    )
+                                                }
+                                            }),
+                                        spotlight
+                                    )
+                                },
+                            text = stringResource(id = R.string.add_items)
+                        ) { callbacks.onAddItemClick(dishDomain.id, dishDomain.name) }
+                    }, secondaryButton = {
+                        FCCTextButton(
+                            modifier = Modifier
+                                .conditionally(isFirstDish) {
+                                    spotlightTarget(
+                                        SpotlightStep.DetailsButton.toSpotlightTarget(
+                                            scrollToElement = {
+                                                coroutineScope.launch {
+                                                    buttonsRequester.bringIntoViewWithOffset(
+                                                        buttonsLayoutCoords.value,
+                                                        bringIntoViewOffset
+                                                    )
+                                                }
+                                            }),
+                                        spotlight
+                                    )
+                                },
+                            text = stringResource(id = R.string.details)
+                        ) { callbacks.onEditClick(dishDomain.id) }
+                    })
             }
         })
 }
@@ -369,10 +515,11 @@ private fun DishItem(
 @Composable
 private fun DishDetails(
     dishDomain: DishDomain,
+    servings: Double,
+    modifier: Modifier = Modifier,
     onChangeServingsClicked: () -> Unit,
-    servings: Double
 ) {
-    Row(Modifier, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+    Row(modifier, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
         DetailItem(
             divider = false,
             label = stringResource(id = R.string.margin),
@@ -455,9 +602,20 @@ private fun DishItemPreview() {
                 servings = 1.0,
                 currency = Currency.getInstance(Locale.getDefault()),
                 isExpanded = true,
-                onExpandToggle = { },
-                onChangeServingsClick = { },
-                onAddItemsClick = { }) {}
+                callbacks = DishesScreenCallbacks(
+                    onAdFailedToLoad = {},
+                    onExpandToggle = {},
+                    onChangeServingsClick = {},
+                    updateSearchKey = {},
+                    userCanBeAskedForReview = {},
+                    makeFabVisible = {},
+                    hideFab = {},
+                    onAddItemClick = { _, _ -> },
+                    onEditClick = {}
+                ),
+                spotlight = Spotlight(rememberCoroutineScope()),
+                isFirstDish = true
+            )
 
             DishItem(
                 dishDomain = DishDomain(
@@ -472,9 +630,19 @@ private fun DishItemPreview() {
                 servings = 1.0,
                 currency = Currency.getInstance(Locale.getDefault()),
                 isExpanded = false,
-                onExpandToggle = { },
-                onChangeServingsClick = { },
-                onAddItemsClick = { }) {}
+                callbacks = DishesScreenCallbacks(
+                    onAdFailedToLoad = {},
+                    onExpandToggle = {},
+                    onChangeServingsClick = {},
+                    updateSearchKey = {},
+                    userCanBeAskedForReview = {},
+                    makeFabVisible = {},
+                    hideFab = {},
+                    onAddItemClick = { _, _ -> },
+                    onEditClick = {}
+                ),
+                spotlight = Spotlight(rememberCoroutineScope())
+            )
         }
     }
 }

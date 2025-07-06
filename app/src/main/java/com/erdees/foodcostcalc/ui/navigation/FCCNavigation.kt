@@ -27,6 +27,7 @@ import com.erdees.foodcostcalc.ui.screens.featureRequestList.FeatureRequestListS
 import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.addItemToHalfProduct.AddItemToHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfProductScreen
+import com.erdees.foodcostcalc.ui.screens.onboarding.OnboardingScreen
 import com.erdees.foodcostcalc.ui.screens.onlineBackup.DataBackupScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
 import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductScreen
@@ -38,12 +39,13 @@ import com.erdees.foodcostcalc.ui.screens.subscriptionScreen.SubscriptionScreen
 @Composable
 fun FCCNavigation(
     paddingValues: PaddingValues,
+    startDestination: FCCScreen,
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
     NavHost(
         navController = navController,
-        startDestination = FCCScreen.Products,
+        startDestination = startDestination,
         modifier = modifier
             .padding(paddingValues)
             .consumeWindowInsets(paddingValues)
@@ -146,6 +148,10 @@ fun FCCNavigation(
 
         composable<FCCScreen.FeatureRequestList> {
             FeatureRequestListScreen(navController)
+        }
+
+        composable<FCCScreen.Onboarding> {
+            OnboardingScreen(navController = navController)
         }
     }
 }

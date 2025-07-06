@@ -5,6 +5,7 @@ import android.icu.util.Currency
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.ext.dataStore
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.FeatureVisibilityByInstallDate
@@ -39,6 +40,9 @@ interface Preferences {
 
     val showProductTax: Flow<Boolean>
     suspend fun setShowProductTax(value: Boolean)
+
+    val onboardingState: Flow<OnboardingState>
+    suspend fun setOnboardingState(state: OnboardingState)
 }
 
 
@@ -61,6 +65,7 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val IMPERIAL = booleanPreferencesKey(Constants.Preferences.IMPERIAL)
         val SHOW_HALF_PRODUCTS = booleanPreferencesKey(Constants.Preferences.SHOW_HALF_PRODUCTS)
         val SHOW_PRODUCT_TAX = booleanPreferencesKey(Constants.Preferences.SHOW_PRODUCT_TAX_PERCENT)
+        val ONBOARDING_STATE = stringPreferencesKey(Constants.Preferences.ONBOARDING_STATE)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -147,5 +152,17 @@ class PreferencesImpl(private val context: Context) : Preferences {
 
     override suspend fun setShowProductTax(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_PRODUCT_TAX] = value }
+    }
+
+    override val onboardingState: Flow<OnboardingState> = context.dataStore.data.map { prefs ->
+        val stateName = prefs[Keys.ONBOARDING_STATE]
+        Timber.i("Fetching onboarding state from preferences $stateName")
+        stateName?.let { OnboardingState.valueOf(it) } ?: OnboardingState.NOT_STARTED
+    }
+
+    override suspend fun setOnboardingState(state: OnboardingState) {
+        context.dataStore.edit { prefs ->
+            prefs[Keys.ONBOARDING_STATE] = state.name
+        }
     }
 }

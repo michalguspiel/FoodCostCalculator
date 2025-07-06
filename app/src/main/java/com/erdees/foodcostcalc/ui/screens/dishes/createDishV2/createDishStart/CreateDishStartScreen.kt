@@ -26,6 +26,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetValue
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -52,6 +54,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ingredients
@@ -72,6 +75,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.ne
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 private const val MaxSuggestedProducts = 3
 
@@ -93,8 +97,24 @@ fun CreateDishStartScreen(
     val userIntent by viewModel.intent.collectAsState()
     val isFirstDish by viewModel.isFirstDish.collectAsState()
     val errorRes by viewModel.errorRes.collectAsState()
+    val onboardingState by viewModel.onboardingState.collectAsState()
 
+    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val snackbarMessage = stringResource(id = R.string.onboarding_complete_snackbar_text)
+
+
+    LaunchedEffect(onboardingState) {
+        Timber.i("CreateDishStartScreen LaunchedEffect: onboardingState = $onboardingState")
+        // If we are in this screen with OnboardingState.STARTED it means user has just completed it.
+        if (onboardingState == OnboardingState.STARTED) {
+            scope.launch {
+                viewModel.onboardingComplete()
+                snackbarHostState.showSnackbar(snackbarMessage)
+            }
+        }
+    }
+
     val newProductFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val existingProductFormSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
 
@@ -134,6 +154,7 @@ fun CreateDishStartScreen(
             errorRes
         ),
         allowIngredientListAnimation,
+        snackbarHostState,
         viewModel::updateDishName,
         viewModel::updateNewProductName,
         viewModel::onAddIngredientClick,
@@ -142,7 +163,8 @@ fun CreateDishStartScreen(
         viewModel::dismissError,
         onContinueClick = {
             navController.navigate(FCCScreen.CreateDishSummary)
-        })
+        }
+    )
 
     AnimatedVisibility(userIntent != null) {
         when (userIntent) {
@@ -226,6 +248,7 @@ private fun CreateDishStartScreenContent(
     navController: NavController,
     createDishStartScreenState: CreateDishStartScreenState,
     allowAnimation: Boolean,
+    snackbarHostState: SnackbarHostState,
     updateDishName: (String) -> Unit,
     updateNewProductName: (String) -> Unit,
     onAddIngredientClick: () -> Unit,
@@ -242,7 +265,8 @@ private fun CreateDishStartScreenContent(
         }
 
         Scaffold(
-            modifier = modifier, topBar = {
+            modifier = modifier,
+            topBar = {
                 TopAppBar(title = {
                     Text(
                         text = stringResource(
@@ -262,7 +286,6 @@ private fun CreateDishStartScreenContent(
                 })
             }) { paddingValues ->
             Column(
-                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
@@ -282,7 +305,8 @@ private fun CreateDishStartScreenContent(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
                         FCCTextField(
-                            modifier = Modifier.focusRequester(dishNameFocusRequester),
+                            modifier = Modifier
+                                .focusRequester(dishNameFocusRequester),
                             title = null,
                             value = dishName,
                             onValueChange = { updateDishName(it) },
@@ -304,6 +328,7 @@ private fun CreateDishStartScreenContent(
                         )
 
                         FCCTextFieldWithSuggestions(
+                            modifier = Modifier,
                             title = null,
                             value = newProductName,
                             placeholder = stringResource(R.string.product_name),
@@ -337,6 +362,10 @@ private fun CreateDishStartScreenContent(
                     )
                 }
 
+                Spacer(Modifier.weight(1f))
+
+                SnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(vertical = 12.dp))
+
                 Section(Modifier.animateContentSize(tween())) {
                     AnimatedVisibility(
                         visible = sectionVisible,
@@ -351,6 +380,7 @@ private fun CreateDishStartScreenContent(
                                 persistentListOf(),
                                 SingleServing,
                                 currency,
+                                modifier = Modifier
                             )
                         }
                     }
@@ -398,12 +428,14 @@ private fun CreateDishStartScreenContentPreview() {
                 errorRes = null
             ),
             allowAnimation = true,
+            snackbarHostState = remember { SnackbarHostState() },
             updateDishName = {},
             updateNewProductName = {},
             onAddIngredientClick = {},
             onContinueClick = {},
             onErrorDismiss = {},
             onSuggestedProductClick = {},
-            onDismissSuggestions = {})
+            onDismissSuggestions = {}
+        )
     }
 }
