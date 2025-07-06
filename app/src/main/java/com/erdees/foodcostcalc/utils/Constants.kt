@@ -63,6 +63,23 @@ object Constants {
             const val MESSAGE = "exception_message"
         }
 
+        object Settings {
+            const val MARGIN_CHANGED = "settings_margin_changed"
+            const val TAX_CHANGED = "settings_tax_changed"
+            const val CURRENCY_CHANGED = "settings_currency_changed"
+            const val METRIC_UNITS_USED_CHANGED = "settings_metric_units_used_changed"
+            const val IMPERIAL_UNITS_USED_CHANGED = "settings_imperial_units_used_changed"
+            const val SHOW_HALF_PRODUCTS_CHANGED = "settings_show_half_products_changed"
+            const val SHOW_PRODUCT_TAX_CHANGED = "settings_show_product_tax_changed"
+            const val SAVED = "settings_saved"
+
+            // Parameter names
+            const val MARGIN_VALUE = "margin_value"
+            const val TAX_VALUE = "tax_value"
+            const val CURRENCY_CODE = "currency_code"
+            const val IS_ENABLED = "is_enabled"
+        }
+
         object DishV2 {
             const val PRODUCT_CREATED = "product_created_dishv2"
             const val DISH_CREATION_STARTED =
