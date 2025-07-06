@@ -162,9 +162,21 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
             try {
                 productRepository.addProduct(product)
                 _screenState.value = ScreenState.Success(product.name)
+                // Reset form fields after successful product addition
+                resetFormFields()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
+        }
+    }
+
+    // Method to reset form fields after successful product addition
+    private fun resetFormFields() {
+        _productName.value = ""
+        _productPrice.value = ""
+        _productWaste.value = ""
+        if (showTaxPercent.value) {
+            _productTax.value = ""
         }
     }
 
