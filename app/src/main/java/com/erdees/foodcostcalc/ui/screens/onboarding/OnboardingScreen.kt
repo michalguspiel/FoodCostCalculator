@@ -120,7 +120,7 @@ fun OnboardingScreenContent(
             onClick = onSkipClick
         )
         if (uiState is OnboardingUiState.Loading) {
-            Text("Loading example...", modifier = Modifier.padding(top = 16.dp))
+            Text(stringResource(id = R.string.onboarding_loading_example), modifier = Modifier.padding(top = 16.dp))
         }
         if (uiState is OnboardingUiState.Error) {
             Text(uiState.message, color = MaterialTheme.colorScheme.error)
