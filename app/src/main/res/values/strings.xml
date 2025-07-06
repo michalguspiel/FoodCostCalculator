@@ -292,7 +292,7 @@
     <string name="onboarding_skip">Skip &amp; Start Fresh</string>
     <string name="onboarding_loading_example">Loading example…</string>
     <string name="spotlight_next">Next</string>
-    <string name="spotlight_example_dish_card">Great! We\'ve added a sample dish for you. Tap to expand and see how it works!</string>
+    <string name="spotlight_example_dish_card">Great! We\'ve added a sample dish for you. Tap on it to expand and see how it works!</string>
     <string name="spotlight_example_dish_card_expanded">Let\'s take a look at the details. We\'ll start with the key financial info…</string>
     <string name="spotlight_dish_details">Here are the key financial details for your dish. Tap \'1 Portion\' to adjust the number of servings.</string>
     <string name="spotlight_ingredients_list">Each ingredient\'s cost is listed here. Together, they make up your total Food Cost.</string>
