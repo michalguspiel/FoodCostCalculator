@@ -11,6 +11,7 @@ import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.di.dbModule
 import com.erdees.foodcostcalc.data.di.remoteDataModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
+import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.usecase.di.useCaseModule
 import com.erdees.foodcostcalc.ui.di.appModule
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
@@ -70,8 +71,21 @@ class MyApplication : Application() {
         startKoin()
         Timber.i("Koin Started!")
 
+        initializeOnboardingState()
         initializeBilling()
         initializeAds()
+    }
+
+    private fun initializeOnboardingState() {
+        if (BuildConfig.DEBUG) {
+            // Reset onboarding state in debug builds, but only once at app launch
+            val preferences: Preferences = get(Preferences::class.java)
+            CoroutineScope(Dispatchers.IO).launch {
+                // Only set it if not already set, to prevent inconsistencies
+                    preferences.setOnboardingState(OnboardingState.NOT_STARTED)
+                    Timber.i("Onboarding state initialized to NOT_STARTED")
+            }
+        }
     }
 
     private fun initializeBilling() {

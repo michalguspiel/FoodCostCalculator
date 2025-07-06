@@ -166,14 +166,14 @@ fun DishesScreen(
             FCCAnimatedFAB(
                 modifier = Modifier.spotlightTarget(
                     SpotlightStep.CreateDishFAB.toSpotlightTarget(onClickAction = {
-                        navController.navigate(FCCScreen.CreateDishStart(completedOnboarding = true))
+                        navController.navigate(FCCScreen.CreateDishStart)
                     }),
                     spotlight
                 ),
                 isVisible = fullUiShown.value,
                 contentDescription = stringResource(id = R.string.content_description_create_dish)
             ) {
-                navController.navigate(FCCScreen.CreateDishStart())
+                navController.navigate(FCCScreen.CreateDishStart)
             }
         }
     }) { paddingValues ->
@@ -184,7 +184,7 @@ fun DishesScreen(
             listItems?.let { listItems ->
                 if (isEmptyListContentVisible) {
                     EmptyListContent(screen = FCCScreen.Dishes) {
-                        navController.navigate(FCCScreen.CreateDishStart())
+                        navController.navigate(FCCScreen.CreateDishStart)
                     }
                 } else {
                     DishesScreenContent(
