@@ -67,22 +67,30 @@ fun SpotlightOverlay(
     content: @Composable (BoxScope.() -> Unit)
 ) {
     var boxSize by remember { mutableStateOf<Rect?>(null) }
-    val density = LocalDensity.current
     var infoBoxHeight by remember { mutableFloatStateOf(0f) }
     var showInfoBox by remember { mutableStateOf(false) }
-
-    // Remember the target rect to animate to
     var targetHighlightRect by remember { mutableStateOf<Rect?>(null) }
 
-    // Animate the highlight rect
     val animatedHighlightRect by animateRectAsState(
-        targetValue = targetHighlightRect ?: Rect(0f, 0f, 0f, 0f),
+        targetValue = targetHighlightRect ?: Rect.Zero,
         animationSpec = SpringSpec(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMediumLow
         ),
         label = "spotlight_rect_animation"
     )
+
+    val currentTarget = spotlight.currentTarget
+    val density = LocalDensity.current
+
+    LaunchedEffect(currentTarget) {
+        if (currentTarget != null) {
+            if (spotlight.currentIndex == FirstSpotlightIndex) {
+                delay(FirstPromptPopUpDelayMs)
+            }
+            showInfoBox = true
+        }
+    }
 
     Box(
         modifier
@@ -92,172 +100,207 @@ fun SpotlightOverlay(
             }
     ) {
         content()
-        val current = spotlight.currentTarget
 
-        LaunchedEffect(current) {
-            if (current != null) {
-                if (spotlight.currentIndex == FirstSpotlightIndex) {
-                    delay(FirstPromptPopUpDelayMs)
-                }
-                showInfoBox = true
-            }
-        }
-
-        if (spotlight.isActive && current?.rect != null) {
+        if (spotlight.isActive && currentTarget != null) {
             val padPx = with(density) { highlightPadding.toPx() }
-            val rect = current.rect
-            val cornerRadiusPx = with(density) { current.cornerRadius.toPx() }
+            val newHighlightRect = calculateHighlightRect(currentTarget, padPx)
 
-            // Calculate the target highlight rect
-            val newHighlightRect = when (current.shape) {
-                SpotlightShape.Circle -> {
-                    val size = min(rect.width, rect.height)
-                    Rect(
-                        rect.center.x - size / 2 - padPx,
-                        rect.center.y - size / 2 - padPx,
-                        rect.center.x + size / 2 + padPx,
-                        rect.center.y + size / 2 + padPx
-                    )
-                }
-
-                else -> Rect(
-                    rect.left - padPx,
-                    rect.top - padPx,
-                    rect.right + padPx,
-                    rect.bottom + padPx
-                )
-            }
-
-            // Update the target rect for animation
             LaunchedEffect(newHighlightRect) {
                 targetHighlightRect = newHighlightRect
             }
 
-            // Draw the dimming overlay with a cutout for the spotlighted area
-            Canvas(Modifier.fillMaxSize()) {
-                val holePath = Path().apply {
-                    when (current.shape) {
-                        SpotlightShape.Rectangle -> addRect(animatedHighlightRect)
-                        SpotlightShape.RoundedRectangle -> addRoundRect(
-                            RoundRect(
-                                animatedHighlightRect,
-                                cornerRadiusPx,
-                                cornerRadiusPx
-                            )
-                        )
-
-                        SpotlightShape.Circle -> addOval(animatedHighlightRect)
-                    }
-                }
-
-                val fullScreenPath = Path().apply {
-                    addRect(Rect(0f, 0f, size.width, size.height))
-                }
-
-                val dimPath = Path().apply {
-                    addPath(fullScreenPath)
-                    op(fullScreenPath, holePath, PathOperation.Difference)
-                }
-
-                drawPath(dimPath, dimColor)
-            }
-
-            // Add a clickable overlay that covers only the dimmed part (not the spotlight)
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .pointerInput(current) { // re-compose on current target change
-                        detectTapGestures { offset ->
-                            // Only intercept taps outside the spotlight area
-                            val isOutsideSpotlight = when (current.shape) {
-                                SpotlightShape.Circle -> {
-                                    val centerX = animatedHighlightRect.center.x
-                                    val centerY = animatedHighlightRect.center.y
-                                    val radius = min(
-                                        animatedHighlightRect.width,
-                                        animatedHighlightRect.height
-                                    ) / 2
-                                    val dx = offset.x - centerX
-                                    val dy = offset.y - centerY
-                                    (dx * dx + dy * dy) > (radius * radius)  // Outside circle
-                                }
-
-                                else -> {
-                                    offset.x < animatedHighlightRect.left ||
-                                            offset.x > animatedHighlightRect.right ||
-                                            offset.y < animatedHighlightRect.top ||
-                                            offset.y > animatedHighlightRect.bottom  // Outside rectangle
-                                }
-                            }
-
-                            if (isOutsideSpotlight) {
-                                Timber.i("Clicked on dimmed area - intercepting click")
-                                spotlight.clickedOutsideSpotlightArea()
-                                // Do nothing, just intercept the click
-                            } else {
-                                Timber.i("Clicked on spotlight area - triggering action and navigating to next target")
-                                spotlight.next()
-                            }
-                        }
-                    }
+            DimOverlay(
+                dimColor = dimColor,
+                animatedHighlightRect = animatedHighlightRect,
+                currentTarget = currentTarget
             )
 
-            // Calculate the info box position based on animated highlight rect
+            ClickableOverlay(
+                animatedHighlightRect = animatedHighlightRect,
+                currentTarget = currentTarget,
+                spotlight = spotlight
+            )
+
             boxSize?.let { size ->
-                val infoBoxPadding = with(density) { 16.dp.toPx() }
-
-                val safeInsets = WindowInsets.safeDrawing.asPaddingValues(density)
-                val topInset = with(density) { safeInsets.calculateTopPadding().toPx() }
-                val bottomInset = with(density) { safeInsets.calculateBottomPadding().toPx() }
-
-                val spaceBelow =
-                    size.bottom - bottomInset - animatedHighlightRect.bottom - infoBoxPadding
-                val spaceAbove = animatedHighlightRect.top - topInset - infoBoxPadding
-
-                val showBelow = (spaceBelow >= infoBoxHeight) || (spaceBelow > spaceAbove)
-
-                val infoBoxY = if (showBelow) {
-                    animatedHighlightRect.bottom + infoBoxPadding
-                } else {
-                    animatedHighlightRect.top - infoBoxHeight - infoBoxPadding
-                }
-
-                val finalInfoBoxY = infoBoxY.coerceIn(
-                    topInset,
-                    size.height - bottomInset - infoBoxHeight
+                InfoBox(
+                    boxSize = size,
+                    animatedHighlightRect = animatedHighlightRect,
+                    infoBoxHeight = infoBoxHeight,
+                    setInfoBoxHeight = { infoBoxHeight = it },
+                    showInfoBox = showInfoBox,
+                    currentTarget = currentTarget,
+                    nextButtonText = nextButtonText,
+                    onNext = { spotlight.next() }
                 )
+            }
+        }
+    }
+}
 
-                AnimatedVisibility(showInfoBox) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(WindowInsets.safeDrawing.asPaddingValues())
-                            .padding(horizontal = 16.dp)
-                            .offset { IntOffset(x = 0, y = (finalInfoBoxY - topInset).roundToInt()) }
-                            .onGloballyPositioned { layoutCoordinates ->
-                                infoBoxHeight = layoutCoordinates.size.height.toFloat()
-                            }
-                            .background(MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.medium)
-                            .padding(16.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        Text(
-                            text = stringResource(current.info),
-                            style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground),
-                            textAlign = TextAlign.Center
-                        )
-                        if (current.hasNextButton) {
-                            FCCPrimaryButton(
-                                nextButtonText,
-                                modifier = Modifier.padding(top = 8.dp)
-                            ) {
-                                spotlight.next()
-                            }
+@Composable
+private fun DimOverlay(
+    dimColor: Color,
+    animatedHighlightRect: Rect,
+    currentTarget: SpotlightTarget
+) {
+    val density = LocalDensity.current
+    val cornerRadiusPx = with(density) { currentTarget.cornerRadius.toPx() }
+
+    Canvas(Modifier.fillMaxSize()) {
+        val holePath = Path().apply {
+            when (currentTarget.shape) {
+                SpotlightShape.Rectangle -> addRect(animatedHighlightRect)
+                SpotlightShape.RoundedRectangle -> addRoundRect(
+                    RoundRect(
+                        animatedHighlightRect,
+                        cornerRadiusPx,
+                        cornerRadiusPx
+                    )
+                )
+                SpotlightShape.Circle -> addOval(animatedHighlightRect)
+            }
+        }
+
+        val fullScreenPath = Path().apply {
+            addRect(Rect(0f, 0f, size.width, size.height))
+        }
+
+        val dimPath = Path().apply {
+            addPath(fullScreenPath)
+            op(fullScreenPath, holePath, PathOperation.Difference)
+        }
+
+        drawPath(dimPath, dimColor)
+    }
+}
+
+@Composable
+private fun ClickableOverlay(
+    animatedHighlightRect: Rect,
+    currentTarget: SpotlightTarget,
+    spotlight: Spotlight
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .pointerInput(currentTarget) {
+                detectTapGestures { offset ->
+                    val isOutsideSpotlight = when (currentTarget.shape) {
+                        SpotlightShape.Circle -> {
+                            val centerX = animatedHighlightRect.center.x
+                            val centerY = animatedHighlightRect.center.y
+                            val radius = min(
+                                animatedHighlightRect.width,
+                                animatedHighlightRect.height
+                            ) / 2
+                            val dx = offset.x - centerX
+                            val dy = offset.y - centerY
+                            (dx * dx + dy * dy) > (radius * radius)
+                        }
+                        else -> {
+                            offset.x < animatedHighlightRect.left ||
+                                    offset.x > animatedHighlightRect.right ||
+                                    offset.y < animatedHighlightRect.top ||
+                                    offset.y > animatedHighlightRect.bottom
                         }
                     }
+
+                    if (isOutsideSpotlight) {
+                        Timber.i("Clicked on dimmed area - intercepting click")
+                        spotlight.clickedOutsideSpotlightArea()
+                    } else {
+                        Timber.i("Clicked on spotlight area - triggering action and navigating to next target")
+                        spotlight.next()
+                    }
+                }
+            }
+    )
+}
+
+@Composable
+private fun InfoBox(
+    boxSize: Rect,
+    animatedHighlightRect: Rect,
+    infoBoxHeight: Float,
+    setInfoBoxHeight: (Float) -> Unit,
+    showInfoBox: Boolean,
+    currentTarget: SpotlightTarget,
+    nextButtonText: String,
+    onNext: () -> Unit
+) {
+    val density = LocalDensity.current
+    val infoBoxPadding = with(density) { 16.dp.toPx() }
+
+    val safeInsets = WindowInsets.safeDrawing.asPaddingValues(density)
+    val topInset = with(density) { safeInsets.calculateTopPadding().toPx() }
+    val bottomInset = with(density) { safeInsets.calculateBottomPadding().toPx() }
+
+    val spaceBelow =
+        boxSize.bottom - bottomInset - animatedHighlightRect.bottom - infoBoxPadding
+    val spaceAbove = animatedHighlightRect.top - topInset - infoBoxPadding
+
+    val showBelow = (spaceBelow >= infoBoxHeight) || (spaceBelow > spaceAbove)
+
+    val infoBoxY = if (showBelow) {
+        animatedHighlightRect.bottom + infoBoxPadding
+    } else {
+        animatedHighlightRect.top - infoBoxHeight - infoBoxPadding
+    }
+
+    val finalInfoBoxY = infoBoxY.coerceIn(
+        topInset,
+        boxSize.height - bottomInset - infoBoxHeight
+    )
+
+    AnimatedVisibility(showInfoBox) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(WindowInsets.safeDrawing.asPaddingValues())
+                .padding(horizontal = 16.dp)
+                .offset { IntOffset(x = 0, y = (finalInfoBoxY - topInset).roundToInt()) }
+                .onGloballyPositioned { layoutCoordinates ->
+                    setInfoBoxHeight(layoutCoordinates.size.height.toFloat())
+                }
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh, shape = MaterialTheme.shapes.medium)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(currentTarget.info),
+                style = MaterialTheme.typography.bodyMedium.copy(color = MaterialTheme.colorScheme.onBackground),
+                textAlign = TextAlign.Center
+            )
+            if (currentTarget.hasNextButton) {
+                FCCPrimaryButton(
+                    nextButtonText,
+                    modifier = Modifier.padding(top = 8.dp)
+                ) {
+                    onNext()
                 }
             }
         }
+    }
+}
+
+private fun calculateHighlightRect(currentTarget: SpotlightTarget, padPx: Float): Rect {
+    val rect = currentTarget.rect ?: return Rect.Zero
+    return when (currentTarget.shape) {
+        SpotlightShape.Circle -> {
+            val size = min(rect.width, rect.height)
+            Rect(
+                rect.center.x - size / 2 - padPx,
+                rect.center.y - size / 2 - padPx,
+                rect.center.x + size / 2 + padPx,
+                rect.center.y + size / 2 + padPx
+            )
+        }
+        else -> Rect(
+            rect.left - padPx,
+            rect.top - padPx,
+            rect.right + padPx,
+            rect.bottom + padPx
+        )
     }
 }
 
