@@ -5,7 +5,9 @@ import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
 import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.PendingPurchasesParams
+import com.android.billingclient.api.QueryPurchasesParams
 import com.erdees.foodcostcalc.BuildConfig
+import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.di.dbModule
 import com.erdees.foodcostcalc.data.di.remoteDataModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
@@ -74,6 +76,7 @@ class MyApplication : Application() {
 
     private fun initializeBilling() {
         val premiumUtil: PremiumUtil = get(PremiumUtil::class.java)
+        val preferences: Preferences = get(Preferences::class.java)
         premiumUtil.billingClient = BillingClient.newBuilder(this)
             .setListener(premiumUtil.purchaseUpdateListener)
             .enablePendingPurchases(
@@ -83,6 +86,26 @@ class MyApplication : Application() {
                     .build()
             )
             .build()
+
+        premiumUtil.billingClient?.let { client ->
+            val params = QueryPurchasesParams.newBuilder()
+                .setProductType(BillingClient.ProductType.SUBS)
+
+            client.queryPurchasesAsync(params.build()) { billingResult, purchase ->
+                Timber.i("queryPurchasesAsync(), responseCode: ${billingResult.responseCode}, purchase: $purchase")
+                if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
+                    if (purchase.isEmpty()) {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            preferences.setUserHasActiveSubscription(false)
+                        }
+                    } else {
+                        CoroutineScope(Dispatchers.IO).launch {
+                            preferences.setUserHasActiveSubscription(true)
+                        }
+                    }
+                }
+            }
+        }
 
         CoroutineScope(Dispatchers.IO).launch {
             premiumUtil.billingSetup()
