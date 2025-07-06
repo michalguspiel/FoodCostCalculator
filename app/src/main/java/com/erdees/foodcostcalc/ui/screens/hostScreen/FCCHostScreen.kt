@@ -13,6 +13,7 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,6 +55,12 @@ fun FCCHostScreen(
     val bottomNavigationScreens by viewModel.filteredBottomNavScreens.collectAsState()
     val startingDestination by viewModel.startingDestination.collectAsState()
     val safeStartDestination = startingDestination
+
+    DisposableEffect(Unit) {
+        onDispose {
+            spotlight.clearTargetLambdas()
+        }
+    }
 
     LaunchedEffect(currentDestination) {
         navBackStackEntry?.destination?.let { viewModel.logNavigation(it) }

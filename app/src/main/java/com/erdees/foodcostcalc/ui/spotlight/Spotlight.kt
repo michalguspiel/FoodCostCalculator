@@ -81,6 +81,14 @@ class Spotlight(private val scope: CoroutineScope) : KoinComponent {
     }
 
     /**
+     * Clears the lambdas that hold references to the UI, to prevent memory leaks on configuration changes.
+     */
+    fun clearTargetLambdas() {
+        Timber.i("Clearing spotlight target lambdas.")
+        targets = targets.map { it.copy(onClickAction = null, scrollToElement = null) }
+    }
+
+    /**
      * Updates a target in the list with new properties.
      * This is useful for updating a target's position or actions dynamically.
      *
