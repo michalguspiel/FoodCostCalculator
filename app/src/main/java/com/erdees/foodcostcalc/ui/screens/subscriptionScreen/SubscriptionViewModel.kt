@@ -14,6 +14,7 @@ import com.erdees.foodcostcalc.ext.toPremiumSubscription
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -75,23 +76,23 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
                 screenLaunchedWithoutSubscription = !userHasSub
             )
         }
+        Timber.i("SubscriptionViewModel initialized with state: ${_screenState.value}")
+
+        // Start observing subscription changes
+        observeSubscriptionChanges()
     }
 
+    private fun observeSubscriptionChanges() {
+        viewModelScope.launch {
+            preferences.userHasActiveSubscription().collectLatest { hasSubscription ->
+                Timber.i("Subscription change detected: $hasSubscription")
+                _screenState.value = _screenState.value?.copy(userAlreadySubscribes = hasSubscription)
+            }
+        }
+    }
 
     fun onPlanSelected(plan: Plan) {
         _screenState.value = _screenState.value?.copy(selectedPlan = plan)
-    }
-
-    /**
-     * This function checks the subscription status of the user.
-     *
-     * It is called onResume, so that when user made the purchase the screen will be updated.
-     * */
-    fun updateSubscriptionStatus() {
-        viewModelScope.launch {
-            _screenState.value = _screenState.value?.copy(userAlreadySubscribes = preferences.userHasActiveSubscription().first())
-
-        }
     }
 
     fun onSubscribeClicked(activity: Activity?) {
