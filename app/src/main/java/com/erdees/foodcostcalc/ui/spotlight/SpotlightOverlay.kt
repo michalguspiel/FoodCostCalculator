@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -53,9 +54,13 @@ import timber.log.Timber
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+private const val FirstSpotlightIndex = 0
+private const val FirstPromptPopUpDelayMs = 500L
+
 @Composable
 fun SpotlightOverlay(
     spotlight: Spotlight,
+    modifier: Modifier = Modifier,
     dimColor: Color = MaterialTheme.colorScheme.scrim.copy(alpha = 0.65f),
     highlightPadding: Dp = 8.dp,
     nextButtonText: String = stringResource(R.string.spotlight_next),
@@ -80,7 +85,7 @@ fun SpotlightOverlay(
     )
 
     Box(
-        Modifier
+        modifier
             .fillMaxSize()
             .onGloballyPositioned { coordinates ->
                 boxSize = coordinates.boundsInRoot()
@@ -91,8 +96,8 @@ fun SpotlightOverlay(
 
         LaunchedEffect(current) {
             if (current != null) {
-                if (spotlight.currentIndex == 0) {
-                    delay(500)
+                if (spotlight.currentIndex == FirstSpotlightIndex) {
+                    delay(FirstPromptPopUpDelayMs)
                 }
                 showInfoBox = true
             }
@@ -257,8 +262,9 @@ fun SpotlightOverlay(
 }
 
 @Composable
+@Preview
 @PreviewLightDark
-fun SpotlightPreview() {
+private fun SpotlightPreview() {
     FCCTheme {
         val spotlight = Spotlight(rememberCoroutineScope())
         LaunchedEffect(Unit) { spotlight.start(SpotlightStep.entries.map { it.toSpotlightTarget() }) }

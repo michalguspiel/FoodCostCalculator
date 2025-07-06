@@ -44,6 +44,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
     private val _uiState = MutableStateFlow<OnboardingUiState>(OnboardingUiState.Idle)
     val uiState: StateFlow<OnboardingUiState> = _uiState.asStateFlow()
 
+    @Suppress("MagicNumber")
     fun startOnboardingCreateSampleDishAndNavigate(context: Context) {
         viewModelScope.launch {
             _uiState.value = OnboardingUiState.Loading
@@ -104,6 +105,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
         }
     }
 
+    @Suppress("MagicNumber")
     private fun sampleIngredients(context: Context) = listOf(
         ProductBase(0, context.getString(R.string.onboarding_ingredient_minced_beef), 19.20, 0.0, 0.0, "per kilogram"),
         ProductBase(0, context.getString(R.string.onboarding_ingredient_burger_bun), 0.7, 0.0, 0.0, "per piece"),
@@ -111,6 +113,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
         ProductBase(0, context.getString(R.string.onboarding_ingredient_lettuce), 3.99, 0.0, 15.0, "per kilogram")
     )
 
+    @Suppress("MagicNumber")
     private fun sampleDish(recipeId: Long, context: Context) = DishBase(
         0, context.getString(R.string.onboarding_dish_classic_cheeseburger), marginPercent = 360.0, dishTax = 12.0, recipeId = recipeId
     )

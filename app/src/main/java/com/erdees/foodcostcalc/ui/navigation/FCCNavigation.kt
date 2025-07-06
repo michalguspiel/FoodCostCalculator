@@ -39,8 +39,8 @@ import com.erdees.foodcostcalc.ui.screens.subscriptionScreen.SubscriptionScreen
 @Composable
 fun FCCNavigation(
     paddingValues: PaddingValues,
-    modifier: Modifier = Modifier,
     startDestination: FCCScreen,
+    modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
 ) {
     NavHost(

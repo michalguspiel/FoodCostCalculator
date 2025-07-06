@@ -14,11 +14,6 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 /**
- * TODO:
- *  - Test Recompositions
- *  - Test Why Expanding Dish does flicker the UI
- */
-/**
  * Manages the state and flow of a spotlight tour.
  * This class is responsible for orchestrating the display of spotlight targets in a sequential manner.
  */

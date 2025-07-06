@@ -515,9 +515,9 @@ private fun DishItem(
 @Composable
 private fun DishDetails(
     dishDomain: DishDomain,
+    servings: Double,
     modifier: Modifier = Modifier,
     onChangeServingsClicked: () -> Unit,
-    servings: Double
 ) {
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(24.dp)) {
         DetailItem(
