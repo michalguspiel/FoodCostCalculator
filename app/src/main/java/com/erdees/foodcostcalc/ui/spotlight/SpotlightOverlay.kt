@@ -55,7 +55,7 @@ import kotlin.math.min
 import kotlin.math.roundToInt
 
 private const val FirstSpotlightIndex = 0
-private const val FirstPromptPopUpDelayMs = 500L
+private const val FirstPromptPopUpDelayMs = 300L
 
 @Composable
 fun SpotlightOverlay(
