@@ -64,14 +64,14 @@ object Constants {
         }
 
         object Settings {
-            const val SETTINGS_MARGIN_CHANGED = "settings_margin_changed"
-            const val SETTINGS_TAX_CHANGED = "settings_tax_changed"
-            const val SETTINGS_CURRENCY_CHANGED = "settings_currency_changed"
-            const val SETTINGS_METRIC_UNITS_USED_CHANGED = "settings_metric_units_used_changed"
-            const val SETTINGS_IMPERIAL_UNITS_USED_CHANGED = "settings_imperial_units_used_changed"
-            const val SETTINGS_SHOW_HALF_PRODUCTS_CHANGED = "settings_show_half_products_changed"
-            const val SETTINGS_SHOW_PRODUCT_TAX_CHANGED = "settings_show_product_tax_changed"
-            const val SETTINGS_SAVED = "settings_saved" // Added here as it's related to settings
+            const val MARGIN_CHANGED = "settings_margin_changed"
+            const val TAX_CHANGED = "settings_tax_changed"
+            const val CURRENCY_CHANGED = "settings_currency_changed"
+            const val METRIC_UNITS_USED_CHANGED = "settings_metric_units_used_changed"
+            const val IMPERIAL_UNITS_USED_CHANGED = "settings_imperial_units_used_changed"
+            const val SHOW_HALF_PRODUCTS_CHANGED = "settings_show_half_products_changed"
+            const val SHOW_PRODUCT_TAX_CHANGED = "settings_show_product_tax_changed"
+            const val SAVED = "settings_saved"
 
             // Parameter names
             const val MARGIN_VALUE = "margin_value"
