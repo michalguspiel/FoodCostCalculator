@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import com.android.billingclient.api.BillingClient
-import com.android.billingclient.api.PendingPurchasesParams
 import com.android.billingclient.api.QueryPurchasesParams
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.data.Preferences
@@ -15,8 +14,6 @@ import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.ui.screens.hostScreen.FCCHostScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -41,33 +38,6 @@ class FCCActivity : AppCompatActivity() {
             }
         }
 
-        premiumUtil.billingClient = BillingClient.newBuilder(this)
-            .setListener(premiumUtil.purchaseUpdateListener)
-            .enablePendingPurchases(
-                PendingPurchasesParams
-                    .newBuilder()
-                    .enableOneTimeProducts()
-                    .build()
-            )
-            .build()
-
-        CoroutineScope(Dispatchers.IO).launch {
-            premiumUtil.billingSetup()
-        }
-
-        CoroutineScope(Dispatchers.IO).launch {
-            val testDevices = listOf(
-                "3C07BBF025D37C2860EE53088321FCB2",
-                "6D82FB226E12482C4555652147F98C12"
-            )
-            val adsRequestConfiguration = RequestConfiguration.Builder()
-                .setTestDeviceIds(testDevices)
-                .build()
-            MobileAds.setRequestConfiguration(adsRequestConfiguration)
-            MobileAds.initialize(this@FCCActivity) {
-                // Initialization complete. It is now safe to show ads.
-            }
-        }
         setContent {
             FCCTheme {
                 FCCHostScreen()

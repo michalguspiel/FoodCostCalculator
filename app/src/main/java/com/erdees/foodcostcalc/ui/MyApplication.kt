@@ -3,21 +3,30 @@ package com.erdees.foodcostcalc.ui
 import android.app.Application
 import android.os.StrictMode
 import android.os.StrictMode.VmPolicy
+import com.android.billingclient.api.BillingClient
+import com.android.billingclient.api.PendingPurchasesParams
 import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.data.di.dbModule
 import com.erdees.foodcostcalc.data.di.remoteDataModule
 import com.erdees.foodcostcalc.data.di.repositoryModule
 import com.erdees.foodcostcalc.domain.usecase.di.useCaseModule
 import com.erdees.foodcostcalc.ui.di.appModule
+import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import com.erdees.foodcostcalc.utils.di.utilModule
+import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 import com.google.firebase.initialize
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.loadKoinModules
 import org.koin.core.context.startKoin
 import org.koin.core.context.unloadKoinModules
+import org.koin.java.KoinJavaComponent.get
 import timber.log.Timber
 import timber.log.Timber.DebugTree
 import timber.log.Timber.Forest.plant
@@ -58,6 +67,42 @@ class MyApplication : Application() {
 
         startKoin()
         Timber.i("Koin Started!")
+
+        initializeBilling()
+        initializeAds()
+    }
+
+    private fun initializeBilling() {
+        val premiumUtil: PremiumUtil = get(PremiumUtil::class.java)
+        premiumUtil.billingClient = BillingClient.newBuilder(this)
+            .setListener(premiumUtil.purchaseUpdateListener)
+            .enablePendingPurchases(
+                PendingPurchasesParams
+                    .newBuilder()
+                    .enableOneTimeProducts()
+                    .build()
+            )
+            .build()
+
+        CoroutineScope(Dispatchers.IO).launch {
+            premiumUtil.billingSetup()
+        }
+    }
+
+    private fun initializeAds() {
+        CoroutineScope(Dispatchers.IO).launch {
+            val testDevices = listOf(
+                "3C07BBF025D37C2860EE53088321FCB2",
+                "6D82FB226E12482C4555652147F98C12"
+            )
+            val adsRequestConfiguration = RequestConfiguration.Builder()
+                .setTestDeviceIds(testDevices)
+                .build()
+            MobileAds.setRequestConfiguration(adsRequestConfiguration)
+            MobileAds.initialize(this@MyApplication) {
+                // Initialization complete. It is now safe to show ads.
+            }
+        }
     }
 
     private fun startKoin() {
