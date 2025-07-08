@@ -45,7 +45,7 @@ sealed class FCCScreen(
     data class AddItemsToDish(val dishId: Long, val dishName: String) : FCCScreen()
 
     @Serializable
-    data class EditDish(@SerialName(DISH_ID_KEY) val dishId: Long) : FCCScreen()
+    data class DishDetails(@SerialName(DISH_ID_KEY) val dishId: Long) : FCCScreen()
 
     @Serializable
     data object CreateDish : FCCScreen()

@@ -89,7 +89,7 @@ fun CreateDishSummaryScreen(
         onTaxChange = { viewModel.updateTaxPercentInput(it) },
         onErrorDismiss = { viewModel.dismissError() },
         successNavigate = {
-            navController.navigate(FCCScreen.EditDish(it)) {
+            navController.navigate(FCCScreen.DishDetails(it)) {
                 popUpTo(FCCScreen.Dishes) {
                     inclusive = false
                 }

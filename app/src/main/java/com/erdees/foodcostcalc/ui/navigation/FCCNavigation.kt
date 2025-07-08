@@ -21,7 +21,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewMo
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishStartScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishSummary.CreateDishSummaryScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.EditDishScreen
+import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsScreen
 import com.erdees.foodcostcalc.ui.screens.featureRequest.FeatureRequestScreen
 import com.erdees.foodcostcalc.ui.screens.featureRequestList.FeatureRequestListScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen
@@ -84,9 +84,9 @@ fun FCCNavigation(
             )
         }
 
-        composable<FCCScreen.EditDish> { backStackEntry ->
-            val route: FCCScreen.EditDish = backStackEntry.toRoute()
-            EditDishScreen(dishId = route.dishId, navController = navController)
+        composable<FCCScreen.DishDetails> { backStackEntry ->
+            val route: FCCScreen.DishDetails = backStackEntry.toRoute()
+            DishDetailsScreen(dishId = route.dishId, navController = navController)
         }
 
         composable<FCCScreen.Recipe> { backStackEntry ->

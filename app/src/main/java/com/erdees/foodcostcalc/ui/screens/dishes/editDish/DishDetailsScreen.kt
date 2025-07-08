@@ -105,7 +105,7 @@ data class EditDishScreenState(
 
 @Screen
 @Composable
-fun EditDishScreen(
+fun DishDetailsScreen(
     dishId: Long, navController: NavController, viewModel: DishDetailsViewModel = viewModel()
 ) {
     val screenState by viewModel.screenState.collectAsState()
