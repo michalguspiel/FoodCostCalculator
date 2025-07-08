@@ -40,6 +40,7 @@ import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
@@ -86,7 +87,7 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
                 },
                 actions = {
                     IconButton(onClick = {
-                        viewModel.deleteHalfProduct(halfProductId)
+                        viewModel.onDeleteHalfProductClick()
                     }) {
                         Icon(
                             imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
@@ -160,7 +161,7 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
                 is ScreenState.Success<*> -> {}
 
                 is ScreenState.Interaction -> {
-                    when ((screenState as ScreenState.Interaction).interaction) {
+                    when (val interaction = (screenState as ScreenState.Interaction).interaction) {
                         is InteractionType.EditItem -> {
                             ValueEditDialog(
                                 title = stringResource(id = R.string.edit_quantity),
@@ -184,6 +185,16 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
                                     keyboardType = KeyboardType.Text,
                                     capitalization = KeyboardCapitalization.Words
                                 )
+                            )
+                        }
+
+                        is InteractionType.DeleteConfirmation -> {
+                            FCCDeleteConfirmationDialog(
+                                itemName = interaction.itemName,
+                                onDismiss = viewModel::resetScreenState,
+                                onConfirmDelete = {
+                                    viewModel.confirmDelete(interaction.itemId)
+                                }
                             )
                         }
 

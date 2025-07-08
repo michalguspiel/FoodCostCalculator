@@ -122,6 +122,11 @@ object Constants {
             const val DELETED = "product_deleted"
         }
 
+        object HalfProducts {
+            const val DELETE = "half_product_delete"
+            const val DELETED = "half_product_deleted"
+        }
+
     }
 
     object UI {

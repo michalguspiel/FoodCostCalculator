@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
@@ -13,6 +14,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState.Interaction
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,6 +34,7 @@ class EditHalfProductViewModel : ViewModel(), KoinComponent {
 
     private val halfProductRepository: HalfProductRepository by inject()
     private val preferences: Preferences by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
@@ -117,11 +120,22 @@ class EditHalfProductViewModel : ViewModel(), KoinComponent {
         _halfProduct.value = halfProduct.copy(products = halfProduct.products.filter { it != item })
     }
 
-    fun deleteHalfProduct(id: Long) {
+    fun onDeleteHalfProductClick() {
+        val halfProduct = _halfProduct.value ?: return
+        analyticsRepository.logEvent(Constants.Analytics.HalfProducts.DELETE, null)
+        _screenState.update {
+            Interaction(
+                InteractionType.DeleteConfirmation(halfProduct.id, halfProduct.name)
+            )
+        }
+    }
+
+    fun confirmDelete(halfProductId: Long) {
         _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch(Dispatchers.IO) {
             try {
-                halfProductRepository.deleteHalfProduct(id)
+                halfProductRepository.deleteHalfProduct(halfProductId)
+                analyticsRepository.logEvent(Constants.Analytics.HalfProducts.DELETED, null)
                 _screenState.value = ScreenState.Success<Nothing>()
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
