@@ -167,7 +167,6 @@ fun DishDetailsScreen(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditDishScreenContent(
     state: EditDishScreenState,
@@ -179,30 +178,14 @@ private fun EditDishScreenContent(
         Scaffold(
             modifier = modifier,
             topBar = {
-                TopAppBar(title = {
-                    Text(
-                        text = modifiedDishDomain?.name ?: dishId.toString(),
-                        modifier = Modifier.clickable {
-                            callbacks.setInteraction(InteractionType.EditName)
-                        })
-                }, actions = {
-                    IconButton(onClick = {
-                        callbacks.onDeleteDishClick()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Sharp.Delete,
-                            contentDescription = stringResource(R.string.remove_dish)
-                        )
-                    }
-                }, navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Sharp.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-                })
-            }) { paddingValues ->
+                EditDishTopBar(
+                    dishName = modifiedDishDomain?.name ?: dishId.toString(),
+                    onNameClick = { callbacks.setInteraction(InteractionType.EditName) },
+                    onDeleteClick = { callbacks.onDeleteDishClick() },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+        ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 Column {
                     LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
@@ -341,6 +324,40 @@ private fun EditDishScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditDishTopBar(
+    dishName: String,
+    onNameClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = dishName,
+                modifier = Modifier.clickable { onNameClick() }
+            )
+        },
+        actions = {
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    imageVector = Icons.Sharp.Delete,
+                    contentDescription = stringResource(R.string.remove_dish)
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    Icons.AutoMirrored.Sharp.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+        }
+    )
+}
+
 @Composable
 private fun Buttons(
     saveDish: () -> Unit,
@@ -373,10 +390,10 @@ private fun Buttons(
 fun DishDetails(
     dishDomain: DishDomain,
     currency: Currency?,
-    modifier: Modifier = Modifier,
     onTaxClick: () -> Unit,
     onMarginClick: () -> Unit,
-    onTotalPriceClick: () -> Unit
+    onTotalPriceClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         Row {
@@ -429,9 +446,9 @@ fun DishDetails(
 @Composable
 fun UsedItem(
     usedItem: UsedItem,
-    modifier: Modifier = Modifier,
     onRemove: (UsedItem) -> Unit,
-    onEdit: (UsedItem) -> Unit
+    onEdit: (UsedItem) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val swipeState = rememberSwipeToDismissBoxState()
 
