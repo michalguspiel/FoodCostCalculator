@@ -37,16 +37,17 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import timber.log.Timber
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Screen
 @Composable
 fun EditProductScreen(
@@ -77,141 +78,221 @@ fun EditProductScreen(
         }
     }
 
-
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = product?.name ?: "",
-                        modifier = Modifier.clickable {
-                            viewModel.setInteractionEditName()
-                        })
-                },
-                actions = {
-                    IconButton(onClick = { viewModel.deleteProduct(productId) }) {
-                        Icon(
-                            imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
-                                id = R.string.content_description_remove_product
-                            )
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
-                                id = R.string.back
-                            )
-                        )
-                    }
-                }
+            EditProductTopBar(
+                productName = product?.name ?: "",
+                onNameClick = { viewModel.setInteractionEditName() },
+                onDeleteClick = { viewModel.onDeleteProductClick() },
+                onBackClick = { navController.popBackStack() }
             )
         }
     ) { paddingValues ->
         Box(
             modifier = Modifier.padding(paddingValues)
         ) {
-            Column(
-                verticalArrangement = Arrangement.SpaceBetween,
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = 12.dp)
-            ) {
-                Column(
-                    Modifier
-                        .fillMaxWidth()
-                        .animateContentSize()
-                    ,
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
+            EditProductContent(
+                product = product,
+                showTaxPercent = showTaxPercent,
+                saveButtonEnabled = saveButtonEnabled,
+                onPriceChange = viewModel::updatePrice,
+                onTaxChange = viewModel::updateTax,
+                onWasteChange = viewModel::updateWaste,
+                onSaveClick = viewModel::save
+            )
 
-                    Text(
-                        text = stringResource(id = R.string.values_per_unit, product?.unit ?: ""),
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
+            HandleScreenState(
+                screenState = screenState,
+                editableName = editableName,
+                saveNameButtonEnabled = saveNameButtonEnabled,
+                onNameChange = viewModel::updateName,
+                onSaveName = viewModel::saveName,
+                onDismissDialog = viewModel::resetScreenState,
+                onDeleteConfirm = viewModel::deleteProduct
+            )
+        }
+    }
+}
 
-                    FCCTextField(
-                        title = stringResource(id = R.string.price),
-                        value = product?.pricePerUnit.toString(),
-                        onValueChange = viewModel::updatePrice,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Next
-                        )
-                    )
-
-                    if (showTaxPercent || product?.tax?.toDoubleOrNull() != 0.0) {
-                        FCCTextField(
-                            title = stringResource(id = R.string.tax_percent),
-                            value = product?.tax.toString(),
-                            onValueChange = viewModel::updateTax,
-                            keyboardOptions = KeyboardOptions(
-                                keyboardType = KeyboardType.Number,
-                                imeAction = ImeAction.Next
-                            )
-                        )
-                    }
-
-                    FCCTextField(
-                        title = stringResource(id = R.string.percent_of_waste),
-                        value = product?.waste.toString(),
-                        onValueChange = viewModel::updateWaste,
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Number,
-                            imeAction = ImeAction.Done
-                        )
-                    )
-                }
-                ButtonRow(
-                    primaryButton = {
-                    FCCPrimaryButton(
-                        enabled = saveButtonEnabled,
-                        onClick = {
-                            viewModel.save()
-                        },
-                        text = stringResource(id = R.string.save)
-                    )
-                })
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditProductTopBar(
+    productName: String,
+    onNameClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = productName,
+                modifier = Modifier.clickable { onNameClick() }
+            )
+        },
+        actions = {
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    imageVector = Icons.Sharp.Delete,
+                    contentDescription = stringResource(id = R.string.content_description_remove_product)
+                )
             }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    Icons.AutoMirrored.Sharp.ArrowBack,
+                    contentDescription = stringResource(id = R.string.back)
+                )
+            }
+        }
+    )
+}
 
-            when (screenState) {
-                is ScreenState.Interaction -> {
-                    when ((screenState as ScreenState.Interaction).interaction) {
-                        InteractionType.EditName -> {
-                            ValueEditDialog(
-                                title = stringResource(id = R.string.edit_name),
-                                value = editableName,
-                                saveButtonEnabled = saveNameButtonEnabled,
-                                updateValue = viewModel::updateName,
-                                onSave = viewModel::saveName,
-                                onDismiss = viewModel::resetScreenState,
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Text,
-                                    capitalization = KeyboardCapitalization.Words
-                                )
-                            )
+@Composable
+private fun EditProductContent(
+    product: EditableProductDomain?,
+    showTaxPercent: Boolean,
+    saveButtonEnabled: Boolean,
+    onPriceChange: (String) -> Unit,
+    onTaxChange: (String) -> Unit,
+    onWasteChange: (String) -> Unit,
+    onSaveClick: () -> Unit
+) {
+    Column(
+        verticalArrangement = Arrangement.SpaceBetween,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 12.dp)
+    ) {
+        ProductFormFields(
+            product = product,
+            showTaxPercent = showTaxPercent,
+            onPriceChange = onPriceChange,
+            onTaxChange = onTaxChange,
+            onWasteChange = onWasteChange
+        )
+
+        ButtonRow(
+            primaryButton = {
+                FCCPrimaryButton(
+                    enabled = saveButtonEnabled,
+                    onClick = onSaveClick,
+                    text = stringResource(id = R.string.save)
+                )
+            }
+        )
+    }
+}
+
+@Composable
+private fun ProductFormFields(
+    product: EditableProductDomain?,
+    showTaxPercent: Boolean,
+    onPriceChange: (String) -> Unit,
+    onTaxChange: (String) -> Unit,
+    onWasteChange: (String) -> Unit
+) {
+    Column(
+        Modifier
+            .fillMaxWidth()
+            .animateContentSize(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Text(
+            text = stringResource(id = R.string.values_per_unit, product?.unit ?: ""),
+            style = MaterialTheme.typography.titleLarge,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        FCCTextField(
+            title = stringResource(id = R.string.price),
+            value = product?.pricePerUnit.toString(),
+            onValueChange = onPriceChange,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Next
+            )
+        )
+
+        if (showTaxPercent || product?.tax?.toDoubleOrNull() != 0.0) {
+            FCCTextField(
+                title = stringResource(id = R.string.tax_percent),
+                value = product?.tax.toString(),
+                onValueChange = onTaxChange,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    imeAction = ImeAction.Next
+                )
+            )
+        }
+
+        FCCTextField(
+            title = stringResource(id = R.string.percent_of_waste),
+            value = product?.waste.toString(),
+            onValueChange = onWasteChange,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            )
+        )
+    }
+}
+
+@Composable
+private fun HandleScreenState(
+    screenState: ScreenState,
+    editableName: String,
+    saveNameButtonEnabled: Boolean,
+    onNameChange: (String) -> Unit,
+    onSaveName: () -> Unit,
+    onDismissDialog: () -> Unit,
+    onDeleteConfirm: (Long) -> Unit
+) {
+    when (screenState) {
+        is ScreenState.Interaction -> {
+            when (screenState.interaction) {
+                InteractionType.EditName -> {
+                    ValueEditDialog(
+                        title = stringResource(id = R.string.edit_name),
+                        value = editableName,
+                        saveButtonEnabled = saveNameButtonEnabled,
+                        updateValue = onNameChange,
+                        onSave = onSaveName,
+                        onDismiss = onDismissDialog,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            capitalization = KeyboardCapitalization.Words
+                        )
+                    )
+                }
+
+                is InteractionType.DeleteConfirmation -> {
+                    val deleteConfirmation = screenState.interaction
+                    FCCDeleteConfirmationDialog(
+                        itemName = deleteConfirmation.itemName,
+                        onDismiss = onDismissDialog,
+                        onConfirmDelete = {
+                            onDeleteConfirm(deleteConfirmation.itemId)
                         }
-
-                        else -> {}
-                    }
-                }
-
-                is ScreenState.Loading<*> -> {
-                    ScreenLoadingOverlay()
-                }
-
-                is ScreenState.Error -> {
-                    ErrorDialog {
-                        viewModel.resetScreenState()
-                    }
+                    )
                 }
 
                 else -> {}
             }
         }
+
+        is ScreenState.Loading<*> -> {
+            ScreenLoadingOverlay()
+        }
+
+        is ScreenState.Error -> {
+            ErrorDialog {
+                onDismissDialog()
+            }
+        }
+
+        else -> {}
     }
 }

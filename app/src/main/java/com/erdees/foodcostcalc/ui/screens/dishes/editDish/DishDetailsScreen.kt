@@ -64,6 +64,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
@@ -75,7 +76,6 @@ data class EditDishScreenCallbacks(
     val saveDish: () -> Unit,
     val shareDish: (Context) -> Unit,
     val setInteraction: (InteractionType) -> Unit,
-    val deleteDish: (Long) -> Unit,
     val removeItem: (UsedItem) -> Unit,
     val updateQuantity: (String) -> Unit,
     val saveQuantity: () -> Unit,
@@ -87,7 +87,9 @@ data class EditDishScreenCallbacks(
     val saveName: () -> Unit,
     val updateTotalPrice: (String) -> Unit,
     val saveTotalPrice: () -> Unit,
-    val resetScreenState: () -> Unit
+    val resetScreenState: () -> Unit,
+    val onDeleteDishClick: () -> Unit,
+    val onDeleteConfirmed: (Long) -> Unit
 )
 
 data class EditDishScreenState(
@@ -105,7 +107,7 @@ data class EditDishScreenState(
 
 @Screen
 @Composable
-fun EditDishScreen(
+fun DishDetailsScreen(
     dishId: Long, navController: NavController, viewModel: DishDetailsViewModel = viewModel()
 ) {
     val screenState by viewModel.screenState.collectAsState()
@@ -147,7 +149,6 @@ fun EditDishScreen(
             saveDish = viewModel::saveDish,
             shareDish = viewModel::shareDish,
             setInteraction = viewModel::setInteraction,
-            deleteDish = viewModel::deleteDish,
             removeItem = viewModel::removeItem,
             updateQuantity = viewModel::updateQuantity,
             saveQuantity = viewModel::updateItemQuantity,
@@ -159,12 +160,13 @@ fun EditDishScreen(
             saveName = viewModel::saveDishName,
             updateTotalPrice = viewModel::updateTotalPrice,
             saveTotalPrice = viewModel::saveDishTotalPrice,
-            resetScreenState = viewModel::resetScreenState
+            resetScreenState = viewModel::resetScreenState,
+            onDeleteDishClick = viewModel::onDeleteDishClick,
+            onDeleteConfirmed = viewModel::confirmDelete
         )
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditDishScreenContent(
     state: EditDishScreenState,
@@ -176,28 +178,14 @@ private fun EditDishScreenContent(
         Scaffold(
             modifier = modifier,
             topBar = {
-                TopAppBar(title = {
-                    Text(
-                        text = modifiedDishDomain?.name ?: dishId.toString(),
-                        modifier = Modifier.clickable {
-                            callbacks.setInteraction(InteractionType.EditName)
-                        })
-                }, actions = {
-                    IconButton(onClick = { callbacks.deleteDish(dishId) }) {
-                        Icon(
-                            imageVector = Icons.Sharp.Delete,
-                            contentDescription = stringResource(R.string.remove_dish)
-                        )
-                    }
-                }, navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Sharp.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-                })
-            }) { paddingValues ->
+                EditDishTopBar(
+                    dishName = modifiedDishDomain?.name ?: dishId.toString(),
+                    onNameClick = { callbacks.setInteraction(InteractionType.EditName) },
+                    onDeleteClick = { callbacks.onDeleteDishClick() },
+                    onBackClick = { navController.popBackStack() }
+                )
+            }
+        ) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 Column {
                     LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
@@ -314,6 +302,17 @@ private fun EditDishScreenContent(
                                 )
                             }
 
+                            is InteractionType.DeleteConfirmation -> {
+                                val deleteConfirmation = screenState.interaction
+                                FCCDeleteConfirmationDialog(
+                                    itemName = deleteConfirmation.itemName,
+                                    onDismiss = { callbacks.resetScreenState() },
+                                    onConfirmDelete = {
+                                        callbacks.onDeleteConfirmed(deleteConfirmation.itemId)
+                                    }
+                                )
+                            }
+
                             else -> {}
                         }
                     }
@@ -323,6 +322,40 @@ private fun EditDishScreenContent(
             }
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditDishTopBar(
+    dishName: String,
+    onNameClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onBackClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = dishName,
+                modifier = Modifier.clickable { onNameClick() }
+            )
+        },
+        actions = {
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    imageVector = Icons.Sharp.Delete,
+                    contentDescription = stringResource(R.string.remove_dish)
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    Icons.AutoMirrored.Sharp.ArrowBack,
+                    contentDescription = stringResource(R.string.back)
+                )
+            }
+        }
+    )
 }
 
 @Composable
@@ -357,10 +390,10 @@ private fun Buttons(
 fun DishDetails(
     dishDomain: DishDomain,
     currency: Currency?,
-    modifier: Modifier = Modifier,
     onTaxClick: () -> Unit,
     onMarginClick: () -> Unit,
-    onTotalPriceClick: () -> Unit
+    onTotalPriceClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         Row {
@@ -413,9 +446,9 @@ fun DishDetails(
 @Composable
 fun UsedItem(
     usedItem: UsedItem,
-    modifier: Modifier = Modifier,
     onRemove: (UsedItem) -> Unit,
-    onEdit: (UsedItem) -> Unit
+    onEdit: (UsedItem) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val swipeState = rememberSwipeToDismissBoxState()
 
@@ -515,5 +548,5 @@ private fun EditDishScreenContentPreview(
 }
 
 private fun createEmptyEditDishScreenCallbacks() = EditDishScreenCallbacks(
-    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
+    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 )

@@ -7,14 +7,8 @@
     <ID>ClassNaming:Migration_3to_4_CreateRecipeTable.kt$Migration_3to_4_CreateRecipeTable : Migration</ID>
     <ID>ComposableParamOrder:AddItemFields.kt$AddItemFields</ID>
     <ID>ComposableParamOrder:ButtonRow.kt$ButtonRow</ID>
-    <ID>ComposableParamOrder:CreateProductScreen.kt$ButtonRow</ID>
-    <ID>ComposableParamOrder:CreateProductScreen.kt$CalculatePiecePriceDialog</ID>
-    <ID>ComposableParamOrder:CreateProductScreen.kt$CalculateWasteDialog</ID>
-    <ID>ComposableParamOrder:CreateProductScreen.kt$CreateProductScreen</ID>
     <ID>ComposableParamOrder:DetailItem.kt$DetailItem</ID>
     <ID>ComposableParamOrder:DishesScreen.kt$DishItem</ID>
-    <ID>ComposableParamOrder:EditDishScreen.kt$DishDetails</ID>
-    <ID>ComposableParamOrder:EditDishScreen.kt$UsedItem</ID>
     <ID>ComposableParamOrder:FCCDialog.kt$FCCDialog</ID>
     <ID>ComposableParamOrder:HalfProductsScreen.kt$CreateHalfProductDialog</ID>
     <ID>ComposableParamOrder:HalfProductsScreen.kt$HalfProductItem</ID>
@@ -23,66 +17,15 @@
     <ID>ComposableParamOrder:RecipeScreen.kt$RecipeScreenContent</ID>
     <ID>ComposableParamOrder:RecipeScreen.kt$RecipeView</ID>
     <ID>ComposableParamOrder:SettingsScreen.kt$AccountServicesSection</ID>
-    <ID>ComposableParamOrder:SettingsScreen.kt$Defaults</ID>
     <ID>ComposableParamOrder:SubscriptionScreen.kt$ButtonRow</ID>
     <ID>ComposableParamOrder:ValueEditDialog.kt$ValueEditDialog</ID>
     <ID>CyclomaticComplexMethod:DataBackupScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Screen @Composable fun DataBackupScreen(navController: NavController, viewModel: OnlineBackupViewModel = viewModel())</ID>
     <ID>LongMethod:DataBackupScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Screen @Composable fun DataBackupScreen(navController: NavController, viewModel: OnlineBackupViewModel = viewModel())</ID>
-    <ID>LongMethod:EditDishScreen.kt$@OptIn(ExperimentalMaterial3Api::class) @Screen @Composable fun EditDishScreen(dishId: Long, navController: NavController, viewModel: EditDishViewModel = viewModel())</ID>
-    <ID>LongParameterList:SettingsScreen.kt$( snackbarHostState: SnackbarHostState, navController: NavController, settings: UserSettings, currencies: Set&lt;Currency&gt;, saveButtonEnabled: Boolean, screenState: ScreenState, updateDefaultTax: (String) -&gt; Unit, updateDefaultMargin: (String) -&gt; Unit, updateMetricUsed: (Boolean) -&gt; Unit, updateImperialUsed: (Boolean) -&gt; Unit, updateDefaultCurrencyCode: (Currency) -&gt; Unit, saveSettings: () -&gt; Unit, resetScreenState: () -&gt; Unit, )</ID>
-    <ID>MagicNumber:Buttons.kt$250</ID>
-    <ID>MagicNumber:CreateProductScreenViewModel.kt$CreateProductScreenViewModel$100</ID>
-    <ID>MagicNumber:DishDomain.kt$DishDomain$100</ID>
-    <ID>MagicNumber:DishesScreen.kt$0.5</ID>
-    <ID>MagicNumber:DishesScreen.kt$100.0</ID>
-    <ID>MagicNumber:DishesScreen.kt$15.0</ID>
-    <ID>MagicNumber:DishesScreen.kt$5.0</ID>
-    <ID>MagicNumber:HalfProductDomain.kt$HalfProductDomain$100</ID>
-    <ID>MagicNumber:HalfProductsScreen.kt$0.5</ID>
-    <ID>MagicNumber:HalfProductsScreen.kt$100.0</ID>
-    <ID>MagicNumber:HalfProductsScreen.kt$15.0</ID>
-    <ID>MagicNumber:HalfProductsScreen.kt$5.0</ID>
-    <ID>MagicNumber:IngredientRow.kt$0.2f</ID>
-    <ID>MagicNumber:IngredientRow.kt$0.6f</ID>
-    <ID>MagicNumber:IngredientRow.kt$0.8f</ID>
-    <ID>MagicNumber:Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist.kt$Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist$3</ID>
-    <ID>MagicNumber:Migration_3to_4_CreateRecipeTable.kt$Migration_3to_4_CreateRecipeTable$3</ID>
-    <ID>MagicNumber:Migration_3to_4_CreateRecipeTable.kt$Migration_3to_4_CreateRecipeTable$4</ID>
-    <ID>MagicNumber:OnlineBackupViewModel.kt$OnlineBackupViewModel$1024</ID>
-    <ID>MagicNumber:RecipeScreen.kt$0.8f</ID>
-    <ID>MagicNumber:SearchField.kt$0.6f</ID>
-    <ID>MagicNumber:SubscriptionScreen.kt$0.3</ID>
-    <ID>MagicNumber:SubscriptionScreen.kt$0.5</ID>
-    <ID>MagicNumber:SubscriptionScreen.kt$0xb48def</ID>
-    <ID>MagicNumber:SubscriptionScreen.kt$0xf4306d</ID>
-    <ID>MagicNumber:SubscriptionScreen.kt$0xfce18a</ID>
-    <ID>MagicNumber:SubscriptionScreen.kt$0xff726d</ID>
-    <ID>MagicNumber:SubscriptionScreen.kt$100</ID>
-    <ID>MagicNumber:SubscriptionScreen.kt$5</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$0.119826427</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$0.264172052</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$1000</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$128</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$16</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$2.20462262</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$28.3495</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$3785.41178</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$453.59237</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$8.345404436202464</ID>
-    <ID>MagicNumber:UnitsUtils.kt$UnitsUtils$900000.9</ID>
-    <ID>MagicNumber:UsedItem.kt$UsedItem$100</ID>
-    <ID>MagicNumber:UsedProductDomain.kt$UsedProductDomain$100</ID>
-    <ID>MutableStateParam:NestedScrollConnection.kt$isVisible</ID>
     <ID>ParameterNaming:DishesScreen.kt$onChangeServingsClicked</ID>
     <ID>ParameterNaming:SubscriptionScreen.kt$onPlanSelected</ID>
-    <ID>ReturnCount:CreateProductScreenViewModel.kt$CreateProductScreenViewModel$fun addProduct()</ID>
-    <ID>ReturnCount:EditDishViewModel.kt$EditDishViewModel$fun updateItemQuantity()</ID>
     <ID>ReturnCount:EditHalfProductViewModel.kt$EditHalfProductViewModel$fun updateProductQuantity()</ID>
-    <ID>ReturnCount:SubscriptionViewModel.kt$SubscriptionViewModel$fun onSubscribeClicked(activity: Activity?)</ID>
     <ID>SpreadOperator:AppRoomDataBase.kt$AppRoomDataBase.Companion$(*migrations())</ID>
     <ID>ThrowingExceptionsWithoutMessageOrCause:AdHelper.kt$AdHelper$NullPointerException()</ID>
-    <ID>ThrowingExceptionsWithoutMessageOrCause:EditDishViewModel.kt$EditDishViewModel$NullPointerException()</ID>
-    <ID>UnusedParameter:EditDishScreen.kt$onTotalPriceClick: () -&gt; Unit</ID>
     <ID>UnusedPrivateMember:OnlineBackupError.kt$DownloadFailure$private fun readResolve(): Any</ID>
     <ID>UnusedPrivateMember:OnlineBackupError.kt$DrivePermissionFailure$private fun readResolve(): Any</ID>
     <ID>UnusedPrivateMember:OnlineBackupError.kt$DriveQueryFailure$private fun readResolve(): Any</ID>
@@ -100,6 +43,5 @@
     <ID>UnusedPrivateProperty:Theme.kt$private val mediumContrastLightColorScheme = lightColorScheme( primary = primaryLightMediumContrast, onPrimary = onPrimaryLightMediumContrast, primaryContainer = primaryContainerLightMediumContrast, onPrimaryContainer = onPrimaryContainerLightMediumContrast, secondary = secondaryLightMediumContrast, onSecondary = onSecondaryLightMediumContrast, secondaryContainer = secondaryContainerLightMediumContrast, onSecondaryContainer = onSecondaryContainerLightMediumContrast, tertiary = tertiaryLightMediumContrast, onTertiary = onTertiaryLightMediumContrast, tertiaryContainer = tertiaryContainerLightMediumContrast, onTertiaryContainer = onTertiaryContainerLightMediumContrast, error = errorLightMediumContrast, onError = onErrorLightMediumContrast, errorContainer = errorContainerLightMediumContrast, onErrorContainer = onErrorContainerLightMediumContrast, background = backgroundLightMediumContrast, onBackground = onBackgroundLightMediumContrast, surface = surfaceLightMediumContrast, onSurface = onSurfaceLightMediumContrast, surfaceVariant = surfaceVariantLightMediumContrast, onSurfaceVariant = onSurfaceVariantLightMediumContrast, outline = outlineLightMediumContrast, outlineVariant = outlineVariantLightMediumContrast, scrim = scrimLightMediumContrast, inverseSurface = inverseSurfaceLightMediumContrast, inverseOnSurface = inverseOnSurfaceLightMediumContrast, inversePrimary = inversePrimaryLightMediumContrast, surfaceDim = surfaceDimLightMediumContrast, surfaceBright = surfaceBrightLightMediumContrast, surfaceContainerLowest = surfaceContainerLowestLightMediumContrast, surfaceContainerLow = surfaceContainerLowLightMediumContrast, surfaceContainer = surfaceContainerLightMediumContrast, surfaceContainerHigh = surfaceContainerHighLightMediumContrast, surfaceContainerHighest = surfaceContainerHighestLightMediumContrast, )</ID>
     <ID>UseCheckOrError:ProductDetails.kt$throw IllegalStateException("Monthly plan not found")</ID>
     <ID>UseCheckOrError:ProductDetails.kt$throw IllegalStateException("Yearly plan not found")</ID>
-    <ID>WildcardImport:MyApplication.kt$import timber.log.Timber.*</ID>
   </CurrentIssues>
 </SmellBaseline>

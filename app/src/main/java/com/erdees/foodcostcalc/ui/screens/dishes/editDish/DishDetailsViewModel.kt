@@ -45,7 +45,7 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 /**
- * Shared ViewModel between [EditDishScreen] and [RecipeScreen].
+ * Shared ViewModel between [DishDetailsScreen] and [RecipeScreen].
  * It was decided to share it in order to avoid passing data between screens.
  * */
 class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
@@ -280,18 +280,6 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         }
     }
 
-    fun deleteDish(dishId: Long) {
-        _screenState.value = ScreenState.Loading<Nothing>()
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                dishRepository.deleteDish(dishId)
-                _screenState.value = ScreenState.Success<Nothing>()
-            } catch (e: Exception) {
-                _screenState.value = ScreenState.Error(Error(e.message))
-            }
-        }
-    }
-
     /**
      * This function is responsible for saving the changes made to a dish.
      * It first sets the screen state to loading and then launches a coroutine on the main thread.
@@ -367,6 +355,28 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         context.startActivity(shareIntent)
     }
 
+    fun onDeleteDishClick() {
+        val dish = _dish.value ?: return
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.DELETE, null)
+        _screenState.update {
+            ScreenState.Interaction(
+                InteractionType.DeleteConfirmation(dish.id, dish.name)
+            )
+        }
+    }
+
+    fun confirmDelete(dishId: Long) {
+        _screenState.value = ScreenState.Loading<Nothing>()
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                dishRepository.deleteDish(dishId)
+                analyticsRepository.logEvent(Constants.Analytics.DishV2.DELETED, null)
+                _screenState.value = ScreenState.Success<Nothing>()
+            } catch (e: Exception) {
+                _screenState.value = ScreenState.Error(Error(e.message))
+            }
+        }
+    }
 
     fun toggleRecipeViewMode() = recipeHandler.toggleRecipeViewMode()
     fun cancelRecipeEdit() = recipeHandler.cancelRecipeEdit(_dish.value?.recipe)

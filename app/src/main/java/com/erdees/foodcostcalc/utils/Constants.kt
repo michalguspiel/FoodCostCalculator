@@ -81,6 +81,8 @@ object Constants {
         }
 
         object DishV2 {
+            const val DELETE = "dish_delete_clicked"
+            const val DELETED = "dish_deleted"
             const val PRODUCT_CREATED = "product_created_dishv2"
             const val DISH_CREATION_STARTED =
                 "dish_creation_started" // When the screen is first entered
@@ -114,6 +116,17 @@ object Constants {
             const val ADD_INGREDIENT_CLICKED = "add_ingredient_clicked"
             const val ADD_INGREDIENT_TYPE_INTENT = "add_ingredient_type_intent"
         }
+
+        object Products {
+            const val DELETE = "product_delete"
+            const val DELETED = "product_deleted"
+        }
+
+        object HalfProducts {
+            const val DELETE = "half_product_delete"
+            const val DELETED = "half_product_deleted"
+        }
+
     }
 
     object UI {
