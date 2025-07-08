@@ -81,6 +81,8 @@ object Constants {
         }
 
         object DishV2 {
+            const val DELETE = "dish_delete_clicked"
+            const val DELETED = "dish_deleted"
             const val PRODUCT_CREATED = "product_created_dishv2"
             const val DISH_CREATION_STARTED =
                 "dish_creation_started" // When the screen is first entered

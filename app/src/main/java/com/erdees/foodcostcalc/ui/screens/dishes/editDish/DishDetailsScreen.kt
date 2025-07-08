@@ -64,6 +64,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
@@ -75,7 +76,6 @@ data class EditDishScreenCallbacks(
     val saveDish: () -> Unit,
     val shareDish: (Context) -> Unit,
     val setInteraction: (InteractionType) -> Unit,
-    val deleteDish: (Long) -> Unit,
     val removeItem: (UsedItem) -> Unit,
     val updateQuantity: (String) -> Unit,
     val saveQuantity: () -> Unit,
@@ -87,7 +87,9 @@ data class EditDishScreenCallbacks(
     val saveName: () -> Unit,
     val updateTotalPrice: (String) -> Unit,
     val saveTotalPrice: () -> Unit,
-    val resetScreenState: () -> Unit
+    val resetScreenState: () -> Unit,
+    val onDeleteDishClick: () -> Unit,
+    val onDeleteConfirmed: (Long) -> Unit
 )
 
 data class EditDishScreenState(
@@ -147,7 +149,6 @@ fun DishDetailsScreen(
             saveDish = viewModel::saveDish,
             shareDish = viewModel::shareDish,
             setInteraction = viewModel::setInteraction,
-            deleteDish = viewModel::deleteDish,
             removeItem = viewModel::removeItem,
             updateQuantity = viewModel::updateQuantity,
             saveQuantity = viewModel::updateItemQuantity,
@@ -159,7 +160,9 @@ fun DishDetailsScreen(
             saveName = viewModel::saveDishName,
             updateTotalPrice = viewModel::updateTotalPrice,
             saveTotalPrice = viewModel::saveDishTotalPrice,
-            resetScreenState = viewModel::resetScreenState
+            resetScreenState = viewModel::resetScreenState,
+            onDeleteDishClick = viewModel::onDeleteDishClick,
+            onDeleteConfirmed = viewModel::confirmDelete
         )
     )
 }
@@ -183,7 +186,9 @@ private fun EditDishScreenContent(
                             callbacks.setInteraction(InteractionType.EditName)
                         })
                 }, actions = {
-                    IconButton(onClick = { callbacks.deleteDish(dishId) }) {
+                    IconButton(onClick = {
+                        callbacks.onDeleteDishClick()
+                    }) {
                         Icon(
                             imageVector = Icons.Sharp.Delete,
                             contentDescription = stringResource(R.string.remove_dish)
@@ -311,6 +316,17 @@ private fun EditDishScreenContent(
                                     updateValue = { callbacks.updateQuantity(it) },
                                     onSave = { callbacks.saveQuantity() },
                                     onDismiss = { callbacks.resetScreenState() }
+                                )
+                            }
+
+                            is InteractionType.DeleteConfirmation -> {
+                                val deleteConfirmation = screenState.interaction
+                                FCCDeleteConfirmationDialog(
+                                    itemName = deleteConfirmation.itemName,
+                                    onDismiss = { callbacks.resetScreenState() },
+                                    onConfirmDelete = {
+                                        callbacks.onDeleteConfirmed(deleteConfirmation.itemId)
+                                    }
                                 )
                             }
 
@@ -515,5 +531,5 @@ private fun EditDishScreenContentPreview(
 }
 
 private fun createEmptyEditDishScreenCallbacks() = EditDishScreenCallbacks(
-    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
+    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 )
