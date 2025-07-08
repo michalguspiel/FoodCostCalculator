@@ -114,6 +114,12 @@ object Constants {
             const val ADD_INGREDIENT_CLICKED = "add_ingredient_clicked"
             const val ADD_INGREDIENT_TYPE_INTENT = "add_ingredient_type_intent"
         }
+
+        object Products {
+            const val DELETE = "product_delete"
+            const val DELETED = "product_deleted"
+        }
+
     }
 
     object UI {

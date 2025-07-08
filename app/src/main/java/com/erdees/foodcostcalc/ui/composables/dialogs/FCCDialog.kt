@@ -20,6 +20,44 @@ import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FCCDialog(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    onDismiss: () -> Unit,
+    primaryActionButton: @Composable () -> Unit,
+    secondaryActionButton: @Composable (() -> Unit)? = null
+) {
+    BasicAlertDialog(
+        modifier = modifier,
+        onDismissRequest = { onDismiss() },
+    ) {
+        Column(
+            Modifier
+                .background(
+                    MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(28.dp)
+                )
+                .padding(24.dp)
+        ) {
+            Text(text = title, style = MaterialTheme.typography.titleLarge)
+
+            subtitle?.let {
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(text = it, style = MaterialTheme.typography.bodyMedium)
+            }
+
+            Spacer(modifier = Modifier.size(24.dp))
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                secondaryActionButton?.invoke()
+                Spacer(modifier = Modifier.size(8.dp))
+                primaryActionButton()
+            }
+        }
+    }
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

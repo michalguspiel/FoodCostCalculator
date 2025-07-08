@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.ProductBase
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableProductDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductBase
@@ -11,6 +12,7 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +32,7 @@ class EditProductViewModel : ViewModel(), KoinComponent {
 
     private val productRepository: ProductRepository by inject()
     private val preferences: Preferences by inject()
+    private val analyticsRepository: AnalyticsRepository by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -112,18 +115,6 @@ class EditProductViewModel : ViewModel(), KoinComponent {
         _screenState.value = ScreenState.Interaction(InteractionType.EditName)
     }
 
-    fun deleteProduct(id: Long) {
-        _screenState.value = ScreenState.Loading<Nothing>()
-        try {
-            viewModelScope.launch(Dispatchers.IO) {
-                productRepository.deleteProduct(id)
-                _screenState.value = ScreenState.Success<Nothing>()
-            }
-        } catch (e: Exception) {
-            _screenState.value = ScreenState.Error(Error(e))
-        }
-    }
-
     val saveButtonEnabled = product.map {
         it?.name?.isNotBlank() == true &&
                 it.pricePerUnit.toDoubleOrNull() != null &&
@@ -154,6 +145,27 @@ class EditProductViewModel : ViewModel(), KoinComponent {
     private suspend fun updateProductInRepository(productBase: ProductBase) {
         withContext(Dispatchers.IO) {
             productRepository.editProduct(productBase)
+        }
+    }
+
+    fun onDeleteProductClick() {
+        val product = _product.value ?: return
+        analyticsRepository.logEvent(Constants.Analytics.Products.DELETE, null)
+        _screenState.update {
+            ScreenState.Interaction(InteractionType.DeleteConfirmation(product.id, product.name))
+        }
+    }
+
+    fun deleteProduct(id: Long) {
+        _screenState.value = ScreenState.Loading<Nothing>()
+        try {
+            viewModelScope.launch(Dispatchers.IO) {
+                productRepository.deleteProduct(id)
+                analyticsRepository.logEvent(Constants.Analytics.Products.DELETED, null)
+                _screenState.value = ScreenState.Success<Nothing>()
+            }
+        } catch (e: Exception) {
+            _screenState.value = ScreenState.Error(Error(e))
         }
     }
 }

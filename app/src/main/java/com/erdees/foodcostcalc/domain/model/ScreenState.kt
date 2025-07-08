@@ -13,6 +13,7 @@ sealed class InteractionType {
     data object CalculateWaste : InteractionType()
     data object CalculatePiecePrice : InteractionType()
     data object CreateHalfProduct : InteractionType()
+    data class DeleteConfirmation(val itemId: Long, val itemName: String) : InteractionType()
 }
 
 sealed class ScreenState {

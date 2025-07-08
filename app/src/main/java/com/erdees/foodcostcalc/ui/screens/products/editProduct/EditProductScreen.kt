@@ -40,6 +40,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
@@ -89,7 +90,9 @@ fun EditProductScreen(
                         })
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.deleteProduct(productId) }) {
+                    IconButton(onClick = {
+                        viewModel.onDeleteProductClick()
+                    }) {
                         Icon(
                             imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
                                 id = R.string.content_description_remove_product
@@ -193,6 +196,17 @@ fun EditProductScreen(
                                     keyboardType = KeyboardType.Text,
                                     capitalization = KeyboardCapitalization.Words
                                 )
+                            )
+                        }
+
+                        is InteractionType.DeleteConfirmation -> {
+                            val deleteConfirmation = (screenState as ScreenState.Interaction).interaction as InteractionType.DeleteConfirmation
+                            FCCDeleteConfirmationDialog(
+                                itemName = deleteConfirmation.itemName,
+                                onDismiss = viewModel::resetScreenState,
+                                onConfirmDelete = {
+                                    viewModel.deleteProduct(deleteConfirmation.itemId)
+                                }
                             )
                         }
 
