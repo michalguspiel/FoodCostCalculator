@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.products.editProduct
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
@@ -12,6 +13,9 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
+import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.PRODUCT_ID_KEY
+import com.erdees.foodcostcalc.utils.MyDispatchers
+import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
@@ -21,18 +25,22 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
-class EditProductViewModel : ViewModel(), KoinComponent {
+class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
+    KoinComponent {
 
     private val productRepository: ProductRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
+    private val myDispatchers: MyDispatchers by inject()
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -43,6 +51,15 @@ class EditProductViewModel : ViewModel(), KoinComponent {
 
     private var _product = MutableStateFlow<EditableProductDomain?>(null)
     val product: StateFlow<EditableProductDomain?> = _product
+        .onStart { fetchProduct() }
+        .stateIn(
+            viewModelScope,
+            SharingStarted.Lazily,
+            null
+        )
+
+    // Store original product state for comparison
+    private var originalProduct: EditableProductDomain? = null
 
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
@@ -53,19 +70,25 @@ class EditProductViewModel : ViewModel(), KoinComponent {
         false
     )
 
-    fun initializeWith(productId: Long) {
+    private fun fetchProduct() {
         _screenState.update { ScreenState.Loading<Nothing>() }
         viewModelScope.launch {
             try {
+                val productId = savedStateHandle.get<Long>(PRODUCT_ID_KEY)
+                    ?: throw NullPointerException("Failed to fetch product due to missing id in savedStateHandle")
+
+                Timber.i("Fetching product with ID: $productId")
                 val product = productRepository.getProduct(productId)
-                    .flowOn(Dispatchers.IO)
+                    .flowOn(myDispatchers.ioDispatcher)
                     .first()
                 with(product.toProductDomain()) {
                     _product.value = this.toEditableProductDomain()
+                    originalProduct = this.toEditableProductDomain() // Store original state
                     _editableName.value = this.name
                 }
                 _screenState.update { ScreenState.Idle }
             } catch (e: Exception) {
+                Timber.e(e, "Error fetching product")
                 _screenState.update {
                     ScreenState.Error(Error(e))
                 }
@@ -167,5 +190,14 @@ class EditProductViewModel : ViewModel(), KoinComponent {
         } catch (e: Exception) {
             _screenState.value = ScreenState.Error(Error(e))
         }
+    }
+
+    /**
+     * Checks if there are unsaved changes by comparing current product state with original state.
+     *
+     * @return true if there are unsaved changes, false otherwise
+     */
+    fun hasUnsavedChanges(): Boolean {
+        return UnsavedChangesValidator.hasUnsavedChanges(originalProduct, _product.value)
     }
 }

@@ -62,9 +62,6 @@ fun EditProductScreen(
     val saveNameButtonEnabled by viewModel.saveNameButtonEnabled.collectAsState()
     val showTaxPercent by viewModel.showTaxPercent.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.initializeWith(productId)
-    }
 
     LaunchedEffect(screenState) {
         when (screenState) {

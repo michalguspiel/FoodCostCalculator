@@ -59,10 +59,6 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
     val editableName by viewModel.editableName.collectAsState()
     val currency by viewModel.currency.collectAsState()
 
-    LaunchedEffect(halfProductId) {
-        viewModel.initializeWith(halfProductId)
-    }
-
     LaunchedEffect(screenState) {
         when (screenState) {
             is ScreenState.Success<*> -> {
