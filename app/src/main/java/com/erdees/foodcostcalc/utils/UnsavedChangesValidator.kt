@@ -32,16 +32,11 @@ object UnsavedChangesValidator {
      * @return true if changes are detected, false otherwise
      */
     fun <T> hasListChanges(originalList: List<T>?, currentList: List<T>?): Boolean {
-        // If both are null, no changes
-        if (originalList == null && currentList == null) return false
-
-        // If one is null and the other isn't, there are changes
-        if (originalList == null || currentList == null) return true
-
-        // If sizes differ, there are changes
-        if (originalList.size != currentList.size) return true
-
-        // Compare each element
-        return originalList != currentList
+        return when {
+            originalList == null && currentList == null -> false
+            originalList == null || currentList == null -> true
+            originalList.size != currentList.size -> true
+            else -> originalList != currentList
+        }
     }
 }
