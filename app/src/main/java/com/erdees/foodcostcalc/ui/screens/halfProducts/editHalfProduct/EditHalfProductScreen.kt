@@ -50,7 +50,10 @@ import timber.log.Timber
 @OptIn(ExperimentalMaterial3Api::class)
 @Screen
 @Composable
-fun EditHalfProductScreen(navController: NavController, halfProductId: Long, viewModel: EditHalfProductViewModel = viewModel()) {
+fun EditHalfProductScreen(
+    navController: NavController,
+    viewModel: EditHalfProductViewModel = viewModel()
+) {
 
     val screenState by viewModel.screenState.collectAsState()
     val usedItems by viewModel.usedItems.collectAsState()

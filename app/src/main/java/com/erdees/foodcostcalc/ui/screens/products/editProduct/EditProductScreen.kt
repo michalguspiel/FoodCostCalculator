@@ -51,7 +51,6 @@ import timber.log.Timber
 @Screen
 @Composable
 fun EditProductScreen(
-    productId: Long,
     navController: NavController,
     viewModel: EditProductViewModel = viewModel()
 ) {
