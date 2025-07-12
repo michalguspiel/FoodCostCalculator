@@ -57,10 +57,10 @@ sealed class FCCScreen(
     data object CreateDishSummary : FCCScreen()
 
     @Serializable
-    data class EditHalfProduct(val halfProductId: Long) : FCCScreen()
+    data class EditHalfProduct(@SerialName(HALF_PRODUCT_ID_KEY) val halfProductId: Long) : FCCScreen()
 
     @Serializable
-    data class EditProduct(val productId: Long) : FCCScreen()
+    data class EditProduct(@SerialName(PRODUCT_ID_KEY) val productId: Long) : FCCScreen()
 
     @Serializable
     data object Subscription : FCCScreen()
@@ -69,15 +69,17 @@ sealed class FCCScreen(
     data object Recipe : FCCScreen()
 
     @Serializable
-    data object FeatureRequest: FCCScreen()
+    data object FeatureRequest : FCCScreen()
 
     @Serializable
-    data object FeatureRequestList: FCCScreen()
+    data object FeatureRequestList : FCCScreen()
 
     @Serializable
     data object Onboarding : FCCScreen()
 
     companion object {
         const val DISH_ID_KEY = "dishId"
+        const val PRODUCT_ID_KEY = "productId"
+        const val HALF_PRODUCT_ID_KEY = "halfProductId"
     }
 }

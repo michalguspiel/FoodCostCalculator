@@ -64,6 +64,41 @@ fun FCCDialog(
 fun FCCDialog(
     title: String,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    onDismiss: () -> Unit,
+    buttonRow: @Composable () -> Unit
+) {
+    BasicAlertDialog(
+        modifier = modifier,
+        onDismissRequest = { onDismiss() },
+    ) {
+        Column(
+            Modifier
+                .background(
+                    MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(28.dp)
+                )
+                .padding(24.dp)
+        ) {
+            Text(text = title, style = MaterialTheme.typography.titleLarge)
+
+            subtitle?.let {
+                Spacer(modifier = Modifier.size(8.dp))
+                Text(text = it, style = MaterialTheme.typography.bodyMedium)
+            }
+
+            Spacer(modifier = Modifier.size(24.dp))
+
+            buttonRow()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FCCDialog(
+    title: String,
+    modifier: Modifier = Modifier,
     primaryButtonText: String = stringResource(id = R.string.save),
     onDismiss: () -> Unit,
     onPrimaryButtonClick: () -> Unit,
