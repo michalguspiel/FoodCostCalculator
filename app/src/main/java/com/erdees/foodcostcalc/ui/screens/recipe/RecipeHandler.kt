@@ -171,6 +171,25 @@ class RecipeHandler(
         }
     }
 
+    /**
+     * Checks if the recipe has been modified.
+     * @param originalRecipe The original state of the recipe to compare against.
+     * @return `true` if there are unsaved changes, `false` otherwise.
+     */
+    fun hasRecipeChanges(originalRecipe: RecipeDomain?): Boolean {
+        val currentRecipe = _recipe.value
+        // If there was no original recipe and the current one is empty (default), no changes.
+        if (originalRecipe == null && currentRecipe == EditableRecipe()) {
+            return false
+        }
+        // If there was no original recipe, but user added something, there are changes.
+        if (originalRecipe == null) {
+            return currentRecipe != EditableRecipe()
+        }
+        // Compare the original recipe with the current editable recipe.
+        return originalRecipe.toEditableRecipe() != currentRecipe
+    }
+
     fun saveRecipe(dish: DishDomain?) {
         Timber.i("saveRecipe()")
         updateScreenState(ScreenState.Loading<Nothing>())

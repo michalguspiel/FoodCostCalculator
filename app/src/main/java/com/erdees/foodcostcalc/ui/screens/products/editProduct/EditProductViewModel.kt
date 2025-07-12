@@ -14,9 +14,9 @@ import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.PRODUCT_ID_KEY
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
-import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -44,6 +44,9 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
+
+    // Store the navigation action to be executed after confirmation
+    private var pendingNavigation: (() -> Unit)? = null
 
     fun resetScreenState() {
         _screenState.value = ScreenState.Idle
@@ -156,6 +159,9 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 }
                 updateProductInRepository(newProduct)
                 _screenState.value = ScreenState.Success<Nothing>()
+
+                // Clear pending navigation after successful save
+                pendingNavigation = null
             }
         } catch (e: Exception) {
             _screenState.value = ScreenState.Error(Error(e))
@@ -199,5 +205,40 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      */
     fun hasUnsavedChanges(): Boolean {
         return UnsavedChangesValidator.hasUnsavedChanges(originalProduct, _product.value)
+    }
+
+    /**
+     * Handles back navigation with unsaved changes check
+     *
+     * @param navigate The navigation action to perform if confirmed or no unsaved changes
+     */
+    fun handleBackNavigation(navigate: () -> Unit) {
+        if (hasUnsavedChanges()) {
+            // Store the navigation action for later use
+            pendingNavigation = navigate
+            // Show confirmation dialog
+            _screenState.update { ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation) }
+        } else {
+            // No unsaved changes, proceed with navigation
+            navigate()
+        }
+    }
+
+    /**
+     * Called when user confirms to discard changes in the unsaved changes dialog
+     */
+    fun discardChanges() {
+        pendingNavigation?.invoke()
+        pendingNavigation = null
+        resetScreenState()
+    }
+
+    /**
+     * Called when user confirms to save changes in the unsaved changes dialog
+     */
+    fun saveAndNavigate() {
+        // Save and then navigate
+        save()
+        // The navigation will be handled in the LaunchedEffect in the UI that observes ScreenState.Success
     }
 }

@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct
 
 import android.icu.util.Currency
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
@@ -61,6 +63,10 @@ fun EditHalfProductScreen(
     val editableQuantity by viewModel.editableQuantity.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
     val currency by viewModel.currency.collectAsState()
+
+    BackHandler {
+        viewModel.handleBackNavigation { navController.popBackStack() }
+    }
 
     LaunchedEffect(screenState) {
         when (screenState) {
@@ -96,7 +102,9 @@ fun EditHalfProductScreen(
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = {
+                        viewModel.handleBackNavigation { navController.popBackStack() }
+                    }) {
                         Icon(
                             Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
                                 id = R.string.back
@@ -194,6 +202,14 @@ fun EditHalfProductScreen(
                                 onConfirmDelete = {
                                     viewModel.confirmDelete(interaction.itemId)
                                 }
+                            )
+                        }
+
+                        InteractionType.UnsavedChangesConfirmation -> {
+                            FCCUnsavedChangesDialog(
+                                onDismiss = viewModel::resetScreenState,
+                                onDiscard = viewModel::discardChanges,
+                                onSave = viewModel::saveAndNavigate
                             )
                         }
 

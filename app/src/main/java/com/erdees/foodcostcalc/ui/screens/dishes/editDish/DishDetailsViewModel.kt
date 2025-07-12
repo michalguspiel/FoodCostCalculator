@@ -27,6 +27,7 @@ import com.erdees.foodcostcalc.ui.screens.recipe.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
+import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,12 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private var _editableTotalPrice: MutableStateFlow<String> = MutableStateFlow("")
     val editableTotalPrice: StateFlow<String> = _editableTotalPrice
 
+    // Store the navigation action to be executed after confirmation
+    private var pendingNavigation: (() -> Unit)? = null
+
+    // Original dish for comparison to detect unsaved changes
+    private var originalDish: DishDomain? = null
+
     val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val recipeHandler: RecipeHandler = RecipeHandler(
@@ -106,6 +113,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                         recipeHandler.updateRecipeViewMode(RecipeViewMode.EDIT)
                     }
                     _dish.update { this }
+                    // Store original dish for unsaved changes detection
+                    originalDish = this.copy()
                     recipeHandler.updateRecipe(this.recipe.toEditableRecipe())
                     originalProducts = this.products
                     originalHalfProducts = this.halfProducts
@@ -281,6 +290,63 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     /**
+     * Checks if the dish has unsaved changes by comparing with the original state
+     *
+     * @return true if there are unsaved changes, false otherwise
+     */
+    fun hasUnsavedChanges(): Boolean {
+        if (recipeHandler.hasRecipeChanges(originalDish?.recipe)) {
+            return true
+        }
+
+        // Check if dish properties have changed
+        if (!UnsavedChangesValidator.hasUnsavedChanges(originalDish, _dish.value)) {
+            // Deep check for products and half-products changes
+            val productsChanged = originalProducts != _dish.value?.products
+            val halfProductsChanged = originalHalfProducts != _dish.value?.halfProducts
+
+            return productsChanged || halfProductsChanged
+        }
+
+        return true
+    }
+
+    /**
+     * Handles back navigation with unsaved changes check
+     *
+     * @param navigate The navigation action to perform if confirmed or no unsaved changes
+     */
+    fun handleBackNavigation(navigate: () -> Unit) {
+        if (hasUnsavedChanges()) {
+            // Store the navigation action for later use
+            pendingNavigation = navigate
+            // Show confirmation dialog
+            _screenState.update { ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation) }
+        } else {
+            // No unsaved changes, proceed with navigation
+            navigate()
+        }
+    }
+
+    /**
+     * Called when user confirms to discard changes in the unsaved changes dialog
+     */
+    fun discardChanges() {
+        pendingNavigation?.invoke()
+        pendingNavigation = null
+        resetScreenState()
+    }
+
+    /**
+     * Called when user confirms to save changes in the unsaved changes dialog
+     */
+    fun saveAndNavigate() {
+        // Save and then navigate
+        saveDish()
+        // The navigation will be handled in the LaunchedEffect in the UI that observes ScreenState.Success
+    }
+
+    /**
      * This function is responsible for saving the changes made to a dish.
      * It first sets the screen state to loading and then launches a coroutine on the main thread.
      *
@@ -331,6 +397,9 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                     dishRepository.updateDish(this@DishDetailsViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
                 }
                 _screenState.value = ScreenState.Success<Nothing>()
+
+                // Clear pending navigation after successful save
+                pendingNavigation = null
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }

@@ -15,9 +15,10 @@ import com.erdees.foodcostcalc.domain.model.ScreenState.Interaction
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
-import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.HALF_PRODUCT_ID_KEY
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
+import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -64,6 +65,9 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
         _editableName.value = value
     }
 
+    // Store the navigation action to be executed after confirmation
+    private var pendingNavigation: (() -> Unit)? = null
+
     fun setInteraction(interaction: InteractionType) {
         when (interaction) {
             is InteractionType.EditItem -> {
@@ -92,6 +96,7 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
             null
         )
 
+    private var originalHalfProduct: HalfProductDomain? = null
     private var originalProducts: List<UsedProductDomain> = listOf()
 
     val usedItems: StateFlow<List<UsedProductDomain>> = halfProduct.map {
@@ -111,6 +116,7 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
                     .first()
                 with(halfProduct.toHalfProductDomain()) {
                     _halfProduct.value = this
+                    originalHalfProduct = this
                     originalProducts = this.products
                     _editableName.value = this.name
                 }
@@ -136,6 +142,32 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
     fun removeItem(item: UsedItem) {
         val halfProduct = halfProduct.value ?: return
         _halfProduct.value = halfProduct.copy(products = halfProduct.products.filter { it != item })
+    }
+
+    private fun hasUnsavedChanges(): Boolean {
+        val halfProductChanged = UnsavedChangesValidator.hasUnsavedChanges(originalHalfProduct, _halfProduct.value)
+        val productsChanged = UnsavedChangesValidator.hasListChanges(originalProducts, _halfProduct.value?.products)
+        return halfProductChanged || productsChanged
+    }
+
+    fun handleBackNavigation(navigate: () -> Unit) {
+        if (hasUnsavedChanges()) {
+            pendingNavigation = navigate
+            _screenState.update { Interaction(InteractionType.UnsavedChangesConfirmation) }
+        } else {
+            navigate()
+        }
+    }
+
+    fun discardChanges() {
+        pendingNavigation?.invoke()
+        pendingNavigation = null
+        resetScreenState()
+    }
+
+    fun saveAndNavigate() {
+        saveHalfProduct()
+        // Navigation will be handled by the LaunchedEffect in the UI that observes ScreenState.Success
     }
 
     fun onDeleteHalfProductClick() {
@@ -194,6 +226,7 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
                     halfProductRepository.updateHalfProduct(halfProduct.toHalfProductBase())
                 }
                 _screenState.value = ScreenState.Success<Nothing>()
+                pendingNavigation = null
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }

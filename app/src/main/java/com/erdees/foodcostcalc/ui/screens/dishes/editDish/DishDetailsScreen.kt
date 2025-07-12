@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import android.content.Context
 import android.icu.util.Currency
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -65,6 +66,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
@@ -89,7 +91,9 @@ data class EditDishScreenCallbacks(
     val saveTotalPrice: () -> Unit,
     val resetScreenState: () -> Unit,
     val onDeleteDishClick: () -> Unit,
-    val onDeleteConfirmed: (Long) -> Unit
+    val onDeleteConfirmed: (Long) -> Unit,
+    val discardChanges: () -> Unit,
+    val saveAndNavigate: () -> Unit
 )
 
 data class EditDishScreenState(
@@ -119,6 +123,10 @@ fun DishDetailsScreen(
     val editableName by viewModel.editableName.collectAsState()
     val editableTotalPrice by viewModel.editableTotalPrice.collectAsState()
     val currency by viewModel.currency.collectAsState()
+
+    BackHandler {
+        viewModel.handleBackNavigation { navController.popBackStack() }
+    }
 
     LaunchedEffect(screenState) {
         when (screenState) {
@@ -162,7 +170,9 @@ fun DishDetailsScreen(
             saveTotalPrice = viewModel::saveDishTotalPrice,
             resetScreenState = viewModel::resetScreenState,
             onDeleteDishClick = viewModel::onDeleteDishClick,
-            onDeleteConfirmed = viewModel::confirmDelete
+            onDeleteConfirmed = viewModel::confirmDelete,
+            discardChanges = viewModel::discardChanges,
+            saveAndNavigate = viewModel::saveAndNavigate
         )
     )
 }
@@ -310,6 +320,14 @@ private fun EditDishScreenContent(
                                     onConfirmDelete = {
                                         callbacks.onDeleteConfirmed(deleteConfirmation.itemId)
                                     }
+                                )
+                            }
+
+                            InteractionType.UnsavedChangesConfirmation -> {
+                                FCCUnsavedChangesDialog(
+                                    onDismiss = { callbacks.resetScreenState() },
+                                    onDiscard = { callbacks.discardChanges() },
+                                    onSave = { callbacks.saveAndNavigate() }
                                 )
                             }
 
@@ -548,5 +566,5 @@ private fun EditDishScreenContentPreview(
 }
 
 private fun createEmptyEditDishScreenCallbacks() = EditDishScreenCallbacks(
-    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
+    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
 )
