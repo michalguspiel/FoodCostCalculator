@@ -68,7 +68,6 @@ class Spotlight(private val scope: CoroutineScope) : KoinComponent {
             logStepShown()
             scrollToCurrentTarget()
         } else {
-            logCompleted()
             stop()
         }
     }
@@ -76,6 +75,7 @@ class Spotlight(private val scope: CoroutineScope) : KoinComponent {
     /** Stops the spotlight tour and cleans up the state. */
     private fun stop() {
         Timber.i("Spotlight stopping.")
+        logCompleted()
         currentIndex = -1
         targets = emptyList()
     }
