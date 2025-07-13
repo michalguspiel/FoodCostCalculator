@@ -38,6 +38,7 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableTax = "10",
             editableMargin = "150",
             editableName = sampleDish.name,
+            editableCopiedDishName = "",
             editableTotalPrice = "120",
             currency = sampleCurrency,
             screenState = ScreenState.Idle // or ScreenState.Idle if you have one
@@ -51,6 +52,7 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableTax = "",
             editableMargin = "",
             editableName = "",
+            editableCopiedDishName = "",
             editableTotalPrice = "",
             currency = sampleCurrency,
             screenState = ScreenState.Loading<Nothing>()
@@ -64,6 +66,7 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableTax = "",
             editableMargin = "",
             editableName = "",
+            editableCopiedDishName = "",
             editableTotalPrice = "",
             currency = sampleCurrency,
             screenState = ScreenState.Error(Error("Something went wrong!"))
@@ -77,6 +80,7 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableTax = "10",
             editableMargin = "150",
             editableName = sampleDish.name,
+            editableCopiedDishName = "",
             editableTotalPrice = sampleDish.totalPrice.toString(),
             currency = sampleCurrency,
             screenState = ScreenState.Interaction(InteractionType.EditName)
@@ -90,6 +94,7 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableTax = "10", // Current tax being edited
             editableMargin = "150",
             editableName = sampleDish.name,
+            editableCopiedDishName = "",
             editableTotalPrice = sampleDish.totalPrice.toString(),
             currency = sampleCurrency,
             screenState = ScreenState.Interaction(InteractionType.EditTax)

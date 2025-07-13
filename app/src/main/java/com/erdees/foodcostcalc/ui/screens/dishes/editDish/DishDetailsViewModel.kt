@@ -17,9 +17,12 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
+import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
+import com.erdees.foodcostcalc.domain.model.dish.DishActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
 import com.erdees.foodcostcalc.ext.toShareableText
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
@@ -52,6 +55,7 @@ import timber.log.Timber
 class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
     KoinComponent {
 
+    private val copyDishUseCase: CopyDishUseCase by inject()
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
@@ -66,6 +70,9 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
     val editableName: StateFlow<String> = _editableName
 
+    private var _editableCopiedDishName: MutableStateFlow<String> = MutableStateFlow("")
+    val editableCopiedDishName: StateFlow<String> = _editableCopiedDishName
+
     private var _editableTotalPrice: MutableStateFlow<String> = MutableStateFlow("")
     val editableTotalPrice: StateFlow<String> = _editableTotalPrice
 
@@ -77,8 +84,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         viewModelScope = viewModelScope,
         resetScreenState = { resetScreenState() },
         updateScreenState = { _screenState.value = it },
-        updateDish = { _dish.value = it }
-    )
+        updateDish = { _dish.value = it })
 
     val recipe = recipeHandler.recipe
     val recipeViewModeState = recipeHandler.recipeViewModeState
@@ -101,7 +107,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         _screenState.update { ScreenState.Loading<Nothing>() }
         viewModelScope.launch {
             try {
-                val id = savedStateHandle.get<Long>(DISH_ID_KEY) ?: throw NullPointerException("Failed to fetch dish due to missing id in savedStateHandle")
+                val id = savedStateHandle.get<Long>(DISH_ID_KEY)
+                    ?: throw NullPointerException("Failed to fetch dish due to missing id in savedStateHandle")
                 val dish = dishRepository.getDish(id).flowOn(myDispatchers.ioDispatcher).first()
                 with(dish.toDishDomain()) {
                     Timber.i("Fetched dish: $this")
@@ -124,6 +131,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     fun updateName(value: String) {
         _editableName.value = value
+    }
+
+    fun updateCopiedDishName(value: String) {
+        _editableCopiedDishName.value = value
     }
 
     private var _editableQuantity: MutableStateFlow<String> = MutableStateFlow("")
@@ -171,9 +182,14 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 if (_dish.value?.foodCost == 0.00) {
                     return
                 }
-                val price = Utils.formatPriceWithoutSymbol(dish.value?.totalPrice, currency.value?.currencyCode)
+                val price = Utils.formatPriceWithoutSymbol(
+                    dish.value?.totalPrice, currency.value?.currencyCode
+                )
                 _editableTotalPrice.value = price
             }
+
+            is InteractionType.CopyDish ->
+                _editableCopiedDishName.value = dish.value?.name ?: ""
 
             else -> {}
         }
@@ -207,8 +223,9 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 val index = dish.halfProducts.indexOf(item)
                 if (index != -1) {
                     val updatedItem = item.copy(quantity = value)
-                    _dish.value = _dish.value?.copy(halfProducts = dish.halfProducts.toMutableList()
-                        .apply { set(index, updatedItem) })
+                    _dish.value = _dish.value?.copy(
+                        halfProducts = dish.halfProducts.toMutableList()
+                            .apply { set(index, updatedItem) })
                 }
             }
         }
@@ -246,8 +263,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         val newTotalPrice = newTotalPriceString.toDoubleOrNull()
         if (newTotalPrice == null) {
             Timber.e("Invalid total price format: $newTotalPriceString")
-            _screenState.value = ScreenState.Error(Error("Invalid total price format.")) // Example error handling
-            // Optionally, reset _editableTotalPrice.value or keep it for user correction
+            _screenState.value = ScreenState.Error(Error("Invalid total price format."))
             return
         }
         _dish.value = currentDish.withUpdatedTotalPrice(newTotalPrice)
@@ -386,7 +402,12 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
                     dishRepository.updateDish(this@DishDetailsViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
                 }
-                _screenState.value = ScreenState.Success<Nothing>()
+                _screenState.value = ScreenState.Success(
+                    DishActionResult(
+                        DishActionResultType.UPDATED,
+                        dish.id
+                    )
+                )
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
@@ -394,7 +415,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun shareDish(context: Context) {
-        analyticsRepository.logEvent(Constants.Analytics.DISH_SHARE, Bundle().apply{
+        analyticsRepository.logEvent(Constants.Analytics.DISH_SHARE, Bundle().apply {
             putString(Constants.Analytics.DISH_NAME, _dish.value?.name)
         })
 
@@ -427,7 +448,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             try {
                 dishRepository.deleteDish(dishId)
                 analyticsRepository.logEvent(Constants.Analytics.DishV2.DELETED, null)
-                _screenState.value = ScreenState.Success<Nothing>()
+                _screenState.value =
+                    ScreenState.Success(
+                        DishActionResult(DishActionResultType.DELETED, dishId)
+                    )
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
@@ -439,4 +463,24 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     fun onChangeServings() = recipeHandler.onChangeServings()
     fun updateServings(servings: String) = recipeHandler.updateServings(servings)
     fun saveRecipe() = recipeHandler.saveRecipe(_dish.value)
+
+    /**
+     * Creates a copy of the current dish with the name set in editableName.
+     * On success, emits a ScreenState.Success with DishActionResult.COPIED and the new dish ID.
+     */
+    fun copyDish() {
+        val currentDish = dish.value ?: return
+        val newName = editableCopiedDishName.value
+
+        _screenState.value = ScreenState.Loading<Nothing>()
+
+        viewModelScope.launch {
+            copyDishUseCase.invoke(currentDish, newName).onSuccess { result ->
+                _screenState.value = ScreenState.Success(result)
+            }.onFailure {
+                Timber.e("Failed to copy dish: ${it.message}", it)
+                _screenState.value = ScreenState.Error(Error(it.message))
+            }
+        }
+    }
 }

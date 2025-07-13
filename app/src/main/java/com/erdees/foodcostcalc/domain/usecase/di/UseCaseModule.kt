@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.domain.usecase.di
 
+import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.SubmitFeatureRequestUseCase
 import org.koin.dsl.module
 
@@ -10,6 +11,16 @@ val useCaseModule = module {
             featureRequestService = get(),
             featureRequestRepository = get(),
             dispatchers = get()
+        )
+    }
+    factory {
+        CopyDishUseCase(
+            dishRepository = get(),
+            productRepository = get(),
+            halfProductRepository = get(),
+            recipeRepository = get(),
+            analyticsRepository = get(),
+            myDispatchers = get()
         )
     }
 }

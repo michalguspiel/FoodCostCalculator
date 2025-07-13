@@ -211,6 +211,20 @@ object Mapper {
         return this.toRecipeDomain().toEditableRecipe()
     }
 
+    fun RecipeDomain.toRecipe(id: Long? = null): Recipe {
+        return Recipe(
+            recipeId = id ?: 0,
+            cookTimeMinutes = cookTimeMinutes,
+            prepTimeMinutes = prepTimeMinutes,
+            description = description,
+            tips = tips
+        )
+    }
+
+    fun RecipeDomain.toSteps() : List<RecipeStep> {
+        return steps?.map { it.toRecipeStep(recipeId = recipeId ?: 0) } ?: emptyList()
+    }
+
 
     fun EditableRecipe.toRecipe(id: Long?): Recipe {
         return Recipe(

@@ -8,37 +8,32 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.ArrowBack
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.sharp.Delete
-import androidx.compose.material.icons.sharp.Edit
+import androidx.compose.material.icons.sharp.Face
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SwipeToDismissBox
-import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.minimumInteractiveComponentSize
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -56,10 +51,11 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
+import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
+import com.erdees.foodcostcalc.domain.model.dish.DishActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
-import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -72,7 +68,6 @@ import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
-import com.erdees.foodcostcalc.utils.Utils
 
 data class EditDishScreenCallbacks(
     val saveDish: () -> Unit,
@@ -93,7 +88,9 @@ data class EditDishScreenCallbacks(
     val onDeleteDishClick: () -> Unit,
     val onDeleteConfirmed: (Long) -> Unit,
     val discardChanges: (() -> Unit) -> Unit,
-    val saveAndNavigate: () -> Unit
+    val saveAndNavigate: () -> Unit,
+    val copyDish: () -> Unit,
+    val updateCopiedDishName: (String) -> Unit,
 )
 
 data class EditDishScreenState(
@@ -104,6 +101,7 @@ data class EditDishScreenState(
     val editableTax: String,
     val editableMargin: String,
     val editableName: String,
+    val editableCopiedDishName: String,
     val editableTotalPrice: String,
     val currency: Currency?,
     val screenState: ScreenState,
@@ -121,6 +119,7 @@ fun DishDetailsScreen(
     val editableTax by viewModel.editableTax.collectAsState()
     val editableMargin by viewModel.editableMargin.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
+    val editableCopiedDishName by viewModel.editableCopiedDishName.collectAsState()
     val editableTotalPrice by viewModel.editableTotalPrice.collectAsState()
     val currency by viewModel.currency.collectAsState()
 
@@ -129,13 +128,21 @@ fun DishDetailsScreen(
     }
 
     LaunchedEffect(screenState) {
-        when (screenState) {
-            is ScreenState.Success<*> -> {
-                viewModel.resetScreenState()
+        val state = screenState as? ScreenState.Success<*> ?: return@LaunchedEffect
+        val data = state.data as? DishActionResult ?: return@LaunchedEffect
+
+        viewModel.resetScreenState()
+        when (data.type) {
+            DishActionResultType.COPIED -> {
+                navController.navigate(FCCScreen.DishDetails(data.dishId)) {
+                    popUpTo(navController.currentBackStackEntry?.destination?.route ?: "") {
+                        inclusive = true
+                    }
+                }
+            }
+            else -> {
                 navController.popBackStack()
             }
-
-            else -> {}
         }
     }
 
@@ -149,6 +156,7 @@ fun DishDetailsScreen(
             editableTax = editableTax,
             editableMargin = editableMargin,
             editableName = editableName,
+            editableCopiedDishName = editableCopiedDishName,
             editableTotalPrice = editableTotalPrice,
             currency = currency,
             screenState = screenState
@@ -171,6 +179,9 @@ fun DishDetailsScreen(
             resetScreenState = viewModel::resetScreenState,
             onDeleteDishClick = viewModel::onDeleteDishClick,
             onDeleteConfirmed = viewModel::confirmDelete,
+            copyDish = viewModel::copyDish,
+            updateCopiedDishName = viewModel::updateCopiedDishName,
+            onDeleteConfirmed = viewModel::confirmDelete,
             discardChanges = viewModel::discardChanges,
             saveAndNavigate = viewModel::saveAndNavigate
         )
@@ -192,6 +203,7 @@ private fun EditDishScreenContent(
                     dishName = modifiedDishDomain?.name ?: dishId.toString(),
                     onNameClick = { callbacks.setInteraction(InteractionType.EditName) },
                     onDeleteClick = { callbacks.onDeleteDishClick() },
+                    onCopyClick = { callbacks.setInteraction(InteractionType.CopyDish) },
                     onBackClick = { navController.popBackStack() }
                 )
             }
@@ -298,6 +310,20 @@ private fun EditDishScreenContent(
                                 )
                             }
 
+                            InteractionType.CopyDish -> {
+                                ValueEditDialog(
+                                    title = stringResource(R.string.copy_dish),
+                                    value = editableCopiedDishName,
+                                    updateValue = { callbacks.updateCopiedDishName(it) },
+                                    onSave = { callbacks.copyDish() },
+                                    onDismiss = { callbacks.resetScreenState() },
+                                    keyboardOptions = KeyboardOptions(
+                                        keyboardType = KeyboardType.Text,
+                                        capitalization = KeyboardCapitalization.Words
+                                    )
+                                )
+                            }
+
                             is InteractionType.EditItem -> {
                                 ValueEditDialog(
                                     title = stringResource(R.string.edit_quantity),
@@ -348,8 +374,11 @@ private fun EditDishTopBar(
     dishName: String,
     onNameClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onCopyClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     TopAppBar(
         title = {
             Text(
@@ -358,10 +387,41 @@ private fun EditDishTopBar(
             )
         },
         actions = {
-            IconButton(onClick = onDeleteClick) {
+            IconButton(onClick = { showMenu = true }) {
                 Icon(
-                    imageVector = Icons.Sharp.Delete,
-                    contentDescription = stringResource(R.string.remove_dish)
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = stringResource(R.string.more_options)
+                )
+            }
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false }
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.copy_dish)) },
+                    onClick = {
+                        onCopyClick()
+                        showMenu = false
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Sharp.Face,
+                            contentDescription = stringResource(R.string.copy_dish)
+                        )
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.remove_dish)) },
+                    onClick = {
+                        onDeleteClick()
+                        showMenu = false
+                    },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Sharp.Delete,
+                            contentDescription = stringResource(R.string.remove_dish)
+                        )
+                    }
                 )
             }
         },
@@ -404,121 +464,6 @@ private fun Buttons(
     )
 }
 
-@Composable
-fun DishDetails(
-    dishDomain: DishDomain,
-    currency: Currency?,
-    onTaxClick: () -> Unit,
-    onMarginClick: () -> Unit,
-    onTotalPriceClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier) {
-        Row {
-            DetailItem(
-                label = stringResource(R.string.margin),
-                value = "${dishDomain.marginPercent}%",
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .weight(1f)
-                    .clickable {
-                        onMarginClick()
-                    })
-            DetailItem(
-                label = stringResource(R.string.tax),
-                value = "${dishDomain.taxPercent}%",
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .weight(1f)
-                    .clickable {
-                        onTaxClick()
-                    })
-        }
-
-        Spacer(modifier = Modifier.size(8.dp))
-
-        Row {
-            DetailItem(
-                label = stringResource(R.string.food_cost),
-                value = Utils.formatPrice(dishDomain.foodCost, currency),
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .weight(1f)
-            )
-            DetailItem(
-                label = stringResource(R.string.final_price),
-                value = Utils.formatPrice(dishDomain.totalPrice, currency),
-                modifier = Modifier
-                    .padding(horizontal = 12.dp)
-                    .weight(1f)
-                    .clickable(enabled = dishDomain.foodCost != 0.0) {
-                        onTotalPriceClick()
-                    },
-                bolder = true
-            )
-        }
-    }
-}
-
-
-@Composable
-fun UsedItem(
-    usedItem: UsedItem,
-    onRemove: (UsedItem) -> Unit,
-    onEdit: (UsedItem) -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val swipeState = rememberSwipeToDismissBoxState()
-
-    SwipeToDismissBox(
-        modifier = modifier.animateContentSize(),
-        state = swipeState,
-        backgroundContent = {
-            Box(
-                contentAlignment = Alignment.CenterEnd,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.error)
-            ) {
-                Icon(
-                    modifier = Modifier.minimumInteractiveComponentSize(),
-                    imageVector = Icons.Sharp.Delete,
-                    contentDescription = null
-                )
-            }
-        },
-        enableDismissFromStartToEnd = false,
-        enableDismissFromEndToStart = true,
-        content = {
-            ListItem(
-                colors = (ListItemDefaults.colors(containerColor = MaterialTheme.colorScheme.background)),
-                headlineContent = {
-                    Text(text = usedItem.item.name)
-                },
-                supportingContent = {
-                    Text(text = usedItem.quantity.toString() + " " + usedItem.quantityUnit)
-                },
-                trailingContent = {
-                    IconButton(onClick = { onEdit(usedItem) }) {
-                        Icon(imageVector = Icons.Sharp.Edit, contentDescription = "Edit")
-                    }
-                })
-        })
-
-    when (swipeState.currentValue) {
-        SwipeToDismissBoxValue.EndToStart -> {
-            LaunchedEffect(swipeState) {
-                swipeState.reset()
-            }
-            onRemove(usedItem)
-        }
-
-        SwipeToDismissBoxValue.StartToEnd -> {}
-
-        SwipeToDismissBoxValue.Settled -> {}
-    }
-}
-
 
 @Preview
 @Composable
@@ -542,25 +487,21 @@ private fun UsedItemPreview() {
     }
 }
 
-// --- Main Preview Function using the Provider ---
-
 @Preview(name = "Edit Dish Screen States", showBackground = true)
 @PreviewLightDark
 @Composable
 private fun EditDishScreenContentPreview(
     @PreviewParameter(EditDishScreenStateProvider::class) state: EditDishScreenState
 ) {
-    // You need a NavController for the preview, even if it doesn't navigate.
-    // rememberNavController() is fine for previews.
     val navController = rememberNavController()
     val emptyCallbacks = createEmptyEditDishScreenCallbacks()
 
-    FCCTheme { // Replace FCCTheme with your actual app theme
+    FCCTheme {
         EditDishScreenContent(
             state = state,
             navController = navController,
             callbacks = emptyCallbacks,
-            modifier = Modifier // Add any desired modifiers for preview sizing if needed
+            modifier = Modifier
         )
     }
 }

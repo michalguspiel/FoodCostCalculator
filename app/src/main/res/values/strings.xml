@@ -149,6 +149,9 @@
     <string name="add_product">Add Ingredient</string>
     <string name="add_half_product">Add Half Product</string>
     <string name="item_added">%1$s added</string>
+    <string name="copy">copy</string>
+    <string name="copy_dish">Copy Dish</string>
+    <string name="more_options">More Options</string>
 
     <!-- Delete confirmation dialog -->
     <string name="delete_item_title">Delete \'%1$s\'?</string>
