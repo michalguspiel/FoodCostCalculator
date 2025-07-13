@@ -45,9 +45,6 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
 
-    // Store the navigation action to be executed after confirmation
-    private var pendingNavigation: (() -> Unit)? = null
-
     fun resetScreenState() {
         _screenState.value = ScreenState.Idle
     }
@@ -159,9 +156,6 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 }
                 updateProductInRepository(newProduct)
                 _screenState.value = ScreenState.Success<Nothing>()
-
-                // Clear pending navigation after successful save
-                pendingNavigation = null
             }
         } catch (e: Exception) {
             _screenState.value = ScreenState.Error(Error(e))
@@ -214,12 +208,10 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      */
     fun handleBackNavigation(navigate: () -> Unit) {
         if (hasUnsavedChanges()) {
-            // Store the navigation action for later use
-            pendingNavigation = navigate
-            // Show confirmation dialog
-            _screenState.update { ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation) }
+            _screenState.update {
+                ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation)
+            }
         } else {
-            // No unsaved changes, proceed with navigation
             navigate()
         }
     }
@@ -227,9 +219,8 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     /**
      * Called when user confirms to discard changes in the unsaved changes dialog
      */
-    fun discardChanges() {
-        pendingNavigation?.invoke()
-        pendingNavigation = null
+    fun discardChanges(navigate: () -> Unit) {
+        navigate()
         resetScreenState()
     }
 

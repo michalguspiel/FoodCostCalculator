@@ -69,10 +69,6 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private var _editableTotalPrice: MutableStateFlow<String> = MutableStateFlow("")
     val editableTotalPrice: StateFlow<String> = _editableTotalPrice
 
-    // Store the navigation action to be executed after confirmation
-    private var pendingNavigation: (() -> Unit)? = null
-
-    // Original dish for comparison to detect unsaved changes
     private var originalDish: DishDomain? = null
 
     val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Eagerly, null)
@@ -317,12 +313,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      */
     fun handleBackNavigation(navigate: () -> Unit) {
         if (hasUnsavedChanges()) {
-            // Store the navigation action for later use
-            pendingNavigation = navigate
-            // Show confirmation dialog
             _screenState.update { ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation) }
         } else {
-            // No unsaved changes, proceed with navigation
             navigate()
         }
     }
@@ -330,9 +322,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     /**
      * Called when user confirms to discard changes in the unsaved changes dialog
      */
-    fun discardChanges() {
-        pendingNavigation?.invoke()
-        pendingNavigation = null
+    fun discardChanges(navigate: () -> Unit) {
+        navigate()
         resetScreenState()
     }
 
@@ -396,9 +387,6 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                     dishRepository.updateDish(this@DishDetailsViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
                 }
                 _screenState.value = ScreenState.Success<Nothing>()
-
-                // Clear pending navigation after successful save
-                pendingNavigation = null
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }

@@ -65,9 +65,6 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
         _editableName.value = value
     }
 
-    // Store the navigation action to be executed after confirmation
-    private var pendingNavigation: (() -> Unit)? = null
-
     fun setInteraction(interaction: InteractionType) {
         when (interaction) {
             is InteractionType.EditItem -> {
@@ -150,24 +147,32 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
         return halfProductChanged || productsChanged
     }
 
+    /**
+     * Handles back navigation with unsaved changes check
+     *
+     * @param navigate The navigation action to perform if confirmed or no unsaved changes
+     */
     fun handleBackNavigation(navigate: () -> Unit) {
         if (hasUnsavedChanges()) {
-            pendingNavigation = navigate
             _screenState.update { Interaction(InteractionType.UnsavedChangesConfirmation) }
         } else {
             navigate()
         }
     }
 
-    fun discardChanges() {
-        pendingNavigation?.invoke()
-        pendingNavigation = null
+    /**
+     * Called when user confirms to discard changes in the unsaved changes dialog
+     */
+    fun discardChanges(navigate: () -> Unit) {
+        navigate()
         resetScreenState()
     }
 
+    /**
+     * Called when user confirms to save changes in the unsaved changes dialog
+     */
     fun saveAndNavigate() {
         saveHalfProduct()
-        // Navigation will be handled by the LaunchedEffect in the UI that observes ScreenState.Success
     }
 
     fun onDeleteHalfProductClick() {
@@ -226,7 +231,6 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
                     halfProductRepository.updateHalfProduct(halfProduct.toHalfProductBase())
                 }
                 _screenState.value = ScreenState.Success<Nothing>()
-                pendingNavigation = null
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
             }

@@ -71,7 +71,7 @@ data class EditHalfProductScreenCallbacks(
     val updateName: (String) -> Unit,
     val saveName: () -> Unit,
     val confirmDelete: (Long) -> Unit,
-    val discardChanges: () -> Unit,
+    val discardChanges: (() -> Unit) -> Unit,
     val saveAndNavigate: () -> Unit
 )
 
@@ -129,13 +129,14 @@ fun EditHalfProductScreen(
         saveAndNavigate = viewModel::saveAndNavigate
     )
 
-    EditHalfProductScreenContent(state = state, callbacks = callbacks)
+    EditHalfProductScreenContent(state = state, callbacks = callbacks, navController)
 }
 
 @Composable
 private fun EditHalfProductScreenContent(
     state: EditHalfProductScreenState,
-    callbacks: EditHalfProductScreenCallbacks
+    callbacks: EditHalfProductScreenCallbacks,
+    navController: NavController
 ) {
     Scaffold(
         topBar = {
@@ -185,7 +186,7 @@ private fun EditHalfProductScreenContent(
                     })
             }
 
-            HandleScreenState(state, callbacks)
+            HandleScreenState(state, callbacks, navController)
         }
     }
 }
@@ -228,7 +229,8 @@ private fun EditHalfProductTopBar(
 @Composable
 private fun HandleScreenState(
     state: EditHalfProductScreenState,
-    callbacks: EditHalfProductScreenCallbacks
+    callbacks: EditHalfProductScreenCallbacks,
+    navController: NavController
 ) {
     when (state.screenState) {
         is ScreenState.Loading<*> -> {
@@ -282,7 +284,7 @@ private fun HandleScreenState(
                 InteractionType.UnsavedChangesConfirmation -> {
                     FCCUnsavedChangesDialog(
                         onDismiss = callbacks.resetScreenState,
-                        onDiscard = callbacks.discardChanges,
+                        onDiscard = { callbacks.discardChanges { navController.popBackStack() } },
                         onSave = callbacks.saveAndNavigate
                     )
                 }

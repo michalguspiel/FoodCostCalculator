@@ -92,7 +92,7 @@ data class EditDishScreenCallbacks(
     val resetScreenState: () -> Unit,
     val onDeleteDishClick: () -> Unit,
     val onDeleteConfirmed: (Long) -> Unit,
-    val discardChanges: () -> Unit,
+    val discardChanges: (() -> Unit) -> Unit,
     val saveAndNavigate: () -> Unit
 )
 
@@ -326,7 +326,7 @@ private fun EditDishScreenContent(
                             InteractionType.UnsavedChangesConfirmation -> {
                                 FCCUnsavedChangesDialog(
                                     onDismiss = { callbacks.resetScreenState() },
-                                    onDiscard = { callbacks.discardChanges() },
+                                    onDiscard = { callbacks.discardChanges { navController.popBackStack() } },
                                     onSave = { callbacks.saveAndNavigate() }
                                 )
                             }

@@ -110,7 +110,9 @@ fun EditProductScreen(
                 onSaveName = viewModel::saveName,
                 onDismissDialog = viewModel::resetScreenState,
                 onDeleteConfirm = viewModel::deleteProduct,
-                onDiscardChanges = viewModel::discardChanges,
+                onDiscardChanges = {
+                    viewModel.discardChanges { navController.popBackStack() }
+                },
                 onSaveChanges = viewModel::saveAndNavigate
             )
         }
