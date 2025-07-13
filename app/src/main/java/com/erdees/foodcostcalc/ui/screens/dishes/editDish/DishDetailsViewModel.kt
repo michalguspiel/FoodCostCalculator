@@ -299,16 +299,15 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             return true
         }
 
-        // Check if dish properties have changed
-        if (!UnsavedChangesValidator.hasUnsavedChanges(originalDish, _dish.value)) {
-            // Deep check for products and half-products changes
-            val productsChanged = originalProducts != _dish.value?.products
-            val halfProductsChanged = originalHalfProducts != _dish.value?.halfProducts
-
-            return productsChanged || halfProductsChanged
+        if (UnsavedChangesValidator.hasUnsavedChanges(originalDish, _dish.value)) {
+            return true
         }
 
-        return true
+        // Deep check for products and half-products changes
+        val productsChanged = originalProducts != _dish.value?.products
+        val halfProductsChanged = originalHalfProducts != _dish.value?.halfProducts
+
+        return productsChanged || halfProductsChanged
     }
 
     /**
