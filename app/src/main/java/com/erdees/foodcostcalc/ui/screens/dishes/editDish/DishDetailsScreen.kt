@@ -13,7 +13,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.sharp.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.sharp.Delete
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -416,7 +415,7 @@ private fun EditDishTopBar(
                     },
                     leadingIcon = {
                         Icon(
-                            imageVector = Icons.Sharp.Delete,
+                            painter = painterResource(R.drawable.delete_24dp),
                             contentDescription = stringResource(R.string.remove_dish)
                         )
                     }
