@@ -86,7 +86,10 @@ fun FCCNavigation(
 
         composable<FCCScreen.DishDetails> { backStackEntry ->
             val route: FCCScreen.DishDetails = backStackEntry.toRoute()
-            DishDetailsScreen(dishId = route.dishId, navController = navController)
+            DishDetailsScreen(
+                dishId = route.dishId,
+                navController = navController
+            )
         }
 
         composable<FCCScreen.Recipe> { backStackEntry ->
@@ -119,7 +122,7 @@ fun FCCNavigation(
 
         composable<FCCScreen.CreateDishSummary>(
             enterTransition = { slideInHorizontally { it } },
-            popExitTransition = { slideOutHorizontally { it }}
+            popExitTransition = { slideOutHorizontally { it } }
         ) { backStackEntry ->
             val parentEntry = remember(backStackEntry) {
                 navController.getBackStackEntry(navController.previousBackStackEntry?.destination?.route.toString())

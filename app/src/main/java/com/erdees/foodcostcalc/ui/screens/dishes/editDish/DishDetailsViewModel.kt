@@ -25,6 +25,7 @@ import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
 import com.erdees.foodcostcalc.ext.toShareableText
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
+import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.IS_COPIED
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
@@ -52,6 +53,7 @@ import timber.log.Timber
  * Shared ViewModel between [DishDetailsScreen] and [RecipeScreen].
  * It was decided to share it in order to avoid passing data between screens.
  * */
+// TODO LAUNCH UNSAVED CHANGES DIALOG WHEN USER ATTEMPTS TO COPY DISH WITH UNSAVED CHANGES
 class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
     KoinComponent {
 
@@ -98,8 +100,23 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         updateStep = recipeHandler::updateStep
     )
 
+    private val _showCopyConfirmation = MutableStateFlow(false)
+    val showCopyConfirmation: StateFlow<Boolean> = _showCopyConfirmation
+
     init {
         fetchDish()
+        checkIfCopied()
+    }
+
+    private fun checkIfCopied() {
+        val isCopied = savedStateHandle.get<Boolean>(IS_COPIED) ?: false
+        if (isCopied) {
+            _showCopyConfirmation.value = true
+        }
+    }
+
+    fun hideCopyConfirmation() {
+        _showCopyConfirmation.value = false
     }
 
     private fun fetchDish() {

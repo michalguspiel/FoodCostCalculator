@@ -45,13 +45,20 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 
-@Suppress("MagicNumber")
+/**
+ * A full-screen confirmation pop-up that shows an animated checkmark and then navigates.
+ *
+ * @param visible Controls the visibility of the pop-up. When set to true, the animation sequence begins.
+ * @param modifier The [Modifier] to be applied to this composable.
+ * @param progress The initial progress of the checkmark animation (from 0.0f to 1.0f).
+ * @param actionAfter An optional lambda that is called after the animation has finished.
+ */
 @Composable
-fun ConfirmAndNavigate(
+fun ConfirmPopUp(
     visible: Boolean,
     modifier: Modifier = Modifier,
     progress: Float = 0f,
-    navigate: () -> Unit = {},
+    actionAfter: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val configuration = LocalWindowInfo.current
@@ -59,7 +66,7 @@ fun ConfirmAndNavigate(
     val screenHeight = configuration.containerSize.height.dp
     val checkmarkProgress = remember { Animatable(progress) }
     val animationDuration = 300
-    val currentNavigate by rememberUpdatedState(newValue = navigate)
+    val currentActionAfter by rememberUpdatedState(newValue = actionAfter)
 
     val cornerRadius by animateIntAsState(
         targetValue = if (visible) 0 else 100,
@@ -87,7 +94,7 @@ fun ConfirmAndNavigate(
                 )
             )
             delay(animationDuration * 2L)
-            currentNavigate()
+            currentActionAfter()
         }
     }
 
@@ -198,7 +205,7 @@ private fun ConfirmAndNavigate_ProgressPreview(
     @PreviewParameter(ProgressPreviewParameterProvider::class) progress: Float
 ) {
     FCCTheme {
-        ConfirmAndNavigate(true, progress = progress, modifier = Modifier.size(200.dp))
+        ConfirmPopUp(true, progress = progress, modifier = Modifier.size(200.dp))
     }
 }
 
@@ -211,6 +218,6 @@ private fun ConfirmAndNavigate_ProgressPreview(
 @Composable
 private fun InteractiveConfirmAndNavigatePreview() {
     FCCTheme {
-        ConfirmAndNavigate(true)
+        ConfirmPopUp(true)
     }
 }
