@@ -3,8 +3,6 @@ package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 import android.content.Context
 import android.icu.util.Currency
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.animateContentSize
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -182,7 +180,6 @@ fun DishDetailsScreen(
             onDeleteConfirmed = viewModel::confirmDelete,
             copyDish = viewModel::copyDish,
             updateCopiedDishName = viewModel::updateCopiedDishName,
-            onDeleteConfirmed = viewModel::confirmDelete,
             discardChanges = viewModel::discardChanges,
             saveAndNavigate = viewModel::saveAndNavigate
         )
@@ -508,5 +505,5 @@ private fun EditDishScreenContentPreview(
 }
 
 private fun createEmptyEditDishScreenCallbacks() = EditDishScreenCallbacks(
-    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
+    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},
 )
