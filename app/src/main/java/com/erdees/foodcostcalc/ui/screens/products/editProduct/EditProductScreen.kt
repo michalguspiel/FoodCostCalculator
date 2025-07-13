@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.products.editProduct
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,6 +43,7 @@ import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
@@ -51,7 +53,6 @@ import timber.log.Timber
 @Screen
 @Composable
 fun EditProductScreen(
-    productId: Long,
     navController: NavController,
     viewModel: EditProductViewModel = viewModel()
 ) {
@@ -62,8 +63,8 @@ fun EditProductScreen(
     val saveNameButtonEnabled by viewModel.saveNameButtonEnabled.collectAsState()
     val showTaxPercent by viewModel.showTaxPercent.collectAsState()
 
-    LaunchedEffect(Unit) {
-        viewModel.initializeWith(productId)
+    BackHandler {
+        viewModel.handleBackNavigation { navController.popBackStack() }
     }
 
     LaunchedEffect(screenState) {
@@ -84,7 +85,7 @@ fun EditProductScreen(
                 productName = product?.name ?: "",
                 onNameClick = { viewModel.setInteractionEditName() },
                 onDeleteClick = { viewModel.onDeleteProductClick() },
-                onBackClick = { navController.popBackStack() }
+                onBackClick = { viewModel.handleBackNavigation { navController.popBackStack() } }
             )
         }
     ) { paddingValues ->
@@ -108,7 +109,11 @@ fun EditProductScreen(
                 onNameChange = viewModel::updateName,
                 onSaveName = viewModel::saveName,
                 onDismissDialog = viewModel::resetScreenState,
-                onDeleteConfirm = viewModel::deleteProduct
+                onDeleteConfirm = viewModel::deleteProduct,
+                onDiscardChanges = {
+                    viewModel.discardChanges { navController.popBackStack() }
+                },
+                onSaveChanges = viewModel::saveAndNavigate
             )
         }
     }
@@ -248,7 +253,9 @@ private fun HandleScreenState(
     onNameChange: (String) -> Unit,
     onSaveName: () -> Unit,
     onDismissDialog: () -> Unit,
-    onDeleteConfirm: (Long) -> Unit
+    onDeleteConfirm: (Long) -> Unit,
+    onDiscardChanges: () -> Unit,
+    onSaveChanges: () -> Unit
 ) {
     when (screenState) {
         is ScreenState.Interaction -> {
@@ -276,6 +283,14 @@ private fun HandleScreenState(
                         onConfirmDelete = {
                             onDeleteConfirm(deleteConfirmation.itemId)
                         }
+                    )
+                }
+
+                InteractionType.UnsavedChangesConfirmation -> {
+                    FCCUnsavedChangesDialog(
+                        onDismiss = onDismissDialog,
+                        onDiscard = onDiscardChanges,
+                        onSave = onSaveChanges
                     )
                 }
 

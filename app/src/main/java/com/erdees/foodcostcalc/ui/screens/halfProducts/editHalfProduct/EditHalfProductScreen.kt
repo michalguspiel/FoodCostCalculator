@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct
 
 import android.icu.util.Currency
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,23 +36,51 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.UsedItem
 import timber.log.Timber
 
-@OptIn(ExperimentalMaterial3Api::class)
+data class EditHalfProductScreenState(
+    val screenState: ScreenState,
+    val usedItems: List<UsedItem>,
+    val halfProduct: HalfProductDomain?,
+    val editableQuantity: String,
+    val editableName: String,
+    val currency: Currency?
+)
+
+data class EditHalfProductScreenCallbacks(
+    val onBack: () -> Unit,
+    val onDeleteHalfProductClick: () -> Unit,
+    val setInteraction: (InteractionType) -> Unit,
+    val removeItem: (UsedItem) -> Unit,
+    val saveHalfProduct: () -> Unit,
+    val resetScreenState: () -> Unit,
+    val setEditableQuantity: (String) -> Unit,
+    val updateProductQuantity: () -> Unit,
+    val updateName: (String) -> Unit,
+    val saveName: () -> Unit,
+    val confirmDelete: (Long) -> Unit,
+    val discardChanges: (() -> Unit) -> Unit,
+    val saveAndNavigate: () -> Unit
+)
+
 @Screen
 @Composable
-fun EditHalfProductScreen(navController: NavController, halfProductId: Long, viewModel: EditHalfProductViewModel = viewModel()) {
-
+fun EditHalfProductScreen(
+    navController: NavController,
+    viewModel: EditHalfProductViewModel = viewModel()
+) {
     val screenState by viewModel.screenState.collectAsState()
     val usedItems by viewModel.usedItems.collectAsState()
     val halfProduct by viewModel.halfProduct.collectAsState()
@@ -59,8 +88,8 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
     val editableName by viewModel.editableName.collectAsState()
     val currency by viewModel.currency.collectAsState()
 
-    LaunchedEffect(halfProductId) {
-        viewModel.initializeWith(halfProductId)
+    BackHandler {
+        viewModel.handleBackNavigation { navController.popBackStack() }
     }
 
     LaunchedEffect(screenState) {
@@ -75,36 +104,47 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
         }
     }
 
+    val state = EditHalfProductScreenState(
+        screenState = screenState,
+        usedItems = usedItems,
+        halfProduct = halfProduct,
+        editableQuantity = editableQuantity,
+        editableName = editableName,
+        currency = currency
+    )
+
+    val callbacks = EditHalfProductScreenCallbacks(
+        onBack = { viewModel.handleBackNavigation { navController.popBackStack() } },
+        onDeleteHalfProductClick = viewModel::onDeleteHalfProductClick,
+        setInteraction = viewModel::setInteraction,
+        removeItem = viewModel::removeItem,
+        saveHalfProduct = viewModel::saveHalfProduct,
+        resetScreenState = viewModel::resetScreenState,
+        setEditableQuantity = viewModel::setEditableQuantity,
+        updateProductQuantity = viewModel::updateProductQuantity,
+        updateName = viewModel::updateName,
+        saveName = viewModel::saveName,
+        confirmDelete = viewModel::confirmDelete,
+        discardChanges = viewModel::discardChanges,
+        saveAndNavigate = viewModel::saveAndNavigate
+    )
+
+    EditHalfProductScreenContent(state = state, callbacks = callbacks, navController)
+}
+
+@Composable
+private fun EditHalfProductScreenContent(
+    state: EditHalfProductScreenState,
+    callbacks: EditHalfProductScreenCallbacks,
+    navController: NavController
+) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = halfProduct?.name ?: "",
-                        modifier = Modifier.clickable {
-                            viewModel.setInteraction(InteractionType.EditName)
-                        })
-                },
-                actions = {
-                    IconButton(onClick = {
-                        viewModel.onDeleteHalfProductClick()
-                    }) {
-                        Icon(
-                            imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
-                                id = R.string.content_description_remove_half_product
-                            )
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
-                                id = R.string.back
-                            )
-                        )
-                    }
-                }
+            EditHalfProductTopBar(
+                halfProduct = state.halfProduct,
+                onBackClick = callbacks.onBack,
+                onDeleteClick = callbacks.onDeleteHalfProductClick,
+                onNameClick = { callbacks.setInteraction(InteractionType.EditName) }
             )
         }
     ) { paddingValues ->
@@ -114,12 +154,12 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
         ) {
             Column {
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
-                    items(usedItems, key = { item -> item.id }) { item ->
+                    items(state.usedItems, key = { item -> item.id }) { item ->
                         UsedItem(
                             usedItem = item,
-                            onRemove = viewModel::removeItem,
+                            onRemove = callbacks.removeItem,
                             onEdit = {
-                                viewModel.setInteraction(InteractionType.EditItem(it))
+                                callbacks.setInteraction(InteractionType.EditItem(it))
                             }
                         )
                         HorizontalDivider(
@@ -129,83 +169,131 @@ fun EditHalfProductScreen(navController: NavController, halfProductId: Long, vie
                     }
                 }
 
-                halfProduct?.let {
+                state.halfProduct?.let {
                     HalfProductDetails(
                         halfProductDomain = it,
-                        currency = currency,
+                        currency = state.currency,
                         modifier = Modifier
                     )
-                } // todo ?: EmptyOne
-
+                }
 
                 ButtonRow(
                     modifier = Modifier.padding(end = 12.dp),
                     primaryButton = {
-                    FCCPrimaryButton(text = stringResource(id = R.string.save)) {
-                        viewModel.saveHalfProduct()
-                    }
-                })
+                        FCCPrimaryButton(text = stringResource(id = R.string.save)) {
+                            callbacks.saveHalfProduct()
+                        }
+                    })
             }
 
-            when (screenState) {
-                is ScreenState.Loading<*> -> {
-                    ScreenLoadingOverlay()
+            HandleScreenState(state, callbacks, navController)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun EditHalfProductTopBar(
+    halfProduct: HalfProductDomain?,
+    onBackClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onNameClick: () -> Unit
+) {
+    TopAppBar(
+        title = {
+            Text(
+                text = halfProduct?.name ?: "",
+                modifier = Modifier.clickable { onNameClick() })
+        },
+        actions = {
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    imageVector = Icons.Sharp.Delete, contentDescription = stringResource(
+                        id = R.string.content_description_remove_half_product
+                    )
+                )
+            }
+        },
+        navigationIcon = {
+            IconButton(onClick = onBackClick) {
+                Icon(
+                    Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
+                        id = R.string.back
+                    )
+                )
+            }
+        }
+    )
+}
+
+@Composable
+private fun HandleScreenState(
+    state: EditHalfProductScreenState,
+    callbacks: EditHalfProductScreenCallbacks,
+    navController: NavController
+) {
+    when (state.screenState) {
+        is ScreenState.Loading<*> -> {
+            ScreenLoadingOverlay()
+        }
+
+        is ScreenState.Error -> {
+            ErrorDialog {
+                callbacks.resetScreenState()
+            }
+        }
+
+        is ScreenState.Interaction -> {
+            when (val interaction = state.screenState.interaction) {
+                is InteractionType.EditItem -> {
+                    ValueEditDialog(
+                        title = stringResource(id = R.string.edit_quantity),
+                        value = state.editableQuantity,
+                        modifier = Modifier,
+                        updateValue = callbacks.setEditableQuantity,
+                        onSave = callbacks.updateProductQuantity,
+                        onDismiss = callbacks.resetScreenState,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    )
                 }
 
-                is ScreenState.Error -> {
-                    ErrorDialog {
-                        viewModel.resetScreenState()
-                    }
+                InteractionType.EditName -> {
+                    ValueEditDialog(
+                        title = stringResource(id = R.string.edit_name),
+                        value = state.editableName,
+                        updateValue = callbacks.updateName,
+                        onSave = callbacks.saveName,
+                        onDismiss = callbacks.resetScreenState,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Text,
+                            capitalization = KeyboardCapitalization.Words
+                        )
+                    )
                 }
 
-                is ScreenState.Success<*> -> {}
-
-                is ScreenState.Interaction -> {
-                    when (val interaction = (screenState as ScreenState.Interaction).interaction) {
-                        is InteractionType.EditItem -> {
-                            ValueEditDialog(
-                                title = stringResource(id = R.string.edit_quantity),
-                                value = editableQuantity,
-                                modifier = Modifier,
-                                updateValue = viewModel::setEditableQuantity,
-                                onSave = viewModel::updateProductQuantity,
-                                onDismiss = viewModel::resetScreenState,
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                            )
+                is InteractionType.DeleteConfirmation -> {
+                    FCCDeleteConfirmationDialog(
+                        itemName = interaction.itemName,
+                        onDismiss = callbacks.resetScreenState,
+                        onConfirmDelete = {
+                            callbacks.confirmDelete(interaction.itemId)
                         }
+                    )
+                }
 
-                        InteractionType.EditName -> {
-                            ValueEditDialog(
-                                title = stringResource(id = R.string.edit_name),
-                                value = editableName,
-                                updateValue = viewModel::updateName,
-                                onSave = viewModel::saveName,
-                                onDismiss = viewModel::resetScreenState,
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Text,
-                                    capitalization = KeyboardCapitalization.Words
-                                )
-                            )
-                        }
-
-                        is InteractionType.DeleteConfirmation -> {
-                            FCCDeleteConfirmationDialog(
-                                itemName = interaction.itemName,
-                                onDismiss = viewModel::resetScreenState,
-                                onConfirmDelete = {
-                                    viewModel.confirmDelete(interaction.itemId)
-                                }
-                            )
-                        }
-
-                        else -> {}
-                    }
+                InteractionType.UnsavedChangesConfirmation -> {
+                    FCCUnsavedChangesDialog(
+                        onDismiss = callbacks.resetScreenState,
+                        onDiscard = { callbacks.discardChanges { navController.popBackStack() } },
+                        onSave = callbacks.saveAndNavigate
+                    )
                 }
 
                 else -> {}
             }
-
         }
+
+        else -> {}
     }
 }
 

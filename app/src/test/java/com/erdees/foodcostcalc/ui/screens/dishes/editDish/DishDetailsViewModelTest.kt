@@ -5,9 +5,12 @@ import androidx.lifecycle.SavedStateHandle
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.DishBase
 import com.erdees.foodcostcalc.data.model.local.ProductBase
+import com.erdees.foodcostcalc.data.model.local.Recipe
+import com.erdees.foodcostcalc.data.model.local.RecipeStep
 import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
 import com.erdees.foodcostcalc.data.model.local.joined.CompleteDish
 import com.erdees.foodcostcalc.data.model.local.joined.ProductAndProductDish
+import com.erdees.foodcostcalc.data.model.local.joined.RecipeWithSteps
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
@@ -20,6 +23,7 @@ import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.verify
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -67,11 +71,21 @@ class DishDetailsViewModelTest {
     /**
      * Created dish with a food cost of 20, single product,
      * total price of 44.0 (40.0 (food cost + 200% margin) + 10% tax).
-     * */
-    private fun createDishModel(dishTax: Double = 10.0, productPrice: Double = 10.0): CompleteDish {
+      * */
+    private fun createDishModel(
+        dishTax: Double = 10.0,
+        productPrice: Double = 10.0,
+        withRecipe: Boolean = false
+    ): CompleteDish {
+        val recipe = if (withRecipe) {
+            RecipeWithSteps(
+                recipe = Recipe(1L,30,60, "Test Recipe", "Test Description"),
+                steps = listOf(RecipeStep(1L, 1L, "Test Step", 1))
+            )
+        } else null
         return CompleteDish(
-            dish = DishBase(testDishId, testDishName, 200.0, dishTax, null),
-            recipe = null,
+            dish = DishBase(testDishId, testDishName, 200.0, dishTax, if (withRecipe) 1L else null),
+            recipe = recipe,
             products = listOf(
                 ProductAndProductDish(
                     productDish = ProductDish(0L, 0L, testDishId, 1.0, "kilogram"),
@@ -92,12 +106,54 @@ class DishDetailsViewModelTest {
         savedStateHandle = SavedStateHandle().apply { set("dishId", 1L) }
         every { mockPreferences.currency }.returns(flowOf(androidCurrency))
         every { androidCurrency.currencyCode } returns "EUR"
+        coEvery { mockAnalyticsRepository.logEvent(any(), any()) } returns Unit
     }
 
     @After
     fun tearDown() {
         Dispatchers.resetMain()
         stopKoin()
+    }
+
+    @Test
+    fun `hasUnsavedChanges returns true when dish name is changed`() = runTest {
+        coEvery { mockDishRepository.getDish(any()) }.returns(flowOf(testDish))
+        viewModel = DishDetailsViewModel(savedStateHandle)
+        advanceUntilIdle()
+
+        viewModel.updateName("New Name")
+        viewModel.saveDishName()
+
+        viewModel.hasUnsavedChanges() shouldBe true
+    }
+
+    @Test
+    fun `handleBackNavigation shows dialog when changes are made`() = runTest {
+        coEvery { mockDishRepository.getDish(any()) }.returns(flowOf(testDish))
+        viewModel = DishDetailsViewModel(savedStateHandle)
+        advanceUntilIdle()
+
+        viewModel.updateName("New Name")
+        viewModel.saveDishName()
+
+        val navigateAction: () -> Unit = mockk(relaxed = true)
+        viewModel.handleBackNavigation(navigateAction)
+
+        verify(exactly = 0) { navigateAction.invoke() }
+        val screenState = viewModel.screenState.first()
+        screenState shouldBe ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation)
+    }
+
+    @Test
+    fun `hasUnsavedChanges returns true when recipe is changed`() = runTest {
+        coEvery { mockDishRepository.getDish(any()) }.returns(flowOf(createDishModel(withRecipe = true)))
+        viewModel = DishDetailsViewModel(savedStateHandle)
+        advanceUntilIdle()
+
+        viewModel.recipeUpdater.updateDescription("New recipe description")
+
+        advanceUntilIdle()
+        viewModel.hasUnsavedChanges() shouldBe true
     }
 
     @Test

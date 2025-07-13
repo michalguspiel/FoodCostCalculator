@@ -27,6 +27,7 @@ import com.erdees.foodcostcalc.ui.screens.recipe.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
+import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.Dispatchers
@@ -68,6 +69,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private var _editableTotalPrice: MutableStateFlow<String> = MutableStateFlow("")
     val editableTotalPrice: StateFlow<String> = _editableTotalPrice
 
+    private var originalDish: DishDomain? = null
+
     val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     private val recipeHandler: RecipeHandler = RecipeHandler(
@@ -106,6 +109,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                         recipeHandler.updateRecipeViewMode(RecipeViewMode.EDIT)
                     }
                     _dish.update { this }
+                    // Store original dish for unsaved changes detection
+                    originalDish = this.copy()
                     recipeHandler.updateRecipe(this.recipe.toEditableRecipe())
                     originalProducts = this.products
                     originalHalfProducts = this.halfProducts
@@ -278,6 +283,57 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             is UsedHalfProductDomain -> _dish.value =
                 dish.copy(halfProducts = dish.halfProducts.filter { it != item })
         }
+    }
+
+    /**
+     * Checks if the dish has unsaved changes by comparing with the original state
+     *
+     * @return true if there are unsaved changes, false otherwise
+     */
+    fun hasUnsavedChanges(): Boolean {
+        if (recipeHandler.hasRecipeChanges(originalDish?.recipe)) {
+            return true
+        }
+
+        if (UnsavedChangesValidator.hasUnsavedChanges(originalDish, _dish.value)) {
+            return true
+        }
+
+        // Deep check for products and half-products changes
+        val productsChanged = originalProducts != _dish.value?.products
+        val halfProductsChanged = originalHalfProducts != _dish.value?.halfProducts
+
+        return productsChanged || halfProductsChanged
+    }
+
+    /**
+     * Handles back navigation with unsaved changes check
+     *
+     * @param navigate The navigation action to perform if confirmed or no unsaved changes
+     */
+    fun handleBackNavigation(navigate: () -> Unit) {
+        if (hasUnsavedChanges()) {
+            _screenState.update { ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation) }
+        } else {
+            navigate()
+        }
+    }
+
+    /**
+     * Called when user confirms to discard changes in the unsaved changes dialog
+     */
+    fun discardChanges(navigate: () -> Unit) {
+        navigate()
+        resetScreenState()
+    }
+
+    /**
+     * Called when user confirms to save changes in the unsaved changes dialog
+     */
+    fun saveAndNavigate() {
+        // Save and then navigate
+        saveDish()
+        // The navigation will be handled in the LaunchedEffect in the UI that observes ScreenState.Success
     }
 
     /**
