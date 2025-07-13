@@ -116,7 +116,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                         recipeHandler.updateRecipeViewMode(RecipeViewMode.EDIT)
                     }
                     _dish.update { this }
-                    // Store original dish for unsaved changes detection
+                    _editableName.update { this.name }
                     originalDish = this.copy()
                     recipeHandler.updateRecipe(this.recipe.toEditableRecipe())
                     originalProducts = this.products
@@ -189,7 +189,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             }
 
             is InteractionType.CopyDish ->
-                _editableCopiedDishName.value = dish.value?.name ?: ""
+                _editableCopiedDishName.value = interaction.prefilledName
 
             else -> {}
         }

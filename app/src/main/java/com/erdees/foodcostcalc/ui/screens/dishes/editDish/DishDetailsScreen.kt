@@ -192,6 +192,7 @@ private fun EditDishScreenContent(
     callbacks: EditDishScreenCallbacks,
     modifier: Modifier = Modifier,
 ) {
+    val context = LocalContext.current
     with(state) {
         Scaffold(
             modifier = modifier,
@@ -200,7 +201,9 @@ private fun EditDishScreenContent(
                     dishName = modifiedDishDomain?.name ?: dishId.toString(),
                     onNameClick = { callbacks.setInteraction(InteractionType.EditName) },
                     onDeleteClick = { callbacks.onDeleteDishClick() },
-                    onCopyClick = { callbacks.setInteraction(InteractionType.CopyDish) },
+                    onCopyClick = { callbacks.setInteraction(InteractionType.CopyDish(
+                        context.getString(R.string.copy_dish_prefilled_name, state.editableName)
+                    )) },
                     onBackClick = { navController.popBackStack() }
                 )
             }
@@ -307,7 +310,7 @@ private fun EditDishScreenContent(
                                 )
                             }
 
-                            InteractionType.CopyDish -> {
+                            is InteractionType.CopyDish -> {
                                 ValueEditDialog(
                                     title = stringResource(R.string.copy_dish),
                                     value = editableCopiedDishName,
