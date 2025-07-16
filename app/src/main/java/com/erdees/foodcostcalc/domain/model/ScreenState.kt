@@ -10,6 +10,7 @@ sealed class InteractionType {
     data class EditQuantity(val itemId: Long) : InteractionType()
     data object ChangeServings : InteractionType()
     data object UnsavedChangesConfirmation : InteractionType()
+    data object UnsavedChangesConfirmationBeforeCopy : InteractionType()
     data class CopyDish(val prefilledName: String) : InteractionType()
 
     data object CalculateWaste : InteractionType()

@@ -6,6 +6,7 @@ import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
@@ -18,7 +19,7 @@ import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
-import com.erdees.foodcostcalc.domain.model.dish.DishActionResultType
+import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
@@ -53,7 +54,6 @@ import timber.log.Timber
  * Shared ViewModel between [DishDetailsScreen] and [RecipeScreen].
  * It was decided to share it in order to avoid passing data between screens.
  * */
-// TODO LAUNCH UNSAVED CHANGES DIALOG WHEN USER ATTEMPTS TO COPY DISH WITH UNSAVED CHANGES
 class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
     KoinComponent {
 
@@ -104,7 +104,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     val showCopyConfirmation: StateFlow<Boolean> = _showCopyConfirmation
 
     init {
-        fetchDish()
+        fetchDishAndUpdateScreenState()
         checkIfCopied()
     }
 
@@ -119,30 +119,41 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         _showCopyConfirmation.value = false
     }
 
-    private fun fetchDish() {
-        Timber.i("fetchDish() \n SavedStateHandle: $savedStateHandle, ${savedStateHandle.get<Long>("dishId")}")
+    private fun fetchDishAndUpdateScreenState() {
+        Timber.i("fetchDishAndUpdateScreenState()")
         _screenState.update { ScreenState.Loading<Nothing>() }
         viewModelScope.launch {
             try {
-                val id = savedStateHandle.get<Long>(DISH_ID_KEY)
-                    ?: throw NullPointerException("Failed to fetch dish due to missing id in savedStateHandle")
-                val dish = dishRepository.getDish(id).flowOn(myDispatchers.ioDispatcher).first()
-                with(dish.toDishDomain()) {
-                    Timber.i("Fetched dish: $this")
-                    if (this.recipe == null) {
-                        recipeHandler.updateRecipeViewMode(RecipeViewMode.EDIT)
-                    }
-                    _dish.update { this }
-                    _editableName.update { this.name }
-                    originalDish = this.copy()
-                    recipeHandler.updateRecipe(this.recipe.toEditableRecipe())
-                    originalProducts = this.products
-                    originalHalfProducts = this.halfProducts
-                }
+                loadDishStateFromRepository()
                 _screenState.update { ScreenState.Idle }
             } catch (e: Exception) {
                 _screenState.update { ScreenState.Error(Error(e)) }
             }
+        }
+    }
+
+    private suspend fun loadDishStateFromRepository() {
+        Timber.i(
+            "loadDishStateFromRepository \n SavedStateHandle: $savedStateHandle, ${
+                savedStateHandle.get<Long>(
+                    "dishId"
+                )
+            }"
+        )
+        val id = savedStateHandle.get<Long>(DISH_ID_KEY)
+            ?: throw NullPointerException("Failed to fetch dish due to missing id in savedStateHandle")
+        val dish = dishRepository.getDish(id).flowOn(myDispatchers.ioDispatcher).first()
+        with(dish.toDishDomain()) {
+            Timber.i("Fetched dish: $this")
+            if (this.recipe == null) {
+                recipeHandler.updateRecipeViewMode(RecipeViewMode.EDIT)
+            }
+            _dish.update { this }
+            _editableName.update { this.name }
+            originalDish = this.copy()
+            recipeHandler.updateRecipe(this.recipe.toEditableRecipe())
+            originalProducts = this.products
+            originalHalfProducts = this.halfProducts
         }
     }
 
@@ -308,6 +319,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      * @param item The item to remove.
      * */
     fun removeItem(item: UsedItem) {
+        Timber.i("removeItem: $item")
         val dish = dish.value ?: return
         when (item) {
             is UsedProductDomain -> _dish.value =
@@ -352,21 +364,38 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         }
     }
 
-    /**
-     * Called when user confirms to discard changes in the unsaved changes dialog
-     */
-    fun discardChanges(navigate: () -> Unit) {
-        navigate()
-        resetScreenState()
+    fun discardChangesAndProceed(context: Context) {
+        // Restore dish to original state
+        viewModelScope.launch {
+            loadDishStateFromRepository()
+            resetScreenState()
+            showCopyDish( context.getString(R.string.copy_dish_prefilled_name, dish.value?.name))
+        }
+    }
+
+    private fun showCopyDish(prefilledName: String) {
+        setInteraction(InteractionType.CopyDish(prefilledName))
+    }
+
+    fun saveChangesAndProceed() {
+        saveDish(DishDetailsActionResultType.UPDATED_STAY)
     }
 
     /**
-     * Called when user confirms to save changes in the unsaved changes dialog
+     * Handles the "Copy Dish" action with unsaved changes check
+     * If there are unsaved changes, prompts the user to decide what to do first
+     * Otherwise, proceeds directly to the copy dish dialog
      */
-    fun saveAndNavigate() {
-        // Save and then navigate
-        saveDish()
-        // The navigation will be handled in the LaunchedEffect in the UI that observes ScreenState.Success
+    fun handleCopyDish(context: Context) {
+        if (hasUnsavedChanges()) {
+            _screenState.update {
+                ScreenState.Interaction(InteractionType.UnsavedChangesConfirmationBeforeCopy)
+            }
+        } else {
+            showCopyDish(
+                context.getString(R.string.copy_dish_prefilled_name, dish.value?.name)
+            )
+        }
     }
 
     /**
@@ -390,7 +419,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      *
      * If all operations are successful, it sets the screen state to success. If an exception is caught, it sets the screen state to error.
      */
-    fun saveDish() {
+    fun saveDish(actionResultType: DishDetailsActionResultType = DishDetailsActionResultType.UPDATED_NAVIGATE) {
         val dish = dish.value ?: return
         _screenState.value = ScreenState.Loading<Nothing>()
         viewModelScope.launch(Dispatchers.Default) {
@@ -419,11 +448,11 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
                     dishRepository.updateDish(this@DishDetailsViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
                 }
+                if (actionResultType == DishDetailsActionResultType.UPDATED_STAY) {
+                    loadDishStateFromRepository()
+                }
                 _screenState.value = ScreenState.Success(
-                    DishActionResult(
-                        DishActionResultType.UPDATED,
-                        dish.id
-                    )
+                    DishActionResult(actionResultType, dish.id)
                 )
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
@@ -467,7 +496,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 analyticsRepository.logEvent(Constants.Analytics.DishV2.DELETED, null)
                 _screenState.value =
                     ScreenState.Success(
-                        DishActionResult(DishActionResultType.DELETED, dishId)
+                        DishActionResult(DishDetailsActionResultType.DELETED, dishId)
                     )
             } catch (e: Exception) {
                 _screenState.value = ScreenState.Error(Error(e.message))
@@ -499,5 +528,28 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 _screenState.value = ScreenState.Error(Error(it.message))
             }
         }
+    }
+
+    /**
+     * Called when user clicks "Discard" in the unsaved changes dialog
+     * @param navigate The navigation action to perform after discarding
+     */
+    fun discardChanges(navigate: () -> Unit) {
+        // Restore original dish state
+        _dish.value = originalDish?.copy()
+        recipeHandler.updateRecipe(originalDish?.recipe.toEditableRecipe())
+        resetScreenState()
+        // Navigate back
+        navigate()
+    }
+
+    /**
+     * Called when user clicks "Save" in the unsaved changes dialog
+     * with navigation intent
+     */
+    fun saveAndNavigate() {
+        // Set the pending intent to navigate back after saving
+        // Save dish will trigger the success state, which will then check pendingIntent
+        saveDish(DishDetailsActionResultType.UPDATED_NAVIGATE)
     }
 }

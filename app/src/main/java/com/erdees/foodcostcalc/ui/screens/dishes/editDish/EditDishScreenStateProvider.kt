@@ -41,7 +41,8 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableCopiedDishName = "",
             editableTotalPrice = "120",
             currency = sampleCurrency,
-            screenState = ScreenState.Idle // or ScreenState.Idle if you have one
+            screenState = ScreenState.Idle,
+            showCopyConfirmation = false
         ),
         // Loading State
         EditDishScreenState(
@@ -55,7 +56,8 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableCopiedDishName = "",
             editableTotalPrice = "",
             currency = sampleCurrency,
-            screenState = ScreenState.Loading<Nothing>()
+            screenState = ScreenState.Loading<Nothing>(),
+            showCopyConfirmation = false
         ),
         // Error State
         EditDishScreenState(
@@ -69,7 +71,8 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableCopiedDishName = "",
             editableTotalPrice = "",
             currency = sampleCurrency,
-            screenState = ScreenState.Error(Error("Something went wrong!"))
+            screenState = ScreenState.Error(Error("Something went wrong!")),
+            showCopyConfirmation = false
         ),
         // Interaction: Edit Name
         EditDishScreenState(
@@ -83,7 +86,8 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableCopiedDishName = "",
             editableTotalPrice = sampleDish.totalPrice.toString(),
             currency = sampleCurrency,
-            screenState = ScreenState.Interaction(InteractionType.EditName)
+            screenState = ScreenState.Interaction(InteractionType.EditName),
+            showCopyConfirmation = false
         ),
         // Interaction: Edit Tax
         EditDishScreenState(
@@ -97,7 +101,8 @@ class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState
             editableCopiedDishName = "",
             editableTotalPrice = sampleDish.totalPrice.toString(),
             currency = sampleCurrency,
-            screenState = ScreenState.Interaction(InteractionType.EditTax)
+            screenState = ScreenState.Interaction(InteractionType.EditTax),
+            showCopyConfirmation = false
         ),
     )
 }

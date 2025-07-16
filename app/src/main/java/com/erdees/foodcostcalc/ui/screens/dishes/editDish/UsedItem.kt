@@ -13,16 +13,41 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxDefaults
+import androidx.compose.material3.SwipeToDismissBoxState
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
-import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
 import com.erdees.foodcostcalc.domain.model.UsedItem
 
+
+/**
+ * A composable that displays a single item in a list which can be swiped to dismiss.
+ *
+ * This composable uses [SwipeToDismissBox] to enable a swipe-to-remove gesture.
+ * When an item is swiped away, the [onRemove] callback is triggered.
+ *
+ * **Important Note on State Restoration:**
+ * The internal swipe state of this composable is tied directly to the specific instance
+ * of the [usedItem] object passed to it, using `System.identityHashCode`.
+ * If an item is removed and then subsequently restored (e.g., through an "undo" action),
+ * it is crucial that a **new instance** of the `UsedItem` data class is provided.
+ * If the same object instance is reused for the restored item, the composable will
+ * remember its previous dismissed state and immediately trigger the [onRemove] callback again.
+ * Creating a new instance (e.g., using the `.copy()` method on the data class) ensures that the
+ * swipe state is correctly reset for the restored item.
+ *
+ * @param usedItem The data model for the item to be displayed. A new instance is required for restored items.
+ * @param onRemove Callback invoked when the item is dismissed by swiping.
+ * @param onEdit Callback invoked when the user taps the edit icon.
+ * @param modifier The [Modifier] to be applied to this composable.
+ */
 @Composable
 fun UsedItem(
     usedItem: UsedItem,
@@ -30,7 +55,24 @@ fun UsedItem(
     onEdit: (UsedItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val swipeState = rememberSwipeToDismissBoxState()
+    val density = LocalDensity.current
+    val positionalThreshold = SwipeToDismissBoxDefaults.positionalThreshold
+    val swipeState = remember(System.identityHashCode(usedItem)) {
+        SwipeToDismissBoxState(
+            density = density,
+            initialValue = SwipeToDismissBoxValue.Settled,
+            confirmValueChange = {
+                it == SwipeToDismissBoxValue.EndToStart
+            },
+            positionalThreshold = positionalThreshold
+        )
+    }
+
+    LaunchedEffect(swipeState.currentValue) {
+        if (swipeState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            onRemove(usedItem)
+        }
+    }
 
     SwipeToDismissBox(
         modifier = modifier.animateContentSize(),
@@ -40,7 +82,7 @@ fun UsedItem(
                 contentAlignment = Alignment.CenterEnd,
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color = MaterialTheme.colorScheme.error)
+                    .background(color = MaterialTheme.colorScheme.errorContainer)
             ) {
                 Icon(
                     modifier = Modifier.minimumInteractiveComponentSize(),
@@ -66,17 +108,4 @@ fun UsedItem(
                     }
                 })
         })
-
-    when (swipeState.currentValue) {
-        SwipeToDismissBoxValue.EndToStart -> {
-            LaunchedEffect(swipeState) {
-                swipeState.reset()
-            }
-            onRemove(usedItem)
-        }
-
-        SwipeToDismissBoxValue.StartToEnd -> {}
-
-        SwipeToDismissBoxValue.Settled -> {}
-    }
 }

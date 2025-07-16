@@ -49,7 +49,7 @@ import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
-import com.erdees.foodcostcalc.domain.model.dish.DishActionResultType
+import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
@@ -85,11 +85,14 @@ data class EditDishScreenCallbacks(
     val resetScreenState: () -> Unit,
     val onDeleteDishClick: () -> Unit,
     val onDeleteConfirmed: (Long) -> Unit,
-    val discardChanges: (() -> Unit) -> Unit,
+    val discardAndNavigate: (() -> Unit) -> Unit,
     val saveAndNavigate: () -> Unit,
+    val onCopyDishClick: () -> Unit,
     val copyDish: () -> Unit,
     val updateCopiedDishName: (String) -> Unit,
     val hideCopyConfirmation: () -> Unit,
+    val discardChangesAndProceed: () -> Unit = {},
+    val saveChangesAndProceed: () -> Unit = {},
 )
 
 data class EditDishScreenState(
@@ -104,6 +107,7 @@ data class EditDishScreenState(
     val editableTotalPrice: String,
     val currency: Currency?,
     val screenState: ScreenState,
+    val showCopyConfirmation: Boolean
 )
 
 @Screen
@@ -113,8 +117,9 @@ fun DishDetailsScreen(
     navController: NavController,
     viewModel: DishDetailsViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val screenState by viewModel.screenState.collectAsState()
-    val usedItems: List<UsedItem> by viewModel.items.collectAsState()
+    val usedItems: List<UsedItem> by viewModel.items.collectAsStateWithLifecycle()
     val modifiedDishDomain by viewModel.dish.collectAsStateWithLifecycle()
     val editableQuantity by viewModel.editableQuantity.collectAsState()
     val editableTax by viewModel.editableTax.collectAsState()
@@ -135,7 +140,7 @@ fun DishDetailsScreen(
 
         viewModel.resetScreenState()
         when (data.type) {
-            DishActionResultType.COPIED -> {
+            DishDetailsActionResultType.COPIED -> {
                 navController.navigate(FCCScreen.DishDetails(data.dishId, true)) {
                     popUpTo(navController.currentBackStackEntry?.destination?.route ?: "") {
                         inclusive = true
@@ -143,8 +148,13 @@ fun DishDetailsScreen(
                 }
             }
 
-            else -> {
+            DishDetailsActionResultType.UPDATED_NAVIGATE,
+            DishDetailsActionResultType.DELETED -> {
                 navController.popBackStack()
+            }
+
+            DishDetailsActionResultType.UPDATED_STAY -> {
+                viewModel.handleCopyDish(context)
             }
         }
     }
@@ -161,7 +171,8 @@ fun DishDetailsScreen(
             editableCopiedDishName = editableCopiedDishName,
             editableTotalPrice = editableTotalPrice,
             currency = currency,
-            screenState = screenState
+            screenState = screenState,
+            showCopyConfirmation = showCopyConfirmation
         ),
         navController = navController,
         callbacks = EditDishScreenCallbacks(
@@ -184,11 +195,13 @@ fun DishDetailsScreen(
             onDeleteConfirmed = viewModel::confirmDelete,
             copyDish = viewModel::copyDish,
             updateCopiedDishName = viewModel::updateCopiedDishName,
-            discardChanges = viewModel::discardChanges,
+            discardAndNavigate = viewModel::discardChanges,
             saveAndNavigate = viewModel::saveAndNavigate,
-            hideCopyConfirmation = viewModel::hideCopyConfirmation
-        ),
-        showCopyConfirmation = showCopyConfirmation
+            hideCopyConfirmation = viewModel::hideCopyConfirmation,
+            saveChangesAndProceed = viewModel::saveChangesAndProceed,
+            discardChangesAndProceed = { viewModel.discardChangesAndProceed(context) },
+            onCopyDishClick = { viewModel.handleCopyDish(context) },
+        )
     )
 }
 
@@ -197,10 +210,8 @@ private fun EditDishScreenContent(
     state: EditDishScreenState,
     navController: NavController,
     callbacks: EditDishScreenCallbacks,
-    modifier: Modifier = Modifier,
-    showCopyConfirmation: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     with(state) {
         Scaffold(
             modifier = modifier,
@@ -209,16 +220,7 @@ private fun EditDishScreenContent(
                     dishName = modifiedDishDomain?.name ?: dishId.toString(),
                     onNameClick = { callbacks.setInteraction(InteractionType.EditName) },
                     onDeleteClick = { callbacks.onDeleteDishClick() },
-                    onCopyClick = {
-                        callbacks.setInteraction(
-                            InteractionType.CopyDish(
-                                context.getString(
-                                    R.string.copy_dish_prefilled_name,
-                                    state.editableName
-                                )
-                            )
-                        )
-                    },
+                    onCopyClick = { callbacks.onCopyDishClick() },
                     onBackClick = { navController.popBackStack() }
                 )
             }
@@ -367,8 +369,16 @@ private fun EditDishScreenContent(
                             InteractionType.UnsavedChangesConfirmation -> {
                                 FCCUnsavedChangesDialog(
                                     onDismiss = { callbacks.resetScreenState() },
-                                    onDiscard = { callbacks.discardChanges { navController.popBackStack() } },
+                                    onDiscard = { callbacks.discardAndNavigate { navController.popBackStack() } },
                                     onSave = { callbacks.saveAndNavigate() }
+                                )
+                            }
+
+                            is InteractionType.UnsavedChangesConfirmationBeforeCopy -> {
+                                FCCUnsavedChangesDialog(
+                                    onDismiss = callbacks.resetScreenState,
+                                    onDiscard = callbacks.discardChangesAndProceed,
+                                    onSave = callbacks.saveChangesAndProceed
                                 )
                             }
 
@@ -379,9 +389,9 @@ private fun EditDishScreenContent(
                     is ScreenState.Idle -> {}
                 }
 
-                ConfirmPopUp(
-                    visible = showCopyConfirmation
-                ){ callbacks.hideCopyConfirmation() }
+                ConfirmPopUp(visible = showCopyConfirmation) {
+                    callbacks.hideCopyConfirmation()
+                }
             }
         }
     }
@@ -526,5 +536,27 @@ private fun EditDishScreenContentPreview(
 }
 
 private fun createEmptyEditDishScreenCallbacks() = EditDishScreenCallbacks(
-    {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {},
+    {}
 )

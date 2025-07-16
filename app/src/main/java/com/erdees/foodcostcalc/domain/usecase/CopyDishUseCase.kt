@@ -12,7 +12,7 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toRecipe
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toSteps
 import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
-import com.erdees.foodcostcalc.domain.model.dish.DishActionResultType
+import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
@@ -37,7 +37,7 @@ class CopyDishUseCase(
 
                 Result.success(
                     DishActionResult(
-                        type = DishActionResultType.COPIED,
+                        type = DishDetailsActionResultType.COPIED,
                         dishId = newDishId
                     )
                 )

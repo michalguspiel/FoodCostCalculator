@@ -99,7 +99,7 @@ object Mapper {
         )
     }
 
-    fun ProductAndProductDish.toUsedProductDomain(): UsedProductDomain {
+    private fun ProductAndProductDish.toUsedProductDomain(): UsedProductDomain {
         return UsedProductDomain(
             id = productDish.productDishId,
             ownerId = productDish.dishId,
@@ -110,7 +110,7 @@ object Mapper {
         )
     }
 
-    fun ProductUsedInHalfProduct.toUsedProductDomain(): UsedProductDomain {
+    private fun ProductUsedInHalfProduct.toUsedProductDomain(): UsedProductDomain {
         return UsedProductDomain(
             id = productHalfProduct.productHalfProductId,
             ownerId = productHalfProduct.halfProductId,
