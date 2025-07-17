@@ -1,8 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,7 +19,7 @@ import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.DeleteDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.SaveDishUseCase
-import com.erdees.foodcostcalc.ext.toShareableText
+import com.erdees.foodcostcalc.domain.usecase.ShareDishUseCase
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.IS_COPIED
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
@@ -55,6 +53,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private val copyDishUseCase: CopyDishUseCase by inject()
     private val saveDishUseCase: SaveDishUseCase by inject()
     private val deleteDishUseCase: DeleteDishUseCase by inject()
+    private val shareDishUseCase: ShareDishUseCase by inject()
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
@@ -415,22 +414,27 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         }
     }
 
+    /**
+     * Shares dish information using the Android share functionality.
+     * Delegates to ShareDishUseCase, which handles the business logic.
+     *
+     * @param context Android context needed to start the share intent
+     */
     fun shareDish(context: Context) {
-        analyticsRepository.logEvent(Constants.Analytics.DISH_SHARE, Bundle().apply {
-            putString(Constants.Analytics.DISH_NAME, _dish.value?.name)
-        })
+        val currentDish = dish.value ?: return
 
-        val shareableText = _dish.value?.toShareableText(context, currency.value).also {
-            Timber.i(it)
+        viewModelScope.launch {
+            shareDishUseCase.invoke(
+                context = context,
+                dish = currentDish,
+                currency = currency.value
+            ).onSuccess { shareIntent ->
+                context.startActivity(shareIntent)
+            }.onFailure { exception ->
+                _screenState.value = ScreenState.Error(Error(exception.message))
+                Timber.e(exception, "Failed to share dish")
+            }
         }
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, shareableText)
-            type = "text/plain"
-        }
-
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        context.startActivity(shareIntent)
     }
 
     fun onDeleteDishClick() {
