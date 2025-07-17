@@ -113,9 +113,7 @@ data class EditDishScreenState(
 @Screen
 @Composable
 fun DishDetailsScreen(
-    dishId: Long,
-    navController: NavController,
-    viewModel: DishDetailsViewModel = viewModel()
+    dishId: Long, navController: NavController, viewModel: DishDetailsViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val screenState by viewModel.screenState.collectAsState()
@@ -148,13 +146,12 @@ fun DishDetailsScreen(
                 }
             }
 
-            DishDetailsActionResultType.UPDATED_NAVIGATE,
-            DishDetailsActionResultType.DELETED -> {
+            DishDetailsActionResultType.UPDATED_NAVIGATE, DishDetailsActionResultType.DELETED -> {
                 navController.popBackStack()
             }
 
             DishDetailsActionResultType.UPDATED_STAY -> {
-                viewModel.handleCopyDish(context)
+                viewModel.handleCopyDish({ getCopyDishPrefilledName(it, context) })
             }
         }
     }
@@ -173,9 +170,7 @@ fun DishDetailsScreen(
             currency = currency,
             screenState = screenState,
             showCopyConfirmation = showCopyConfirmation
-        ),
-        navController = navController,
-        callbacks = EditDishScreenCallbacks(
+        ), navController = navController, callbacks = EditDishScreenCallbacks(
             saveDish = viewModel::saveDish,
             shareDish = viewModel::shareDish,
             setInteraction = viewModel::setInteraction,
@@ -199,10 +194,26 @@ fun DishDetailsScreen(
             saveAndNavigate = viewModel::saveAndNavigate,
             hideCopyConfirmation = viewModel::hideCopyConfirmation,
             saveChangesAndProceed = viewModel::saveChangesAndProceed,
-            discardChangesAndProceed = { viewModel.discardChangesAndProceed(context) },
-            onCopyDishClick = { viewModel.handleCopyDish(context) },
+            discardChangesAndProceed = {
+                viewModel.discardChangesAndProceed({
+                    getCopyDishPrefilledName(
+                        it, context
+                    )
+                })
+            },
+            onCopyDishClick = {
+                viewModel.handleCopyDish({
+                    getCopyDishPrefilledName(
+                        it, context
+                    )
+                })
+            },
         )
     )
+}
+
+private fun getCopyDishPrefilledName(name: String?, context: Context): String {
+    return context.getString(R.string.copy_dish_prefilled_name, name)
 }
 
 @Composable
@@ -214,17 +225,14 @@ private fun EditDishScreenContent(
 ) {
     with(state) {
         Scaffold(
-            modifier = modifier,
-            topBar = {
+            modifier = modifier, topBar = {
                 EditDishTopBar(
                     dishName = modifiedDishDomain?.name ?: dishId.toString(),
                     onNameClick = { callbacks.setInteraction(InteractionType.EditName) },
                     onDeleteClick = { callbacks.onDeleteDishClick() },
                     onCopyClick = { callbacks.onCopyDishClick() },
-                    onBackClick = { navController.popBackStack() }
-                )
-            }
-        ) { paddingValues ->
+                    onBackClick = { navController.popBackStack() })
+            }) { paddingValues ->
             Box(modifier = Modifier.padding(paddingValues)) {
                 Column {
                     LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
@@ -263,8 +271,7 @@ private fun EditDishScreenContent(
                             shareDish = { callbacks.shareDish(it) },
                             navigate = {
                                 navController.navigate(FCCScreen.Recipe)
-                            }
-                        )
+                            })
                     }
                 }
 
@@ -287,8 +294,7 @@ private fun EditDishScreenContent(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     updateValue = { callbacks.updateTax(it) },
                                     onSave = { callbacks.saveTax() },
-                                    onDismiss = { callbacks.resetScreenState() }
-                                )
+                                    onDismiss = { callbacks.resetScreenState() })
                             }
 
                             InteractionType.EditMargin -> {
@@ -298,8 +304,7 @@ private fun EditDishScreenContent(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     updateValue = { callbacks.updateMargin(it) },
                                     onSave = { callbacks.saveMargin() },
-                                    onDismiss = { callbacks.resetScreenState() }
-                                )
+                                    onDismiss = { callbacks.resetScreenState() })
                             }
 
                             InteractionType.EditTotalPrice -> {
@@ -309,8 +314,7 @@ private fun EditDishScreenContent(
                                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     updateValue = { callbacks.updateTotalPrice(it) },
                                     onSave = { callbacks.saveTotalPrice() },
-                                    onDismiss = { callbacks.resetScreenState() }
-                                )
+                                    onDismiss = { callbacks.resetScreenState() })
                             }
 
                             InteractionType.EditName -> {
@@ -351,8 +355,7 @@ private fun EditDishScreenContent(
                                     ),
                                     updateValue = { callbacks.updateQuantity(it) },
                                     onSave = { callbacks.saveQuantity() },
-                                    onDismiss = { callbacks.resetScreenState() }
-                                )
+                                    onDismiss = { callbacks.resetScreenState() })
                             }
 
                             is InteractionType.DeleteConfirmation -> {
@@ -362,16 +365,14 @@ private fun EditDishScreenContent(
                                     onDismiss = { callbacks.resetScreenState() },
                                     onConfirmDelete = {
                                         callbacks.onDeleteConfirmed(deleteConfirmation.itemId)
-                                    }
-                                )
+                                    })
                             }
 
                             InteractionType.UnsavedChangesConfirmation -> {
                                 FCCUnsavedChangesDialog(
                                     onDismiss = { callbacks.resetScreenState() },
                                     onDiscard = { callbacks.discardAndNavigate { navController.popBackStack() } },
-                                    onSave = { callbacks.saveAndNavigate() }
-                                )
+                                    onSave = { callbacks.saveAndNavigate() })
                             }
 
                             is InteractionType.UnsavedChangesConfirmationBeforeCopy -> {
@@ -408,61 +409,45 @@ private fun EditDishTopBar(
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
-    TopAppBar(
-        title = {
-            Text(
-                text = dishName,
-                modifier = Modifier.clickable { onNameClick() }
+    TopAppBar(title = {
+        Text(
+            text = dishName, modifier = Modifier.clickable { onNameClick() })
+    }, actions = {
+        IconButton(onClick = { showMenu = true }) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = stringResource(R.string.more_options)
             )
-        },
-        actions = {
-            IconButton(onClick = { showMenu = true }) {
-                Icon(
-                    imageVector = Icons.Default.MoreVert,
-                    contentDescription = stringResource(R.string.more_options)
-                )
-            }
-            DropdownMenu(
-                expanded = showMenu,
-                onDismissRequest = { showMenu = false }
-            ) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.copy_dish)) },
-                    onClick = {
-                        onCopyClick()
-                        showMenu = false
-                    },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.content_copy_24dp),
-                            contentDescription = stringResource(R.string.copy_dish)
-                        )
-                    }
-                )
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.remove_dish)) },
-                    onClick = {
-                        onDeleteClick()
-                        showMenu = false
-                    },
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(R.drawable.delete_24dp),
-                            contentDescription = stringResource(R.string.remove_dish)
-                        )
-                    }
-                )
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    Icons.AutoMirrored.Sharp.ArrowBack,
-                    contentDescription = stringResource(R.string.back)
-                )
-            }
         }
-    )
+        DropdownMenu(
+            expanded = showMenu, onDismissRequest = { showMenu = false }) {
+            DropdownMenuItem(text = { Text(stringResource(R.string.copy_dish)) }, onClick = {
+                onCopyClick()
+                showMenu = false
+            }, leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.content_copy_24dp),
+                    contentDescription = stringResource(R.string.copy_dish)
+                )
+            })
+            DropdownMenuItem(text = { Text(stringResource(R.string.remove_dish)) }, onClick = {
+                onDeleteClick()
+                showMenu = false
+            }, leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.delete_24dp),
+                    contentDescription = stringResource(R.string.remove_dish)
+                )
+            })
+        }
+    }, navigationIcon = {
+        IconButton(onClick = onBackClick) {
+            Icon(
+                Icons.AutoMirrored.Sharp.ArrowBack,
+                contentDescription = stringResource(R.string.back)
+            )
+        }
+    })
 }
 
 @Composable
@@ -473,24 +458,19 @@ private fun Buttons(
     modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
-    ButtonRow(
-        modifier = modifier.padding(end = 12.dp),
-        primaryButton = {
-            FCCPrimaryButton(text = stringResource(R.string.save)) {
-                saveDish()
-            }
-        },
-        secondaryButton = {
-            FCCOutlinedButton(text = stringResource(R.string.recipe_button_title)) {
-                navigate()
-            }
-        },
-        tertiaryButton = {
-            FCCTextButton(stringResource(R.string.share)) {
-                shareDish(context)
-            }
+    ButtonRow(modifier = modifier.padding(end = 12.dp), primaryButton = {
+        FCCPrimaryButton(text = stringResource(R.string.save)) {
+            saveDish()
         }
-    )
+    }, secondaryButton = {
+        FCCOutlinedButton(text = stringResource(R.string.recipe_button_title)) {
+            navigate()
+        }
+    }, tertiaryButton = {
+        FCCTextButton(stringResource(R.string.share)) {
+            shareDish(context)
+        }
+    })
 }
 
 
@@ -558,5 +538,4 @@ private fun createEmptyEditDishScreenCallbacks() = EditDishScreenCallbacks(
     {},
     {},
     {},
-    {}
-)
+    {})

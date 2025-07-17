@@ -6,7 +6,6 @@ import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
@@ -364,12 +363,12 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         }
     }
 
-    fun discardChangesAndProceed(context: Context) {
+    fun discardChangesAndProceed(getName: (String?) -> String) {
         // Restore dish to original state
         viewModelScope.launch {
             loadDishStateFromRepository()
             resetScreenState()
-            showCopyDish( context.getString(R.string.copy_dish_prefilled_name, dish.value?.name))
+            showCopyDish(getName(_dish.value?.name))
         }
     }
 
@@ -386,15 +385,13 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      * If there are unsaved changes, prompts the user to decide what to do first
      * Otherwise, proceeds directly to the copy dish dialog
      */
-    fun handleCopyDish(context: Context) {
+    fun handleCopyDish(getName: (String?) -> String) {
         if (hasUnsavedChanges()) {
             _screenState.update {
                 ScreenState.Interaction(InteractionType.UnsavedChangesConfirmationBeforeCopy)
             }
         } else {
-            showCopyDish(
-                context.getString(R.string.copy_dish_prefilled_name, dish.value?.name)
-            )
+            showCopyDish(getName(_dish.value?.name))
         }
     }
 
