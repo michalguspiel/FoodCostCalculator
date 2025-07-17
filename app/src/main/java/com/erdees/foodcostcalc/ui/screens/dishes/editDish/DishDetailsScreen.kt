@@ -275,125 +275,153 @@ private fun EditDishScreenContent(
                     }
                 }
 
-                when (screenState) {
-                    is ScreenState.Loading<*> -> ScreenLoadingOverlay()
-                    is ScreenState.Success<*> -> {} // NOTHING
-
-                    is ScreenState.Error -> {
-                        ErrorDialog {
-                            callbacks.resetScreenState()
-                        }
-                    }
-
-                    is ScreenState.Interaction -> {
-                        when (screenState.interaction) {
-                            InteractionType.EditTax -> {
-                                ValueEditDialog(
-                                    title = stringResource(R.string.edit_tax),
-                                    value = editableTax,
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    updateValue = { callbacks.updateTax(it) },
-                                    onSave = { callbacks.saveTax() },
-                                    onDismiss = { callbacks.resetScreenState() })
-                            }
-
-                            InteractionType.EditMargin -> {
-                                ValueEditDialog(
-                                    title = stringResource(R.string.edit_margin),
-                                    value = editableMargin,
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    updateValue = { callbacks.updateMargin(it) },
-                                    onSave = { callbacks.saveMargin() },
-                                    onDismiss = { callbacks.resetScreenState() })
-                            }
-
-                            InteractionType.EditTotalPrice -> {
-                                ValueEditDialog(
-                                    title = stringResource(R.string.edit_total_price),
-                                    value = editableTotalPrice,
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                                    updateValue = { callbacks.updateTotalPrice(it) },
-                                    onSave = { callbacks.saveTotalPrice() },
-                                    onDismiss = { callbacks.resetScreenState() })
-                            }
-
-                            InteractionType.EditName -> {
-                                ValueEditDialog(
-                                    title = stringResource(R.string.edit_name),
-                                    value = editableName,
-                                    updateValue = { callbacks.updateName(it) },
-                                    onSave = { callbacks.saveName() },
-                                    onDismiss = { callbacks.resetScreenState() },
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Text,
-                                        capitalization = KeyboardCapitalization.Words
-                                    )
-                                )
-                            }
-
-                            is InteractionType.CopyDish -> {
-                                ValueEditDialog(
-                                    title = stringResource(R.string.copy_dish),
-                                    value = editableCopiedDishName,
-                                    updateValue = { callbacks.updateCopiedDishName(it) },
-                                    onSave = { callbacks.copyDish() },
-                                    onDismiss = { callbacks.resetScreenState() },
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Text,
-                                        capitalization = KeyboardCapitalization.Words
-                                    )
-                                )
-                            }
-
-                            is InteractionType.EditItem -> {
-                                ValueEditDialog(
-                                    title = stringResource(R.string.edit_quantity),
-                                    value = editableQuantity,
-                                    keyboardOptions = KeyboardOptions(
-                                        keyboardType = KeyboardType.Number,
-                                        capitalization = KeyboardCapitalization.Words
-                                    ),
-                                    updateValue = { callbacks.updateQuantity(it) },
-                                    onSave = { callbacks.saveQuantity() },
-                                    onDismiss = { callbacks.resetScreenState() })
-                            }
-
-                            is InteractionType.DeleteConfirmation -> {
-                                val deleteConfirmation = screenState.interaction
-                                FCCDeleteConfirmationDialog(
-                                    itemName = deleteConfirmation.itemName,
-                                    onDismiss = { callbacks.resetScreenState() },
-                                    onConfirmDelete = {
-                                        callbacks.onDeleteConfirmed(deleteConfirmation.itemId)
-                                    })
-                            }
-
-                            InteractionType.UnsavedChangesConfirmation -> {
-                                FCCUnsavedChangesDialog(
-                                    onDismiss = { callbacks.resetScreenState() },
-                                    onDiscard = { callbacks.discardAndNavigate { navController.popBackStack() } },
-                                    onSave = { callbacks.saveAndNavigate() })
-                            }
-
-                            is InteractionType.UnsavedChangesConfirmationBeforeCopy -> {
-                                FCCUnsavedChangesDialog(
-                                    onDismiss = callbacks.resetScreenState,
-                                    onDiscard = callbacks.discardChangesAndProceed,
-                                    onSave = callbacks.saveChangesAndProceed
-                                )
-                            }
-
-                            else -> {}
-                        }
-                    }
-
-                    is ScreenState.Idle -> {}
-                }
+                ScreenStateHandler(state, callbacks, navController)
 
                 ConfirmPopUp(visible = showCopyConfirmation) {
                     callbacks.hideCopyConfirmation()
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ScreenStateHandler(
+    state: EditDishScreenState,
+    callbacks: EditDishScreenCallbacks,
+    navController: NavController,
+) {
+    with(state) {
+        when (screenState) {
+            is ScreenState.Loading<*> -> ScreenLoadingOverlay()
+            is ScreenState.Success<*> -> {} // NOTHING
+
+            is ScreenState.Error -> {
+                ErrorDialog {
+                    callbacks.resetScreenState()
+                }
+            }
+
+            is ScreenState.Interaction -> {
+                InteractionHandler(
+                    interaction = screenState.interaction,
+                    state = state,
+                    callbacks = callbacks,
+                    navController = navController
+                )
+            }
+
+            is ScreenState.Idle -> {}
+        }
+    }
+}
+
+@Composable
+private fun InteractionHandler(
+    interaction: InteractionType,
+    state: EditDishScreenState,
+    callbacks: EditDishScreenCallbacks,
+    navController: NavController
+) {
+    with(state) {
+        when (interaction) {
+            InteractionType.EditTax -> {
+                ValueEditDialog(
+                    title = stringResource(R.string.edit_tax),
+                    value = editableTax,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    updateValue = { callbacks.updateTax(it) },
+                    onSave = { callbacks.saveTax() },
+                    onDismiss = { callbacks.resetScreenState() })
+            }
+
+            InteractionType.EditMargin -> {
+                ValueEditDialog(
+                    title = stringResource(R.string.edit_margin),
+                    value = editableMargin,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    updateValue = { callbacks.updateMargin(it) },
+                    onSave = { callbacks.saveMargin() },
+                    onDismiss = { callbacks.resetScreenState() })
+            }
+
+            InteractionType.EditTotalPrice -> {
+                ValueEditDialog(
+                    title = stringResource(R.string.edit_total_price),
+                    value = editableTotalPrice,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    updateValue = { callbacks.updateTotalPrice(it) },
+                    onSave = { callbacks.saveTotalPrice() },
+                    onDismiss = { callbacks.resetScreenState() })
+            }
+
+            InteractionType.EditName -> {
+                ValueEditDialog(
+                    title = stringResource(R.string.edit_name),
+                    value = editableName,
+                    updateValue = { callbacks.updateName(it) },
+                    onSave = { callbacks.saveName() },
+                    onDismiss = { callbacks.resetScreenState() },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Words
+                    )
+                )
+            }
+
+            is InteractionType.CopyDish -> {
+                ValueEditDialog(
+                    title = stringResource(R.string.copy_dish),
+                    value = editableCopiedDishName,
+                    updateValue = { callbacks.updateCopiedDishName(it) },
+                    onSave = { callbacks.copyDish() },
+                    onDismiss = { callbacks.resetScreenState() },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Words
+                    )
+                )
+            }
+
+            is InteractionType.EditItem -> {
+                ValueEditDialog(
+                    title = stringResource(R.string.edit_quantity),
+                    value = editableQuantity,
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Number,
+                        capitalization = KeyboardCapitalization.Words
+                    ),
+                    updateValue = { callbacks.updateQuantity(it) },
+                    onSave = { callbacks.saveQuantity() },
+                    onDismiss = { callbacks.resetScreenState() })
+            }
+
+            is InteractionType.DeleteConfirmation -> {
+                val deleteConfirmation = interaction
+                FCCDeleteConfirmationDialog(
+                    itemName = deleteConfirmation.itemName,
+                    onDismiss = { callbacks.resetScreenState() },
+                    onConfirmDelete = {
+                        callbacks.onDeleteConfirmed(deleteConfirmation.itemId)
+                    })
+            }
+
+            InteractionType.UnsavedChangesConfirmation -> {
+                FCCUnsavedChangesDialog(
+                    onDismiss = { callbacks.resetScreenState() },
+                    onDiscard = { callbacks.discardAndNavigate { navController.popBackStack() } },
+                    onSave = { callbacks.saveAndNavigate() })
+            }
+
+            is InteractionType.UnsavedChangesConfirmationBeforeCopy -> {
+                FCCUnsavedChangesDialog(
+                    onDismiss = callbacks.resetScreenState,
+                    onDiscard = callbacks.discardChangesAndProceed,
+                    onSave = callbacks.saveChangesAndProceed
+                )
+            }
+
+            else -> {}
         }
     }
 }

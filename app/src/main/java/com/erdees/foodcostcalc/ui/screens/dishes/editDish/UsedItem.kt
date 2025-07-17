@@ -20,7 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -55,6 +57,7 @@ fun UsedItem(
     onEdit: (UsedItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val currentOnRemove by rememberUpdatedState(onRemove)
     val density = LocalDensity.current
     val positionalThreshold = SwipeToDismissBoxDefaults.positionalThreshold
     val swipeState = remember(System.identityHashCode(usedItem)) {
@@ -68,9 +71,9 @@ fun UsedItem(
         )
     }
 
-    LaunchedEffect(swipeState.currentValue) {
+    LaunchedEffect(swipeState.currentValue, usedItem) {
         if (swipeState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-            onRemove(usedItem)
+            currentOnRemove(usedItem)
         }
     }
 
