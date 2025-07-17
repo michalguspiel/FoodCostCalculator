@@ -9,11 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDish
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
@@ -23,6 +20,7 @@ import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
+import com.erdees.foodcostcalc.domain.usecase.SaveDishUseCase
 import com.erdees.foodcostcalc.ext.toShareableText
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.IS_COPIED
@@ -44,7 +42,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -57,6 +54,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     KoinComponent {
 
     private val copyDishUseCase: CopyDishUseCase by inject()
+    private val saveDishUseCase: SaveDishUseCase by inject()
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
@@ -396,63 +394,29 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     /**
-     * This function is responsible for saving the changes made to a dish.
-     * It first sets the screen state to loading and then launches a coroutine on the main thread.
+     * Saves the current dish state by delegating to SaveDishUseCase.
+     * It handles loading state, executes the use case, and updates screen state based on the result.
      *
-     * It retrieves the original list of products and half-products from the dishDomain.
-     * If the dishDomain is null, it defaults to an empty list.
-     *
-     * It then determines which products and half-products have been removed by filtering out items
-     * that are in the original list but not in the current list of products and half-products.
-     * These removed items are then mapped to their respective data model representations.
-     *
-     * Similarly, it determines which products and half-products have been edited by filtering out items
-     * that are in the current list but not in the original list. These edited items are also mapped to their respective data model representations.
-     *
-     * The function then enters a try-catch block where it performs the following operations in the IO context:
-     * - It iterates over the list of removed products and half-products and deletes each one from the repository.
-     * - It iterates over the list of edited products and half-products and updates each one in the repository.
-     * - It updates the dish in the repository. If the dishDomain is null, it throws an exception.
-     *
-     * If all operations are successful, it sets the screen state to success. If an exception is caught, it sets the screen state to error.
+     * @param actionResultType The type of action to perform after saving (navigate or stay)
      */
     fun saveDish(actionResultType: DishDetailsActionResultType = DishDetailsActionResultType.UPDATED_NAVIGATE) {
         val dish = dish.value ?: return
         _screenState.value = ScreenState.Loading<Nothing>()
-        viewModelScope.launch(Dispatchers.Default) {
 
-            val editedProducts =
-                dish.products.filterNot { it in originalProducts }.map { it.toProductDish() }
-            val editedHalfProducts = dish.halfProducts.filterNot { it in originalHalfProducts }
-                .map { it.toHalfProductDish() }
-
-            val removedProducts = originalProducts.filterNot {
-                it.id in dish.products.map { product -> product.id }
-            }.map { it.toProductDish() }
-
-            val removedHalfProducts = originalHalfProducts.filterNot {
-                it.id in dish.halfProducts.map { halfProduct -> halfProduct.id }
-            }.map { it.toHalfProductDish() }
-
-            try {
-                withContext(Dispatchers.IO) {
-
-                    removedProducts.forEach { dishRepository.deleteProductDish(it) }
-                    removedHalfProducts.forEach { dishRepository.deleteHalfProductDish(it) }
-
-                    editedProducts.forEach { dishRepository.updateProductDish(it) }
-                    editedHalfProducts.forEach { dishRepository.updateHalfProductDish(it) }
-
-                    dishRepository.updateDish(this@DishDetailsViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
-                }
+        viewModelScope.launch {
+            saveDishUseCase.invoke(
+                dish = dish,
+                originalProducts = originalProducts,
+                originalHalfProducts = originalHalfProducts,
+                actionResultType = actionResultType
+            ).onSuccess { result ->
                 if (actionResultType == DishDetailsActionResultType.UPDATED_STAY) {
                     loadDishStateFromRepository()
                 }
-                _screenState.value = ScreenState.Success(
-                    DishActionResult(actionResultType, dish.id)
-                )
-            } catch (e: Exception) {
-                _screenState.value = ScreenState.Error(Error(e.message))
+                _screenState.value = ScreenState.Success(result)
+            }.onFailure { exception ->
+                _screenState.value = ScreenState.Error(Error(exception.message))
+                Timber.e(exception, "Failed to save dish")
             }
         }
     }
