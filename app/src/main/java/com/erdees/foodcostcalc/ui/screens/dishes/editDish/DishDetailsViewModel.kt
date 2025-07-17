@@ -14,12 +14,12 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
-import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
+import com.erdees.foodcostcalc.domain.usecase.DeleteDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.SaveDishUseCase
 import com.erdees.foodcostcalc.ext.toShareableText
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
@@ -32,7 +32,6 @@ import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -55,6 +54,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     private val copyDishUseCase: CopyDishUseCase by inject()
     private val saveDishUseCase: SaveDishUseCase by inject()
+    private val deleteDishUseCase: DeleteDishUseCase by inject()
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
@@ -393,12 +393,6 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         }
     }
 
-    /**
-     * Saves the current dish state by delegating to SaveDishUseCase.
-     * It handles loading state, executes the use case, and updates screen state based on the result.
-     *
-     * @param actionResultType The type of action to perform after saving (navigate or stay)
-     */
     fun saveDish(actionResultType: DishDetailsActionResultType = DishDetailsActionResultType.UPDATED_NAVIGATE) {
         val dish = dish.value ?: return
         _screenState.value = ScreenState.Loading<Nothing>()
@@ -451,16 +445,13 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     fun confirmDelete(dishId: Long) {
         _screenState.value = ScreenState.Loading<Nothing>()
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                dishRepository.deleteDish(dishId)
-                analyticsRepository.logEvent(Constants.Analytics.DishV2.DELETED, null)
-                _screenState.value =
-                    ScreenState.Success(
-                        DishActionResult(DishDetailsActionResultType.DELETED, dishId)
-                    )
-            } catch (e: Exception) {
-                _screenState.value = ScreenState.Error(Error(e.message))
+
+        viewModelScope.launch {
+            deleteDishUseCase.invoke(dishId).onSuccess { result ->
+                _screenState.value = ScreenState.Success(result)
+            }.onFailure { exception ->
+                _screenState.value = ScreenState.Error(Error(exception.message))
+                Timber.e(exception, "Failed to delete dish")
             }
         }
     }
