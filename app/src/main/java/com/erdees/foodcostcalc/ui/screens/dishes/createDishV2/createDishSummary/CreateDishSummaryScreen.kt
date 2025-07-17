@@ -58,7 +58,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
-import com.erdees.foodcostcalc.ui.navigation.ConfirmAndNavigate
+import com.erdees.foodcostcalc.ui.navigation.ConfirmPopUp
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
@@ -194,9 +194,9 @@ fun CreateDishSummaryContent(
             )
         }
 
-        ConfirmAndNavigate(
+        ConfirmPopUp(
             visible = state.successfullySavedDishId != null,
-            navigate = {
+            actionAfter = {
                 state.successfullySavedDishId?.let { successNavigate(it) }
             }
         )

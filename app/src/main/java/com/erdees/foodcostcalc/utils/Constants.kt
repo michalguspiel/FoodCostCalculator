@@ -81,6 +81,7 @@ object Constants {
         }
 
         object DishV2 {
+            const val COPY = "dish_copy"
             const val DELETE = "dish_delete_clicked"
             const val DELETED = "dish_deleted"
             const val PRODUCT_CREATED = "product_created_dishv2"

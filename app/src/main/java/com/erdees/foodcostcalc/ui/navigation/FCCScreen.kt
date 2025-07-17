@@ -45,7 +45,10 @@ sealed class FCCScreen(
     data class AddItemsToDish(val dishId: Long, val dishName: String) : FCCScreen()
 
     @Serializable
-    data class DishDetails(@SerialName(DISH_ID_KEY) val dishId: Long) : FCCScreen()
+    data class DishDetails(
+        @SerialName(DISH_ID_KEY) val dishId: Long,
+        @SerialName(IS_COPIED) val isCopied: Boolean = false
+    ) : FCCScreen()
 
     @Serializable
     data object CreateDish : FCCScreen()
@@ -57,7 +60,8 @@ sealed class FCCScreen(
     data object CreateDishSummary : FCCScreen()
 
     @Serializable
-    data class EditHalfProduct(@SerialName(HALF_PRODUCT_ID_KEY) val halfProductId: Long) : FCCScreen()
+    data class EditHalfProduct(@SerialName(HALF_PRODUCT_ID_KEY) val halfProductId: Long) :
+        FCCScreen()
 
     @Serializable
     data class EditProduct(@SerialName(PRODUCT_ID_KEY) val productId: Long) : FCCScreen()
@@ -78,6 +82,7 @@ sealed class FCCScreen(
     data object Onboarding : FCCScreen()
 
     companion object {
+        const val IS_COPIED = "isCopied"
         const val DISH_ID_KEY = "dishId"
         const val PRODUCT_ID_KEY = "productId"
         const val HALF_PRODUCT_ID_KEY = "halfProductId"

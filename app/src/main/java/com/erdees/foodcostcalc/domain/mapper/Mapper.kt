@@ -99,7 +99,7 @@ object Mapper {
         )
     }
 
-    fun ProductAndProductDish.toUsedProductDomain(): UsedProductDomain {
+    private fun ProductAndProductDish.toUsedProductDomain(): UsedProductDomain {
         return UsedProductDomain(
             id = productDish.productDishId,
             ownerId = productDish.dishId,
@@ -110,7 +110,7 @@ object Mapper {
         )
     }
 
-    fun ProductUsedInHalfProduct.toUsedProductDomain(): UsedProductDomain {
+    private fun ProductUsedInHalfProduct.toUsedProductDomain(): UsedProductDomain {
         return UsedProductDomain(
             id = productHalfProduct.productHalfProductId,
             ownerId = productHalfProduct.halfProductId,
@@ -209,6 +209,20 @@ object Mapper {
 
     fun RecipeWithSteps.toEditableRecipe(): EditableRecipe {
         return this.toRecipeDomain().toEditableRecipe()
+    }
+
+    fun RecipeDomain.toRecipe(id: Long? = null): Recipe {
+        return Recipe(
+            recipeId = id ?: 0,
+            cookTimeMinutes = cookTimeMinutes,
+            prepTimeMinutes = prepTimeMinutes,
+            description = description,
+            tips = tips
+        )
+    }
+
+    fun RecipeDomain.toSteps() : List<RecipeStep> {
+        return steps?.map { it.toRecipeStep(recipeId = recipeId ?: 0) } ?: emptyList()
     }
 
 

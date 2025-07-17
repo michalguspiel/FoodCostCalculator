@@ -150,7 +150,7 @@ fun DishesScreen(
                 )
             },
             onEditClick = { dishId ->
-                navController.navigate(FCCScreen.DishDetails(dishId))
+                navController.navigate(FCCScreen.DishDetails(dishId, false))
             }
         )
     }
