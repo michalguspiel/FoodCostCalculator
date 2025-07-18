@@ -25,84 +25,75 @@ private fun createDishModel(): CompleteDish {
     )
 }
 
-class EditDishScreenStateProvider : PreviewParameterProvider<EditDishScreenState> {
+class EditDishScreenStateProvider : PreviewParameterProvider<DishDetailsUiState> {
     private val sampleDish = createDishModel().toDishDomain()
-    private val sampleCurrency = android.icu.util.Currency.getInstance("USD")
 
-    override val values: Sequence<EditDishScreenState> = sequenceOf(
-        EditDishScreenState(
-            dishId = 1L,
-            usedItems = sampleDish.products,
-            modifiedDishDomain = sampleDish,
-            editableQuantity = "1.0",
-            editableTax = "10",
-            editableMargin = "150",
-            editableName = sampleDish.name,
-            editableCopiedDishName = "",
-            editableTotalPrice = "120",
-            currency = sampleCurrency,
-            screenState = ScreenState.Idle,
-            showCopyConfirmation = false
+    override val values = sequenceOf(
+        // Idle state with dish
+        DishDetailsUiState(
+            dish = sampleDish,
+            editableFields = EditableFields(
+                name = sampleDish.name,
+                totalPrice = sampleDish.totalPrice.toString(),
+                tax = sampleDish.taxPercent.toString(),
+                margin = sampleDish.marginPercent.toString()
+            ),
+            screenState = ScreenState.Idle
         ),
-        // Loading State
-        EditDishScreenState(
-            dishId = 1L,
-            usedItems = emptyList(),
-            modifiedDishDomain = sampleDish.copy(products = listOf()),
-            editableQuantity = "",
-            editableTax = "",
-            editableMargin = "",
-            editableName = "",
-            editableCopiedDishName = "",
-            editableTotalPrice = "",
-            currency = sampleCurrency,
-            screenState = ScreenState.Loading<Nothing>(),
-            showCopyConfirmation = false
+
+        // Loading state
+        DishDetailsUiState(
+            dish = sampleDish,
+            screenState = ScreenState.Loading<Nothing>()
         ),
-        // Error State
-        EditDishScreenState(
-            dishId = 1L,
-            usedItems = emptyList(),
-            modifiedDishDomain = null,
-            editableQuantity = "",
-            editableTax = "",
-            editableMargin = "",
-            editableName = "",
-            editableCopiedDishName = "",
-            editableTotalPrice = "",
-            currency = sampleCurrency,
-            screenState = ScreenState.Error(Error("Something went wrong!")),
-            showCopyConfirmation = false
+
+        // Error state
+        DishDetailsUiState(
+            dish = sampleDish,
+            screenState = ScreenState.Error(Error("Sample error message"))
         ),
-        // Interaction: Edit Name
-        EditDishScreenState(
-            dishId = 1L,
-            usedItems = sampleDish.products,
-            modifiedDishDomain = sampleDish,
-            editableQuantity = "1.0",
-            editableTax = "10",
-            editableMargin = "150",
-            editableName = sampleDish.name,
-            editableCopiedDishName = "",
-            editableTotalPrice = sampleDish.totalPrice.toString(),
-            currency = sampleCurrency,
-            screenState = ScreenState.Interaction(InteractionType.EditName),
-            showCopyConfirmation = false
+
+        // Interaction: Edit tax
+        DishDetailsUiState(
+            dish = sampleDish,
+            editableFields = EditableFields(
+                tax = sampleDish.taxPercent.toString()
+            ),
+            screenState = ScreenState.Interaction(InteractionType.EditTax)
         ),
-        // Interaction: Edit Tax
-        EditDishScreenState(
-            dishId = 1L,
-            usedItems = sampleDish.products,
-            modifiedDishDomain = sampleDish,
-            editableQuantity = "1.0",
-            editableTax = "10", // Current tax being edited
-            editableMargin = "150",
-            editableName = sampleDish.name,
-            editableCopiedDishName = "",
-            editableTotalPrice = sampleDish.totalPrice.toString(),
-            currency = sampleCurrency,
-            screenState = ScreenState.Interaction(InteractionType.EditTax),
-            showCopyConfirmation = false
+
+        // Interaction: Edit margin
+        DishDetailsUiState(
+            dish = sampleDish,
+            editableFields = EditableFields(
+                margin = sampleDish.marginPercent.toString()
+            ),
+            screenState = ScreenState.Interaction(InteractionType.EditMargin)
         ),
+
+        // Interaction: Edit name
+        DishDetailsUiState(
+            dish = sampleDish,
+            editableFields = EditableFields(
+                name = sampleDish.name
+            ),
+            screenState = ScreenState.Interaction(InteractionType.EditName)
+        ),
+
+        // Interaction: Copy dish
+        DishDetailsUiState(
+            dish = sampleDish,
+            editableFields = EditableFields(
+                copiedDishName = "Copy of ${sampleDish.name}"
+            ),
+            screenState = ScreenState.Interaction(InteractionType.CopyDish("Copy of ${sampleDish.name}"))
+        ),
+
+        // Show copy confirmation
+        DishDetailsUiState(
+            dish = sampleDish,
+            showCopyConfirmation = true,
+            screenState = ScreenState.Idle
+        )
     )
 }

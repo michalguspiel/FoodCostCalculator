@@ -89,7 +89,7 @@ fun RecipeScreen(navController: NavController, viewModel: DishDetailsViewModel) 
     val recipeUpdater = viewModel.recipeUpdater
     val recipeServings by viewModel.recipeServings.collectAsState()
     val recipeEvent by viewModel.recipeEvent.collectAsStateWithLifecycle(null)
-    val currency by viewModel.currency.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(recipeEvent) {
         Timber.i("New $recipeEvent received.")
@@ -105,7 +105,7 @@ fun RecipeScreen(navController: NavController, viewModel: DishDetailsViewModel) 
         recipe = recipe,
         screenState = screenState,
         servings = recipeServings,
-        currency = currency,
+        currency = uiState.currency,
         recipeUpdater = recipeUpdater,
         modifier = Modifier,
         recipeScreenCallbacks = RecipeScreenCallbacks(

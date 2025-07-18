@@ -1,7 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import android.content.Context
-import android.icu.util.Currency
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,7 +48,6 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
-import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
@@ -67,7 +64,7 @@ import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
-data class EditDishScreenCallbacks(
+data class EditDishScreenActions(
     val saveDish: () -> Unit,
     val shareDish: (Context) -> Unit,
     val setInteraction: (InteractionType) -> Unit,
@@ -95,45 +92,20 @@ data class EditDishScreenCallbacks(
     val saveChangesAndProceed: () -> Unit = {},
 )
 
-data class EditDishScreenState(
-    val dishId: Long,
-    val usedItems: List<UsedItem>,
-    val modifiedDishDomain: DishDomain?,
-    val editableQuantity: String,
-    val editableTax: String,
-    val editableMargin: String,
-    val editableName: String,
-    val editableCopiedDishName: String,
-    val editableTotalPrice: String,
-    val currency: Currency?,
-    val screenState: ScreenState,
-    val showCopyConfirmation: Boolean
-)
-
 @Screen
 @Composable
 fun DishDetailsScreen(
     dishId: Long, navController: NavController, viewModel: DishDetailsViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val screenState by viewModel.screenState.collectAsState()
-    val usedItems: List<UsedItem> by viewModel.items.collectAsStateWithLifecycle()
-    val modifiedDishDomain by viewModel.dish.collectAsStateWithLifecycle()
-    val editableQuantity by viewModel.editableQuantity.collectAsState()
-    val editableTax by viewModel.editableTax.collectAsState()
-    val editableMargin by viewModel.editableMargin.collectAsState()
-    val editableName by viewModel.editableName.collectAsState()
-    val editableCopiedDishName by viewModel.editableCopiedDishName.collectAsState()
-    val editableTotalPrice by viewModel.editableTotalPrice.collectAsState()
-    val currency by viewModel.currency.collectAsState()
-    val showCopyConfirmation by viewModel.showCopyConfirmation.collectAsState()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     BackHandler {
         viewModel.handleBackNavigation { navController.popBackStack() }
     }
 
-    LaunchedEffect(screenState) {
-        val state = screenState as? ScreenState.Success<*> ?: return@LaunchedEffect
+    LaunchedEffect(uiState.screenState) {
+        val state = uiState.screenState as? ScreenState.Success<*> ?: return@LaunchedEffect
         val data = state.data as? DishActionResult ?: return@LaunchedEffect
 
         viewModel.resetScreenState()
@@ -157,20 +129,10 @@ fun DishDetailsScreen(
     }
 
     EditDishScreenContent(
-        state = EditDishScreenState(
-            dishId = dishId,
-            usedItems = usedItems,
-            modifiedDishDomain = modifiedDishDomain,
-            editableQuantity = editableQuantity,
-            editableTax = editableTax,
-            editableMargin = editableMargin,
-            editableName = editableName,
-            editableCopiedDishName = editableCopiedDishName,
-            editableTotalPrice = editableTotalPrice,
-            currency = currency,
-            screenState = screenState,
-            showCopyConfirmation = showCopyConfirmation
-        ), navController = navController, callbacks = EditDishScreenCallbacks(
+        uiState = uiState,
+        dishId = dishId,
+        navController = navController,
+        actions = EditDishScreenActions(
             saveDish = viewModel::saveDish,
             shareDish = viewModel::shareDish,
             setInteraction = viewModel::setInteraction,
@@ -218,68 +180,83 @@ private fun getCopyDishPrefilledName(name: String?, context: Context): String {
 
 @Composable
 private fun EditDishScreenContent(
-    state: EditDishScreenState,
+    uiState: DishDetailsUiState,
+    dishId: Long,
     navController: NavController,
-    callbacks: EditDishScreenCallbacks,
+    actions: EditDishScreenActions,
     modifier: Modifier = Modifier
 ) {
-    with(state) {
-        Scaffold(
-            modifier = modifier, topBar = {
-                EditDishTopBar(
-                    dishName = modifiedDishDomain?.name ?: dishId.toString(),
-                    onNameClick = { callbacks.setInteraction(InteractionType.EditName) },
-                    onDeleteClick = { callbacks.onDeleteDishClick() },
-                    onCopyClick = { callbacks.onCopyDishClick() },
-                    onBackClick = { navController.popBackStack() })
-            }) { paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
-                Column {
-                    LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
-                        items(usedItems, key = { item ->
-                            item::class.simpleName + item.id.toString()
-                        }) { item ->
-                            UsedItem(
-                                usedItem = item,
-                                onRemove = { callbacks.removeItem(it) },
-                                onEdit = {
-                                    callbacks.setInteraction(
-                                        InteractionType.EditItem(it)
-                                    )
-                                })
-                            HorizontalDivider(
-                                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
-                                thickness = 1.dp
-                            )
-                        }
-                    }
-
-                    Column(Modifier) {
-                        modifiedDishDomain?.let {
-                            DishDetails(it, currency, onTaxClick = {
-                                callbacks.setInteraction(InteractionType.EditTax)
-                            }, onMarginClick = {
-                                callbacks.setInteraction(InteractionType.EditMargin)
-                            }, onTotalPriceClick = {
-                                callbacks.setInteraction(InteractionType.EditTotalPrice)
-                            })
-                        }
-
-                        Buttons(
-                            modifier = Modifier.padding(top = 16.dp),
-                            saveDish = { callbacks.saveDish() },
-                            shareDish = { callbacks.shareDish(it) },
-                            navigate = {
-                                navController.navigate(FCCScreen.Recipe)
-                            })
+    Scaffold(
+        modifier = modifier,
+        topBar = {
+            EditDishTopBar(
+                dishName = uiState.dish?.name ?: dishId.toString(),
+                onNameClick = { actions.setInteraction(InteractionType.EditName) },
+                onDeleteClick = { actions.onDeleteDishClick() },
+                onCopyClick = { actions.onCopyDishClick() },
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            Column {
+                LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
+                    items(uiState.items, key = { item ->
+                        item::class.simpleName + item.id.toString()
+                    }) { item ->
+                        UsedItem(
+                            usedItem = item,
+                            onRemove = { actions.removeItem(it) },
+                            onEdit = {
+                                actions.setInteraction(
+                                    InteractionType.EditItem(it)
+                                )
+                            }
+                        )
+                        HorizontalDivider(
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
+                            thickness = 1.dp
+                        )
                     }
                 }
 
-                ScreenStateHandler(state, callbacks, navController)
+                Column(Modifier) {
+                    uiState.dish?.let {
+                        DishDetails(
+                            it,
+                            uiState.currency,
+                            onTaxClick = {
+                                actions.setInteraction(InteractionType.EditTax)
+                            },
+                            onMarginClick = {
+                                actions.setInteraction(InteractionType.EditMargin)
+                            },
+                            onTotalPriceClick = {
+                                actions.setInteraction(InteractionType.EditTotalPrice)
+                            }
+                        )
+                    }
 
-                ConfirmPopUp(visible = showCopyConfirmation) {
-                    callbacks.hideCopyConfirmation()
+                    Buttons(
+                        modifier = Modifier.padding(top = 16.dp),
+                        saveDish = { actions.saveDish() },
+                        shareDish = { actions.shareDish(it) },
+                        navigate = {
+                            navController.navigate(FCCScreen.Recipe)
+                        }
+                    )
                 }
+            }
+
+            ScreenStateHandler(
+                uiState = uiState,
+                editableFields = uiState.editableFields,
+                callbacks = actions,
+                navController = navController
+            )
+
+            ConfirmPopUp(visible = uiState.showCopyConfirmation) {
+                actions.hideCopyConfirmation()
             }
         }
     }
@@ -287,142 +264,138 @@ private fun EditDishScreenContent(
 
 @Composable
 private fun ScreenStateHandler(
-    state: EditDishScreenState,
-    callbacks: EditDishScreenCallbacks,
+    uiState: DishDetailsUiState,
+    editableFields: EditableFields,
+    callbacks: EditDishScreenActions,
     navController: NavController,
 ) {
-    with(state) {
-        when (screenState) {
-            is ScreenState.Loading<*> -> ScreenLoadingOverlay()
-            is ScreenState.Success<*> -> {} // NOTHING
+    when (uiState.screenState) {
+        is ScreenState.Loading<*> -> ScreenLoadingOverlay()
+        is ScreenState.Success<*> -> {} // NOTHING
 
-            is ScreenState.Error -> {
-                ErrorDialog {
-                    callbacks.resetScreenState()
-                }
+        is ScreenState.Error -> {
+            ErrorDialog {
+                callbacks.resetScreenState()
             }
-
-            is ScreenState.Interaction -> {
-                InteractionHandler(
-                    interaction = screenState.interaction,
-                    state = state,
-                    callbacks = callbacks,
-                    navController = navController
-                )
-            }
-
-            is ScreenState.Idle -> {}
         }
+
+        is ScreenState.Interaction -> {
+            InteractionHandler(
+                interaction = uiState.screenState.interaction,
+                editableFields = editableFields,
+                callbacks = callbacks,
+                navController = navController
+            )
+        }
+
+        is ScreenState.Idle -> {}
     }
 }
 
 @Composable
 private fun InteractionHandler(
     interaction: InteractionType,
-    state: EditDishScreenState,
-    callbacks: EditDishScreenCallbacks,
+    editableFields: EditableFields,
+    callbacks: EditDishScreenActions,
     navController: NavController
 ) {
-    with(state) {
-        when (interaction) {
-            InteractionType.EditTax -> {
-                ValueEditDialog(
-                    title = stringResource(R.string.edit_tax),
-                    value = editableTax,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    updateValue = { callbacks.updateTax(it) },
-                    onSave = { callbacks.saveTax() },
-                    onDismiss = { callbacks.resetScreenState() })
-            }
-
-            InteractionType.EditMargin -> {
-                ValueEditDialog(
-                    title = stringResource(R.string.edit_margin),
-                    value = editableMargin,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    updateValue = { callbacks.updateMargin(it) },
-                    onSave = { callbacks.saveMargin() },
-                    onDismiss = { callbacks.resetScreenState() })
-            }
-
-            InteractionType.EditTotalPrice -> {
-                ValueEditDialog(
-                    title = stringResource(R.string.edit_total_price),
-                    value = editableTotalPrice,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    updateValue = { callbacks.updateTotalPrice(it) },
-                    onSave = { callbacks.saveTotalPrice() },
-                    onDismiss = { callbacks.resetScreenState() })
-            }
-
-            InteractionType.EditName -> {
-                ValueEditDialog(
-                    title = stringResource(R.string.edit_name),
-                    value = editableName,
-                    updateValue = { callbacks.updateName(it) },
-                    onSave = { callbacks.saveName() },
-                    onDismiss = { callbacks.resetScreenState() },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Words
-                    )
-                )
-            }
-
-            is InteractionType.CopyDish -> {
-                ValueEditDialog(
-                    title = stringResource(R.string.copy_dish),
-                    value = editableCopiedDishName,
-                    updateValue = { callbacks.updateCopiedDishName(it) },
-                    onSave = { callbacks.copyDish() },
-                    onDismiss = { callbacks.resetScreenState() },
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Text,
-                        capitalization = KeyboardCapitalization.Words
-                    )
-                )
-            }
-
-            is InteractionType.EditItem -> {
-                ValueEditDialog(
-                    title = stringResource(R.string.edit_quantity),
-                    value = editableQuantity,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        capitalization = KeyboardCapitalization.Words
-                    ),
-                    updateValue = { callbacks.updateQuantity(it) },
-                    onSave = { callbacks.saveQuantity() },
-                    onDismiss = { callbacks.resetScreenState() })
-            }
-
-            is InteractionType.DeleteConfirmation -> {
-                val deleteConfirmation = interaction
-                FCCDeleteConfirmationDialog(
-                    itemName = deleteConfirmation.itemName,
-                    onDismiss = { callbacks.resetScreenState() },
-                    onConfirmDelete = {
-                        callbacks.onDeleteConfirmed(deleteConfirmation.itemId)
-                    })
-            }
-
-            InteractionType.UnsavedChangesConfirmation -> {
-                FCCUnsavedChangesDialog(
-                    onDismiss = { callbacks.resetScreenState() },
-                    onDiscard = { callbacks.discardAndNavigate { navController.popBackStack() } },
-                    onSave = { callbacks.saveAndNavigate() })
-            }
-
-            is InteractionType.UnsavedChangesConfirmationBeforeCopy -> {
-                FCCUnsavedChangesDialog(
-                    onDismiss = callbacks.resetScreenState,
-                    onDiscard = callbacks.discardChangesAndProceed,
-                    onSave = callbacks.saveChangesAndProceed
-                )
-            }
-
-            else -> {}
+    when (interaction) {
+        InteractionType.EditTax -> {
+            ValueEditDialog(
+                title = stringResource(R.string.edit_tax),
+                value = editableFields.tax,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                updateValue = { callbacks.updateTax(it) },
+                onSave = { callbacks.saveTax() },
+                onDismiss = { callbacks.resetScreenState() })
         }
+
+        InteractionType.EditMargin -> {
+            ValueEditDialog(
+                title = stringResource(R.string.edit_margin),
+                value = editableFields.margin,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                updateValue = { callbacks.updateMargin(it) },
+                onSave = { callbacks.saveMargin() },
+                onDismiss = { callbacks.resetScreenState() })
+        }
+
+        InteractionType.EditTotalPrice -> {
+            ValueEditDialog(
+                title = stringResource(R.string.edit_total_price),
+                value = editableFields.totalPrice,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                updateValue = { callbacks.updateTotalPrice(it) },
+                onSave = { callbacks.saveTotalPrice() },
+                onDismiss = { callbacks.resetScreenState() })
+        }
+
+        InteractionType.EditName -> {
+            ValueEditDialog(
+                title = stringResource(R.string.edit_name),
+                value = editableFields.name,
+                updateValue = { callbacks.updateName(it) },
+                onSave = { callbacks.saveName() },
+                onDismiss = { callbacks.resetScreenState() },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Words
+                )
+            )
+        }
+
+        is InteractionType.CopyDish -> {
+            ValueEditDialog(
+                title = stringResource(R.string.copy_dish),
+                value = editableFields.copiedDishName,
+                updateValue = { callbacks.updateCopiedDishName(it) },
+                onSave = { callbacks.copyDish() },
+                onDismiss = { callbacks.resetScreenState() },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Text,
+                    capitalization = KeyboardCapitalization.Words
+                )
+            )
+        }
+
+        is InteractionType.EditItem -> {
+            ValueEditDialog(
+                title = stringResource(R.string.edit_quantity),
+                value = editableFields.quantity,
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Number,
+                    capitalization = KeyboardCapitalization.Words
+                ),
+                updateValue = { callbacks.updateQuantity(it) },
+                onSave = { callbacks.saveQuantity() },
+                onDismiss = { callbacks.resetScreenState() })
+        }
+
+        is InteractionType.DeleteConfirmation -> {
+            FCCDeleteConfirmationDialog(
+                itemName = interaction.itemName,
+                onDismiss = { callbacks.resetScreenState() },
+                onConfirmDelete = {
+                    callbacks.onDeleteConfirmed(interaction.itemId)
+                })
+        }
+
+        InteractionType.UnsavedChangesConfirmation -> {
+            FCCUnsavedChangesDialog(
+                onDismiss = { callbacks.resetScreenState() },
+                onDiscard = { callbacks.discardAndNavigate { navController.popBackStack() } },
+                onSave = { callbacks.saveAndNavigate() })
+        }
+
+        is InteractionType.UnsavedChangesConfirmationBeforeCopy -> {
+            FCCUnsavedChangesDialog(
+                onDismiss = callbacks.resetScreenState,
+                onDiscard = callbacks.discardChangesAndProceed,
+                onSave = callbacks.saveChangesAndProceed
+            )
+        }
+
+        else -> {}
     }
 }
 
@@ -528,22 +501,23 @@ private fun UsedItemPreview() {
 @PreviewLightDark
 @Composable
 private fun EditDishScreenContentPreview(
-    @PreviewParameter(EditDishScreenStateProvider::class) state: EditDishScreenState
+    @PreviewParameter(EditDishScreenStateProvider::class) state: DishDetailsUiState
 ) {
     val navController = rememberNavController()
     val emptyCallbacks = createEmptyEditDishScreenCallbacks()
 
     FCCTheme {
         EditDishScreenContent(
-            state = state,
+            uiState = state,
             navController = navController,
-            callbacks = emptyCallbacks,
-            modifier = Modifier
+            actions = emptyCallbacks,
+            modifier = Modifier,
+            dishId = 0L
         )
     }
 }
 
-private fun createEmptyEditDishScreenCallbacks() = EditDishScreenCallbacks(
+private fun createEmptyEditDishScreenCallbacks() = EditDishScreenActions(
     {},
     {},
     {},
