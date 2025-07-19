@@ -244,7 +244,7 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
     }
 
     /**
-     * Restores the last removed item to the dish and clears lastRemovedItem.
+     * Restores the last removed item to the half-product and clears lastRemovedItem.
      */
     fun undoRemoveItem() {
         val item = lastRemovedItem.value as? UsedProductDomain ?: return
