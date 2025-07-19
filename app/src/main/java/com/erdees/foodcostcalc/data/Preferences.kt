@@ -8,7 +8,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.ext.dataStore
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.FeatureVisibilityByInstallDate
+import com.erdees.foodcostcalc.utils.Feature
+import com.erdees.foodcostcalc.utils.FeatureManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.koin.java.KoinJavaComponent.inject
@@ -51,8 +52,8 @@ interface Preferences {
 
 class PreferencesImpl(private val context: Context) : Preferences {
 
-    private val featureVisibilityByInstallDate by inject<FeatureVisibilityByInstallDate>(
-        FeatureVisibilityByInstallDate::class.java
+    private val featureManager by inject<FeatureManager>(
+        FeatureManager::class.java
     )
     private val defaultLocale: Locale = Locale.getDefault()
     private val localeDefaultCurrencyCode: String? =
@@ -69,7 +70,8 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val SHOW_HALF_PRODUCTS = booleanPreferencesKey(Constants.Preferences.SHOW_HALF_PRODUCTS)
         val SHOW_PRODUCT_TAX = booleanPreferencesKey(Constants.Preferences.SHOW_PRODUCT_TAX_PERCENT)
         val ONBOARDING_STATE = stringPreferencesKey(Constants.Preferences.ONBOARDING_STATE)
-        val HAS_PROMPTED_DEFAULT_SETTINGS = booleanPreferencesKey(Constants.Preferences.HAS_PROMPTED_DEFAULT_SETTINGS)
+        val HAS_PROMPTED_DEFAULT_SETTINGS =
+            booleanPreferencesKey(Constants.Preferences.HAS_PROMPTED_DEFAULT_SETTINGS)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -134,24 +136,22 @@ class PreferencesImpl(private val context: Context) : Preferences {
         context.dataStore.edit { prefs -> prefs[Keys.IMPERIAL] = value }
     }
 
+    // Return false by default if the feature is enabled,
     override val showHalfProducts: Flow<Boolean> =
         context.dataStore.data.map { prefs ->
             prefs[Keys.SHOW_HALF_PRODUCTS]
-                ?: featureVisibilityByInstallDate.isDefaultVisibleForPreCutoffUser(
-                    false
-                )
+                ?: !featureManager.isFeatureEnabled(Feature.HIDE_HALF_PRODUCTS_BY_DEFAULT)
         }
 
     override suspend fun setShowHalfProducts(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.SHOW_HALF_PRODUCTS] = value }
     }
 
+    // Return false by default if the feature is enabled,
     override val showProductTax: Flow<Boolean> =
         context.dataStore.data.map { prefs ->
             prefs[Keys.SHOW_PRODUCT_TAX]
-                ?: featureVisibilityByInstallDate.isDefaultVisibleForPreCutoffUser(
-                    false
-                )
+                ?: !featureManager.isFeatureEnabled(Feature.HIDE_PRODUCT_TAX_BY_DEFAULT)
         }
 
     override suspend fun setShowProductTax(value: Boolean) {
@@ -170,8 +170,11 @@ class PreferencesImpl(private val context: Context) : Preferences {
         }
     }
 
+    // Return true by default if the feature is not enabled,
+    // so that it acts as if the user has already been prompted
     override val hasPromptedDefaultSettings: Flow<Boolean> = context.dataStore.data.map { prefs ->
-        prefs[Keys.HAS_PROMPTED_DEFAULT_SETTINGS] ?: false
+        prefs[Keys.HAS_PROMPTED_DEFAULT_SETTINGS]
+            ?: !featureManager.isFeatureEnabled(Feature.SET_DEFAULTS_PROMPT)
     }
 
     override suspend fun setHasPromptedDefaultSettings(value: Boolean) {

@@ -1,8 +1,8 @@
 package com.erdees.foodcostcalc.utils.di
 
 import android.content.pm.PackageManager
-import com.erdees.foodcostcalc.utils.FeatureVisibilityByInstallDate
-import com.erdees.foodcostcalc.utils.FeatureVisibilityByInstallDateImpl
+import com.erdees.foodcostcalc.utils.FeatureManager
+import com.erdees.foodcostcalc.utils.FeatureManagerImpl
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.MyDispatchersImpl
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
@@ -13,7 +13,7 @@ import timber.log.Timber
 val utilModule = module {
     single<PremiumUtil> { PremiumUtil(get()) }
     single<MyDispatchers> { MyDispatchersImpl() }
-    single<FeatureVisibilityByInstallDate> {
+    single<FeatureManager> {
         val firstInstallTime: Long? = try {
             val packageInfo =
                 androidContext().packageManager.getPackageInfo(androidContext().packageName, 0)
@@ -22,6 +22,6 @@ val utilModule = module {
             Timber.e(e, "Could not get package info to determine first install time.")
             null
         }
-        FeatureVisibilityByInstallDateImpl(firstInstallTime = firstInstallTime)
+        FeatureManagerImpl(firstInstallTime = firstInstallTime)
     }
 }
