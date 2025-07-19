@@ -94,7 +94,7 @@ fun EditHalfProductScreen(
     val editableQuantity by viewModel.editableQuantity.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
     val currency by viewModel.currency.collectAsState()
-    val lastRemovedItem by viewModel.lastRemovedItem.collectAsState()
+    val lastRemovedItem by viewModel.justRemovedItem.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler {
@@ -102,7 +102,7 @@ fun EditHalfProductScreen(
     }
 
     LaunchedEffect(lastRemovedItem) {
-        val removedItem = lastRemovedItem ?: return@LaunchedEffect
+        val removedItem = lastRemovedItem?.item ?: return@LaunchedEffect
         snackbarHostState.showUndoDeleteSnackbar(
             message = context.getString(R.string.removed_item, removedItem.item.name),
             actionLabel = context.getString(R.string.undo),

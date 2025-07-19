@@ -10,6 +10,7 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductHalfProduct
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.JustRemovedItem
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.ScreenState.Interaction
 import com.erdees.foodcostcalc.domain.model.UsedItem
@@ -65,8 +66,8 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
         _editableName.value = value
     }
 
-    private var _lastRemovedItem: MutableStateFlow<UsedItem?> = MutableStateFlow(null)
-    val lastRemovedItem: StateFlow<UsedItem?> = _lastRemovedItem
+    private var _justRemovedItem: MutableStateFlow<JustRemovedItem?> = MutableStateFlow(null)
+    val justRemovedItem: StateFlow<JustRemovedItem?> = _justRemovedItem
 
     fun setInteraction(interaction: InteractionType) {
         when (interaction) {
@@ -141,8 +142,9 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
      * */
     fun removeItem(item: UsedItem) {
         val halfProduct = halfProduct.value ?: return
+        val index = halfProduct.products.indexOf(item)
         _halfProduct.value = halfProduct.copy(products = halfProduct.products.filter { it != item })
-        _lastRemovedItem.update { item }
+        _justRemovedItem.update { JustRemovedItem(item, index) }
     }
 
     private fun hasUnsavedChanges(): Boolean {
@@ -247,16 +249,18 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
      * Restores the last removed item to the half-product and clears lastRemovedItem.
      */
     fun undoRemoveItem() {
-        val item = lastRemovedItem.value as? UsedProductDomain ?: return
+        val item = justRemovedItem.value
+        val justRemovedProduct = item?.item as? UsedProductDomain ?: return
         _halfProduct.update { halfProduct ->
             halfProduct?.copy(
-                products = halfProduct.products.toMutableList().apply { add(item) }
+                products = halfProduct.products.toMutableList()
+                    .apply { add(item.index, justRemovedProduct) }
             )
         }
         clearLastRemovedItem()
     }
 
     fun clearLastRemovedItem() {
-        _lastRemovedItem.update { null }
+        _justRemovedItem.update { null }
     }
 }

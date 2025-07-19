@@ -109,7 +109,7 @@ fun DishDetailsScreen(
     }
 
     LaunchedEffect(uiState.lastRemovedItem) {
-        val removedItem = uiState.lastRemovedItem ?: return@LaunchedEffect
+        val removedItem = uiState.lastRemovedItem?.item ?: return@LaunchedEffect
         snackbarHostState.showUndoDeleteSnackbar(
             message = context.getString(R.string.removed_item, removedItem.item.name),
             actionLabel = context.getString(R.string.undo),
