@@ -20,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -29,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -50,6 +53,7 @@ import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -98,9 +102,20 @@ fun DishDetailsScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler {
         viewModel.handleBackNavigation { navController.popBackStack() }
+    }
+
+    LaunchedEffect(uiState.lastRemovedItem) {
+        val removedItem = uiState.lastRemovedItem?.item ?: return@LaunchedEffect
+        snackbarHostState.showUndoDeleteSnackbar(
+            message = context.getString(R.string.removed_item, removedItem.item.name),
+            actionLabel = context.getString(R.string.undo),
+            actionPerformed = { viewModel.undoRemoveItem() },
+            ignored = { viewModel.clearLastRemovedItem() }
+        )
     }
 
     LaunchedEffect(uiState.screenState) {
@@ -168,7 +183,8 @@ fun DishDetailsScreen(
                     )
                 }
             },
-        )
+        ),
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -182,6 +198,7 @@ private fun EditDishScreenContent(
     dishId: Long,
     navController: NavController,
     actions: EditDishScreenActions,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -194,7 +211,7 @@ private fun EditDishScreenContent(
                 onCopyClick = { actions.onCopyDishClick() },
                 onBackClick = { navController.popBackStack() }
             )
-        }
+        },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             Column {
@@ -203,6 +220,7 @@ private fun EditDishScreenContent(
                         item::class.simpleName + item.id.toString()
                     }) { item ->
                         UsedItem(
+                            modifier = Modifier.animateItem(),
                             usedItem = item,
                             onRemove = { actions.removeItem(it) },
                             onEdit = {
@@ -219,24 +237,27 @@ private fun EditDishScreenContent(
                 }
 
                 Column(Modifier) {
-                    uiState.dish?.let {
-                        DishDetails(
-                            it,
-                            uiState.currency,
-                            onTaxClick = {
-                                actions.setInteraction(InteractionType.EditTax)
-                            },
-                            onMarginClick = {
-                                actions.setInteraction(InteractionType.EditMargin)
-                            },
-                            onTotalPriceClick = {
-                                actions.setInteraction(InteractionType.EditTotalPrice)
-                            }
-                        )
+                    Box(contentAlignment = Alignment.BottomCenter) {
+                        uiState.dish?.let {
+                            DishDetails(
+                                it,
+                                uiState.currency,
+                                onTaxClick = {
+                                    actions.setInteraction(InteractionType.EditTax)
+                                },
+                                onMarginClick = {
+                                    actions.setInteraction(InteractionType.EditMargin)
+                                },
+                                onTotalPriceClick = {
+                                    actions.setInteraction(InteractionType.EditTotalPrice)
+                                }
+                            )
+                        }
+                        SnackbarHost(snackbarHostState)
                     }
 
                     Buttons(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 8.dp),
                         saveDish = { actions.saveDish() },
                         shareDish = { actions.shareDish(it) },
                         navigate = {
@@ -513,7 +534,8 @@ private fun EditDishScreenContentPreview(
             navController = navController,
             actions = emptyCallbacks,
             modifier = Modifier,
-            dishId = 0L
+            dishId = 0L,
+            snackbarHostState = SnackbarHostState()
         )
     }
 }

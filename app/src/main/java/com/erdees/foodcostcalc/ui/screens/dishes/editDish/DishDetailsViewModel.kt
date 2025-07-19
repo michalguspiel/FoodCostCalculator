@@ -72,8 +72,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private val interactionHandler = InteractionHandler()
     private val dishPropertySaver = DishPropertySaver()
     private val dishItemOperationHandler = DishItemOperationHandler(
-        updateUiState = { updatedDish ->
-            _uiState.update { it.copy(dish = updatedDish) }
+        updateUiState = { newState ->
+            _uiState.update { newState }
         }
     )
 
@@ -242,6 +242,18 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             item = item,
             uiState = _uiState.value
         )
+    }
+
+    /**
+     * Restores the last removed item to the dish and clears lastRemovedItem.
+     */
+    fun undoRemoveItem() {
+        val item = _uiState.value.lastRemovedItem ?: return
+        dishItemOperationHandler.restoreItem(item, _uiState.value)
+    }
+
+    fun clearLastRemovedItem() {
+        _uiState.update { it.copy(lastRemovedItem = null) }
     }
 
     /**

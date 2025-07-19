@@ -18,14 +18,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -38,6 +43,7 @@ import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -81,15 +87,28 @@ fun EditHalfProductScreen(
     navController: NavController,
     viewModel: EditHalfProductViewModel = viewModel()
 ) {
+    val context = LocalContext.current
     val screenState by viewModel.screenState.collectAsState()
     val usedItems by viewModel.usedItems.collectAsState()
     val halfProduct by viewModel.halfProduct.collectAsState()
     val editableQuantity by viewModel.editableQuantity.collectAsState()
     val editableName by viewModel.editableName.collectAsState()
     val currency by viewModel.currency.collectAsState()
+    val lastRemovedItem by viewModel.justRemovedItem.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler {
         viewModel.handleBackNavigation { navController.popBackStack() }
+    }
+
+    LaunchedEffect(lastRemovedItem) {
+        val removedItem = lastRemovedItem?.item ?: return@LaunchedEffect
+        snackbarHostState.showUndoDeleteSnackbar(
+            message = context.getString(R.string.removed_item, removedItem.item.name),
+            actionLabel = context.getString(R.string.undo),
+            actionPerformed = { viewModel.undoRemoveItem() },
+            ignored = { viewModel.clearLastRemovedItem() }
+        )
     }
 
     LaunchedEffect(screenState) {
@@ -129,14 +148,20 @@ fun EditHalfProductScreen(
         saveAndNavigate = viewModel::saveAndNavigate
     )
 
-    EditHalfProductScreenContent(state = state, callbacks = callbacks, navController)
+    EditHalfProductScreenContent(
+        state = state,
+        callbacks = callbacks,
+        navController,
+        snackbarHostState
+    )
 }
 
 @Composable
 private fun EditHalfProductScreenContent(
     state: EditHalfProductScreenState,
     callbacks: EditHalfProductScreenCallbacks,
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
 ) {
     Scaffold(
         topBar = {
@@ -146,7 +171,7 @@ private fun EditHalfProductScreenContent(
                 onDeleteClick = callbacks.onDeleteHalfProductClick,
                 onNameClick = { callbacks.setInteraction(InteractionType.EditName) }
             )
-        }
+        },
     ) { paddingValues ->
         Box(
             modifier = Modifier.padding(paddingValues),
@@ -156,6 +181,7 @@ private fun EditHalfProductScreenContent(
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
                     items(state.usedItems, key = { item -> item.id }) { item ->
                         UsedItem(
+                            modifier = Modifier.animateItem(),
                             usedItem = item,
                             onRemove = callbacks.removeItem,
                             onEdit = {
@@ -169,21 +195,26 @@ private fun EditHalfProductScreenContent(
                     }
                 }
 
-                state.halfProduct?.let {
-                    HalfProductDetails(
-                        halfProductDomain = it,
-                        currency = state.currency,
-                        modifier = Modifier
-                    )
-                }
-
-                ButtonRow(
-                    modifier = Modifier.padding(end = 12.dp),
-                    primaryButton = {
-                        FCCPrimaryButton(text = stringResource(id = R.string.save)) {
-                            callbacks.saveHalfProduct()
+                Box(contentAlignment = TopCenter) {
+                    Column {
+                        state.halfProduct?.let {
+                            HalfProductDetails(
+                                halfProductDomain = it,
+                                currency = state.currency,
+                                modifier = Modifier
+                            )
                         }
-                    })
+
+                        ButtonRow(
+                            modifier = Modifier.padding(end = 12.dp),
+                            primaryButton = {
+                                FCCPrimaryButton(text = stringResource(id = R.string.save)) {
+                                    callbacks.saveHalfProduct()
+                                }
+                            })
+                    }
+                    SnackbarHost(snackbarHostState)
+                }
             }
 
             HandleScreenState(state, callbacks, navController)

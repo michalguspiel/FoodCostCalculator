@@ -10,6 +10,7 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductHalfProduct
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.JustRemovedItem
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.ScreenState.Interaction
 import com.erdees.foodcostcalc.domain.model.UsedItem
@@ -64,6 +65,9 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
     fun updateName(value: String) {
         _editableName.value = value
     }
+
+    private var _justRemovedItem: MutableStateFlow<JustRemovedItem?> = MutableStateFlow(null)
+    val justRemovedItem: StateFlow<JustRemovedItem?> = _justRemovedItem
 
     fun setInteraction(interaction: InteractionType) {
         when (interaction) {
@@ -138,12 +142,16 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
      * */
     fun removeItem(item: UsedItem) {
         val halfProduct = halfProduct.value ?: return
+        val index = halfProduct.products.indexOf(item)
         _halfProduct.value = halfProduct.copy(products = halfProduct.products.filter { it != item })
+        _justRemovedItem.update { JustRemovedItem(item, index) }
     }
 
     private fun hasUnsavedChanges(): Boolean {
-        val halfProductChanged = UnsavedChangesValidator.hasUnsavedChanges(originalHalfProduct, _halfProduct.value)
-        val productsChanged = UnsavedChangesValidator.hasListChanges(originalProducts, _halfProduct.value?.products)
+        val halfProductChanged =
+            UnsavedChangesValidator.hasUnsavedChanges(originalHalfProduct, _halfProduct.value)
+        val productsChanged =
+            UnsavedChangesValidator.hasListChanges(originalProducts, _halfProduct.value?.products)
         return halfProductChanged || productsChanged
     }
 
@@ -235,5 +243,24 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
         }
+    }
+
+    /**
+     * Restores the last removed item to the half-product and clears lastRemovedItem.
+     */
+    fun undoRemoveItem() {
+        val item = justRemovedItem.value
+        val justRemovedProduct = item?.item as? UsedProductDomain ?: return
+        _halfProduct.update { halfProduct ->
+            halfProduct?.copy(
+                products = halfProduct.products.toMutableList()
+                    .apply { add(item.index, justRemovedProduct) }
+            )
+        }
+        clearLastRemovedItem()
+    }
+
+    fun clearLastRemovedItem() {
+        _justRemovedItem.update { null }
     }
 }
