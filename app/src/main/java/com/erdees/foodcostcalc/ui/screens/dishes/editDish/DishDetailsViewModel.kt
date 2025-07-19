@@ -30,13 +30,9 @@ import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -92,11 +88,6 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         updateTips = recipeHandler::updateTips,
         updateStep = recipeHandler::updateStep
     )
-
-    val screenState: StateFlow<ScreenState> = uiState.map { it.screenState }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ScreenState.Idle)
-    val dish: StateFlow<DishDomain?> =
-        uiState.map { it.dish }.stateIn(viewModelScope, SharingStarted.Eagerly, null)
 
     init {
         viewModelScope.launch {
@@ -419,26 +410,6 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 _uiState.update { it.copy(screenState = ScreenState.Error(Error(error.message))) }
             }
         }
-    }
-
-    /**
-     * Called when user clicks "Discard" in the unsaved changes dialog
-     * @param navigate The navigation action to perform after discarding
-     */
-    fun discardChanges(navigate: () -> Unit) {
-        // Restore original dish state
-        _uiState.update {
-            it.copy(
-                dish = originalDish?.copy(),
-                editableFields = it.editableFields.copy(
-                    name = originalDish?.name ?: ""
-                )
-            )
-        }
-        recipeHandler.updateRecipe(originalDish?.recipe.toEditableRecipe())
-        resetScreenState()
-        // Navigate back
-        navigate()
     }
 
     /**

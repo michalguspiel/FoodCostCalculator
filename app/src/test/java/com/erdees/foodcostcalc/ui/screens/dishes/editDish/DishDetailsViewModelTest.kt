@@ -140,7 +140,7 @@ class DishDetailsViewModelTest {
         viewModel.handleBackNavigation(navigateAction)
 
         verify(exactly = 0) { navigateAction.invoke() }
-        val screenState = viewModel.screenState.first()
+        val screenState = viewModel.uiState.first().screenState
         screenState shouldBe ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation)
     }
 
@@ -163,7 +163,7 @@ class DishDetailsViewModelTest {
         println(testDish.toDishDomain().foodCost)
         println(testDish.toDishDomain().products.map { it.foodCost })
         viewModel.updateTotalPrice("123.45")
-        viewModel.editableTotalPrice.first() shouldBe "123.45"
+        viewModel.uiState.first().editableFields.totalPrice shouldBe "123.45"
     }
 
     @Test
@@ -177,14 +177,14 @@ class DishDetailsViewModelTest {
         viewModel.setInteraction(InteractionType.EditTotalPrice)
 
         // verify
-        val screenState = viewModel.screenState.first()
+        val screenState = viewModel.uiState.first().screenState
         screenState::class.java shouldBe ScreenState.Interaction::class.java
         val interaction = (screenState as ScreenState.Interaction).interaction
         interaction shouldBe InteractionType.EditTotalPrice
         val totalPrice = Utils.formatPriceWithoutSymbol(
             testDish.toDishDomain().totalPrice, mockPreferences.currency.first()?.currencyCode
         )
-        viewModel.editableTotalPrice.first() shouldBe totalPrice
+        viewModel.uiState.first().editableFields.totalPrice shouldBe totalPrice
     }
 
     @Test
@@ -210,11 +210,11 @@ class DishDetailsViewModelTest {
             viewModel.setInteraction(InteractionType.EditTotalPrice)
 
             // verify
-            val screenState = viewModel.screenState.first()
+            val screenState = viewModel.uiState.first().screenState
             screenState::class.java shouldBe ScreenState.Interaction::class.java
             val interaction = (screenState as ScreenState.Interaction).interaction
             interaction shouldBe InteractionType.EditTotalPrice
-            viewModel.editableTotalPrice.first() shouldBe newTotalPrice
+            viewModel.uiState.first().editableFields.totalPrice shouldBe newTotalPrice
         }
 
     @Test
@@ -233,7 +233,7 @@ class DishDetailsViewModelTest {
         viewModel.saveDishTotalPrice()
 
         // verify
-        val updatedDishInViewModel = viewModel.dish.first()
+        val updatedDishInViewModel = viewModel.uiState.first().dish
         updatedDishInViewModel.shouldNotBeNull()
         updatedDishInViewModel.totalPrice shouldBe 22.0
         updatedDishInViewModel.marginPercent shouldBe 100.0
@@ -273,9 +273,8 @@ class DishDetailsViewModelTest {
         viewModel.saveDishTotalPrice()
 
         // verify
-        val updatedDishInViewModel = viewModel.dish.first()
+        val updatedDishInViewModel = viewModel.uiState.first().dish
         updatedDishInViewModel.shouldNotBeNull()
-        println(newPriceFormatted)
         newPriceFormatted shouldBe Utils.formatPriceWithoutSymbol(
             updatedDishInViewModel.totalPrice, mockPreferences.currency.first()?.currencyCode
         )

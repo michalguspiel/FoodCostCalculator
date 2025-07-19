@@ -21,50 +21,42 @@ class DishPropertySaver {
         uiState: DishDetailsUiState,
         updateUiState: (DishDetailsUiState) -> Unit
     ) {
-        val currentDish = uiState.dish
-
-        if (currentDish == null) {
+        if (uiState.dish == null) {
             Timber.e("Cannot save property - current dish is null")
             updateUiState(uiState.copy(screenState = ScreenState.Idle))
             return
         }
 
-        when (propertyType) {
+        val updatedState = when (propertyType) {
             PropertyType.TAX -> {
                 val value = uiState.editableFields.tax.toDoubleOrNull()
                 if (value == null) {
-                    updateUiState(uiState.copy(screenState = ScreenState.Idle))
-                    return
-                }
-                updateUiState(
+                    uiState.copy(screenState = ScreenState.Idle)
+                } else {
                     uiState.copy(
-                        dish = currentDish.copy(taxPercent = value),
+                        dish = uiState.dish.copy(taxPercent = value),
                         screenState = ScreenState.Idle
                     )
-                )
+                }
             }
 
             PropertyType.MARGIN -> {
                 val value = uiState.editableFields.margin.toDoubleOrNull()
                 if (value == null) {
-                    updateUiState(uiState.copy(screenState = ScreenState.Idle))
-                    return
-                }
-                updateUiState(
+                    uiState.copy(screenState = ScreenState.Idle)
+                } else {
                     uiState.copy(
-                        dish = currentDish.copy(marginPercent = value),
+                        dish = uiState.dish.copy(marginPercent = value),
                         screenState = ScreenState.Idle
                     )
-                )
+                }
             }
 
             PropertyType.NAME -> {
                 val value = uiState.editableFields.name
-                updateUiState(
-                    uiState.copy(
-                        dish = currentDish.copy(name = value),
-                        screenState = ScreenState.Idle
-                    )
+                uiState.copy(
+                    dish = uiState.dish.copy(name = value),
+                    screenState = ScreenState.Idle
                 )
             }
 
@@ -72,21 +64,17 @@ class DishPropertySaver {
                 val value = uiState.editableFields.totalPrice.toDoubleOrNull()
                 if (value == null) {
                     Timber.e("Invalid total price format: ${uiState.editableFields.totalPrice}")
-                    updateUiState(
-                        uiState.copy(
-                            screenState = ScreenState.Error(Error("Invalid total price format."))
-                        )
-                    )
-                    return
-                }
-
-                updateUiState(
                     uiState.copy(
-                        dish = currentDish.withUpdatedTotalPrice(value),
+                        screenState = ScreenState.Error(Error("Invalid total price format."))
+                    )
+                } else {
+                    uiState.copy(
+                        dish = uiState.dish.withUpdatedTotalPrice(value),
                         screenState = ScreenState.Idle
                     )
-                )
+                }
             }
         }
+        updateUiState(updatedState)
     }
 }

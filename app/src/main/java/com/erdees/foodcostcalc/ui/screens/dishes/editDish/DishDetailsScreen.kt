@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +39,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -82,7 +82,6 @@ data class EditDishScreenActions(
     val resetScreenState: () -> Unit,
     val onDeleteDishClick: () -> Unit,
     val onDeleteConfirmed: (Long) -> Unit,
-    val discardAndNavigate: (() -> Unit) -> Unit,
     val saveAndNavigate: () -> Unit,
     val onCopyDishClick: () -> Unit,
     val copyDish: () -> Unit,
@@ -98,7 +97,7 @@ fun DishDetailsScreen(
     dishId: Long, navController: NavController, viewModel: DishDetailsViewModel = viewModel()
 ) {
     val context = LocalContext.current
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiState.collectAsState()
 
     BackHandler {
         viewModel.handleBackNavigation { navController.popBackStack() }
@@ -152,23 +151,22 @@ fun DishDetailsScreen(
             onDeleteConfirmed = viewModel::confirmDelete,
             copyDish = viewModel::copyDish,
             updateCopiedDishName = viewModel::updateCopiedDishName,
-            discardAndNavigate = viewModel::discardChanges,
             saveAndNavigate = viewModel::saveAndNavigate,
             hideCopyConfirmation = viewModel::hideCopyConfirmation,
             saveChangesAndProceed = viewModel::saveChangesAndProceed,
             discardChangesAndProceed = {
-                viewModel.discardChangesAndProceed({
+                viewModel.discardChangesAndProceed {
                     getCopyDishPrefilledName(
                         it, context
                     )
-                })
+                }
             },
             onCopyDishClick = {
-                viewModel.handleCopyDish({
+                viewModel.handleCopyDish {
                     getCopyDishPrefilledName(
                         it, context
                     )
-                })
+                }
             },
         )
     )
@@ -383,7 +381,10 @@ private fun InteractionHandler(
         InteractionType.UnsavedChangesConfirmation -> {
             FCCUnsavedChangesDialog(
                 onDismiss = { callbacks.resetScreenState() },
-                onDiscard = { callbacks.discardAndNavigate { navController.popBackStack() } },
+                onDiscard = {
+                    callbacks.resetScreenState()
+                    navController.popBackStack()
+                },
                 onSave = { callbacks.saveAndNavigate() })
         }
 
