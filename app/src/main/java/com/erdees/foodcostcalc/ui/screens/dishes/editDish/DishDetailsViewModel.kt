@@ -28,7 +28,6 @@ import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
-import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -73,6 +72,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         updateScreenState = { screenState -> _uiState.update { it.copy(screenState = screenState) } },
         updateDish = { dish -> _uiState.update { it.copy(dish = dish) } }
     )
+
+    private val interactionHandler = InteractionHandler()
 
     val recipe = recipeHandler.recipe
     val recipeViewModeState = recipeHandler.recipeViewModeState
@@ -187,77 +188,9 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun setInteraction(interaction: InteractionType) {
-        when (interaction) {
-            is InteractionType.EditItem -> {
-                _uiState.update {
-                    it.copy(
-                        currentlyEditedItem = interaction.usedItem,
-                        editableFields = it.editableFields.copy(
-                            quantity = interaction.usedItem.quantity.toString()
-                        )
-                    )
-                }
-            }
-
-            is InteractionType.EditTax -> {
-                _uiState.update {
-                    it.copy(
-                        editableFields = it.editableFields.copy(
-                            tax = it.dish?.taxPercent?.toString() ?: ""
-                        )
-                    )
-                }
-            }
-
-            is InteractionType.EditMargin -> {
-                _uiState.update {
-                    it.copy(
-                        editableFields = it.editableFields.copy(
-                            margin = it.dish?.marginPercent?.toString() ?: ""
-                        )
-                    )
-                }
-            }
-
-            is InteractionType.EditName -> {
-                _uiState.update {
-                    it.copy(
-                        editableFields = it.editableFields.copy(
-                            name = it.dish?.name ?: ""
-                        )
-                    )
-                }
-            }
-
-            is InteractionType.EditTotalPrice -> {
-                val currentDish = _uiState.value.dish
-                if (currentDish?.foodCost == 0.00) {
-                    return
-                }
-                val price = Utils.formatPriceWithoutSymbol(
-                    currentDish?.totalPrice, _uiState.value.currency?.currencyCode
-                )
-                _uiState.update {
-                    it.copy(
-                        editableFields = it.editableFields.copy(
-                            totalPrice = price
-                        )
-                    )
-                }
-            }
-
-            is InteractionType.CopyDish ->
-                _uiState.update {
-                    it.copy(
-                        editableFields = it.editableFields.copy(
-                            copiedDishName = interaction.prefilledName
-                        )
-                    )
-                }
-
-            else -> {}
+        interactionHandler.handleInteraction(interaction, _uiState.value) { newState ->
+            _uiState.update { newState }
         }
-        _uiState.update { it.copy(screenState = ScreenState.Interaction(interaction)) }
     }
 
     fun resetScreenState() {
