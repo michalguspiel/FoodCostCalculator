@@ -17,6 +17,8 @@ import timber.log.Timber
  * @see AnalyticsRepositoryImpl for the implementation details.
  */
 interface AnalyticsRepository {
+    fun logEvent(event: String)
+
     fun logEvent(event: String, bundle: Bundle?)
 
     fun logException(exception: Throwable, bundle: Bundle?)
@@ -24,6 +26,10 @@ interface AnalyticsRepository {
 
 class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) :
     AnalyticsRepository {
+    override fun logEvent(event: String) {
+        this.logEvent(event, null)
+    }
+
     override fun logEvent(event: String, bundle: Bundle?) {
         if (!BuildConfig.DEBUG) {
             firebaseAnalytics.logEvent(event, bundle)

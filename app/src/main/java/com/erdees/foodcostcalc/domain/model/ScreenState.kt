@@ -12,6 +12,7 @@ sealed class InteractionType {
     data object UnsavedChangesConfirmation : InteractionType()
     data object UnsavedChangesConfirmationBeforeCopy : InteractionType()
     data class CopyDish(val prefilledName: String) : InteractionType()
+    data class SaveDefaultSettings(val margin: String, val tax: String) : InteractionType()
 
     data object CalculateWaste : InteractionType()
     data object CalculatePiecePrice : InteractionType()

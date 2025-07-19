@@ -49,6 +49,8 @@ import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ingredients
@@ -56,6 +58,7 @@ import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
+import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.ConfirmPopUp
@@ -70,6 +73,27 @@ fun CreateDishSummaryScreen(
     navController: NavController,
     viewModel: CreateDishV2ViewModel,
 ) {
+    val screenState = viewModel.screenState.collectAsState().value
+
+    // Handle different screen states
+    when (screenState) {
+        is ScreenState.Interaction -> {
+            when (val interaction = screenState.interaction) {
+                is InteractionType.SaveDefaultSettings -> {
+                    SaveDefaultSettingsDialog(
+                        margin = interaction.margin,
+                        tax = interaction.tax,
+                        onSaveAsDefault = { viewModel.saveAsDefaultSettings() },
+                        onDismiss = { viewModel.dismissDefaultSettingsPrompt() }
+                    )
+                }
+
+                else -> {}
+            }
+        }
+        else -> { }
+    }
+
     CreateDishSummaryContent(
         CreateDishSummaryScreenState(
             dishName = viewModel.dishName.collectAsState().value,
@@ -84,7 +108,7 @@ fun CreateDishSummaryScreen(
             successfullySavedDishId = viewModel.saveDishSuccess.collectAsState().value
         ),
         onBackClick = { navController.popBackStack() },
-        onSaveDish = { viewModel.onSaveDish() },
+        onSaveDishClick = { viewModel.onSaveDishClick() },
         onMarginChange = { viewModel.updateMarginPercentInput(it) },
         onTaxChange = { viewModel.updateTaxPercentInput(it) },
         onErrorDismiss = { viewModel.dismissError() },
@@ -105,7 +129,7 @@ fun CreateDishSummaryContent(
     state: CreateDishSummaryScreenState,
     modifier: Modifier = Modifier,
     onBackClick: () -> Unit = {},
-    onSaveDish: () -> Unit = {},
+    onSaveDishClick: () -> Unit = {},
     onMarginChange: (String) -> Unit = {},
     onTaxChange: (String) -> Unit = {},
     onErrorDismiss: () -> Unit = {},
@@ -170,7 +194,7 @@ fun CreateDishSummaryContent(
                         stringResource(R.string.save_dish),
                         enabled = !state.isLoading
                     ) {
-                        onSaveDish()
+                        onSaveDishClick()
                     }
                 },
                 secondaryButton = {
@@ -343,10 +367,34 @@ private fun CreateDishSummaryScreenPreview() {
         CreateDishSummaryContent(
             state = previewState,
             onBackClick = {},
-            onSaveDish = {},
+            onSaveDishClick = {},
             onMarginChange = {},
             onTaxChange = {},
             successNavigate = {}
         )
     }
+}
+
+@Composable
+fun SaveDefaultSettingsDialog(
+    margin: String,
+    tax: String,
+    onSaveAsDefault: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    FCCDialog(
+        title = stringResource(R.string.save_default_settings_title),
+        subtitle = stringResource(R.string.save_default_settings_message, margin, tax),
+        onDismiss = onDismiss,
+        primaryActionButton = {
+            FCCTextButton(text = stringResource(R.string.save_as_default)) {
+                onSaveAsDefault()
+            }
+        },
+        secondaryActionButton = {
+            FCCTextButton(text = stringResource(R.string.no_thanks)) {
+                onDismiss()
+            }
+        }
+    )
 }
