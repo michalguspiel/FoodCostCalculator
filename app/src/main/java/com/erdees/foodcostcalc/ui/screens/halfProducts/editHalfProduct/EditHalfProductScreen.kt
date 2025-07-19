@@ -181,6 +181,7 @@ private fun EditHalfProductScreenContent(
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
                     items(state.usedItems, key = { item -> item.id }) { item ->
                         UsedItem(
+                            modifier = Modifier.animateItem(),
                             usedItem = item,
                             onRemove = callbacks.removeItem,
                             onEdit = {

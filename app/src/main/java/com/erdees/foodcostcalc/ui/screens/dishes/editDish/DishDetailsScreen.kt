@@ -220,6 +220,7 @@ private fun EditDishScreenContent(
                         item::class.simpleName + item.id.toString()
                     }) { item ->
                         UsedItem(
+                            modifier = Modifier.animateItem(),
                             usedItem = item,
                             onRemove = { actions.removeItem(it) },
                             onEdit = {
