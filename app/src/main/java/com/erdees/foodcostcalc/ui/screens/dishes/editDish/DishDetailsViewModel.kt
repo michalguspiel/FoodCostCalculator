@@ -74,6 +74,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     )
 
     private val interactionHandler = InteractionHandler()
+    private val dishPropertySaver = DishPropertySaver()
 
     val recipe = recipeHandler.recipe
     val recipeViewModeState = recipeHandler.recipeViewModeState
@@ -241,63 +242,35 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun saveDishTax() {
-        val value = _uiState.value.editableFields.tax.toDoubleOrNull()
-        if (value == null) {
-            resetScreenState()
-            return
-        }
-        _uiState.update {
-            it.copy(
-                dish = it.dish?.copy(taxPercent = value)
-            )
-        }
-        resetScreenState()
+        dishPropertySaver.saveProperty(
+            propertyType = DishPropertySaver.PropertyType.TAX,
+            uiState = _uiState.value,
+            updateUiState = { newState -> _uiState.update { newState } }
+        )
     }
 
     fun saveDishMargin() {
-        val value = _uiState.value.editableFields.margin.toDoubleOrNull()
-        if (value == null) {
-            resetScreenState()
-            return
-        }
-        _uiState.update {
-            it.copy(
-                dish = it.dish?.copy(marginPercent = value)
-            )
-        }
-        resetScreenState()
+        dishPropertySaver.saveProperty(
+            propertyType = DishPropertySaver.PropertyType.MARGIN,
+            uiState = _uiState.value,
+            updateUiState = { newState -> _uiState.update { newState } }
+        )
     }
 
     fun saveDishTotalPrice() {
-        val newTotalPriceString = _uiState.value.editableFields.totalPrice
-        val currentDish = _uiState.value.dish
-        if (currentDish == null) {
-            Timber.e("Current dish is null, cannot save total price.")
-            resetScreenState() // Or handle error appropriately
-            return
-        }
-        val newTotalPrice = newTotalPriceString.toDoubleOrNull()
-        if (newTotalPrice == null) {
-            Timber.e("Invalid total price format: $newTotalPriceString")
-            _uiState.update { it.copy(screenState = ScreenState.Error(Error("Invalid total price format."))) }
-            return
-        }
-        _uiState.update {
-            it.copy(
-                dish = currentDish.withUpdatedTotalPrice(newTotalPrice)
-            )
-        }
-        resetScreenState()
+        dishPropertySaver.saveProperty(
+            propertyType = DishPropertySaver.PropertyType.TOTAL_PRICE,
+            uiState = _uiState.value,
+            updateUiState = { newState -> _uiState.update { newState } }
+        )
     }
 
     fun saveDishName() {
-        val value = _uiState.value.editableFields.name
-        _uiState.update {
-            it.copy(
-                dish = it.dish?.copy(name = value)
-            )
-        }
-        resetScreenState()
+        dishPropertySaver.saveProperty(
+            propertyType = DishPropertySaver.PropertyType.NAME,
+            uiState = _uiState.value,
+            updateUiState = { newState -> _uiState.update { newState } }
+        )
     }
 
     /**
