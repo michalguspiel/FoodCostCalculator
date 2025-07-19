@@ -15,6 +15,7 @@ data class DishDetailsUiState(
     val showCopyConfirmation: Boolean = false,
     val currentlyEditedItem: UsedItem? = null,
     val currency: Currency? = null,
+    val lastRemovedItem: UsedItem? = null, // Added for undo feature
 ){
     val items: List<UsedItem> = (dish?.products ?: listOf()) + (dish?.halfProducts ?: listOf())
 }

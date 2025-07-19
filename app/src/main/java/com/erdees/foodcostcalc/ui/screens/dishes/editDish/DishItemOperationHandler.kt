@@ -1,13 +1,12 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import com.erdees.foodcostcalc.domain.model.UsedItem
-import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import timber.log.Timber
 
 class DishItemOperationHandler(
-    private val updateUiState: (DishDomain) -> Unit
+    private val updateUiState: (DishDetailsUiState) -> Unit
 ) {
 
     /**
@@ -32,7 +31,11 @@ class DishItemOperationHandler(
                     val updatedItem = currentlyEditedItem.copy(quantity = quantity)
                     val updatedProducts = currentDish.products.toMutableList()
                         .apply { set(index, updatedItem) }
-                    updateUiState(currentDish.copy(products = updatedProducts))
+                    updateUiState(
+                        uiState.copy(
+                            dish = currentDish.copy(products = updatedProducts)
+                        )
+                    )
                 }
             }
 
@@ -42,7 +45,11 @@ class DishItemOperationHandler(
                     val updatedItem = currentlyEditedItem.copy(quantity = quantity)
                     val updatedHalfProducts = currentDish.halfProducts.toMutableList()
                         .apply { set(index, updatedItem) }
-                    updateUiState(currentDish.copy(halfProducts = updatedHalfProducts))
+                    updateUiState(
+                        uiState.copy(
+                            dish = currentDish.copy(halfProducts = updatedHalfProducts)
+                        )
+                    )
                 }
             }
         }
@@ -67,12 +74,57 @@ class DishItemOperationHandler(
         when (item) {
             is UsedProductDomain -> {
                 val updatedProducts = currentDish.products.filter { it != item }
-                updateUiState(currentDish.copy(products = updatedProducts))
+                updateUiState(
+                    uiState.copy(
+                        dish = currentDish.copy(products = updatedProducts),
+                        lastRemovedItem = item
+                    )
+                )
             }
 
             is UsedHalfProductDomain -> {
                 val updatedHalfProducts = currentDish.halfProducts.filter { it != item }
-                updateUiState(currentDish.copy(halfProducts = updatedHalfProducts))
+                updateUiState(
+                    uiState.copy(
+                        dish = currentDish.copy(halfProducts = updatedHalfProducts),
+                        lastRemovedItem = item
+                    )
+                )
+            }
+        }
+    }
+
+    /**
+     * Restores a previously removed item to the dish.
+     *
+     * @param item The item to restore
+     * @param uiState The current UI state of the dish details screen
+     */
+    fun restoreItem(
+        item: UsedItem,
+        uiState: DishDetailsUiState
+    ) {
+        val currentDish = uiState.dish ?: return
+        when (item) {
+            is UsedProductDomain -> {
+                val updatedProducts = currentDish.products.toMutableList().apply { add(item) }
+                updateUiState(
+                    uiState.copy(
+                        dish = currentDish.copy(products = updatedProducts),
+                        lastRemovedItem = null
+                    )
+                )
+            }
+
+            is UsedHalfProductDomain -> {
+                val updatedHalfProducts =
+                    currentDish.halfProducts.toMutableList().apply { add(item) }
+                updateUiState(
+                    uiState.copy(
+                        dish = currentDish.copy(halfProducts = updatedHalfProducts),
+                        lastRemovedItem = null
+                    )
+                )
             }
         }
     }

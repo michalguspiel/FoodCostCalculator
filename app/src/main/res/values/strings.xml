@@ -53,6 +53,7 @@
 
     <!-- COMMON -->
 
+    <string name="undo">Undo</string>
     <string name="description">Description</string>
 
     <string name="edit_quantity">Edit quantity</string>
@@ -153,6 +154,7 @@
     <string name="copy_dish">Copy Dish</string>
     <string name="copy_dish_prefilled_name">%1$s Copy</string>
     <string name="more_options">More Options</string>
+    <string name="removed_item">Removed %1$s</string>
 
     <!-- Delete confirmation dialog -->
     <string name="delete_item_title">Delete \'%1$s\'?</string>

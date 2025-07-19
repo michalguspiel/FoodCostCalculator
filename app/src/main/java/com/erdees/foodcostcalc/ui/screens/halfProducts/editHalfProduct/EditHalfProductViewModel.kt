@@ -65,6 +65,9 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
         _editableName.value = value
     }
 
+    private var _lastRemovedItem: MutableStateFlow<UsedItem?> = MutableStateFlow(null)
+    val lastRemovedItem: StateFlow<UsedItem?> = _lastRemovedItem
+
     fun setInteraction(interaction: InteractionType) {
         when (interaction) {
             is InteractionType.EditItem -> {
@@ -139,11 +142,14 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
     fun removeItem(item: UsedItem) {
         val halfProduct = halfProduct.value ?: return
         _halfProduct.value = halfProduct.copy(products = halfProduct.products.filter { it != item })
+        _lastRemovedItem.update { item }
     }
 
     private fun hasUnsavedChanges(): Boolean {
-        val halfProductChanged = UnsavedChangesValidator.hasUnsavedChanges(originalHalfProduct, _halfProduct.value)
-        val productsChanged = UnsavedChangesValidator.hasListChanges(originalProducts, _halfProduct.value?.products)
+        val halfProductChanged =
+            UnsavedChangesValidator.hasUnsavedChanges(originalHalfProduct, _halfProduct.value)
+        val productsChanged =
+            UnsavedChangesValidator.hasListChanges(originalProducts, _halfProduct.value?.products)
         return halfProductChanged || productsChanged
     }
 
@@ -235,5 +241,22 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
                 _screenState.value = ScreenState.Error(Error(e.message))
             }
         }
+    }
+
+    /**
+     * Restores the last removed item to the dish and clears lastRemovedItem.
+     */
+    fun undoRemoveItem() {
+        val item = lastRemovedItem.value as? UsedProductDomain ?: return
+        _halfProduct.update { halfProduct ->
+            halfProduct?.copy(
+                products = halfProduct.products.toMutableList().apply { add(item) }
+            )
+        }
+        clearLastRemovedItem()
+    }
+
+    fun clearLastRemovedItem() {
+        _lastRemovedItem.update { null }
     }
 }

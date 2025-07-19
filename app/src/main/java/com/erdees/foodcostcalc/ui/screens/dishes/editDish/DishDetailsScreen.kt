@@ -20,6 +20,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -50,6 +52,7 @@ import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -98,9 +101,20 @@ fun DishDetailsScreen(
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler {
         viewModel.handleBackNavigation { navController.popBackStack() }
+    }
+
+    LaunchedEffect(uiState.lastRemovedItem) {
+        val removedItem = uiState.lastRemovedItem ?: return@LaunchedEffect
+        snackbarHostState.showUndoDeleteSnackbar(
+            message = context.getString(R.string.removed_item, removedItem.item.name),
+            actionLabel = context.getString(R.string.undo),
+            actionPerformed = { viewModel.undoRemoveItem() },
+            ignored = { viewModel.clearLastRemovedItem() }
+        )
     }
 
     LaunchedEffect(uiState.screenState) {
@@ -168,7 +182,8 @@ fun DishDetailsScreen(
                     )
                 }
             },
-        )
+        ),
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -182,6 +197,7 @@ private fun EditDishScreenContent(
     dishId: Long,
     navController: NavController,
     actions: EditDishScreenActions,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -194,7 +210,8 @@ private fun EditDishScreenContent(
                 onCopyClick = { actions.onCopyDishClick() },
                 onBackClick = { navController.popBackStack() }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             Column {
@@ -513,7 +530,8 @@ private fun EditDishScreenContentPreview(
             navController = navController,
             actions = emptyCallbacks,
             modifier = Modifier,
-            dishId = 0L
+            dishId = 0L,
+            snackbarHostState = SnackbarHostState()
         )
     }
 }
