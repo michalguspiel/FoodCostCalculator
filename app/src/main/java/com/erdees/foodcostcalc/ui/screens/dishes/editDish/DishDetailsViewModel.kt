@@ -1,29 +1,25 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
 import android.content.Context
-import android.content.Intent
-import android.os.Bundle
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDish
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
-import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
-import com.erdees.foodcostcalc.ext.toShareableText
+import com.erdees.foodcostcalc.domain.usecase.DeleteDishUseCase
+import com.erdees.foodcostcalc.domain.usecase.SaveDishUseCase
+import com.erdees.foodcostcalc.domain.usecase.ShareDishUseCase
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.IS_COPIED
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
@@ -32,19 +28,13 @@ import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.UnsavedChangesValidator
-import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -57,35 +47,35 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     KoinComponent {
 
     private val copyDishUseCase: CopyDishUseCase by inject()
+    private val saveDishUseCase: SaveDishUseCase by inject()
+    private val deleteDishUseCase: DeleteDishUseCase by inject()
+    private val shareDishUseCase: ShareDishUseCase by inject()
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
     private val myDispatchers: MyDispatchers by inject()
 
-    private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
-    val screenState: StateFlow<ScreenState> = _screenState
-
-    private var _dish = MutableStateFlow<DishDomain?>(null)
-    val dish: StateFlow<DishDomain?> = _dish
-
-    private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
-    val editableName: StateFlow<String> = _editableName
-
-    private var _editableCopiedDishName: MutableStateFlow<String> = MutableStateFlow("")
-    val editableCopiedDishName: StateFlow<String> = _editableCopiedDishName
-
-    private var _editableTotalPrice: MutableStateFlow<String> = MutableStateFlow("")
-    val editableTotalPrice: StateFlow<String> = _editableTotalPrice
+    private val _uiState = MutableStateFlow(DishDetailsUiState())
+    val uiState = _uiState.asStateFlow()
 
     private var originalDish: DishDomain? = null
-
-    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Eagerly, null)
+    private var originalProducts: List<UsedProductDomain> = listOf()
+    private var originalHalfProducts: List<UsedHalfProductDomain> = listOf()
 
     private val recipeHandler: RecipeHandler = RecipeHandler(
         viewModelScope = viewModelScope,
         resetScreenState = { resetScreenState() },
-        updateScreenState = { _screenState.value = it },
-        updateDish = { _dish.value = it })
+        updateScreenState = { screenState -> _uiState.update { it.copy(screenState = screenState) } },
+        updateDish = { dish -> _uiState.update { it.copy(dish = dish) } }
+    )
+
+    private val interactionHandler = InteractionHandler()
+    private val dishPropertySaver = DishPropertySaver()
+    private val dishItemOperationHandler = DishItemOperationHandler(
+        updateUiState = { updatedDish ->
+            _uiState.update { it.copy(dish = updatedDish) }
+        }
+    )
 
     val recipe = recipeHandler.recipe
     val recipeViewModeState = recipeHandler.recipeViewModeState
@@ -99,10 +89,12 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         updateStep = recipeHandler::updateStep
     )
 
-    private val _showCopyConfirmation = MutableStateFlow(false)
-    val showCopyConfirmation: StateFlow<Boolean> = _showCopyConfirmation
-
     init {
+        viewModelScope.launch {
+            preferences.currency.collect { currency ->
+                _uiState.update { it.copy(currency = currency) }
+            }
+        }
         fetchDishAndUpdateScreenState()
         checkIfCopied()
     }
@@ -110,23 +102,23 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private fun checkIfCopied() {
         val isCopied = savedStateHandle.get<Boolean>(IS_COPIED) ?: false
         if (isCopied) {
-            _showCopyConfirmation.value = true
+            _uiState.update { it.copy(showCopyConfirmation = true) }
         }
     }
 
     fun hideCopyConfirmation() {
-        _showCopyConfirmation.value = false
+        _uiState.update { it.copy(showCopyConfirmation = false) }
     }
 
     private fun fetchDishAndUpdateScreenState() {
         Timber.i("fetchDishAndUpdateScreenState()")
-        _screenState.update { ScreenState.Loading<Nothing>() }
+        _uiState.update { it.copy(screenState = ScreenState.Loading<Nothing>()) }
         viewModelScope.launch {
             try {
                 loadDishStateFromRepository()
-                _screenState.update { ScreenState.Idle }
+                _uiState.update { it.copy(screenState = ScreenState.Idle) }
             } catch (e: Exception) {
-                _screenState.update { ScreenState.Error(Error(e)) }
+                _uiState.update { it.copy(screenState = ScreenState.Error(Error(e))) }
             }
         }
     }
@@ -147,8 +139,16 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             if (this.recipe == null) {
                 recipeHandler.updateRecipeViewMode(RecipeViewMode.EDIT)
             }
-            _dish.update { this }
-            _editableName.update { this.name }
+
+            _uiState.update {
+                it.copy(
+                    dish = this,
+                    editableFields = it.editableFields.copy(
+                        name = this.name
+                    )
+                )
+            }
+
             originalDish = this.copy()
             recipeHandler.updateRecipe(this.recipe.toEditableRecipe())
             originalProducts = this.products
@@ -157,160 +157,79 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun updateName(value: String) {
-        _editableName.value = value
+        _uiState.update { it.copy(editableFields = it.editableFields.copy(name = value)) }
     }
 
     fun updateCopiedDishName(value: String) {
-        _editableCopiedDishName.value = value
+        _uiState.update { it.copy(editableFields = it.editableFields.copy(copiedDishName = value)) }
     }
-
-    private var _editableQuantity: MutableStateFlow<String> = MutableStateFlow("")
-    val editableQuantity: StateFlow<String> = _editableQuantity
 
     fun updateQuantity(value: String) {
-        onNumericValueChange(value, _editableQuantity)
+        val sanitizedValue = onNumericValueChange(_uiState.value.editableFields.quantity, value)
+        _uiState.update { it.copy(editableFields = it.editableFields.copy(quantity = sanitizedValue)) }
     }
-
-    private var _editableTax: MutableStateFlow<String> = MutableStateFlow("")
-    val editableTax: StateFlow<String> = _editableTax
 
     fun updateTax(value: String) {
-        onNumericValueChange(value, _editableTax)
+        val sanitizedValue = onNumericValueChange(_uiState.value.editableFields.tax, value)
+        _uiState.update { it.copy(editableFields = it.editableFields.copy(tax = sanitizedValue)) }
     }
 
-    private var _editableMargin: MutableStateFlow<String> = MutableStateFlow("")
-    val editableMargin: StateFlow<String> = _editableMargin
-
     fun updateMargin(value: String) {
-        onNumericValueChange(value, _editableMargin)
+        val sanitizedValue = onNumericValueChange(_uiState.value.editableFields.margin, value)
+        _uiState.update { it.copy(editableFields = it.editableFields.copy(margin = sanitizedValue)) }
     }
 
     fun updateTotalPrice(value: String) {
-        onNumericValueChange(value, _editableTotalPrice)
+        val sanitizedValue = onNumericValueChange(_uiState.value.editableFields.totalPrice, value)
+        _uiState.update { it.copy(editableFields = it.editableFields.copy(totalPrice = sanitizedValue)) }
     }
 
-    private var currentlyEditedItem: MutableStateFlow<UsedItem?> = MutableStateFlow(null)
-
     fun setInteraction(interaction: InteractionType) {
-        when (interaction) {
-            is InteractionType.EditItem -> {
-                currentlyEditedItem.value = interaction.usedItem
-                _editableQuantity.value = interaction.usedItem.quantity.toString()
-            }
-
-            is InteractionType.EditTax -> _editableTax.value = dish.value?.taxPercent.toString()
-
-            is InteractionType.EditMargin -> _editableMargin.value =
-                dish.value?.marginPercent.toString()
-
-            is InteractionType.EditName -> _editableName.value = dish.value?.name ?: ""
-
-            is InteractionType.EditTotalPrice -> {
-                if (_dish.value?.foodCost == 0.00) {
-                    return
-                }
-                val price = Utils.formatPriceWithoutSymbol(
-                    dish.value?.totalPrice, currency.value?.currencyCode
-                )
-                _editableTotalPrice.value = price
-            }
-
-            is InteractionType.CopyDish ->
-                _editableCopiedDishName.value = interaction.prefilledName
-
-            else -> {}
+        interactionHandler.handleInteraction(interaction, _uiState.value) { newState ->
+            _uiState.update { newState }
         }
-        _screenState.value = ScreenState.Interaction(interaction)
     }
 
     fun resetScreenState() {
-        _screenState.value = ScreenState.Idle
+        _uiState.update { it.copy(screenState = ScreenState.Idle) }
     }
 
     fun updateItemQuantity() {
-        val value = editableQuantity.value.toDoubleOrNull()
-        val item = currentlyEditedItem.value
-        val dish = dish.value
-
-        if (value == null || item == null || dish == null) {
-            return
-        }
-
-        when (item) {
-            is UsedProductDomain -> {
-                val index = dish.products.indexOf(item)
-                if (index != -1) {
-                    val updatedItem = item.copy(quantity = value)
-                    _dish.value = _dish.value?.copy(
-                        products = dish.products.toMutableList().apply { set(index, updatedItem) })
-                }
-            }
-
-            is UsedHalfProductDomain -> {
-                val index = dish.halfProducts.indexOf(item)
-                if (index != -1) {
-                    val updatedItem = item.copy(quantity = value)
-                    _dish.value = _dish.value?.copy(
-                        halfProducts = dish.halfProducts.toMutableList()
-                            .apply { set(index, updatedItem) })
-                }
-            }
-        }
+        dishItemOperationHandler.updateItemQuantity(_uiState.value)
         resetScreenState()
     }
 
     fun saveDishTax() {
-        val value = editableTax.value.toDoubleOrNull()
-        if (value == null) {
-            resetScreenState()
-            return
-        }
-        _dish.value = _dish.value?.copy(taxPercent = value)
-        resetScreenState()
+        dishPropertySaver.saveProperty(
+            propertyType = DishPropertySaver.PropertyType.TAX,
+            uiState = _uiState.value,
+            updateUiState = { newState -> _uiState.update { newState } }
+        )
     }
 
     fun saveDishMargin() {
-        val value = editableMargin.value.toDoubleOrNull()
-        if (value == null) {
-            resetScreenState()
-            return
-        }
-        _dish.value = _dish.value?.copy(marginPercent = value)
-        resetScreenState()
+        dishPropertySaver.saveProperty(
+            propertyType = DishPropertySaver.PropertyType.MARGIN,
+            uiState = _uiState.value,
+            updateUiState = { newState -> _uiState.update { newState } }
+        )
     }
 
     fun saveDishTotalPrice() {
-        val newTotalPriceString = _editableTotalPrice.value
-        val currentDish = _dish.value
-        if (currentDish == null) {
-            Timber.e("Current dish is null, cannot save total price.")
-            resetScreenState() // Or handle error appropriately
-            return
-        }
-        val newTotalPrice = newTotalPriceString.toDoubleOrNull()
-        if (newTotalPrice == null) {
-            Timber.e("Invalid total price format: $newTotalPriceString")
-            _screenState.value = ScreenState.Error(Error("Invalid total price format."))
-            return
-        }
-        _dish.value = currentDish.withUpdatedTotalPrice(newTotalPrice)
-        resetScreenState()
+        dishPropertySaver.saveProperty(
+            propertyType = DishPropertySaver.PropertyType.TOTAL_PRICE,
+            uiState = _uiState.value,
+            updateUiState = { newState -> _uiState.update { newState } }
+        )
     }
 
     fun saveDishName() {
-        val value = editableName.value
-        _dish.value = _dish.value?.copy(name = value)
-        resetScreenState()
+        dishPropertySaver.saveProperty(
+            propertyType = DishPropertySaver.PropertyType.NAME,
+            uiState = _uiState.value,
+            updateUiState = { newState -> _uiState.update { newState } }
+        )
     }
-
-    private var originalProducts: List<UsedProductDomain> = listOf()
-    private var originalHalfProducts: List<UsedHalfProductDomain> = listOf()
-
-    val items: StateFlow<List<UsedItem>> = dish.map {
-        val products = it?.products ?: listOf()
-        val halfProducts = it?.halfProducts ?: listOf()
-        products + halfProducts
-    }.stateIn(viewModelScope, SharingStarted.Lazily, listOf())
 
     /**
      * Removes item from the temporary list of items. Requires saving to persist.
@@ -319,14 +238,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      * */
     fun removeItem(item: UsedItem) {
         Timber.i("removeItem: $item")
-        val dish = dish.value ?: return
-        when (item) {
-            is UsedProductDomain -> _dish.value =
-                dish.copy(products = dish.products.filter { it != item })
-
-            is UsedHalfProductDomain -> _dish.value =
-                dish.copy(halfProducts = dish.halfProducts.filter { it != item })
-        }
+        dishItemOperationHandler.removeItem(
+            item = item,
+            uiState = _uiState.value
+        )
     }
 
     /**
@@ -339,13 +254,13 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             return true
         }
 
-        if (UnsavedChangesValidator.hasUnsavedChanges(originalDish, _dish.value)) {
+        if (UnsavedChangesValidator.hasUnsavedChanges(originalDish, _uiState.value.dish)) {
             return true
         }
 
         // Deep check for products and half-products changes
-        val productsChanged = originalProducts != _dish.value?.products
-        val halfProductsChanged = originalHalfProducts != _dish.value?.halfProducts
+        val productsChanged = originalProducts != _uiState.value.dish?.products
+        val halfProductsChanged = originalHalfProducts != _uiState.value.dish?.halfProducts
 
         return productsChanged || halfProductsChanged
     }
@@ -357,7 +272,11 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      */
     fun handleBackNavigation(navigate: () -> Unit) {
         if (hasUnsavedChanges()) {
-            _screenState.update { ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation) }
+            _uiState.update {
+                it.copy(
+                    screenState = ScreenState.Interaction(InteractionType.UnsavedChangesConfirmation)
+                )
+            }
         } else {
             navigate()
         }
@@ -368,7 +287,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         viewModelScope.launch {
             loadDishStateFromRepository()
             resetScreenState()
-            showCopyDish(getName(_dish.value?.name))
+            showCopyDish(getName(_uiState.value.dish?.name))
         }
     }
 
@@ -387,157 +306,110 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      */
     fun handleCopyDish(getName: (String?) -> String) {
         if (hasUnsavedChanges()) {
-            _screenState.update {
-                ScreenState.Interaction(InteractionType.UnsavedChangesConfirmationBeforeCopy)
+            _uiState.update {
+                it.copy(
+                    screenState = ScreenState.Interaction(InteractionType.UnsavedChangesConfirmationBeforeCopy)
+                )
             }
         } else {
-            showCopyDish(getName(_dish.value?.name))
+            showCopyDish(getName(_uiState.value.dish?.name))
+        }
+    }
+
+    fun saveDish(actionResultType: DishDetailsActionResultType = DishDetailsActionResultType.UPDATED_NAVIGATE) {
+        val currentDish = _uiState.value.dish ?: return
+        _uiState.update { it.copy(screenState = ScreenState.Loading<Nothing>()) }
+
+        viewModelScope.launch {
+            saveDishUseCase.invoke(
+                dish = currentDish,
+                originalProducts = originalProducts,
+                originalHalfProducts = originalHalfProducts,
+                actionResultType = actionResultType
+            ).onSuccess { result ->
+                if (actionResultType == DishDetailsActionResultType.UPDATED_STAY) {
+                    loadDishStateFromRepository()
+                }
+                _uiState.update { it.copy(screenState = ScreenState.Success(result)) }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(screenState = ScreenState.Error(Error(exception.message))) }
+                Timber.e(exception, "Failed to save dish")
+            }
         }
     }
 
     /**
-     * This function is responsible for saving the changes made to a dish.
-     * It first sets the screen state to loading and then launches a coroutine on the main thread.
+     * Shares dish information using the Android share functionality.
+     * Delegates to ShareDishUseCase, which handles the business logic.
      *
-     * It retrieves the original list of products and half-products from the dishDomain.
-     * If the dishDomain is null, it defaults to an empty list.
-     *
-     * It then determines which products and half-products have been removed by filtering out items
-     * that are in the original list but not in the current list of products and half-products.
-     * These removed items are then mapped to their respective data model representations.
-     *
-     * Similarly, it determines which products and half-products have been edited by filtering out items
-     * that are in the current list but not in the original list. These edited items are also mapped to their respective data model representations.
-     *
-     * The function then enters a try-catch block where it performs the following operations in the IO context:
-     * - It iterates over the list of removed products and half-products and deletes each one from the repository.
-     * - It iterates over the list of edited products and half-products and updates each one in the repository.
-     * - It updates the dish in the repository. If the dishDomain is null, it throws an exception.
-     *
-     * If all operations are successful, it sets the screen state to success. If an exception is caught, it sets the screen state to error.
+     * @param context Android context needed to start the share intent
      */
-    fun saveDish(actionResultType: DishDetailsActionResultType = DishDetailsActionResultType.UPDATED_NAVIGATE) {
-        val dish = dish.value ?: return
-        _screenState.value = ScreenState.Loading<Nothing>()
-        viewModelScope.launch(Dispatchers.Default) {
+    fun shareDish(context: Context) {
+        val currentDish = _uiState.value.dish ?: return
 
-            val editedProducts =
-                dish.products.filterNot { it in originalProducts }.map { it.toProductDish() }
-            val editedHalfProducts = dish.halfProducts.filterNot { it in originalHalfProducts }
-                .map { it.toHalfProductDish() }
-
-            val removedProducts = originalProducts.filterNot {
-                it.id in dish.products.map { product -> product.id }
-            }.map { it.toProductDish() }
-
-            val removedHalfProducts = originalHalfProducts.filterNot {
-                it.id in dish.halfProducts.map { halfProduct -> halfProduct.id }
-            }.map { it.toHalfProductDish() }
-
-            try {
-                withContext(Dispatchers.IO) {
-
-                    removedProducts.forEach { dishRepository.deleteProductDish(it) }
-                    removedHalfProducts.forEach { dishRepository.deleteHalfProductDish(it) }
-
-                    editedProducts.forEach { dishRepository.updateProductDish(it) }
-                    editedHalfProducts.forEach { dishRepository.updateHalfProductDish(it) }
-
-                    dishRepository.updateDish(this@DishDetailsViewModel.dish.value!!.toDishBase()) // Throw and handle if dishDomain is null
-                }
-                if (actionResultType == DishDetailsActionResultType.UPDATED_STAY) {
-                    loadDishStateFromRepository()
-                }
-                _screenState.value = ScreenState.Success(
-                    DishActionResult(actionResultType, dish.id)
-                )
-            } catch (e: Exception) {
-                _screenState.value = ScreenState.Error(Error(e.message))
+        viewModelScope.launch {
+            shareDishUseCase.invoke(
+                context = context,
+                dish = currentDish,
+                currency = _uiState.value.currency
+            ).onSuccess { shareIntent ->
+                context.startActivity(shareIntent)
+            }.onFailure { exception ->
+                _uiState.update { it.copy(screenState = ScreenState.Error(Error(exception.message))) }
+                Timber.e(exception, "Failed to share dish")
             }
         }
     }
 
-    fun shareDish(context: Context) {
-        analyticsRepository.logEvent(Constants.Analytics.DISH_SHARE, Bundle().apply {
-            putString(Constants.Analytics.DISH_NAME, _dish.value?.name)
-        })
-
-        val shareableText = _dish.value?.toShareableText(context, currency.value).also {
-            Timber.i(it)
-        }
-        val sendIntent: Intent = Intent().apply {
-            action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, shareableText)
-            type = "text/plain"
-        }
-
-        val shareIntent = Intent.createChooser(sendIntent, null)
-        context.startActivity(shareIntent)
-    }
-
     fun onDeleteDishClick() {
-        val dish = _dish.value ?: return
+        val currentDish = _uiState.value.dish ?: return
         analyticsRepository.logEvent(Constants.Analytics.DishV2.DELETE, null)
-        _screenState.update {
-            ScreenState.Interaction(
-                InteractionType.DeleteConfirmation(dish.id, dish.name)
+        _uiState.update {
+            it.copy(
+                screenState = ScreenState.Interaction(
+                    InteractionType.DeleteConfirmation(currentDish.id, currentDish.name)
+                )
             )
         }
     }
 
     fun confirmDelete(dishId: Long) {
-        _screenState.value = ScreenState.Loading<Nothing>()
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                dishRepository.deleteDish(dishId)
-                analyticsRepository.logEvent(Constants.Analytics.DishV2.DELETED, null)
-                _screenState.value =
-                    ScreenState.Success(
-                        DishActionResult(DishDetailsActionResultType.DELETED, dishId)
-                    )
-            } catch (e: Exception) {
-                _screenState.value = ScreenState.Error(Error(e.message))
+        _uiState.update { it.copy(screenState = ScreenState.Loading<Nothing>()) }
+
+        viewModelScope.launch {
+            deleteDishUseCase.invoke(dishId).onSuccess { result ->
+                _uiState.update { it.copy(screenState = ScreenState.Success(result)) }
+            }.onFailure { exception ->
+                _uiState.update { it.copy(screenState = ScreenState.Error(Error(exception.message))) }
+                Timber.e(exception, "Failed to delete dish")
             }
         }
     }
 
     fun toggleRecipeViewMode() = recipeHandler.toggleRecipeViewMode()
-    fun cancelRecipeEdit() = recipeHandler.cancelRecipeEdit(_dish.value?.recipe)
+    fun cancelRecipeEdit() = recipeHandler.cancelRecipeEdit(_uiState.value.dish?.recipe)
     fun onChangeServings() = recipeHandler.onChangeServings()
     fun updateServings(servings: String) = recipeHandler.updateServings(servings)
-    fun saveRecipe() = recipeHandler.saveRecipe(_dish.value)
+    fun saveRecipe() = recipeHandler.saveRecipe(_uiState.value.dish)
 
     /**
      * Creates a copy of the current dish with the name set in editableName.
      * On success, emits a ScreenState.Success with DishActionResult.COPIED and the new dish ID.
      */
     fun copyDish() {
-        val currentDish = dish.value ?: return
-        val newName = editableCopiedDishName.value
+        val currentDish = _uiState.value.dish ?: return
+        val newName = _uiState.value.editableFields.copiedDishName
 
-        _screenState.value = ScreenState.Loading<Nothing>()
+        _uiState.update { it.copy(screenState = ScreenState.Loading<Nothing>()) }
 
         viewModelScope.launch {
             copyDishUseCase.invoke(currentDish, newName).onSuccess { result ->
-                _screenState.value = ScreenState.Success(result)
-            }.onFailure {
-                Timber.e("Failed to copy dish: ${it.message}", it)
-                _screenState.value = ScreenState.Error(Error(it.message))
+                _uiState.update { it.copy(screenState = ScreenState.Success(result)) }
+            }.onFailure { error ->
+                Timber.e("Failed to copy dish: ${error.message}", error)
+                _uiState.update { it.copy(screenState = ScreenState.Error(Error(error.message))) }
             }
         }
-    }
-
-    /**
-     * Called when user clicks "Discard" in the unsaved changes dialog
-     * @param navigate The navigation action to perform after discarding
-     */
-    fun discardChanges(navigate: () -> Unit) {
-        // Restore original dish state
-        _dish.value = originalDish?.copy()
-        recipeHandler.updateRecipe(originalDish?.recipe.toEditableRecipe())
-        resetScreenState()
-        // Navigate back
-        navigate()
     }
 
     /**

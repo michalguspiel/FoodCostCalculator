@@ -62,6 +62,7 @@ import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
+import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
@@ -82,14 +83,12 @@ data class RecipeScreenCallbacks(
 @Composable
 fun RecipeScreen(navController: NavController, viewModel: DishDetailsViewModel) {
 
-    val dish by viewModel.dish.collectAsState()
     val recipe by viewModel.recipe.collectAsState()
     val recipeViewMode by viewModel.recipeViewModeState.collectAsState()
-    val screenState by viewModel.screenState.collectAsState()
     val recipeUpdater = viewModel.recipeUpdater
     val recipeServings by viewModel.recipeServings.collectAsState()
     val recipeEvent by viewModel.recipeEvent.collectAsStateWithLifecycle(null)
-    val currency by viewModel.currency.collectAsState()
+    val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(recipeEvent) {
         Timber.i("New $recipeEvent received.")
@@ -101,11 +100,9 @@ fun RecipeScreen(navController: NavController, viewModel: DishDetailsViewModel) 
 
     RecipeScreenContent(
         recipeViewMode = recipeViewMode,
-        dish = dish,
+        dishDetailsUiState = uiState,
         recipe = recipe,
-        screenState = screenState,
         servings = recipeServings,
-        currency = currency,
         recipeUpdater = recipeUpdater,
         modifier = Modifier,
         recipeScreenCallbacks = RecipeScreenCallbacks(
@@ -123,12 +120,10 @@ fun RecipeScreen(navController: NavController, viewModel: DishDetailsViewModel) 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RecipeScreenContent(
+    dishDetailsUiState: DishDetailsUiState,
     recipeViewMode: RecipeViewMode,
-    dish: DishDomain?,
     recipe: EditableRecipe,
-    screenState: ScreenState,
     servings: Int,
-    currency: Currency?,
     recipeUpdater: RecipeUpdater,
     modifier: Modifier = Modifier,
     recipeScreenCallbacks: RecipeScreenCallbacks,
@@ -139,7 +134,7 @@ private fun RecipeScreenContent(
             TopAppBar(title = {
                 Text(
                     text = if (recipeViewMode == RecipeViewMode.VIEW) {
-                        dish?.name ?: stringResource(R.string.recipe)
+                        dishDetailsUiState.dish?.name ?: stringResource(R.string.recipe)
                     } else {
                         stringResource(R.string.edit_recipe)
                     }, modifier = Modifier
@@ -160,12 +155,11 @@ private fun RecipeScreenContent(
         ) {
             when (recipeViewMode) {
                 RecipeViewMode.VIEW -> {
-                    dish?.recipe?.let { recipe ->
+                    dishDetailsUiState.dish?.recipe?.let { recipe ->
                         RecipeView(
-                            dish,
+                            dishDetailsUiState,
                             servings,
                             recipe,
-                            currency,
                             toggleRecipeViewMode = { recipeScreenCallbacks.toggleRecipeViewMode() },
                             onChangeServings = { recipeScreenCallbacks.onChangeServings() })
                     } ?: RecipeMissingView()
@@ -181,7 +175,7 @@ private fun RecipeScreenContent(
             }
         }
 
-        when (screenState) {
+        when (dishDetailsUiState.screenState) {
             is ScreenState.Success<*> -> {
                 recipeScreenCallbacks.toggleRecipeViewMode()
             }
@@ -189,7 +183,7 @@ private fun RecipeScreenContent(
             is ScreenState.Error -> {}
             is ScreenState.Loading<*> -> ScreenLoadingOverlay()
             is ScreenState.Interaction -> {
-                if (screenState.interaction == InteractionType.ChangeServings) {
+                if (dishDetailsUiState.screenState.interaction == InteractionType.ChangeServings) {
                     val editable = remember { mutableStateOf(servings.toString()) }
                     ValueEditDialog(
                         title = stringResource(id = R.string.change_portions),
@@ -214,10 +208,9 @@ private fun RecipeScreenContent(
 
 @Composable
 private fun RecipeView(
-    dish: DishDomain,
+    dishDetailsUiState: DishDetailsUiState,
     servings: Int,
     recipe: RecipeDomain,
-    currency: Currency?,
     modifier: Modifier = Modifier,
     toggleRecipeViewMode: () -> Unit,
     onChangeServings: () -> Unit
@@ -261,13 +254,15 @@ private fun RecipeView(
 
             Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 SectionLabel(stringResource(R.string.ingredients_title, servings.toString()))
-                Ingredients(
-                    dishDomain = dish,
-                    servings = servings.toDouble(),
-                    currency = currency,
-                    modifier = Modifier,
-                    showPrices = false
-                )
+                dishDetailsUiState.dish?.let {
+                    Ingredients(
+                        dishDomain = it,
+                        servings = servings.toDouble(),
+                        currency = dishDetailsUiState.currency,
+                        modifier = Modifier,
+                        showPrices = false
+                    )
+                }
                 FCCTextButton(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.change_portions)
@@ -520,11 +515,12 @@ private fun RecipeScreenContentViewPreview() {
     FCCTheme {
         RecipeScreenContent(
             recipeViewMode = RecipeViewMode.VIEW,
-            dish = previewDish,
-            recipe = previewDish.recipe.toEditableRecipe(),
-            screenState = ScreenState.Idle,
+            dishDetailsUiState = DishDetailsUiState(
+                dish = previewDish,
+                screenState = ScreenState.Idle,
+                currency = Currency.getInstance(Locale.getDefault())
+            ), recipe = previewDish.recipe.toEditableRecipe(),
             servings = 1,
-            currency = Currency.getInstance(Locale.getDefault()),
             modifier = Modifier,
             recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
             recipeScreenCallbacks = RecipeScreenCallbacks(
@@ -546,11 +542,13 @@ private fun RecipeScreenContentEditPreview() {
     FCCTheme {
         RecipeScreenContent(
             recipeViewMode = RecipeViewMode.EDIT,
-            dish = previewDish,
+            dishDetailsUiState = DishDetailsUiState(
+                dish = previewDish,
+                screenState = ScreenState.Idle,
+                currency = Currency.getInstance(Locale.getDefault())
+            ),
             recipe = previewDish.recipe.toEditableRecipe(),
-            screenState = ScreenState.Idle,
             servings = 10,
-            currency = Currency.getInstance(Locale.getDefault()),
             recipeUpdater = RecipeUpdater({}, {}, {}, {}, { _, _ -> }),
             modifier = Modifier,
             recipeScreenCallbacks = RecipeScreenCallbacks(
