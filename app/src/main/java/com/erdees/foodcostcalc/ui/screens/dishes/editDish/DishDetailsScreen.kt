@@ -31,6 +31,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -211,7 +212,6 @@ private fun EditDishScreenContent(
                 onBackClick = { navController.popBackStack() }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
             Column {
@@ -236,24 +236,27 @@ private fun EditDishScreenContent(
                 }
 
                 Column(Modifier) {
-                    uiState.dish?.let {
-                        DishDetails(
-                            it,
-                            uiState.currency,
-                            onTaxClick = {
-                                actions.setInteraction(InteractionType.EditTax)
-                            },
-                            onMarginClick = {
-                                actions.setInteraction(InteractionType.EditMargin)
-                            },
-                            onTotalPriceClick = {
-                                actions.setInteraction(InteractionType.EditTotalPrice)
-                            }
-                        )
+                    Box(contentAlignment = Alignment.BottomCenter) {
+                        uiState.dish?.let {
+                            DishDetails(
+                                it,
+                                uiState.currency,
+                                onTaxClick = {
+                                    actions.setInteraction(InteractionType.EditTax)
+                                },
+                                onMarginClick = {
+                                    actions.setInteraction(InteractionType.EditMargin)
+                                },
+                                onTotalPriceClick = {
+                                    actions.setInteraction(InteractionType.EditTotalPrice)
+                                }
+                            )
+                        }
+                        SnackbarHost(snackbarHostState)
                     }
 
                     Buttons(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = 8.dp),
                         saveDish = { actions.saveDish() },
                         shareDish = { actions.shareDish(it) },
                         navigate = {

@@ -28,6 +28,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment.Companion.Center
+import androidx.compose.ui.Alignment.Companion.TopCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -171,7 +172,6 @@ private fun EditHalfProductScreenContent(
                 onNameClick = { callbacks.setInteraction(InteractionType.EditName) }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(
             modifier = Modifier.padding(paddingValues),
@@ -194,21 +194,26 @@ private fun EditHalfProductScreenContent(
                     }
                 }
 
-                state.halfProduct?.let {
-                    HalfProductDetails(
-                        halfProductDomain = it,
-                        currency = state.currency,
-                        modifier = Modifier
-                    )
-                }
-
-                ButtonRow(
-                    modifier = Modifier.padding(end = 12.dp),
-                    primaryButton = {
-                        FCCPrimaryButton(text = stringResource(id = R.string.save)) {
-                            callbacks.saveHalfProduct()
+                Box(contentAlignment = TopCenter) {
+                    Column {
+                        state.halfProduct?.let {
+                            HalfProductDetails(
+                                halfProductDomain = it,
+                                currency = state.currency,
+                                modifier = Modifier
+                            )
                         }
-                    })
+
+                        ButtonRow(
+                            modifier = Modifier.padding(end = 12.dp),
+                            primaryButton = {
+                                FCCPrimaryButton(text = stringResource(id = R.string.save)) {
+                                    callbacks.saveHalfProduct()
+                                }
+                            })
+                    }
+                    SnackbarHost(snackbarHostState)
+                }
             }
 
             HandleScreenState(state, callbacks, navController)
