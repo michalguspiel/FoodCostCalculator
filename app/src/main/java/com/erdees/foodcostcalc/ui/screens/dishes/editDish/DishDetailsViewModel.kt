@@ -75,6 +75,11 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     private val interactionHandler = InteractionHandler()
     private val dishPropertySaver = DishPropertySaver()
+    private val dishItemOperationHandler = DishItemOperationHandler(
+        updateUiState = { updatedDish ->
+            _uiState.update { it.copy(dish = updatedDish) }
+        }
+    )
 
     val recipe = recipeHandler.recipe
     val recipeViewModeState = recipeHandler.recipeViewModeState
@@ -199,45 +204,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun updateItemQuantity() {
-        val value = _uiState.value.editableFields.quantity.toDoubleOrNull()
-        val item = _uiState.value.currentlyEditedItem
-        val currentDish = _uiState.value.dish
-
-        if (value == null || item == null || currentDish == null) {
-            return
-        }
-
-        when (item) {
-            is UsedProductDomain -> {
-                val index = currentDish.products.indexOf(item)
-                if (index != -1) {
-                    val updatedItem = item.copy(quantity = value)
-                    _uiState.update {
-                        it.copy(
-                            dish = it.dish?.copy(
-                                products = currentDish.products.toMutableList()
-                                    .apply { set(index, updatedItem) }
-                            )
-                        )
-                    }
-                }
-            }
-
-            is UsedHalfProductDomain -> {
-                val index = currentDish.halfProducts.indexOf(item)
-                if (index != -1) {
-                    val updatedItem = item.copy(quantity = value)
-                    _uiState.update {
-                        it.copy(
-                            dish = it.dish?.copy(
-                                halfProducts = currentDish.halfProducts.toMutableList()
-                                    .apply { set(index, updatedItem) }
-                            )
-                        )
-                    }
-                }
-            }
-        }
+        dishItemOperationHandler.updateItemQuantity(_uiState.value)
         resetScreenState()
     }
 
@@ -280,27 +247,10 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      * */
     fun removeItem(item: UsedItem) {
         Timber.i("removeItem: $item")
-        val currentDish = _uiState.value.dish ?: return
-
-        when (item) {
-            is UsedProductDomain ->
-                _uiState.update {
-                    it.copy(
-                        dish = currentDish.copy(
-                            products = currentDish.products.filter { product -> product != item }
-                        )
-                    )
-                }
-
-            is UsedHalfProductDomain ->
-                _uiState.update {
-                    it.copy(
-                        dish = currentDish.copy(
-                            halfProducts = currentDish.halfProducts.filter { halfProduct -> halfProduct != item }
-                        )
-                    )
-                }
-        }
+        dishItemOperationHandler.removeItem(
+            item = item,
+            uiState = _uiState.value
+        )
     }
 
     /**
