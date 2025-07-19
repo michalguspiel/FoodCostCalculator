@@ -18,6 +18,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -146,14 +147,20 @@ fun EditHalfProductScreen(
         saveAndNavigate = viewModel::saveAndNavigate
     )
 
-    EditHalfProductScreenContent(state = state, callbacks = callbacks, navController)
+    EditHalfProductScreenContent(
+        state = state,
+        callbacks = callbacks,
+        navController,
+        snackbarHostState
+    )
 }
 
 @Composable
 private fun EditHalfProductScreenContent(
     state: EditHalfProductScreenState,
     callbacks: EditHalfProductScreenCallbacks,
-    navController: NavController
+    navController: NavController,
+    snackbarHostState: SnackbarHostState,
 ) {
     Scaffold(
         topBar = {
@@ -163,7 +170,8 @@ private fun EditHalfProductScreenContent(
                 onDeleteClick = callbacks.onDeleteHalfProductClick,
                 onNameClick = { callbacks.setInteraction(InteractionType.EditName) }
             )
-        }
+        },
+        snackbarHost = { SnackbarHost(snackbarHostState) }
     ) { paddingValues ->
         Box(
             modifier = Modifier.padding(paddingValues),

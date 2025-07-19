@@ -14,7 +14,7 @@ suspend fun SnackbarHostState.showUndoDeleteSnackbar(
         message = message,
         actionLabel = actionLabel,
         duration = SnackbarDuration.Short,
-        withDismissAction = true,
+        withDismissAction = false,
     )
     if (result == SnackbarResult.ActionPerformed) {
         actionPerformed()
