@@ -51,6 +51,9 @@ import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.Locale
 
+/**
+ * Note: Refactor this VM to use ScreenState instead of separate state holders isLoading and errorRes
+ * */
 class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
     private val analyticsRepository: AnalyticsRepository by inject()
@@ -378,6 +381,7 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      * to save each as an ingredient linked to the dish.
      */
     private suspend fun onSaveDish() {
+        resetScreenState()
         _isLoading.update { true }
         withContext(dispatchers.ioDispatcher) {
             try {

@@ -76,9 +76,9 @@ fun CreateDishSummaryScreen(
     val screenState = viewModel.screenState.collectAsState().value
 
     // Handle different screen states
-    when (val state = screenState) {
+    when (screenState) {
         is ScreenState.Interaction -> {
-            when (val interaction = state.interaction) {
+            when (val interaction = screenState.interaction) {
                 is InteractionType.SaveDefaultSettings -> {
                     SaveDefaultSettingsDialog(
                         margin = interaction.margin,
@@ -87,7 +87,8 @@ fun CreateDishSummaryScreen(
                         onDismiss = { viewModel.dismissDefaultSettingsPrompt() }
                     )
                 }
-                else -> { }
+
+                else -> {}
             }
         }
         else -> { }
