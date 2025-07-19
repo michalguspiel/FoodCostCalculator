@@ -11,6 +11,8 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
+import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
@@ -22,6 +24,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.Cr
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm.ExistingProductFormData
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormData
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Constants.UI.SEARCH_DEBOUNCE_MS
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.Utils
@@ -42,6 +45,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -58,6 +62,9 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
     private var _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
+
+    private val hasPromptedDefaultSettings = preferences.hasPromptedDefaultSettings
+        .stateIn(viewModelScope, Eagerly, false)
 
     val onboardingState: StateFlow<OnboardingState?> =
         preferences.onboardingState.stateIn(viewModelScope, Eagerly, null)
@@ -332,7 +339,12 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         _addedProducts.update { currentList ->
             currentList + productAddedToDish
         }
-        analyticsHelper.logProductAddedToDishList(product.name, selectedSuggestedProduct.value, quantityAddedToDish, unit)
+        analyticsHelper.logProductAddedToDishList(
+            product.name,
+            selectedSuggestedProduct.value,
+            quantityAddedToDish,
+            unit
+        )
     }
 
 
@@ -365,17 +377,16 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      * It first saves the main dish entity, then iterates through the added products
      * to save each as an ingredient linked to the dish.
      */
-    fun onSaveDish() {
+    private suspend fun onSaveDish() {
         _isLoading.update { true }
-        analyticsHelper.logDishSaveAttempt(
-            dishName.value,
-            marginPercentInput.value,
-            taxPercentInput.value,
-            addedProducts.value.size
-        )
-
-        viewModelScope.launch(dispatchers.ioDispatcher) {
+        withContext(dispatchers.ioDispatcher) {
             try {
+                analyticsHelper.logDishSaveAttempt(
+                    dishName.value,
+                    marginPercentInput.value,
+                    taxPercentInput.value,
+                    addedProducts.value.size
+                )
                 val dishId = saveDishBase()
 
                 saveDishIngredients(dishId)
@@ -386,6 +397,16 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
             } catch (e: Exception) {
                 analyticsHelper.logDishSaveFailureAnalytics(dishName.value)
                 handleError(e)
+            }
+        }
+    }
+
+    fun onSaveDishClick() {
+        if (!hasPromptedDefaultSettings.value) {
+            showSetAsDefaultSettingsPrompt()
+        } else {
+            viewModelScope.launch {
+                onSaveDish()
             }
         }
     }
@@ -440,6 +461,52 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
         analyticsHelper.logHandleError(throwable, errorResId)
         _errorRes.update { errorResId }
+    }
+
+    /**
+     * Called after successful dish creation to check if we should prompt the user
+     * to save their margin and tax settings as defaults.
+     */
+    private fun showSetAsDefaultSettingsPrompt() {
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.DEFAULT_SETTINGS_PROMPT_SHOWN)
+        updateScreenState(
+            ScreenState.Interaction(
+                InteractionType.SaveDefaultSettings(
+                    margin = marginPercentInput.value,
+                    tax = taxPercentInput.value
+                )
+            )
+        )
+    }
+
+    /**
+     * Saves the current margin and tax values as default settings and marks that we've prompted the user.
+     */
+    fun saveAsDefaultSettings() {
+        viewModelScope.launch(dispatchers.ioDispatcher) {
+            try {
+                preferences.setDefaultMargin(marginPercentInput.value)
+                preferences.setDefaultTax(taxPercentInput.value)
+                preferences.setHasPromptedDefaultSettings(true)
+                analyticsRepository.logEvent(
+                    Constants.Analytics.DishV2.DEFAULT_SETTINGS_SAVED
+                )
+                onSaveDish()
+            } catch (e: Exception) {
+                handleError(e)
+            }
+        }
+    }
+
+    /**
+     * Dismisses the default settings prompt without saving the values.
+     */
+    fun dismissDefaultSettingsPrompt() {
+        viewModelScope.launch(dispatchers.ioDispatcher) {
+            preferences.setHasPromptedDefaultSettings(true)
+            analyticsRepository.logEvent(Constants.Analytics.DishV2.DEFAULT_SETTINGS_DISMISSED)
+            onSaveDish()
+        }
     }
 
     fun dismissError() {

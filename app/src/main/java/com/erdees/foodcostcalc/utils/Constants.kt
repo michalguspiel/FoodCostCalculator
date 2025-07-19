@@ -101,21 +101,24 @@ object Constants {
             const val NEW_PRODUCT_SAVE_SUCCESS_FROM_DISH = "new_product_save_success_from_dish"
             const val NEW_PRODUCT_SAVE_FAILURE_FROM_DISH = "new_product_save_failure_from_dish"
             const val ERROR_DISPLAYED_USER =
-                "error_displayed_user" // When an error is shown to the user
+                "error_displayed_user"
             const val ERROR_TYPE =
-                "error_type"                     // e.g., "InvalidMargin", "Unexpected"
+                "error_type"
             const val ERROR_MESSAGE_RES_ID =
-                "error_message_res_id"       // Resource ID of the error string
+                "error_message_res_id"
             const val SUGGESTION_SELECTED = "suggestion_selected"
             const val SUGGESTIONS_MANUALLY_DISMISSED = "suggestions_manually_dismissed"
 
-            // Parameter names (some might overlap with existing ones, which is fine)
             const val NUMBER_OF_INGREDIENTS = "number_of_ingredients"
             const val DISH_MARGIN = "dish_margin"
             const val DISH_TAX = "dish_tax"
 
             const val ADD_INGREDIENT_CLICKED = "add_ingredient_clicked"
             const val ADD_INGREDIENT_TYPE_INTENT = "add_ingredient_type_intent"
+
+            const val DEFAULT_SETTINGS_PROMPT_SHOWN = "default_settings_prompt_shown"
+            const val DEFAULT_SETTINGS_SAVED = "default_settings_saved"
+            const val DEFAULT_SETTINGS_DISMISSED = "default_settings_dismissed"
         }
 
         object Products {
@@ -146,6 +149,7 @@ object Constants {
         const val SHOW_HALF_PRODUCTS = "show_half_products"
         const val SHOW_PRODUCT_TAX_PERCENT = "show_product_tax_percent"
         const val ONBOARDING_STATE = "onboarding_state"
+        const val HAS_PROMPTED_DEFAULT_SETTINGS = "has_prompted_default_settings"
     }
 
 
