@@ -16,7 +16,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
 import com.erdees.foodcostcalc.ui.screens.dishes.DishesScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScreen
-import com.erdees.foodcostcalc.ui.screens.dishes.createDish.CreateDishScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishStartScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishSummary.CreateDishSummaryScreen
@@ -107,9 +106,6 @@ fun FCCNavigation(
 
         composable<FCCScreen.CreateProduct> {
             CreateProductScreen(navController = navController)
-        }
-        composable<FCCScreen.CreateDish> {
-            CreateDishScreen(navController = navController)
         }
 
         composable<FCCScreen.CreateDishStart>(
