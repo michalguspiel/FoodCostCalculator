@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -46,14 +47,13 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.composables.DetailItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
+import com.erdees.foodcostcalc.ui.composables.UsedItem
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
-import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.UsedItem
 import timber.log.Timber
 
 data class EditHalfProductScreenState(
@@ -84,8 +84,7 @@ data class EditHalfProductScreenCallbacks(
 @Screen
 @Composable
 fun EditHalfProductScreen(
-    navController: NavController,
-    viewModel: EditHalfProductViewModel = viewModel()
+    navController: NavController, viewModel: EditHalfProductViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val screenState by viewModel.screenState.collectAsState()
@@ -107,8 +106,7 @@ fun EditHalfProductScreen(
             message = context.getString(R.string.removed_item, removedItem.item.name),
             actionLabel = context.getString(R.string.undo),
             actionPerformed = { viewModel.undoRemoveItem() },
-            ignored = { viewModel.clearLastRemovedItem() }
-        )
+            ignored = { viewModel.clearLastRemovedItem() })
     }
 
     LaunchedEffect(screenState) {
@@ -149,10 +147,7 @@ fun EditHalfProductScreen(
     )
 
     EditHalfProductScreenContent(
-        state = state,
-        callbacks = callbacks,
-        navController,
-        snackbarHostState
+        state = state, callbacks = callbacks, navController, snackbarHostState
     )
 }
 
@@ -169,13 +164,11 @@ private fun EditHalfProductScreenContent(
                 halfProduct = state.halfProduct,
                 onBackClick = callbacks.onBack,
                 onDeleteClick = callbacks.onDeleteHalfProductClick,
-                onNameClick = { callbacks.setInteraction(InteractionType.EditName) }
-            )
+                onNameClick = { callbacks.setInteraction(InteractionType.EditName) })
         },
     ) { paddingValues ->
         Box(
-            modifier = Modifier.padding(paddingValues),
-            contentAlignment = Center
+            modifier = Modifier.padding(paddingValues), contentAlignment = Center
         ) {
             Column {
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
@@ -183,11 +176,11 @@ private fun EditHalfProductScreenContent(
                         UsedItem(
                             modifier = Modifier.animateItem(),
                             usedItem = item,
+                            currency = state.currency,
                             onRemove = callbacks.removeItem,
                             onEdit = {
                                 callbacks.setInteraction(InteractionType.EditItem(it))
-                            }
-                        )
+                            })
                         HorizontalDivider(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.4f),
                             thickness = 1.dp
@@ -205,12 +198,13 @@ private fun EditHalfProductScreenContent(
                             )
                         }
 
-                        ButtonRow(
-                            modifier = Modifier.padding(end = 12.dp),
-                            primaryButton = {
-                                FCCPrimaryButton(text = stringResource(id = R.string.save)) {
-                                    callbacks.saveHalfProduct()
-                                }
+                        FCCPrimaryButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 24.dp, vertical = 24.dp),
+                            text = stringResource(R.string.save),
+                            onClick = {
+                                callbacks.saveHalfProduct()
                             })
                     }
                     SnackbarHost(snackbarHostState)
@@ -230,30 +224,25 @@ private fun EditHalfProductTopBar(
     onDeleteClick: () -> Unit,
     onNameClick: () -> Unit
 ) {
-    TopAppBar(
-        title = {
-            Text(
-                text = halfProduct?.name ?: "",
-                modifier = Modifier.clickable { onNameClick() })
-        },
-        actions = {
-            IconButton(onClick = onDeleteClick) {
-                Icon(
-                    painter = painterResource(R.drawable.delete_24dp),
-                    contentDescription = stringResource(id = R.string.content_description_remove_half_product)
-                )
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
-                        id = R.string.back
-                    )
-                )
-            }
+    TopAppBar(title = {
+        Text(
+            text = halfProduct?.name ?: "", modifier = Modifier.clickable { onNameClick() })
+    }, actions = {
+        IconButton(onClick = onDeleteClick) {
+            Icon(
+                painter = painterResource(R.drawable.delete_24dp),
+                contentDescription = stringResource(id = R.string.content_description_remove_half_product)
+            )
         }
-    )
+    }, navigationIcon = {
+        IconButton(onClick = onBackClick) {
+            Icon(
+                Icons.AutoMirrored.Sharp.ArrowBack, contentDescription = stringResource(
+                    id = R.string.back
+                )
+            )
+        }
+    })
 }
 
 @Composable
@@ -307,8 +296,7 @@ private fun HandleScreenState(
                         onDismiss = callbacks.resetScreenState,
                         onConfirmDelete = {
                             callbacks.confirmDelete(interaction.itemId)
-                        }
-                    )
+                        })
                 }
 
                 InteractionType.UnsavedChangesConfirmation -> {
@@ -329,9 +317,7 @@ private fun HandleScreenState(
 
 @Composable
 fun HalfProductDetails(
-    halfProductDomain: HalfProductDomain,
-    currency: Currency?,
-    modifier: Modifier = Modifier
+    halfProductDomain: HalfProductDomain, currency: Currency?, modifier: Modifier = Modifier
 ) {
     Row(modifier) {
         DetailItem(

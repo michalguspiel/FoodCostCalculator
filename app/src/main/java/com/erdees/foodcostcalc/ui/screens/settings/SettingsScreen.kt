@@ -61,7 +61,6 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
-import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
@@ -384,12 +383,14 @@ private fun Defaults(
             )
         }
 
-        ButtonRow(primaryButton = {
-            FCCPrimaryButton(
-                text = stringResource(id = R.string.save),
-                enabled = saveButtonEnabled
-            ) { settingsScreenCallbacks.saveSettings() }
-        })
+        FCCPrimaryButton(
+            enabled = saveButtonEnabled,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 24.dp),
+            text = stringResource(R.string.save),
+            onClick = { settingsScreenCallbacks.saveSettings() }
+        )
     }
 }
 

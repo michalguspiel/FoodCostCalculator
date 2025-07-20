@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -51,18 +52,14 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
-import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
-import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
+import com.erdees.foodcostcalc.ui.composables.UsedItem
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
-import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
-import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.ConfirmPopUp
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
@@ -201,6 +198,7 @@ private fun EditDishScreenContent(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -209,6 +207,8 @@ private fun EditDishScreenContent(
                 onNameClick = { actions.setInteraction(InteractionType.EditName) },
                 onDeleteClick = { actions.onDeleteDishClick() },
                 onCopyClick = { actions.onCopyDishClick() },
+                onShareClick = { actions.shareDish(context) },
+                onRecipeClick = { navController.navigate(FCCScreen.Recipe) },
                 onBackClick = { navController.popBackStack() }
             )
         },
@@ -222,6 +222,7 @@ private fun EditDishScreenContent(
                         UsedItem(
                             modifier = Modifier.animateItem(),
                             usedItem = item,
+                            currency = uiState.currency,
                             onRemove = { actions.removeItem(it) },
                             onEdit = {
                                 actions.setInteraction(
@@ -256,14 +257,14 @@ private fun EditDishScreenContent(
                         SnackbarHost(snackbarHostState)
                     }
 
-                    Buttons(
-                        modifier = Modifier.padding(top = 8.dp),
-                        saveDish = { actions.saveDish() },
-                        shareDish = { actions.shareDish(it) },
-                        navigate = {
-                            navController.navigate(FCCScreen.Recipe)
-                        }
-                    )
+                    FCCPrimaryButton(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 24.dp, vertical = 24.dp),
+                        text = stringResource(R.string.save),
+                        onClick = {
+                            actions.saveDish()
+                        })
                 }
             }
 
@@ -428,6 +429,8 @@ private fun EditDishTopBar(
     onNameClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onCopyClick: () -> Unit,
+    onShareClick: () -> Unit,
+    onRecipeClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
@@ -453,6 +456,27 @@ private fun EditDishTopBar(
                     contentDescription = stringResource(R.string.copy_dish)
                 )
             })
+            DropdownMenuItem(text = { Text(stringResource(R.string.share)) }, onClick = {
+                onShareClick()
+                showMenu = false
+            }, leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.share_24dp),
+                    contentDescription = stringResource(R.string.share)
+                )
+            })
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.recipe_button_title)) },
+                onClick = {
+                    onRecipeClick()
+                    showMenu = false
+                },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource(R.drawable.menu_book),
+                        contentDescription = stringResource(R.string.recipe_button_title)
+                    )
+                })
             DropdownMenuItem(text = { Text(stringResource(R.string.remove_dish)) }, onClick = {
                 onDeleteClick()
                 showMenu = false
@@ -471,52 +495,6 @@ private fun EditDishTopBar(
             )
         }
     })
-}
-
-@Composable
-private fun Buttons(
-    saveDish: () -> Unit,
-    shareDish: (Context) -> Unit,
-    navigate: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val context = LocalContext.current
-    ButtonRow(modifier = modifier.padding(end = 12.dp), primaryButton = {
-        FCCPrimaryButton(text = stringResource(R.string.save)) {
-            saveDish()
-        }
-    }, secondaryButton = {
-        FCCOutlinedButton(text = stringResource(R.string.recipe_button_title)) {
-            navigate()
-        }
-    }, tertiaryButton = {
-        FCCTextButton(stringResource(R.string.share)) {
-            shareDish(context)
-        }
-    })
-}
-
-
-@Preview
-@Composable
-private fun UsedItemPreview() {
-    FCCTheme {
-        UsedItem(
-            UsedProductDomain(
-                id = 0, ownerId = 0, item = ProductDomain(
-                    id = 1,
-                    name = "Product",
-                    pricePerUnit = 10.0,
-                    unit = "kg",
-                    tax = 23.0,
-                    waste = 20.0
-                ), quantity = 1.0, quantityUnit = "kg", weightPiece = 1.0
-            ),
-            modifier = Modifier,
-            onEdit = {},
-            onRemove = {},
-        )
-    }
 }
 
 @Preview(name = "Edit Dish Screen States", showBackground = true)

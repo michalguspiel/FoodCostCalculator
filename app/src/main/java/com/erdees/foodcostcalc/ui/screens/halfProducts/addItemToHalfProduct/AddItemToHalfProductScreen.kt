@@ -53,7 +53,6 @@ import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
-import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.SelectedTab
 import com.erdees.foodcostcalc.utils.UnitsUtils
@@ -167,18 +166,16 @@ fun AddItemToHalfProductScreen(
                 ) {
                     Column {
                         SnackbarHost(hostState = snackbarHostState)
-                        ButtonRow(
-                            modifier = Modifier.padding(bottom = 24.dp, top = 12.dp),
-                            applyDefaultPadding = false,
-                            primaryButton = {
-                            FCCPrimaryButton(
-                                enabled = addButtonEnabled,
-                                onClick = { viewModel.addHalfProduct(halfProductId) },
-                                text = stringResource(id = R.string.add)
-                            )
-                        })
+                        FCCPrimaryButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 24.dp),
+                            enabled = addButtonEnabled,
+                            text = stringResource(R.string.add),
+                            onClick = {
+                                viewModel.addHalfProduct(halfProductId)
+                            })
                     }
-
                 }
             }
 

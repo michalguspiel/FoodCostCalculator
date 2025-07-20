@@ -46,7 +46,6 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.FCCDeleteConfirmationDialo
 import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
-import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import timber.log.Timber
 
@@ -179,15 +178,15 @@ private fun EditProductContent(
             onWasteChange = onWasteChange
         )
 
-        ButtonRow(
-            primaryButton = {
-                FCCPrimaryButton(
-                    enabled = saveButtonEnabled,
-                    onClick = onSaveClick,
-                    text = stringResource(id = R.string.save)
-                )
-            }
-        )
+        FCCPrimaryButton(
+            enabled = saveButtonEnabled,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 24.dp),
+            text = stringResource(R.string.save),
+            onClick = {
+                onSaveClick()
+            })
     }
 }
 
