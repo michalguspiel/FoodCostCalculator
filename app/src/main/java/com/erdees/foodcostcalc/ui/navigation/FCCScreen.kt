@@ -51,9 +51,6 @@ sealed class FCCScreen(
     ) : FCCScreen()
 
     @Serializable
-    data object CreateDish : FCCScreen()
-
-    @Serializable
     data object CreateDishStart : FCCScreen()
 
     @Serializable
