@@ -51,10 +51,9 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
-import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
+import com.erdees.foodcostcalc.ui.composables.UsedItem
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
@@ -222,6 +221,7 @@ private fun EditDishScreenContent(
                         UsedItem(
                             modifier = Modifier.animateItem(),
                             usedItem = item,
+                            currency = uiState.currency,
                             onRemove = { actions.removeItem(it) },
                             onEdit = {
                                 actions.setInteraction(
@@ -497,27 +497,7 @@ private fun Buttons(
 }
 
 
-@Preview
-@Composable
-private fun UsedItemPreview() {
-    FCCTheme {
-        UsedItem(
-            UsedProductDomain(
-                id = 0, ownerId = 0, item = ProductDomain(
-                    id = 1,
-                    name = "Product",
-                    pricePerUnit = 10.0,
-                    unit = "kg",
-                    tax = 23.0,
-                    waste = 20.0
-                ), quantity = 1.0, quantityUnit = "kg", weightPiece = 1.0
-            ),
-            modifier = Modifier,
-            onEdit = {},
-            onRemove = {},
-        )
-    }
-}
+
 
 @Preview(name = "Edit Dish Screen States", showBackground = true)
 @PreviewLightDark

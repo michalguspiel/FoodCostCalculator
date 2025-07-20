@@ -1,9 +1,12 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish
+package com.erdees.foodcostcalc.ui.composables
 
+import android.icu.util.Currency
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.sharp.Delete
 import androidx.compose.material.icons.sharp.Edit
@@ -26,8 +29,14 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.domain.model.UsedItem
-
+import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ui.composables.dividers.FCCDecorativeCircle
+import com.erdees.foodcostcalc.ui.theme.FCCTheme
+import java.util.Locale
 
 /**
  * A composable that displays a single item in a list which can be swiped to dismiss.
@@ -53,6 +62,7 @@ import com.erdees.foodcostcalc.domain.model.UsedItem
 @Composable
 fun UsedItem(
     usedItem: UsedItem,
+    currency: Currency?,
     onRemove: (UsedItem) -> Unit,
     onEdit: (UsedItem) -> Unit,
     modifier: Modifier = Modifier,
@@ -103,7 +113,19 @@ fun UsedItem(
                     Text(text = usedItem.item.name)
                 },
                 supportingContent = {
-                    Text(text = usedItem.quantity.toString() + " " + usedItem.quantityUnit)
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = usedItem.quantity.toString() + " " + usedItem.quantityUnit
+                        )
+                        FCCDecorativeCircle(Modifier.padding(horizontal = 6.dp))
+                        Text(
+                            text = usedItem.formattedTotalPricePerServing(
+                                1.0,
+                                currency = currency
+                            )
+                        )
+                    }
+
                 },
                 trailingContent = {
                     IconButton(onClick = { onEdit(usedItem) }) {
@@ -111,4 +133,27 @@ fun UsedItem(
                     }
                 })
         })
+}
+
+@Preview
+@Composable
+private fun UsedItemPreview() {
+    FCCTheme {
+        UsedItem(
+            UsedProductDomain(
+                id = 0, ownerId = 0, item = ProductDomain(
+                    id = 1,
+                    name = "Product",
+                    pricePerUnit = 10.0,
+                    unit = "kg",
+                    tax = 23.0,
+                    waste = 20.0
+                ), quantity = 1.0, quantityUnit = "kg", weightPiece = 1.0
+            ),
+            currency = Currency.getInstance(Locale.getDefault()),
+            modifier = Modifier,
+            onEdit = {},
+            onRemove = {},
+        )
+    }
 }

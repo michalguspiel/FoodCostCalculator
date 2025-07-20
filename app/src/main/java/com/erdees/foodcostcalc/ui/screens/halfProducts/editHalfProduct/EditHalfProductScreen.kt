@@ -53,7 +53,7 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.UsedItem
+import com.erdees.foodcostcalc.ui.composables.UsedItem
 import timber.log.Timber
 
 data class EditHalfProductScreenState(
@@ -183,6 +183,7 @@ private fun EditHalfProductScreenContent(
                         UsedItem(
                             modifier = Modifier.animateItem(),
                             usedItem = item,
+                            currency = state.currency,
                             onRemove = callbacks.removeItem,
                             onEdit = {
                                 callbacks.setInteraction(InteractionType.EditItem(it))
