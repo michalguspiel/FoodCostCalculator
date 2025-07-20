@@ -23,7 +23,7 @@ fun FCCDecorativeCircle(modifier: Modifier = Modifier) {
 
 @Preview
 @Composable
-fun FCCDecorativeCirclePreview() {
+private fun FCCDecorativeCirclePreview() {
     FCCTheme {
         Box(modifier = Modifier.size(24.dp), contentAlignment = Alignment.Center) {
             FCCDecorativeCircle(
