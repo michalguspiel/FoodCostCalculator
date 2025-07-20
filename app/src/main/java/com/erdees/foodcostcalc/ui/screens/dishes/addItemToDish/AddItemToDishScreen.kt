@@ -41,7 +41,6 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
-import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
 
 enum class SelectedTab {
@@ -139,7 +138,9 @@ fun AddItemToDishScreen(
                         Text(
                             text = stringResource(id = R.string.add_product),
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 12.dp),
                             textAlign = TextAlign.Start
                         )
                     }
@@ -162,18 +163,16 @@ fun AddItemToDishScreen(
 
                     Column {
                         SnackbarHost(hostState = snackbarHostState)
-                        ButtonRow(
-                            modifier = Modifier.padding(bottom = 24.dp, top = 12.dp),
-                            applyDefaultPadding = false,
-                            primaryButton = {
-                            FCCPrimaryButton(
-                                onClick = { viewModel.addItem(dishId) },
-                                text = stringResource(id = R.string.add),
-                                enabled = addButtonEnabled
-                            )
-                        })
+                        FCCPrimaryButton(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 24.dp),
+                            enabled = addButtonEnabled,
+                            text = stringResource(R.string.add),
+                            onClick = {
+                                viewModel.addItem(dishId)
+                            })
                     }
-
                 }
             } // Column
 
