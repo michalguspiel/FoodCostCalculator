@@ -263,7 +263,7 @@ private fun EditDishScreenContent(
                             .padding(horizontal = 24.dp, vertical = 24.dp),
                         text = stringResource(R.string.save),
                         onClick = {
-                            actions.saveDish
+                            actions.saveDish()
                         })
                 }
             }
