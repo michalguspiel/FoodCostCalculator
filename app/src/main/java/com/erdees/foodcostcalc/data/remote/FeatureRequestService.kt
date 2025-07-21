@@ -48,7 +48,6 @@ class FeatureRequestService {
                 if (error != null) {
                     Timber.e(error, "Error listening for approved feature requests")
                     trySend(FirestoreResult.Error(error))
-                    close(error) // Close the flow on error
                     return@addSnapshotListener
                 }
 
