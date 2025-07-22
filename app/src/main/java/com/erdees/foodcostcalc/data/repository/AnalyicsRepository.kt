@@ -17,6 +17,9 @@ import timber.log.Timber
  * @see AnalyticsRepositoryImpl for the implementation details.
  */
 interface AnalyticsRepository {
+
+    fun setUserProperty(name: String, value: String?)
+
     fun logEvent(event: String)
 
     fun logEvent(event: String, bundle: Bundle?)
@@ -26,6 +29,15 @@ interface AnalyticsRepository {
 
 class AnalyticsRepositoryImpl(private val firebaseAnalytics: FirebaseAnalytics) :
     AnalyticsRepository {
+
+    override fun setUserProperty(name: String, value: String?) {
+        if (!BuildConfig.DEBUG) {
+            firebaseAnalytics.setUserProperty(name, value)
+        } else {
+            Timber.d("Set user property: $name = $value")
+        }
+    }
+
     override fun logEvent(event: String) {
         this.logEvent(event, null)
     }

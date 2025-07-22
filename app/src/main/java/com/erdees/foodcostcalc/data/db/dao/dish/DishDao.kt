@@ -31,4 +31,7 @@ interface DishDao {
 
     @Query("UPDATE dishes SET recipeId=:recipeId WHERE dishId=:dishId ")
     suspend fun update(recipeId: Long, dishId: Long)
+
+    @Query("SELECT COUNT(*) FROM dishes")
+    suspend fun getDishCount(): Int
 }

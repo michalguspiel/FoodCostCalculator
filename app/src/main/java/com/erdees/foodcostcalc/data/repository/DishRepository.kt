@@ -15,6 +15,8 @@ interface DishRepository {
     val dishes: Flow<List<CompleteDish>>
     suspend fun getDish(id: Long): Flow<CompleteDish>
 
+    suspend fun getDishCount(): Int
+
     suspend fun addDish(dish: DishBase) : Long
     suspend fun deleteDish(dishId: Long)
     suspend fun updateDish(dish: DishBase)
@@ -34,6 +36,9 @@ class DishRepositoryImpl : DishRepository, KoinComponent {
     override val dishes: Flow<List<CompleteDish>> = dishDao.getCompleteDishes()
 
     override suspend fun getDish(id: Long) = dishDao.getCompleteDish(id)
+
+    override suspend fun getDishCount(): Int = dishDao.getDishCount()
+
 
     override suspend fun addDish(dish: DishBase): Long = dishDao.addDish(dish)
 

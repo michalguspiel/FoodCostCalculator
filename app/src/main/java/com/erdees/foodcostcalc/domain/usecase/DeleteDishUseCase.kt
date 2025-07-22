@@ -20,7 +20,7 @@ class DeleteDishUseCase(
         withContext(myDispatchers.ioDispatcher) {
             try {
                 dishRepository.deleteDish(dishId)
-                logDishDeletionEvent()
+                logDishDeletionEvent(dishRepository.getDishCount())
 
                 Result.success(
                     DishActionResult(
@@ -33,7 +33,11 @@ class DeleteDishUseCase(
             }
         }
 
-    private fun logDishDeletionEvent() {
+    private fun logDishDeletionEvent(dishCount: Int) {
         analyticsRepository.logEvent(Constants.Analytics.DishV2.DELETED, null)
+        analyticsRepository.setUserProperty(
+            Constants.Analytics.UserProperties.DISH_COUNT,
+            dishCount.toString()
+        )
     }
 }

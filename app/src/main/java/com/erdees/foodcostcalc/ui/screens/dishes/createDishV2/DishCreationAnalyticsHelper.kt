@@ -78,7 +78,7 @@ class DishCreationAnalyticsHelper(val analyticsRepository: AnalyticsRepository) 
             })
     }
 
-    fun logDishSaveSuccess(dishName: String, addedProductsSize: Int) {
+    fun logDishSaveSuccess(dishName: String, addedProductsSize: Int, dishCount: Int) {
         analyticsRepository.logEvent(
             Constants.Analytics.DishV2.DISH_SAVE_SUCCESS,
             Bundle().apply {
@@ -91,6 +91,7 @@ class DishCreationAnalyticsHelper(val analyticsRepository: AnalyticsRepository) 
         analyticsRepository.logEvent(Constants.Analytics.DISH_CREATED, Bundle().apply {
             putString(Constants.Analytics.DISH_NAME, dishName)
         })
+        analyticsRepository.setUserProperty(Constants.Analytics.UserProperties.DISH_COUNT, dishCount.toString())
     }
 
     fun logDishSaveAttempt(

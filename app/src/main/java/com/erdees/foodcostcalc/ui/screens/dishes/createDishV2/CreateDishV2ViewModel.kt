@@ -397,7 +397,11 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
                 _isLoading.update { false }
                 _saveDishSuccess.update { dishId }
-                analyticsHelper.logDishSaveSuccess(dishName.value, addedProducts.value.size)
+                analyticsHelper.logDishSaveSuccess(
+                    dishName.value,
+                    addedProducts.value.size,
+                    dishRepository.getDishCount()
+                )
             } catch (e: Exception) {
                 analyticsHelper.logDishSaveFailureAnalytics(dishName.value)
                 handleError(e)
