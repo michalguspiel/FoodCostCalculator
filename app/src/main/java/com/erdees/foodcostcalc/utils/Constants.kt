@@ -16,6 +16,11 @@ object Constants {
     }
 
     object Analytics {
+
+        object UserProperties {
+            const val DISH_COUNT = "dish_count"
+        }
+
         const val DISH_CREATED = "dish_created"
         const val HALF_PRODUCT_CREATED = "half_product_created"
         const val PRODUCT_CREATED = "product_created"
