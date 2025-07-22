@@ -148,10 +148,16 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     fun save() {
         _screenState.value = ScreenState.Loading<Nothing>()
         try {
-            viewModelScope.launch(Dispatchers.Default) {
-                val newProduct = product.value?.toProductBase()
-                if (newProduct == null) {
-                    _screenState.value = ScreenState.Error(Error(NumberFormatException()))
+            viewModelScope.launch(myDispatchers.defaultDispatcher) {
+                val productValue = product.value
+                if (productValue == null) {
+                    _screenState.value = ScreenState.Error(Error(NullPointerException("Product is null")))
+                    return@launch
+                }
+                val newProduct = try {
+                    productValue.toProductBase()
+                } catch (exception: NumberFormatException) {
+                    _screenState.value = ScreenState.Error(Error(exception))
                     return@launch
                 }
                 updateProductInRepository(newProduct)
@@ -166,7 +172,7 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      * Switches to IO dispatcher and updates product in repository
      * */
     private suspend fun updateProductInRepository(productBase: ProductBase) {
-        withContext(Dispatchers.IO) {
+        withContext(myDispatchers.ioDispatcher) {
             productRepository.editProduct(productBase)
         }
     }
