@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm
+package com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,16 +29,6 @@ import com.erdees.foodcostcalc.ui.composables.fields.UnitField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onNumericValueChange
-data class NewProductFormState(
-    val productName: String,
-    val dishName: String,
-    val productCreationUnits: Set<String>,
-    val productAdditionUnits: Set<String>,
-    val formData: NewProductFormData,
-    val isAddButtonEnabled: Boolean,
-    val productCreationDropdownExpanded: Boolean,
-    val productAdditionDropdownExpanded: Boolean,
-)
 
 @Composable
 fun NewProductForm(

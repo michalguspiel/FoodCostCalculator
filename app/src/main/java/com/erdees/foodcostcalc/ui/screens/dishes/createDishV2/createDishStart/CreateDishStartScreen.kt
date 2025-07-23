@@ -67,11 +67,11 @@ import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm.ExistingProductForm
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm.ExistingProductFormViewModel
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductForm
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormState
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingProductForm
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingProductFormViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductForm
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormState
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormViewModel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch

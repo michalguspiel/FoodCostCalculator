@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm
+package com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent
 
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel

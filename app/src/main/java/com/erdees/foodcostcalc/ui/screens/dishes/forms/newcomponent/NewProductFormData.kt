@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm
+package com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent
 
 data class NewProductFormData(
     val purchasePrice: String = "",

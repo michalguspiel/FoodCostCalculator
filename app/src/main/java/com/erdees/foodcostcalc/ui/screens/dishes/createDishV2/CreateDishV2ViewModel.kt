@@ -21,8 +21,8 @@ import com.erdees.foodcostcalc.ui.errors.InvalidProductPriceException
 import com.erdees.foodcostcalc.ui.errors.InvalidTaxFormatException
 import com.erdees.foodcostcalc.ui.errors.UserReportableError
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishIntent
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm.ExistingProductFormData
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm.NewProductFormData
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingProductFormData
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormData
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Constants.UI.SEARCH_DEBOUNCE_MS

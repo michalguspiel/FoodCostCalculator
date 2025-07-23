@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm
+package com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent
 
 data class ExistingProductFormData(
     val quantityForDish: String = "",

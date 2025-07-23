@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.newProductForm
+package com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent
 
 import android.content.res.Resources
 import androidx.lifecycle.ViewModel
@@ -62,7 +62,6 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
                 }
         }
     }
-
 
     /**
      * Function used to prepare selection of units for the product creation.

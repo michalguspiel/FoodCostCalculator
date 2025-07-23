@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.existingProductForm // Or a more general location
+package com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent // Or a more general location
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
