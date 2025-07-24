@@ -232,7 +232,6 @@ fun CreateDishStartScreen(
                         onDismiss = {
                             viewModel.onModalDismissed()
                         }
-
                     )
                 }
             }
