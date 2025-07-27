@@ -10,8 +10,8 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
@@ -22,6 +22,8 @@ import com.erdees.foodcostcalc.domain.usecase.SaveDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.ShareDishUseCase
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.IS_COPIED
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingItemFormData
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeHandler
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeUpdater
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeViewMode
@@ -191,7 +193,12 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun resetScreenState() {
-        _uiState.update { it.copy(screenState = ScreenState.Idle) }
+        _uiState.update {
+            it.copy(
+                screenState = ScreenState.Idle,
+                componentSelection = null,
+            )
+        }
     }
 
     fun updateItemQuantity() {
@@ -236,7 +243,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      *
      * @param item The item to remove.
      * */
-    fun removeItem(item: UsedItem) {
+    fun removeItem(item: ItemUsageEntry) {
         Timber.i("removeItem: $item")
         dishItemOperationHandler.removeItem(
             item = item,
@@ -432,5 +439,24 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         // Set the pending intent to navigate back after saving
         // Save dish will trigger the success state, which will then check pendingIntent
         saveDish(DishDetailsActionResultType.UPDATED_NAVIGATE)
+    }
+
+    fun setComponentSelection(componentSelection: ComponentSelection?) {
+        _uiState.update { it.copy(componentSelection = componentSelection) }
+    }
+
+    fun onAddExistingComponent(
+        existingComponentFormData: ExistingItemFormData,
+    ) {
+        val componentSelection = _uiState.value.componentSelection ?: run {
+            // todo throw error state
+            return
+        }
+        dishItemOperationHandler.onAddExistingComponent(
+            uiState.value,
+            existingComponentFormData,
+            componentSelection
+        )
+        resetScreenState()
     }
 }

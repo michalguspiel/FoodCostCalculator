@@ -21,7 +21,7 @@ import com.erdees.foodcostcalc.ui.errors.InvalidProductPriceException
 import com.erdees.foodcostcalc.ui.errors.InvalidTaxFormatException
 import com.erdees.foodcostcalc.ui.errors.UserReportableError
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishIntent
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingProductFormData
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingItemFormData
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormData
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
 import com.erdees.foodcostcalc.utils.Constants
@@ -53,6 +53,7 @@ import java.util.Locale
 
 /**
  * Note: Refactor this VM to use ScreenState instead of separate state holders isLoading and errorRes
+ * TODO: Fix this so that it is able to handle adding half products as ingredients as well.
  * */
 class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
@@ -301,7 +302,7 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      *
      * @param existingProductFormData Data containing the quantity and unit for the product in the dish.
      */
-    fun onAddExistingProductClick(existingProductFormData: ExistingProductFormData) {
+    fun onAddExistingProductClick(existingProductFormData: ExistingItemFormData) {
         _isLoading.update { true }
         viewModelScope.launch {
             try {

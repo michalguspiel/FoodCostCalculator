@@ -1,18 +1,23 @@
 package com.erdees.foodcostcalc.domain.model
 
 
+/**
+ * TODO Refactor usage of this to split per feature instead of generic one for all.
+ * TODO This is becoming quite large and unwieldy.
+ * */
 sealed class InteractionType {
     data object EditTax : InteractionType()
     data object EditMargin : InteractionType()
     data object EditTotalPrice : InteractionType()
     data object EditName : InteractionType()
-    data class EditItem(val usedItem: UsedItem) : InteractionType()
+    data class EditItem(val usedItem: ItemUsageEntry) : InteractionType()
     data class EditQuantity(val itemId: Long) : InteractionType()
     data object ChangeServings : InteractionType()
     data object UnsavedChangesConfirmation : InteractionType()
     data object UnsavedChangesConfirmationBeforeCopy : InteractionType()
     data class CopyDish(val prefilledName: String) : InteractionType()
     data class SaveDefaultSettings(val margin: String, val tax: String) : InteractionType()
+    data object ContextualAddComponent : InteractionType()
 
     data object CalculateWaste : InteractionType()
     data object CalculatePiecePrice : InteractionType()

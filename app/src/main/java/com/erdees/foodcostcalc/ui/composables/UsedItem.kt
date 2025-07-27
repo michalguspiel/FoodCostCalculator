@@ -31,7 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.erdees.foodcostcalc.domain.model.UsedItem
+import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCDecorativeCircle
@@ -61,10 +61,10 @@ import java.util.Locale
  */
 @Composable
 fun UsedItem(
-    usedItem: UsedItem,
+    usedItem: ItemUsageEntry,
     currency: Currency?,
-    onRemove: (UsedItem) -> Unit,
-    onEdit: (UsedItem) -> Unit,
+    onRemove: (ItemUsageEntry) -> Unit,
+    onEdit: (ItemUsageEntry) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val currentOnRemove by rememberUpdatedState(onRemove)

@@ -156,6 +156,8 @@
     <string name="more_options">More Options</string>
     <string name="removed_item">Removed %1$s</string>
 
+    <string name="add_product_with_name">Add Ingredient: %1$s</string>
+    <string name="add_half_product_with_name">Add Half Product: %1$s</string>
     <string name="create_new_product">Create new ingredient</string>
     <string name="add_component">Add Component</string>
     <string name="add_component_hint">Add a component to your dish</string>

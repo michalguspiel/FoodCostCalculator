@@ -97,7 +97,7 @@ class InteractionHandler {
                     )
                 )
 
-            else -> {}
+            else -> updateUiState(uiState.copy(screenState = ScreenState.Interaction(interaction)))
         }
     }
 }

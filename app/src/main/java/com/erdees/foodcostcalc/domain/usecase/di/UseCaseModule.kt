@@ -29,6 +29,8 @@ val useCaseModule = module {
     factory {
         SaveDishUseCase(
             dishRepository = get(),
+            productRepository = get(),
+            halfProductRepository = get(),
             myDispatchers = get()
         )
     }

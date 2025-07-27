@@ -3,7 +3,9 @@ package com.erdees.foodcostcalc.domain.model.dish
 import android.icu.util.Currency
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.domain.model.Item
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
 import com.erdees.foodcostcalc.utils.Utils
@@ -11,6 +13,11 @@ import kotlinx.serialization.Serializable
 import timber.log.Timber
 import kotlin.math.abs
 
+/**
+ *
+ * @param productsNotSaved added to the dish by user but not saved yet.
+ * @param halfProductsNotSaved added to the dish by user but not saved yet.
+ * */
 @Keep
 @Serializable
 data class DishDomain(
@@ -20,17 +27,15 @@ data class DishDomain(
     val taxPercent: Double,
     val products: List<UsedProductDomain>,
     val halfProducts: List<UsedHalfProductDomain>,
+    val productsNotSaved: List<ProductAddedToDish> = emptyList(),
+    val halfProductsNotSaved: List<HalfProductAddedToDish> = emptyList(),
     val recipe: RecipeDomain?,
 ) : Item {
-    val foodCost: Double = products.sumOf {
-        it.foodCost.also { totalPrice ->
-            Timber.v("Product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
-        }
-    } + halfProducts.sumOf {
-        it.foodCost.also { totalPrice ->
-            Timber.v("Half product: ${it}, quantity : ${it.quantity}, totalPrice: $totalPrice")
-        }
-    }
+    val foodCost: Double =
+        products.sumOf { it.foodCost } +
+                halfProducts.sumOf { it.foodCost } +
+                productsNotSaved.sumOf { it.foodCost } +
+                halfProductsNotSaved.sumOf { it.foodCost }
 
     fun formattedFoodCostPerServings(amountOfServings: Int, currency: Currency?): String {
         return Utils.formatPrice(foodCost * amountOfServings, currency)
@@ -99,6 +104,7 @@ data class DishDomain(
         )
         return bestAttemptDish
     }
+
     companion object {
         private const val MAX_ITERATIONS = 5
         private const val TOLERANCE = 0.001

@@ -10,10 +10,10 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductHalfProduct
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.domain.model.JustRemovedItem
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.ScreenState.Interaction
-import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.HALF_PRODUCT_ID_KEY
@@ -50,7 +50,7 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
 
-    private var currentlyEditedItem: MutableStateFlow<UsedItem?> = MutableStateFlow(null)
+    private var currentlyEditedItem: MutableStateFlow<ItemUsageEntry?> = MutableStateFlow(null)
 
     private var _editableQuantity: MutableStateFlow<String> = MutableStateFlow("")
     val editableQuantity: StateFlow<String> = _editableQuantity
@@ -140,7 +140,7 @@ class EditHalfProductViewModel(private val savedStateHandle: SavedStateHandle) :
      *
      * @param item The item to remove.
      * */
-    fun removeItem(item: UsedItem) {
+    fun removeItem(item: ItemUsageEntry) {
         val halfProduct = halfProduct.value ?: return
         val index = halfProduct.products.indexOf(item)
         _halfProduct.value = halfProduct.copy(products = halfProduct.products.filter { it != item })

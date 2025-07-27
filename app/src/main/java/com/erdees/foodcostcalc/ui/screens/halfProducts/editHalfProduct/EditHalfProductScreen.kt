@@ -41,6 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
@@ -69,7 +70,7 @@ data class EditHalfProductScreenCallbacks(
     val onBack: () -> Unit,
     val onDeleteHalfProductClick: () -> Unit,
     val setInteraction: (InteractionType) -> Unit,
-    val removeItem: (UsedItem) -> Unit,
+    val removeItem: (ItemUsageEntry) -> Unit,
     val saveHalfProduct: () -> Unit,
     val resetScreenState: () -> Unit,
     val setEditableQuantity: (String) -> Unit,

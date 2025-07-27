@@ -67,8 +67,8 @@ import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingProductForm
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingProductFormViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentForm
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductForm
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormViewModel
@@ -85,7 +85,7 @@ fun CreateDishStartScreen(
     navController: NavController,
     viewModel: CreateDishV2ViewModel = viewModel(),
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
-    existingProductFormViewModel: ExistingProductFormViewModel = viewModel(),
+    existingProductFormViewModel: ExistingComponentFormViewModel = viewModel(),
 ) {
     val dishName by viewModel.dishName.collectAsState()
     val newProductName by viewModel.newProductName.collectAsState()
@@ -136,7 +136,7 @@ fun CreateDishStartScreen(
 
     LaunchedEffect(selectedProduct) {
         selectedProduct?.let {
-            existingProductFormViewModel.setProductContext(it, context.resources)
+            existingProductFormViewModel.setItemContext(it, context.resources)
         }
     }
 
@@ -210,18 +210,18 @@ fun CreateDishStartScreen(
                         viewModel.onModalDismissed()
                     }, sheetState = existingProductFormSheetState
                 ) {
-                    ExistingProductForm(
+                    ExistingComponentForm(
                         formData = existingProductFormViewModel.formData.collectAsState().value,
                         isAddButtonEnabled = existingProductFormViewModel.isAddButtonEnabled.collectAsState().value,
                         compatibleUnitsForDish = existingProductFormViewModel.compatibleUnitsForDish.collectAsState().value,
                         unitForDishDropdownExpanded = existingProductFormViewModel.unitForDishDropdownExpanded.collectAsState().value,
-                        selectedProduct = (userIntent as CreateDishIntent.AddProduct).product,
+                        selectedComponent = (userIntent as CreateDishIntent.AddProduct).product,
                         dishName = dishName,
                         onFormDataChange = existingProductFormViewModel::updateFormData,
                         onUnitForDishDropdownExpandedChange = {
                             existingProductFormViewModel.unitForDishDropdownExpanded.value = it
                         },
-                        onSaveIngredient = { data ->
+                        onAddComponent = { data ->
                             scope.launch {
                                 existingProductFormSheetState.hide()
                             }.invokeOnCompletion {
@@ -229,7 +229,7 @@ fun CreateDishStartScreen(
                                 existingProductFormViewModel.onAddIngredientClick()
                             }
                         },
-                        onDismiss = {
+                        onCancel = {
                             viewModel.onModalDismissed()
                         }
                     )

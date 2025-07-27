@@ -1,6 +1,8 @@
 package com.erdees.foodcostcalc.domain.usecase
 
 import com.erdees.foodcostcalc.data.repository.DishRepository
+import com.erdees.foodcostcalc.data.repository.HalfProductRepository
+import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishBase
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
@@ -14,6 +16,8 @@ import kotlinx.coroutines.withContext
 
 class SaveDishUseCase(
     private val dishRepository: DishRepository,
+    private val productRepository: ProductRepository,
+    private val halfProductRepository: HalfProductRepository,
     private val myDispatchers: MyDispatchers
 ) {
     suspend operator fun invoke(
@@ -42,6 +46,13 @@ class SaveDishUseCase(
 
             editedProducts.forEach { dishRepository.updateProductDish(it) }
             editedHalfProducts.forEach { dishRepository.updateHalfProductDish(it) }
+
+            dish.productsNotSaved.map { it.toProductDish(dish.id) }.forEach {
+                productRepository.addProductDish(it)
+            }
+            dish.halfProductsNotSaved.map { it.toHalfProductDish(dish.id) }.forEach {
+                halfProductRepository.addHalfProductDish(it)
+            }
 
             dishRepository.updateDish(dish.toDishBase())
 

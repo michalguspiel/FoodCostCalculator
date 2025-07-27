@@ -1,9 +1,15 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
+import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.domain.model.JustRemovedItem
-import com.erdees.foodcostcalc.domain.model.UsedItem
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductAddedToDish
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
+import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingItemFormData
 import timber.log.Timber
 
 class DishItemOperationHandler(
@@ -63,7 +69,7 @@ class DishItemOperationHandler(
      * @param uiState The current UI state of the dish details screen
      */
     fun removeItem(
-        item: UsedItem,
+        item: ItemUsageEntry,
         uiState: DishDetailsUiState
     ) {
         val currentDish = uiState.dish
@@ -90,6 +96,30 @@ class DishItemOperationHandler(
                 updateUiState(
                     uiState.copy(
                         dish = currentDish.copy(halfProducts = updatedHalfProducts),
+                        lastRemovedItem = JustRemovedItem(item, index)
+                    )
+                )
+            }
+
+            is ProductAddedToDish -> {
+                val index = currentDish.productsNotSaved.indexOf(item)
+                val updatedProductsNotSaved =
+                    currentDish.productsNotSaved.filter { it != item }
+                updateUiState(
+                    uiState.copy(
+                        dish = currentDish.copy(productsNotSaved = updatedProductsNotSaved),
+                        lastRemovedItem = JustRemovedItem(item, index)
+                    )
+                )
+            }
+
+            is HalfProductAddedToDish -> {
+                val index = currentDish.halfProductsNotSaved.indexOf(item)
+                val updatedHalfProductsNotSaved =
+                    currentDish.halfProductsNotSaved.filter { it != item }
+                updateUiState(
+                    uiState.copy(
+                        dish = currentDish.copy(halfProductsNotSaved = updatedHalfProductsNotSaved),
                         lastRemovedItem = JustRemovedItem(item, index)
                     )
                 )
@@ -130,6 +160,85 @@ class DishItemOperationHandler(
                     )
                 )
             }
+
+            is ProductAddedToDish -> {
+                val updatedProductsNotSaved =
+                    currentDish.productsNotSaved.toMutableList().apply { add(item.index, item.item) }
+                updateUiState(
+                    uiState.copy(
+                        dish = currentDish.copy(productsNotSaved = updatedProductsNotSaved),
+                        lastRemovedItem = null
+                    )
+                )
+            }
+
+            is HalfProductAddedToDish -> {
+                val updatedHalfProductsNotSaved =
+                    currentDish.halfProductsNotSaved.toMutableList().apply { add(item.index, item.item) }
+                updateUiState(
+                    uiState.copy(
+                        dish = currentDish.copy(halfProductsNotSaved = updatedHalfProductsNotSaved),
+                        lastRemovedItem = null
+                    )
+                )
+            }
         }
+    }
+
+    fun onAddExistingComponent(
+        uiState: DishDetailsUiState,
+        existingComponentFormData: ExistingItemFormData,
+        selectedComponent: ComponentSelection
+    ) {
+        val existingComponent = selectedComponent as? ComponentSelection.ExistingComponent ?: return
+        when (existingComponent.item) {
+            is ProductDomain -> {
+                addProduct(uiState, existingComponentFormData, existingComponent.item)
+            }
+
+            is HalfProductDomain -> {
+                addHalfProduct(uiState, existingComponentFormData, existingComponent.item)
+            }
+        }
+    }
+
+    private fun addProduct(
+        uiState: DishDetailsUiState,
+        existingComponentFormData: ExistingItemFormData,
+        product: ProductDomain,
+    ) {
+        val dish = uiState.dish ?: return
+        val quantityAddedToDish = existingComponentFormData.quantityForDish.toDoubleOrNull()
+            ?: error("Quantity for the product in the dish cannot be empty or invalid.")
+        val item = ProductAddedToDish(
+            item = product,
+            quantity = quantityAddedToDish,
+            quantityUnit = existingComponentFormData.unitForDish
+        )
+        val updatedProductsNotSaved =
+            dish.productsNotSaved.toMutableList().apply { add(item) }
+        updateUiState(
+            uiState.copy(dish = dish.copy(productsNotSaved = updatedProductsNotSaved))
+        )
+    }
+
+    private fun addHalfProduct(
+        uiState: DishDetailsUiState,
+        existingComponentFormData: ExistingItemFormData,
+        halfProduct: HalfProductDomain
+    ) {
+        val dish = uiState.dish ?: return
+        val quantityAddedToDish = existingComponentFormData.quantityForDish.toDoubleOrNull()
+            ?: error("Quantity for the product in the dish cannot be empty or invalid.")
+        val item = HalfProductAddedToDish(
+            item = halfProduct,
+            quantity = quantityAddedToDish,
+            quantityUnit = existingComponentFormData.unitForDish
+        )
+        val updatedHalfProductsNotSaved =
+            dish.halfProductsNotSaved.toMutableList().apply { add(item) }
+        updateUiState(
+            uiState.copy(dish = dish.copy(halfProductsNotSaved = updatedHalfProductsNotSaved))
+        )
     }
 }

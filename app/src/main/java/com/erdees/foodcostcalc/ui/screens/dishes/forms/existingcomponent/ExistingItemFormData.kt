@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent
 
-data class ExistingProductFormData(
+data class ExistingItemFormData(
     val quantityForDish: String = "",
     val unitForDish: String = ""
 )

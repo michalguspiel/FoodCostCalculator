@@ -55,6 +55,7 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 import java.util.Locale
 
 data class ComponentLookupResult(
@@ -132,18 +133,21 @@ class ComponentLookupViewModel : ViewModel(), KoinComponent {
     )
 
     fun onComponentSelected(item: Item) {
+        Timber.i("onComponentSelected: ${item.name}")
         _newComponentName.value = item.name
         selectedComponent.value = item
         analyticsHelper.logSuggestionSelected(item.name)
     }
 
     fun updateNewComponentName(newValue: String) {
+        Timber.i("updateNewComponentName: $newValue")
         suggestionsManuallyDismissed.value = false
         _newComponentName.value = newValue
         updateSelectedComponent(newValue)
     }
 
     private fun updateSelectedComponent(newValue: String) {
+        Timber.i("updateSelectedComponent: $newValue")
         if (newValue.isBlank()) {
             selectedComponent.value = null
             return
@@ -169,6 +173,11 @@ class ComponentLookupViewModel : ViewModel(), KoinComponent {
 }
 
 
+/**
+ * Represents the selection made by the user in the component lookup form.
+ * It can be either an existing component (an item from the suggestions) or a new component.
+ *
+ * */
 sealed class ComponentSelection {
     data class ExistingComponent(val item: Item) : ComponentSelection()
     data class NewComponent(val name: String) : ComponentSelection()
@@ -190,7 +199,10 @@ fun ComponentLookupForm(
         newComponentName = newComponentName,
         selectedComponent = selectedComponent,
         onNewComponentNameChange = viewModel::updateNewComponentName,
-        onComponentSelected = viewModel::onComponentSelected,
+        onComponentSelected = {
+            viewModel.onComponentSelected(it)
+            onNext(viewModel.getComponentSelectionResult())
+        },
         onNext = {
             onNext(viewModel.getComponentSelectionResult())
         },
@@ -252,12 +264,12 @@ private fun ComponentLookupFormContent(
                         ) { onComponentSelected(it) }
                     }
                 }
-            } else {
+            } else if (selectedComponent == null) {
                 item {
                     val text = if (newComponentName.isBlank()) {
                         stringResource(R.string.start_typing_to_see_suggestions)
                     } else {
-                        stringResource(R.string.no_suggestions, newComponentName)
+                        stringResource(R.string.no_suggestions)
                     }
                     Text(
                         text = text,
