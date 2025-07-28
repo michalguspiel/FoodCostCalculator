@@ -21,13 +21,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-class ExistingComponentFormUiState(
-    val formData: ExistingItemFormData = ExistingItemFormData(),
-    val compatibleUnitsForDish: Set<String> = emptySet(),
-    val unitForDishDropdownExpanded: Boolean = false,
-    val isAddButtonEnabled: Boolean = false
-)
-
 class ExistingComponentFormViewModel : ViewModel(), KoinComponent {
 
     private val preferences: Preferences by inject()

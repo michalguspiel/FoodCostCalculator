@@ -1,6 +1,5 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.editDish
 
-import android.content.Context
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -55,9 +54,11 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.navigation.ConfirmPopUp
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
+import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsUtil.getCopyDishPrefilledName
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupForm
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentForm
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
@@ -121,7 +122,7 @@ fun DishDetailsScreen(
             }
 
             DishDetailsActionResultType.UPDATED_STAY -> {
-                viewModel.handleCopyDish({ getCopyDishPrefilledName(it, context) })
+                viewModel.handleCopyDish{ getCopyDishPrefilledName(it, context) }
             }
         }
     }
@@ -132,44 +133,56 @@ fun DishDetailsScreen(
         dishId = dishId,
         navController = navController,
         actions = EditDishScreenActions(
-            saveDish = viewModel::saveDish,
-            shareDish = viewModel::shareDish,
-            setInteraction = viewModel::setInteraction,
-            removeItem = viewModel::removeItem,
-            updateQuantity = viewModel::updateQuantity,
-            saveQuantity = viewModel::updateItemQuantity,
-            updateTax = viewModel::updateTax,
-            saveTax = viewModel::saveDishTax,
-            updateMargin = viewModel::updateMargin,
-            saveMargin = viewModel::saveDishMargin,
-            updateName = viewModel::updateName,
-            saveName = viewModel::saveDishName,
-            updateTotalPrice = viewModel::updateTotalPrice,
-            saveTotalPrice = viewModel::saveDishTotalPrice,
-            resetScreenState = viewModel::resetScreenState,
-            onDeleteDishClick = viewModel::onDeleteDishClick,
-            onDeleteConfirmed = viewModel::confirmDelete,
-            copyDish = viewModel::copyDish,
-            updateCopiedDishName = viewModel::updateCopiedDishName,
-            saveAndNavigate = viewModel::saveAndNavigate,
-            hideCopyConfirmation = viewModel::hideCopyConfirmation,
-            saveChangesAndProceed = viewModel::saveChangesAndProceed,
-            setComponentSelection = viewModel::setComponentSelection,
-            onAddExistingComponentClick = viewModel::onAddExistingComponent,
-            discardChangesAndProceed = {
-                viewModel.discardChangesAndProceed {
-                    getCopyDishPrefilledName(
-                        it, context
-                    )
-                }
-            },
-            onCopyDishClick = {
-                viewModel.handleCopyDish {
-                    getCopyDishPrefilledName(
-                        it, context
-                    )
-                }
-            },
+            dishActions = DishActions(
+                saveDish = viewModel::saveDish,
+                shareDish = viewModel::shareDish,
+                saveAndNavigate = viewModel::saveAndNavigate,
+                resetScreenState = viewModel::resetScreenState,
+            ),
+            propertyActions = DishPropertyActions(
+                updateName = viewModel::updateName,
+                saveName = viewModel::saveDishName,
+                updateTax = viewModel::updateTax,
+                saveTax = viewModel::saveDishTax,
+                updateMargin = viewModel::updateMargin,
+                saveMargin = viewModel::saveDishMargin,
+                updateTotalPrice = viewModel::updateTotalPrice,
+                saveTotalPrice = viewModel::saveDishTotalPrice,
+            ),
+            itemActions = ItemActions(
+                removeItem = viewModel::removeItem,
+                updateQuantity = viewModel::updateQuantity,
+                saveQuantity = viewModel::updateItemQuantity,
+                setComponentSelection = viewModel::setComponentSelection,
+                onAddExistingComponentClick = viewModel::onAddExistingComponent,
+            ),
+            deletionActions = DishDeletionActions(
+                onDeleteDishClick = viewModel::onDeleteDishClick,
+                onDeleteConfirmed = viewModel::confirmDelete,
+            ),
+            copyActions = DishCopyActions(
+                onCopyDishClick = {
+                    viewModel.handleCopyDish {
+                        getCopyDishPrefilledName(
+                            it, context
+                        )
+                    }
+                },
+                copyDish = viewModel::copyDish,
+                updateCopiedDishName = viewModel::updateCopiedDishName,
+                hideCopyConfirmation = viewModel::hideCopyConfirmation,
+            ),
+            interactionActions = ScreenInteractionActions(
+                setInteraction = viewModel::setInteraction,
+                saveChangesAndProceed = viewModel::saveChangesAndProceed,
+                discardChangesAndProceed = {
+                    viewModel.discardChangesAndProceed {
+                        getCopyDishPrefilledName(
+                            it, context
+                        )
+                    }
+                },
+            ),
         ),
         existingComponentFormActions = ExistingComponentFormActions(
             onFormDataChange = existingFormViewModel::updateFormData,
@@ -194,10 +207,6 @@ fun DishDetailsScreen(
     )
 }
 
-private fun getCopyDishPrefilledName(name: String?, context: Context): String {
-    return context.getString(R.string.copy_dish_prefilled_name, name)
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditDishScreenContent(
@@ -217,10 +226,10 @@ private fun EditDishScreenContent(
         topBar = {
             EditDishTopBar(
                 dishName = uiState.dish?.name ?: dishId.toString(),
-                onNameClick = { actions.setInteraction(InteractionType.EditName) },
-                onDeleteClick = { actions.onDeleteDishClick() },
-                onCopyClick = { actions.onCopyDishClick() },
-                onShareClick = { actions.shareDish(context) },
+                onNameClick = { actions.interactionActions.setInteraction(InteractionType.EditName) },
+                onDeleteClick = { actions.deletionActions.onDeleteDishClick() },
+                onCopyClick = { actions.copyActions.onCopyDishClick() },
+                onShareClick = { actions.dishActions.shareDish(context) },
                 onRecipeClick = { navController.navigate(FCCScreen.Recipe) },
                 onBackClick = { navController.popBackStack() }
             )
@@ -234,9 +243,9 @@ private fun EditDishScreenContent(
                             modifier = Modifier.animateItem(),
                             usedItem = item,
                             currency = uiState.currency,
-                            onRemove = { actions.removeItem(it) },
+                            onRemove = { actions.itemActions.removeItem(it) },
                             onEdit = {
-                                actions.setInteraction(
+                                actions.interactionActions.setInteraction(
                                     InteractionType.EditItem(it)
                                 )
                             }
@@ -254,7 +263,7 @@ private fun EditDishScreenContent(
                                 .padding(horizontal = 24.dp, vertical = 12.dp),
                             text = stringResource(R.string.add_component),
                             onClick = {
-                                actions.setInteraction(InteractionType.ContextualAddComponent)
+                                actions.interactionActions.setInteraction(InteractionType.ContextualAddComponent)
                             }
                         )
                     }
@@ -267,13 +276,13 @@ private fun EditDishScreenContent(
                                 it,
                                 uiState.currency,
                                 onTaxClick = {
-                                    actions.setInteraction(InteractionType.EditTax)
+                                    actions.interactionActions.setInteraction(InteractionType.EditTax)
                                 },
                                 onMarginClick = {
-                                    actions.setInteraction(InteractionType.EditMargin)
+                                    actions.interactionActions.setInteraction(InteractionType.EditMargin)
                                 },
                                 onTotalPriceClick = {
-                                    actions.setInteraction(InteractionType.EditTotalPrice)
+                                    actions.interactionActions.setInteraction(InteractionType.EditTotalPrice)
                                 }
                             )
                         }
@@ -286,7 +295,7 @@ private fun EditDishScreenContent(
                             .padding(horizontal = 24.dp, vertical = 24.dp),
                         text = stringResource(R.string.save),
                         onClick = {
-                            actions.saveDish()
+                            actions.dishActions.saveDish()
                         })
                 }
             }
@@ -301,7 +310,7 @@ private fun EditDishScreenContent(
             )
 
             ConfirmPopUp(visible = uiState.showCopyConfirmation) {
-                actions.hideCopyConfirmation()
+                actions.copyActions.hideCopyConfirmation()
             }
         }
     }
@@ -323,7 +332,7 @@ private fun ScreenStateHandler(
 
         is ScreenState.Error -> {
             ErrorDialog {
-                actions.resetScreenState()
+                actions.dishActions.resetScreenState()
             }
         }
 
@@ -361,9 +370,9 @@ private fun InteractionHandler(
                 title = stringResource(R.string.edit_tax),
                 value = uiState.editableFields.tax,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                updateValue = { actions.updateTax(it) },
-                onSave = { actions.saveTax() },
-                onDismiss = { actions.resetScreenState() })
+                updateValue = { actions.propertyActions.updateTax(it) },
+                onSave = { actions.propertyActions.saveTax() },
+                onDismiss = { actions.dishActions.resetScreenState() })
         }
 
         InteractionType.EditMargin -> {
@@ -371,9 +380,9 @@ private fun InteractionHandler(
                 title = stringResource(R.string.edit_margin),
                 value = uiState.editableFields.margin,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                updateValue = { actions.updateMargin(it) },
-                onSave = { actions.saveMargin() },
-                onDismiss = { actions.resetScreenState() })
+                updateValue = { actions.propertyActions.updateMargin(it) },
+                onSave = { actions.propertyActions.saveMargin() },
+                onDismiss = { actions.dishActions.resetScreenState() })
         }
 
         InteractionType.EditTotalPrice -> {
@@ -381,18 +390,18 @@ private fun InteractionHandler(
                 title = stringResource(R.string.edit_total_price),
                 value = uiState.editableFields.totalPrice,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                updateValue = { actions.updateTotalPrice(it) },
-                onSave = { actions.saveTotalPrice() },
-                onDismiss = { actions.resetScreenState() })
+                updateValue = { actions.propertyActions.updateTotalPrice(it) },
+                onSave = { actions.propertyActions.saveTotalPrice() },
+                onDismiss = { actions.dishActions.resetScreenState() })
         }
 
         InteractionType.EditName -> {
             ValueEditDialog(
                 title = stringResource(R.string.edit_name),
                 value = uiState.editableFields.name,
-                updateValue = { actions.updateName(it) },
-                onSave = { actions.saveName() },
-                onDismiss = { actions.resetScreenState() },
+                updateValue = { actions.propertyActions.updateName(it) },
+                onSave = { actions.propertyActions.saveName() },
+                onDismiss = { actions.dishActions.resetScreenState() },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Words
@@ -404,9 +413,9 @@ private fun InteractionHandler(
             ValueEditDialog(
                 title = stringResource(R.string.copy_dish),
                 value = uiState.editableFields.copiedDishName,
-                updateValue = { actions.updateCopiedDishName(it) },
-                onSave = { actions.copyDish() },
-                onDismiss = { actions.resetScreenState() },
+                updateValue = { actions.copyActions.updateCopiedDishName(it) },
+                onSave = { actions.copyActions.copyDish() },
+                onDismiss = { actions.dishActions.resetScreenState() },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Words
@@ -422,42 +431,42 @@ private fun InteractionHandler(
                     keyboardType = KeyboardType.Number,
                     capitalization = KeyboardCapitalization.Words
                 ),
-                updateValue = { actions.updateQuantity(it) },
-                onSave = { actions.saveQuantity() },
-                onDismiss = { actions.resetScreenState() })
+                updateValue = { actions.itemActions.updateQuantity(it) },
+                onSave = { actions.itemActions.saveQuantity() },
+                onDismiss = { actions.dishActions.resetScreenState() })
         }
 
         is InteractionType.DeleteConfirmation -> {
             FCCDeleteConfirmationDialog(
                 itemName = interaction.itemName,
-                onDismiss = { actions.resetScreenState() },
+                onDismiss = { actions.dishActions.resetScreenState() },
                 onConfirmDelete = {
-                    actions.onDeleteConfirmed(interaction.itemId)
+                    actions.deletionActions.onDeleteConfirmed(interaction.itemId)
                 })
         }
 
         InteractionType.UnsavedChangesConfirmation -> {
             FCCUnsavedChangesDialog(
-                onDismiss = { actions.resetScreenState() },
+                onDismiss = { actions.dishActions.resetScreenState() },
                 onDiscard = {
-                    actions.resetScreenState()
+                    actions.dishActions.resetScreenState()
                     navController.popBackStack()
                 },
-                onSave = { actions.saveAndNavigate() })
+                onSave = { actions.dishActions.saveAndNavigate() })
         }
 
         is InteractionType.UnsavedChangesConfirmationBeforeCopy -> {
             FCCUnsavedChangesDialog(
-                onDismiss = actions.resetScreenState,
-                onDiscard = actions.discardChangesAndProceed,
-                onSave = actions.saveChangesAndProceed
+                onDismiss = actions.dishActions.resetScreenState,
+                onDiscard = actions.interactionActions.discardChangesAndProceed,
+                onSave = actions.interactionActions.saveChangesAndProceed
             )
         }
 
         is InteractionType.ContextualAddComponent -> {
             ModalBottomSheet(
                 onDismissRequest = {
-                    actions.resetScreenState()
+                    actions.dishActions.resetScreenState()
                 }, sheetState = addComponentSheetState
             ) {
                 when (uiState.componentSelection) {
@@ -483,7 +492,7 @@ private fun InteractionHandler(
                     }
 
                     null -> ComponentLookupForm {
-                        actions.setComponentSelection(
+                        actions.itemActions.setComponentSelection(
                             it
                         )
                     }

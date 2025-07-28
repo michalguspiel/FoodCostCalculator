@@ -6,39 +6,55 @@ import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingItemFormData
 
-data class EditDishScreenActions(
+data class DishActions(
     val saveDish: () -> Unit = {},
     val shareDish: (Context) -> Unit = {},
-    val setInteraction: (InteractionType) -> Unit = {},
-    val removeItem: (ItemUsageEntry) -> Unit = {},
-    val updateQuantity: (String) -> Unit = {},
-    val saveQuantity: () -> Unit = {},
+    val saveAndNavigate: () -> Unit = {},
+    val resetScreenState: () -> Unit = {},
+)
+
+data class DishPropertyActions(
+    val updateName: (String) -> Unit = {},
+    val saveName: () -> Unit = {},
     val updateTax: (String) -> Unit = {},
     val saveTax: () -> Unit = {},
     val updateMargin: (String) -> Unit = {},
     val saveMargin: () -> Unit = {},
-    val updateName: (String) -> Unit = {},
-    val saveName: () -> Unit = {},
     val updateTotalPrice: (String) -> Unit = {},
     val saveTotalPrice: () -> Unit = {},
-    val resetScreenState: () -> Unit = {},
+)
+
+data class ItemActions(
+    val removeItem: (ItemUsageEntry) -> Unit = {},
+    val updateQuantity: (String) -> Unit = {},
+    val saveQuantity: () -> Unit = {},
+    val setComponentSelection: (ComponentSelection?) -> Unit = {},
+    val onAddExistingComponentClick: (ExistingItemFormData) -> Unit = {},
+)
+
+data class DishDeletionActions(
     val onDeleteDishClick: () -> Unit = {},
     val onDeleteConfirmed: (Long) -> Unit = {},
-    val saveAndNavigate: () -> Unit = {},
+)
+
+data class DishCopyActions(
     val onCopyDishClick: () -> Unit = {},
     val copyDish: () -> Unit = {},
     val updateCopiedDishName: (String) -> Unit = {},
     val hideCopyConfirmation: () -> Unit = {},
+)
+
+data class ScreenInteractionActions(
+    val setInteraction: (InteractionType) -> Unit = {},
     val discardChangesAndProceed: () -> Unit = {},
     val saveChangesAndProceed: () -> Unit = {},
-    val setComponentSelection: (ComponentSelection?) -> Unit = {},
-    val onAddExistingComponentClick: (ExistingItemFormData) -> Unit = {},
+)
 
-    )
-
-data class ExistingComponentFormActions(
-    val onFormDataChange: (ExistingItemFormData) -> Unit = {},
-    val onUnitForDishDropdownExpandedChange: (Boolean) -> Unit = {},
-    val onAddComponent: (ExistingItemFormData) -> Unit = {},
-    val onCancel: () -> Unit = {},
+data class EditDishScreenActions(
+    val dishActions: DishActions = DishActions(),
+    val propertyActions: DishPropertyActions = DishPropertyActions(),
+    val itemActions: ItemActions = ItemActions(),
+    val deletionActions: DishDeletionActions = DishDeletionActions(),
+    val copyActions: DishCopyActions = DishCopyActions(),
+    val interactionActions: ScreenInteractionActions = ScreenInteractionActions(),
 )
