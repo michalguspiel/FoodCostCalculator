@@ -37,6 +37,7 @@ import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.UsedItem
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.UsedItem
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -196,7 +197,12 @@ private fun EditDishScreenContent(
         Box(modifier = Modifier.padding(paddingValues)) {
             Column {
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
-                    items(uiState.items) { item ->
+                    items(uiState.items, key = {
+                        when(it) {
+                            is UsedItem -> it.id
+                            else -> System.identityHashCode(it)
+                        }
+                    }) { item ->
                         UsedItem(
                             modifier = Modifier.animateItem(),
                             usedItem = item,
