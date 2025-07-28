@@ -17,7 +17,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -38,9 +37,6 @@ import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
-import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
-import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.UsedItem
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -53,7 +49,6 @@ import com.erdees.foodcostcalc.ui.navigation.ConfirmPopUp
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsUtil.getCopyDishPrefilledName
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
@@ -81,47 +76,14 @@ fun DishDetailsScreen(
         viewModel.handleBackNavigation { navController.popBackStack() }
     }
 
-    LaunchedEffect(uiState.componentSelection) {
-        uiState.componentSelection?.let {
-            if (it is ComponentSelection.ExistingComponent) {
-                existingFormViewModel.setItemContext(it.item, context.resources)
-            }
-        }
-    }
-
-    LaunchedEffect(uiState.lastRemovedItem) {
-        val removedItem = uiState.lastRemovedItem?.item ?: return@LaunchedEffect
-        snackbarHostState.showUndoDeleteSnackbar(
-            message = context.getString(R.string.removed_item, removedItem.item.name),
-            actionLabel = context.getString(R.string.undo),
-            actionPerformed = { viewModel.undoRemoveItem() },
-            ignored = { viewModel.clearLastRemovedItem() }
-        )
-    }
-
-    LaunchedEffect(uiState.screenState) {
-        val state = uiState.screenState as? ScreenState.Success<*> ?: return@LaunchedEffect
-        val data = state.data as? DishActionResult ?: return@LaunchedEffect
-
-        viewModel.resetScreenState()
-        when (data.type) {
-            DishDetailsActionResultType.COPIED -> {
-                navController.navigate(FCCScreen.DishDetails(data.dishId, true)) {
-                    popUpTo(navController.currentBackStackEntry?.destination?.route ?: "") {
-                        inclusive = true
-                    }
-                }
-            }
-
-            DishDetailsActionResultType.UPDATED_NAVIGATE, DishDetailsActionResultType.DELETED -> {
-                navController.popBackStack()
-            }
-
-            DishDetailsActionResultType.UPDATED_STAY -> {
-                viewModel.handleCopyDish{ getCopyDishPrefilledName(it, context) }
-            }
-        }
-    }
+    DishDetailsStateManager(
+        uiState = uiState,
+        context = context,
+        navController = navController,
+        snackbarHostState = snackbarHostState,
+        existingFormViewModel = existingFormViewModel,
+        viewModel = viewModel,
+    )
 
     EditDishScreenContent(
         uiState = uiState,
