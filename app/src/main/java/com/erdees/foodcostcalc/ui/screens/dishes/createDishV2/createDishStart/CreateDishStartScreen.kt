@@ -70,7 +70,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentForm
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductForm
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormState
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormViewModel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.collections.immutable.persistentListOf
@@ -175,7 +175,7 @@ fun CreateDishStartScreen(
                     }, sheetState = newProductFormSheetState
                 ) {
                     NewProductForm(
-                        NewProductFormState(
+                        NewProductFormUiState(
                             productName = newProductName,
                             dishName = dishName,
                             productCreationUnits = newProductFormViewModel.productCreationUnits.collectAsState().value,

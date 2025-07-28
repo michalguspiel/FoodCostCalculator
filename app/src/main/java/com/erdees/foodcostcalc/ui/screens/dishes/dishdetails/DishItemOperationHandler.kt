@@ -10,6 +10,7 @@ import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingItemFormData
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormData
 import timber.log.Timber
 
 class DishItemOperationHandler(
@@ -163,7 +164,8 @@ class DishItemOperationHandler(
 
             is ProductAddedToDish -> {
                 val updatedProductsNotSaved =
-                    currentDish.productsNotSaved.toMutableList().apply { add(item.index, item.item) }
+                    currentDish.productsNotSaved.toMutableList()
+                        .apply { add(item.index, item.item) }
                 updateUiState(
                     uiState.copy(
                         dish = currentDish.copy(productsNotSaved = updatedProductsNotSaved),
@@ -174,7 +176,8 @@ class DishItemOperationHandler(
 
             is HalfProductAddedToDish -> {
                 val updatedHalfProductsNotSaved =
-                    currentDish.halfProductsNotSaved.toMutableList().apply { add(item.index, item.item) }
+                    currentDish.halfProductsNotSaved.toMutableList()
+                        .apply { add(item.index, item.item) }
                 updateUiState(
                     uiState.copy(
                         dish = currentDish.copy(halfProductsNotSaved = updatedHalfProductsNotSaved),
@@ -183,6 +186,26 @@ class DishItemOperationHandler(
                 )
             }
         }
+    }
+
+    fun addNewProductToDish(
+        uiState: DishDetailsUiState,
+        newProduct: ProductDomain,
+        newProductFormData: NewProductFormData
+    ) {
+        val dish = uiState.dish ?: error("Cannot add product - current dish is null")
+        val quantityAddedToDish = newProductFormData.quantityAddedToDish.toDoubleOrNull()
+            ?: error("Quantity for the product in the dish cannot be empty or invalid.")
+        val productAddedToDish = ProductAddedToDish(
+            item = newProduct,
+            quantity = quantityAddedToDish,
+            quantityUnit = newProductFormData.unitForDish
+        )
+        val updatedProductsNotSaved =
+            dish.productsNotSaved.toMutableList().apply { add(productAddedToDish) }
+        updateUiState(
+            uiState.copy(dish = dish.copy(productsNotSaved = updatedProductsNotSaved))
+        )
     }
 
     fun onAddExistingComponent(

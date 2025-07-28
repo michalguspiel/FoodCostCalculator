@@ -32,7 +32,7 @@ import com.erdees.foodcostcalc.utils.onNumericValueChange
 
 @Composable
 fun NewProductForm(
-    state: NewProductFormState,
+    state: NewProductFormUiState,
     modifier: Modifier = Modifier,
     onProductCreationDropdownExpandedChange: (Boolean) -> Unit = {},
     onProductAdditionDropdownExpandedChange: (Boolean) -> Unit = {},
@@ -147,7 +147,7 @@ fun NewProductForm(
 private fun NewProductIngredientModalContentDarkPreview() {
     FCCTheme {
         NewProductForm(
-            NewProductFormState(
+            NewProductFormUiState(
                 productName = "Sugar",
                 dishName = "Cake",
                 productAdditionUnits = setOf("kg", "g", "l", "ml"),
