@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.DishBase
-import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
@@ -16,8 +15,8 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.usecase.CreateProductUseCase
 import com.erdees.foodcostcalc.ui.errors.InvalidMarginFormatException
-import com.erdees.foodcostcalc.ui.errors.InvalidProductPriceException
 import com.erdees.foodcostcalc.ui.errors.InvalidTaxFormatException
 import com.erdees.foodcostcalc.ui.errors.UserReportableError
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishIntent
@@ -62,6 +61,7 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
     private val dispatchers: MyDispatchers by inject()
+    private val createProductUseCase: CreateProductUseCase by inject()
     private val analyticsHelper = DishCreationAnalyticsHelper(analyticsRepository)
 
     private var _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -256,16 +256,22 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         analyticsHelper.logNewProductSaveAttempt(_newProductName.value)
         viewModelScope.launch(dispatchers.ioDispatcher) {
             try {
-                val newlyCreatedProduct = addNewProductToRepository(newProductFormData)
-                analyticsHelper.logNewProductSaveSuccess(newlyCreatedProduct)
+                createProductUseCase.invoke(_newProductName.value, newProductFormData)
+                    .onSuccess { newlyCreatedProduct ->
+                        analyticsHelper.logNewProductSaveSuccess(newlyCreatedProduct)
 
-                addProductToDishList(
-                    newlyCreatedProduct,
-                    newProductFormData.quantityAddedToDish,
-                    newProductFormData.unitForDish
-                )
+                        addProductToDishList(
+                            newlyCreatedProduct,
+                            newProductFormData.quantityAddedToDish,
+                            newProductFormData.unitForDish
+                        )
 
-                resetProductAdditionState()
+                        resetProductAdditionState()
+                    }
+                    .onFailure { exception ->
+                        analyticsHelper.logNewProductSaveFailure(newProductName.value)
+                        handleError(exception)
+                    }
             } catch (e: Exception) {
                 analyticsHelper.logNewProductSaveFailure(newProductName.value)
                 handleError(e)
@@ -273,29 +279,6 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         }
     }
 
-    /**
-     * Creates a new ProductBase entity from the form data, saves it to the product repository,
-     * and returns the corresponding ProductDomain object.
-     *
-     * @param formData The data captured from the new product form.
-     * @return The ProductDomain representation of the newly created product.
-     * @throws IllegalStateException if essential data like price is missing.
-     */
-    private suspend fun addNewProductToRepository(formData: NewProductFormData): ProductDomain {
-        val price = formData.purchasePrice.toDoubleOrNull()
-            ?: throw InvalidProductPriceException("Product purchase price cannot be empty or invalid.")
-
-        val productBase = ProductBase(
-            productId = 0,
-            name = _newProductName.value,
-            pricePerUnit = price,
-            tax = 0.0,
-            waste = formData.wastePercent.toDoubleOrNull() ?: 0.0,
-            unit = formData.purchaseUnit
-        )
-        val newProductId = productRepository.addProduct(productBase)
-        return productBase.copy(productId = newProductId).toProductDomain()
-    }
 
     /**
      * Called when the user confirms adding a pre-existing, selected product to the current dish.

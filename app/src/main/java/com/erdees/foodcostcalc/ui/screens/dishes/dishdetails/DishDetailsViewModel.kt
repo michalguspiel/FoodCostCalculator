@@ -5,26 +5,22 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
-import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
-import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toEditableRecipe
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
-import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
+import com.erdees.foodcostcalc.domain.usecase.CreateProductUseCase
 import com.erdees.foodcostcalc.domain.usecase.DeleteDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.SaveDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.ShareDishUseCase
-import com.erdees.foodcostcalc.ui.errors.InvalidProductPriceException
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.IS_COPIED
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
@@ -58,8 +54,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private val saveDishUseCase: SaveDishUseCase by inject()
     private val deleteDishUseCase: DeleteDishUseCase by inject()
     private val shareDishUseCase: ShareDishUseCase by inject()
+    private val createProductUseCase: CreateProductUseCase by inject()
     private val dishRepository: DishRepository by inject()
-    private val productRepository: ProductRepository by inject()
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
     private val myDispatchers: MyDispatchers by inject()
@@ -476,46 +472,28 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 //      analyticsHelper.logNewProductSaveAttempt(_newProductName.value)
         viewModelScope.launch(myDispatchers.ioDispatcher) {
             try {
-                val newlyCreatedProduct = addNewProductToRepository(newProductFormData)
-//              analyticsHelper.logNewProductSaveSuccess(newlyCreatedProduct)
-
-                dishItemOperationHandler.addNewProductToDish(
-                    uiState.value,
-                    newlyCreatedProduct,
-                    newProductFormData
+                val newComponent = (uiState.value.componentSelection as? ComponentSelection.NewComponent) ?: error(
+                    "Component selection must be of type NewComponent to add a new product."
                 )
-                resetScreenState()
+
+                createProductUseCase.invoke(newComponent.name, newProductFormData)
+                    .onSuccess { newlyCreatedProduct ->
+//                      analyticsHelper.logNewProductSaveSuccess(newlyCreatedProduct)
+                        dishItemOperationHandler.addNewProductToDish(
+                            uiState.value,
+                            newlyCreatedProduct,
+                            newProductFormData
+                        )
+                        resetScreenState()
+                    }
+                    .onFailure { exception ->
+//                      analyticsHelper.logNewProductSaveFailure(newProductName.value)
+//                      handleError(exception)
+                    }
             } catch (e: Exception) {
 //                analyticsHelper.logNewProductSaveFailure(newProductName.value)
 //                handleError(e)
             }
         }
-    }
-
-    /**
-     * Creates a new ProductBase entity from the form data, saves it to the product repository,
-     * and returns the corresponding ProductDomain object.
-     *
-     * @param formData The data captured from the new product form.
-     * @return The ProductDomain representation of the newly created product.
-     * @throws IllegalStateException if essential data like price is missing.
-     */
-    private suspend fun addNewProductToRepository(formData: NewProductFormData): ProductDomain {
-        val newComponent = (uiState.value.componentSelection as? ComponentSelection.NewComponent) ?: error(
-            "Component selection must be of type NewComponent to add a new product."
-        )
-        val price = formData.purchasePrice.toDoubleOrNull()
-            ?: throw InvalidProductPriceException("Product purchase price cannot be empty or invalid.")
-
-        val productBase = ProductBase(
-            productId = 0,
-            name = newComponent.name,
-            pricePerUnit = price,
-            tax = 0.0,
-            waste = formData.wastePercent.toDoubleOrNull() ?: 0.0,
-            unit = formData.purchaseUnit
-        )
-        val newProductId = productRepository.addProduct(productBase)
-        return productBase.copy(productId = newProductId).toProductDomain()
     }
 }

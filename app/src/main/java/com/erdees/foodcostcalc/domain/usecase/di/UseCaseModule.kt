@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.domain.usecase.di
 
 import com.erdees.foodcostcalc.domain.usecase.CopyDishUseCase
+import com.erdees.foodcostcalc.domain.usecase.CreateProductUseCase
 import com.erdees.foodcostcalc.domain.usecase.DeleteDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.SaveDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.ShareDishUseCase
@@ -44,6 +45,12 @@ val useCaseModule = module {
     factory {
         ShareDishUseCase(
             analyticsRepository = get(),
+            myDispatchers = get()
+        )
+    }
+    factory {
+        CreateProductUseCase(
+            productRepository = get(),
             myDispatchers = get()
         )
     }
