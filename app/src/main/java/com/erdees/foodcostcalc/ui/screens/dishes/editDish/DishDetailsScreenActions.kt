@@ -50,7 +50,7 @@ data class ScreenInteractionActions(
     val saveChangesAndProceed: () -> Unit = {},
 )
 
-data class EditDishScreenActions(
+data class DishDetailsScreenActions(
     val dishActions: DishActions = DishActions(),
     val propertyActions: DishPropertyActions = DishPropertyActions(),
     val itemActions: ItemActions = ItemActions(),

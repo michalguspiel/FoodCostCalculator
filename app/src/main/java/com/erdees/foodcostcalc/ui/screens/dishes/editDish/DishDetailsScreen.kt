@@ -11,12 +11,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -55,9 +53,7 @@ import com.erdees.foodcostcalc.ui.navigation.ConfirmPopUp
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsUtil.getCopyDishPrefilledName
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupForm
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentForm
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
@@ -132,7 +128,7 @@ fun DishDetailsScreen(
         existingComponentFormUiState = existingFormUiState,
         dishId = dishId,
         navController = navController,
-        actions = EditDishScreenActions(
+        actions = DishDetailsScreenActions(
             dishActions = DishActions(
                 saveDish = viewModel::saveDish,
                 shareDish = viewModel::shareDish,
@@ -214,7 +210,7 @@ private fun EditDishScreenContent(
     existingComponentFormUiState: ExistingComponentFormUiState,
     dishId: Long,
     navController: NavController,
-    actions: EditDishScreenActions,
+    actions: DishDetailsScreenActions,
     existingComponentFormActions: ExistingComponentFormActions,
     addComponentSheetState: SheetState,
     snackbarHostState: SnackbarHostState,
@@ -321,7 +317,7 @@ private fun EditDishScreenContent(
 private fun ScreenStateHandler(
     uiState: DishDetailsUiState,
     existingComponentFormUiState: ExistingComponentFormUiState,
-    actions: EditDishScreenActions,
+    actions: DishDetailsScreenActions,
     existingComponentFormActions: ExistingComponentFormActions,
     addComponentSheetState: SheetState,
     navController: NavController,
@@ -358,7 +354,7 @@ private fun InteractionHandler(
     uiState: DishDetailsUiState,
     existingComponentFormUiState: ExistingComponentFormUiState,
     interaction: InteractionType,
-    actions: EditDishScreenActions,
+    actions: DishDetailsScreenActions,
     existingComponentFormActions: ExistingComponentFormActions,
     addComponentSheetState: SheetState,
     navController: NavController,
@@ -464,40 +460,14 @@ private fun InteractionHandler(
         }
 
         is InteractionType.ContextualAddComponent -> {
-            ModalBottomSheet(
-                onDismissRequest = {
-                    actions.dishActions.resetScreenState()
-                }, sheetState = addComponentSheetState
-            ) {
-                when (uiState.componentSelection) {
-                    is ComponentSelection.ExistingComponent -> {
-                        with(existingComponentFormUiState) {
-                            ExistingComponentForm(
-                                formData = formData,
-                                dishName = uiState.dish?.name ?: "",
-                                isAddButtonEnabled = isAddButtonEnabled,
-                                compatibleUnitsForDish = compatibleUnitsForDish,
-                                unitForDishDropdownExpanded = unitForDishDropdownExpanded,
-                                selectedComponent = uiState.componentSelection.item,
-                                onUnitForDishDropdownExpandedChange = existingComponentFormActions.onUnitForDishDropdownExpandedChange,
-                                onCancel = existingComponentFormActions.onCancel,
-                                onAddComponent = existingComponentFormActions.onAddComponent,
-                                onFormDataChange = existingComponentFormActions.onFormDataChange
-                            )
-                        }
-                    }
-
-                    is ComponentSelection.NewComponent -> {
-                        Text("TODO NEW PRODUCT FORM")
-                    }
-
-                    null -> ComponentLookupForm {
-                        actions.itemActions.setComponentSelection(
-                            it
-                        )
-                    }
-                }
-            }
+            DishDetailsModalSheet(
+                sheetState = addComponentSheetState,
+                componentSelection = uiState.componentSelection,
+                dishName = uiState.dish?.name ?: "",
+                dishDetailsActions = actions,
+                existingComponentFormUiState = existingComponentFormUiState,
+                existingComponentFormActions = existingComponentFormActions,
+            )
         }
 
         else -> {}
@@ -517,7 +487,7 @@ private fun EditDishScreenContentPreview(
         EditDishScreenContent(
             uiState = state,
             navController = navController,
-            actions = EditDishScreenActions(),
+            actions = DishDetailsScreenActions(),
             modifier = Modifier,
             dishId = 0L,
             snackbarHostState = SnackbarHostState(),
