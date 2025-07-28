@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
 import android.content.Context
 import androidx.compose.material3.SnackbarHostState
@@ -12,7 +12,7 @@ import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
 import com.erdees.foodcostcalc.domain.model.dish.DishDetailsActionResultType
 import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsUtil.getCopyDishPrefilledName
+import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsUtil.getCopyDishPrefilledName
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
 

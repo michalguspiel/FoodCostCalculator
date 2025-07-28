@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
@@ -49,7 +49,7 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.navigation.ConfirmPopUp
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsUtil.getCopyDishPrefilledName
+import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsUtil.getCopyDishPrefilledName
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel

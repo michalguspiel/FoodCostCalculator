@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons

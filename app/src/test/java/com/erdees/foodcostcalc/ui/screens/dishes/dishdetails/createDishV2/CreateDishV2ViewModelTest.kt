@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish.createDishV2
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.createDishV2
 
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository

@@ -62,8 +62,8 @@ import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.navigation.Screen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsUiState
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsUiState
+import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsViewModel
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onIntegerValueChange
 import timber.log.Timber

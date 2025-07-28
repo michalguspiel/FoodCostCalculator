@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
 import android.content.Context
 import androidx.lifecycle.SavedStateHandle
@@ -425,7 +425,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             copyDishUseCase.invoke(currentDish, newName).onSuccess { result ->
                 _uiState.update { it.copy(screenState = ScreenState.Success(result)) }
             }.onFailure { error ->
-                Timber.e("Failed to copy dish: ${error.message}", error)
+                Timber.e(error, "Failed to copy dish: ${error.message}")
                 _uiState.update { it.copy(screenState = ScreenState.Error(Error(error.message))) }
             }
         }

@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish.editDish
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.editDish
 
 import android.icu.util.Currency
 import androidx.lifecycle.SavedStateHandle
@@ -16,7 +16,7 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsViewModel
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.Utils
 import io.kotest.matchers.nulls.shouldNotBeNull

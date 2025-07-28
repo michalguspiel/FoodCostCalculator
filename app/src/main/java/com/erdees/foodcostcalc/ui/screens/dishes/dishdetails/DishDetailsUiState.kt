@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
 import android.icu.util.Currency
 import com.erdees.foodcostcalc.domain.model.ItemUsageEntry

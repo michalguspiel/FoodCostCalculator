@@ -19,8 +19,8 @@ import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.AddItemToDishScre
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishStartScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishSummary.CreateDishSummaryScreen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsScreen
-import com.erdees.foodcostcalc.ui.screens.dishes.editDish.DishDetailsViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsScreen
+import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsViewModel
 import com.erdees.foodcostcalc.ui.screens.featureRequest.FeatureRequestScreen
 import com.erdees.foodcostcalc.ui.screens.featureRequestList.FeatureRequestListScreen
 import com.erdees.foodcostcalc.ui.screens.halfProducts.HalfProductsScreen

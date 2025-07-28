@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.editDish
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import com.erdees.foodcostcalc.data.model.local.DishBase
