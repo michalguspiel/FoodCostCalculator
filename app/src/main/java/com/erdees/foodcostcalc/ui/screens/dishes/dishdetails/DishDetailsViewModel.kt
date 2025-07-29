@@ -47,6 +47,8 @@ import timber.log.Timber
  * Shared ViewModel between [DishDetailsScreen] and [RecipeScreen].
  * It was decided to share it in order to avoid passing data between screens.
  * */
+// todo analytics
+// todo handle errors
 class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
     KoinComponent {
 
