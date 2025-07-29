@@ -189,7 +189,6 @@ sealed class ComponentSelection {
     data class NewComponent(val name: String) : ComponentSelection()
 }
 
-// todo make this pretty
 @Composable
 fun ComponentLookupForm(
     modifier: Modifier = Modifier,
