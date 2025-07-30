@@ -172,6 +172,8 @@
     <string name="matching_half_products">Matching half products</string>
     <string name="matching_ingredients">Matching ingredients</string>
 
+    <string name="error_failed_to_add_component">Failed to add component. Please try again.</string>
+
     <!-- Delete confirmation dialog -->
     <string name="delete_item_title">Delete \'%1$s\'?</string>
     <string name="delete_confirmation_message">Are you sure you want to permanently delete this item?</string>

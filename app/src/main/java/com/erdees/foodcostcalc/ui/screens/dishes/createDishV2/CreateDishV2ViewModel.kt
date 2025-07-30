@@ -270,11 +270,11 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
                         resetProductAdditionState()
                     }
                     .onFailure { exception ->
-                        analyticsHelper.logNewProductSaveFailure(newProductName.value)
+                        analyticsHelper.logNewProductSaveFailure()
                         handleError(exception)
                     }
             } catch (e: Exception) {
-                analyticsHelper.logNewProductSaveFailure(newProductName.value)
+                analyticsHelper.logNewProductSaveFailure()
                 handleError(e)
             }
         }

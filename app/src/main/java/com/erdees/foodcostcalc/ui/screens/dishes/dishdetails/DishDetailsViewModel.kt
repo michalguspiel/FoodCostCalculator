@@ -21,8 +21,10 @@ import com.erdees.foodcostcalc.domain.usecase.CreateProductUseCase
 import com.erdees.foodcostcalc.domain.usecase.DeleteDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.SaveDishUseCase
 import com.erdees.foodcostcalc.domain.usecase.ShareDishUseCase
+import com.erdees.foodcostcalc.ui.errors.FailedToAddComponent
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.DISH_ID_KEY
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.IS_COPIED
+import com.erdees.foodcostcalc.ui.screens.dishes.DishAnalyticsHelper
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingItemFormData
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormData
@@ -44,11 +46,9 @@ import org.koin.core.component.inject
 import timber.log.Timber
 
 /**
- * Shared ViewModel between [DishDetailsScreen] and [RecipeScreen].
- * It was decided to share it in order to avoid passing data between screens.
- * */
-// todo analytics
-// todo handle errors
+ * Shared ViewModel for both [DishDetailsScreen] and [RecipeScreen].
+ * Sharing this ViewModel eliminates the need to manually pass data between these screens.
+ */
 class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(),
     KoinComponent {
 
@@ -61,6 +61,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
     private val myDispatchers: MyDispatchers by inject()
+    private val analyticsHelper = DishAnalyticsHelper(analyticsRepository)
 
     private val _uiState = MutableStateFlow(DishDetailsUiState())
     val uiState = _uiState.asStateFlow()
@@ -307,7 +308,6 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     }
 
     fun discardChangesAndProceed(getName: (String?) -> String) {
-        // Restore dish to original state
         viewModelScope.launch {
             loadDishStateFromRepository()
             resetScreenState()
@@ -438,11 +438,8 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
     /**
      * Called when user clicks "Save" in the unsaved changes dialog
-     * with navigation intent
      */
     fun saveAndNavigate() {
-        // Set the pending intent to navigate back after saving
-        // Save dish will trigger the success state, which will then check pendingIntent
         saveDish(DishDetailsActionResultType.UPDATED_NAVIGATE)
     }
 
@@ -454,7 +451,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
         existingComponentFormData: ExistingItemFormData,
     ) {
         val componentSelection = _uiState.value.componentSelection ?: run {
-            // todo throw error state
+            _uiState.update { it.copy(screenState = ScreenState.Error(Error(FailedToAddComponent()))) }
             return
         }
         dishItemOperationHandler.onAddExistingComponent(
@@ -462,6 +459,7 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             existingComponentFormData,
             componentSelection
         )
+        analyticsHelper.logExistingComponentAdded()
         resetScreenState()
     }
 
@@ -471,16 +469,16 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      */
     fun onAddNewProduct(newProductFormData: NewProductFormData) {
         _uiState.update { it.copy(screenState = ScreenState.Loading<Nothing>()) }
-//      analyticsHelper.logNewProductSaveAttempt(_newProductName.value)
         viewModelScope.launch(myDispatchers.ioDispatcher) {
             try {
-                val newComponent = (uiState.value.componentSelection as? ComponentSelection.NewComponent) ?: error(
-                    "Component selection must be of type NewComponent to add a new product."
-                )
-
+                val newComponent =
+                    (uiState.value.componentSelection as? ComponentSelection.NewComponent) ?: error(
+                        "Component selection must be of type NewComponent to add a new product."
+                    )
+                analyticsHelper.logNewProductSaveAttempt(newComponent.name)
                 createProductUseCase.invoke(newComponent.name, newProductFormData)
                     .onSuccess { newlyCreatedProduct ->
-//                      analyticsHelper.logNewProductSaveSuccess(newlyCreatedProduct)
+                        analyticsHelper.logNewProductSaveSuccess(newlyCreatedProduct)
                         dishItemOperationHandler.addNewProductToDish(
                             uiState.value,
                             newlyCreatedProduct,
@@ -489,12 +487,12 @@ class DishDetailsViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                         resetScreenState()
                     }
                     .onFailure { exception ->
-//                      analyticsHelper.logNewProductSaveFailure(newProductName.value)
-//                      handleError(exception)
+                        analyticsHelper.logNewProductSaveFailure()
+                        _uiState.update { it.copy(screenState = ScreenState.Error(Error(exception))) }
                     }
             } catch (e: Exception) {
-//                analyticsHelper.logNewProductSaveFailure(newProductName.value)
-//                handleError(e)
+                analyticsHelper.logNewProductSaveFailure()
+                _uiState.update { it.copy(screenState = ScreenState.Error(Error(e))) }
             }
         }
     }

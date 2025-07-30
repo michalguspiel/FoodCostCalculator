@@ -39,12 +39,8 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
             })
     }
 
-    fun logNewProductSaveFailure(productName: String) {
-        analyticsRepository.logEvent(
-            Constants.Analytics.DishV2.NEW_PRODUCT_SAVE_FAILURE_FROM_DISH,
-            Bundle().apply {
-                putString(Constants.Analytics.PRODUCT_NAME, productName)
-            })
+    fun logNewProductSaveFailure() {
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.NEW_PRODUCT_SAVE_FAILURE_FROM_DISH)
     }
 
     fun logProductAddedToDishList(productName: String, selectedSuggestedProduct: ProductDomain?, quantityAddedToDish: Double, unit: String){
@@ -131,5 +127,9 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
             bundle.putString(Constants.Analytics.DishV2.ADD_INGREDIENT_TYPE_INTENT, "existing_product")
         }
         analyticsRepository.logEvent(Constants.Analytics.DishV2.ADD_INGREDIENT_CLICKED, bundle)
+    }
+
+    fun logExistingComponentAdded(){
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.EXISTING_COMPONENT_ADDED)
     }
 }
