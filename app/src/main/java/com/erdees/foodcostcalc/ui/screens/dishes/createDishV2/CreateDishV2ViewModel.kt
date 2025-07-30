@@ -19,6 +19,7 @@ import com.erdees.foodcostcalc.domain.usecase.CreateProductUseCase
 import com.erdees.foodcostcalc.ui.errors.InvalidMarginFormatException
 import com.erdees.foodcostcalc.ui.errors.InvalidTaxFormatException
 import com.erdees.foodcostcalc.ui.errors.UserReportableError
+import com.erdees.foodcostcalc.ui.screens.dishes.DishAnalyticsHelper
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishIntent
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingItemFormData
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormData
@@ -62,7 +63,7 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
     private val preferences: Preferences by inject()
     private val dispatchers: MyDispatchers by inject()
     private val createProductUseCase: CreateProductUseCase by inject()
-    private val analyticsHelper = DishCreationAnalyticsHelper(analyticsRepository)
+    private val analyticsHelper = DishAnalyticsHelper(analyticsRepository)
 
     private var _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()

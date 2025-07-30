@@ -1,11 +1,11 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2
+package com.erdees.foodcostcalc.ui.screens.dishes
 
 import android.os.Bundle
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.utils.Constants
 
-class DishCreationAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
+class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
 
     fun logFlowStarted(){
         analyticsRepository.logEvent(Constants.Analytics.DishV2.DISH_CREATION_STARTED, null)

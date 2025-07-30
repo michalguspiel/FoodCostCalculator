@@ -2,7 +2,6 @@ package com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDomain
@@ -10,7 +9,7 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.DishCreationAnalyticsHelper
+import com.erdees.foodcostcalc.ui.screens.dishes.DishAnalyticsHelper
 import com.erdees.foodcostcalc.utils.Constants
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,16 +21,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.Locale
 
 class ComponentLookupViewModel : ViewModel(), KoinComponent {
 
-    private val analyticsRepository: AnalyticsRepository by inject()
     private val productRepository: ProductRepository by inject()
     private val halfProductRepository: HalfProductRepository by inject()
-    private val analyticsHelper = DishCreationAnalyticsHelper(analyticsRepository)
+    private val analyticsHelper = DishAnalyticsHelper(get())
 
     private val suggestionsManuallyDismissed = MutableStateFlow(false)
     private val _newComponentName = MutableStateFlow("")
@@ -73,7 +72,9 @@ class ComponentLookupViewModel : ViewModel(), KoinComponent {
                 }
             )
         }.stateIn(
-            scope = viewModelScope, started = SharingStarted.Companion.Lazily, initialValue = ComponentLookupResult()
+            scope = viewModelScope,
+            started = SharingStarted.Companion.Lazily,
+            initialValue = ComponentLookupResult()
         )
 
     @OptIn(FlowPreview::class)
