@@ -98,6 +98,11 @@ fun DishDetailsScreen(
         productCreationDropdownExpanded = newProductFormViewModel.productCreationUnitDropdownExpanded.collectAsState().value,
         productAdditionDropdownExpanded = newProductFormViewModel.productAdditionUnitDropdownExpanded.collectAsState().value,
     )
+
+    val dishDetailsActions = viewModel.createActions(
+        getCopyDishPrefilledName = { getCopyDishPrefilledName(it, context) }
+    )
+
     val snackbarHostState = remember { SnackbarHostState() }
     val addComponentSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
@@ -140,58 +145,7 @@ fun DishDetailsScreen(
         existingComponentFormUiState = existingFormUiState,
         dishId = dishId,
         navController = navController,
-        actions = DishDetailsScreenActions(
-            dishActions = DishActions(
-                saveDish = viewModel::saveDish,
-                shareDish = viewModel::shareDish,
-                saveAndNavigate = viewModel::saveAndNavigate,
-                resetScreenState = viewModel::resetScreenState,
-            ),
-            propertyActions = DishPropertyActions(
-                updateName = viewModel::updateName,
-                saveName = viewModel::saveDishName,
-                updateTax = viewModel::updateTax,
-                saveTax = viewModel::saveDishTax,
-                updateMargin = viewModel::updateMargin,
-                saveMargin = viewModel::saveDishMargin,
-                updateTotalPrice = viewModel::updateTotalPrice,
-                saveTotalPrice = viewModel::saveDishTotalPrice,
-            ),
-            itemActions = ItemActions(
-                removeItem = viewModel::removeItem,
-                updateQuantity = viewModel::updateQuantity,
-                saveQuantity = viewModel::updateItemQuantity,
-                setComponentSelection = viewModel::setComponentSelection,
-                onAddExistingComponentClick = viewModel::onAddExistingComponent,
-            ),
-            deletionActions = DishDeletionActions(
-                onDeleteDishClick = viewModel::onDeleteDishClick,
-                onDeleteConfirmed = viewModel::confirmDelete,
-            ),
-            copyActions = DishCopyActions(
-                onCopyDishClick = {
-                    viewModel.handleCopyDish {
-                        getCopyDishPrefilledName(
-                            it, context
-                        )
-                    }
-                },
-                copyDish = viewModel::copyDish,
-                updateCopiedDishName = viewModel::updateCopiedDishName,
-                hideCopyConfirmation = viewModel::hideCopyConfirmation,
-            ),
-            interactionActions = ScreenInteractionActions(
-                setInteraction = viewModel::setInteraction,
-                saveChangesAndProceed = viewModel::saveChangesAndProceed,
-                discardChangesAndProceed = {
-                    viewModel.discardChangesAndProceed {
-                        getCopyDishPrefilledName(
-                            it, context
-                        )
-                    }
-                },
-            ),
-        ),
+        actions = dishDetailsActions,
         existingComponentFormActions = ExistingComponentFormActions(
             onFormDataChange = existingFormViewModel::updateFormData,
             onUnitForDishDropdownExpandedChange = {
