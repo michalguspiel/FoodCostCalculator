@@ -91,6 +91,24 @@ class ComponentLookupViewModel : ViewModel(), KoinComponent {
         scope = viewModelScope, started = SharingStarted.Companion.Lazily, initialValue = false
     )
 
+    val uiState: StateFlow<ComponentLookupFormUiState> = combine(
+        suggestedComponents,
+        shouldShowSuggestedProducts,
+        newComponentName,
+        selectedComponent
+    ) { suggestedComponents, showSuggestedComponents, newComponentName, selectedComponent ->
+        ComponentLookupFormUiState(
+            suggestedComponents = suggestedComponents,
+            showSuggestedComponents = showSuggestedComponents,
+            newComponentName = newComponentName,
+            selectedComponent = selectedComponent
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Companion.Lazily,
+        initialValue = ComponentLookupFormUiState()
+    )
+
     fun onComponentSelected(item: Item) {
         Timber.i("onComponentSelected: ${item.name}")
         _newComponentName.value = item.name

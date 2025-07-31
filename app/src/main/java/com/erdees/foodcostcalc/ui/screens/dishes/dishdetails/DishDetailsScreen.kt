@@ -55,6 +55,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.Component
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.createActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
@@ -81,18 +82,9 @@ fun DishDetailsScreen(
     val uiState by viewModel.uiState.collectAsState()
     val existingFormUiState by existingFormViewModel.uiState.collectAsState()
 
-    val componentLookupFormUiState = ComponentLookupFormUiState(
-        suggestedComponents = componentLookupViewModel.suggestedComponents.collectAsState().value,
-        showSuggestedComponents = componentLookupViewModel.shouldShowSuggestedProducts.collectAsState().value,
-        newComponentName = componentLookupViewModel.newComponentName.collectAsState().value,
-        selectedComponent = componentLookupViewModel.selectedComponent.collectAsState().value
-    )
-
-    val componentLookupFormActions = ComponentLookupFormActions(
-        onNewComponentNameChange = componentLookupViewModel::updateNewComponentName,
-        onSelectComponent = componentLookupViewModel::onComponentSelected,
-        onNext = { viewModel.setComponentSelection(componentLookupViewModel.getComponentSelectionResult()) },
-        onReset = componentLookupViewModel::reset
+    val componentLookupFormUiState by componentLookupViewModel.uiState.collectAsState()
+    val componentLookupFormActions = componentLookupViewModel.createActions(
+        onNext = { viewModel.setComponentSelection(componentLookupViewModel.getComponentSelectionResult()) }
     )
 
     val newProductFormUiState = NewProductFormUiState(
