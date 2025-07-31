@@ -51,6 +51,9 @@ import com.erdees.foodcostcalc.ui.navigation.ConfirmPopUp
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsUtil.getCopyDishPrefilledName
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupFormActions
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupFormUiState
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormUiState
@@ -72,10 +75,26 @@ fun DishDetailsScreen(
     viewModel: DishDetailsViewModel = viewModel(),
     existingFormViewModel: ExistingComponentFormViewModel = viewModel(),
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
+    componentLookupViewModel: ComponentLookupViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val existingFormUiState by existingFormViewModel.uiState.collectAsState()
+
+    val componentLookupFormUiState = ComponentLookupFormUiState(
+        suggestedComponents = componentLookupViewModel.suggestedComponents.collectAsState().value,
+        showSuggestedComponents = componentLookupViewModel.shouldShowSuggestedProducts.collectAsState().value,
+        newComponentName = componentLookupViewModel.newComponentName.collectAsState().value,
+        selectedComponent = componentLookupViewModel.selectedComponent.collectAsState().value
+    )
+
+    val componentLookupFormActions = ComponentLookupFormActions(
+        onNewComponentNameChange = componentLookupViewModel::updateNewComponentName,
+        onSelectComponent = componentLookupViewModel::onComponentSelected,
+        onNext = { viewModel.setComponentSelection(componentLookupViewModel.getComponentSelectionResult()) },
+        onReset = componentLookupViewModel::reset
+    )
+
     val newProductFormUiState = NewProductFormUiState(
         productName = (uiState.componentSelection as? ComponentSelection.NewComponent)?.name
             ?: "", // This will be set in the modal sheet based on componentSelection
@@ -217,6 +236,8 @@ fun DishDetailsScreen(
                 }
             }
         ),
+        componentLookupFormUiState = componentLookupFormUiState,
+        componentLookupFormActions = componentLookupFormActions,
         snackbarHostState = snackbarHostState,
         addComponentSheetState = addComponentSheetState,
     )
@@ -233,6 +254,8 @@ private fun EditDishScreenContent(
     existingComponentFormActions: ExistingComponentFormActions,
     newProductFormUiState: NewProductFormUiState,
     newProductFormActions: NewProductFormActions,
+    componentLookupFormUiState: ComponentLookupFormUiState,
+    componentLookupFormActions: ComponentLookupFormActions,
     addComponentSheetState: SheetState,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -330,7 +353,9 @@ private fun EditDishScreenContent(
                 existingComponentFormActions = existingComponentFormActions,
                 newProductFormActions = newProductFormActions,
                 addComponentSheetState = addComponentSheetState,
-                navController = navController
+                navController = navController,
+                componentLookupFormUiState =  componentLookupFormUiState,
+                componentLookupFormActions = componentLookupFormActions
             )
 
             ConfirmPopUp(visible = uiState.showCopyConfirmation) {
@@ -351,6 +376,8 @@ private fun ScreenStateHandler(
     newProductFormActions: NewProductFormActions,
     addComponentSheetState: SheetState,
     navController: NavController,
+    componentLookupFormUiState: ComponentLookupFormUiState,
+    componentLookupFormActions: ComponentLookupFormActions
 ) {
     when (uiState.screenState) {
         is ScreenState.Loading<*> -> ScreenLoadingOverlay()
@@ -372,7 +399,9 @@ private fun ScreenStateHandler(
                 existingComponentFormActions = existingComponentFormActions,
                 newProductFormActions = newProductFormActions,
                 navController = navController,
-                addComponentSheetState = addComponentSheetState
+                addComponentSheetState = addComponentSheetState,
+                componentLookupFormUiState = componentLookupFormUiState,
+                componentLookupFormActions = componentLookupFormActions
             )
         }
 
@@ -392,6 +421,8 @@ private fun InteractionHandler(
     newProductFormActions: NewProductFormActions,
     addComponentSheetState: SheetState,
     navController: NavController,
+    componentLookupFormUiState: ComponentLookupFormUiState,
+    componentLookupFormActions: ComponentLookupFormActions
 ) {
     Timber.i("InteractionHandler: interaction = $interaction")
     when (interaction) {
@@ -503,6 +534,8 @@ private fun InteractionHandler(
                 existingComponentFormActions = existingComponentFormActions,
                 newProductFormUiState = newProductFormUiState,
                 newProductFormActions = newProductFormActions,
+                componentLookupFormUiState = componentLookupFormUiState,
+                componentLookupFormActions = componentLookupFormActions
             )
         }
 
@@ -531,6 +564,8 @@ private fun EditDishScreenContentPreview(
             existingComponentFormActions = ExistingComponentFormActions(),
             newProductFormUiState = NewProductFormUiState(),
             newProductFormActions = NewProductFormActions(),
+            componentLookupFormUiState = ComponentLookupFormUiState(),
+            componentLookupFormActions = ComponentLookupFormActions(),
             addComponentSheetState = rememberModalBottomSheetState()
         )
     }

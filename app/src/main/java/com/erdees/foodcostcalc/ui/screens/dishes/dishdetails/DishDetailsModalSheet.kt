@@ -5,6 +5,8 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupForm
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupFormActions
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentForm
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
@@ -24,6 +26,8 @@ fun DishDetailsModalSheet(
     existingComponentFormActions: ExistingComponentFormActions,
     newProductFormUiState: NewProductFormUiState,
     newProductFormActions: NewProductFormActions,
+    componentLookupFormUiState: ComponentLookupFormUiState,
+    componentLookupFormActions: ComponentLookupFormActions
 ) {
     ModalBottomSheet(
         onDismissRequest = { dishDetailsActions.dishActions.resetScreenState() },
@@ -41,7 +45,10 @@ fun DishDetailsModalSheet(
                         selectedComponent = componentSelection.item,
                         onUnitForDishDropdownExpandedChange = existingComponentFormActions.onUnitForDishDropdownExpandedChange,
                         onCancel = existingComponentFormActions.onCancel,
-                        onAddComponent = existingComponentFormActions.onAddComponent,
+                        onAddComponent = { data ->
+                            existingComponentFormActions.onAddComponent(data)
+                            componentLookupFormActions.onReset()
+                        },
                         onFormDataChange = existingComponentFormActions.onFormDataChange
                     )
                 }
@@ -56,14 +63,18 @@ fun DishDetailsModalSheet(
                     onProductCreationDropdownExpandedChange = newProductFormActions.onProductCreationDropdownExpandedChange,
                     onProductAdditionDropdownExpandedChange = newProductFormActions.onProductAdditionDropdownExpandedChange,
                     onFormDataUpdate = newProductFormActions.onFormDataUpdate,
-                    onSaveProduct = newProductFormActions.onSaveProduct
+                    onSaveProduct = { data ->
+                        newProductFormActions.onSaveProduct(data)
+                        componentLookupFormActions.onReset()
+                    }
                 )
             }
 
             null -> {
-                ComponentLookupForm {
-                    dishDetailsActions.itemActions.setComponentSelection(it)
-                }
+                ComponentLookupForm(
+                    uiState = componentLookupFormUiState,
+                    actions = componentLookupFormActions
+                )
             }
         }
     }

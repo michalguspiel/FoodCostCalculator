@@ -82,13 +82,11 @@ class ComponentLookupViewModel : ViewModel(), KoinComponent {
         newComponentName.debounce(Constants.UI.SEARCH_DEBOUNCE_MS),
         suggestedComponents,
         selectedComponent,
-        suggestionsManuallyDismissed
-    ) { newProductName, suggestedProducts, selectedSuggestedProduct, suggestionsManuallyDismissed ->
+    ) { newProductName, suggestedProducts, selectedSuggestedProduct ->
         newProductName.isNotBlank() &&
                 newProductName.length > 2 &&
                 !suggestedProducts.isEmpty &&
-                selectedSuggestedProduct == null &&
-                !suggestionsManuallyDismissed
+                selectedSuggestedProduct == null
     }.stateIn(
         scope = viewModelScope, started = SharingStarted.Companion.Lazily, initialValue = false
     )
@@ -130,5 +128,10 @@ class ComponentLookupViewModel : ViewModel(), KoinComponent {
     fun getComponentSelectionResult(): ComponentSelection {
         return selectedComponent.value?.let { ComponentSelection.ExistingComponent(it) }
             ?: ComponentSelection.NewComponent(newComponentName.value)
+    }
+
+    fun reset() {
+        _newComponentName.value = ""
+        selectedComponent.value = null
     }
 }

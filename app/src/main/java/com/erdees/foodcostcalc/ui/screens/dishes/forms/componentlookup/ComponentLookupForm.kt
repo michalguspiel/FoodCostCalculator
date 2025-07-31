@@ -21,7 +21,6 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +30,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
@@ -45,26 +42,20 @@ import com.erdees.foodcostcalc.ui.theme.FCCTheme
 @Composable
 fun ComponentLookupForm(
     modifier: Modifier = Modifier,
-    viewModel: ComponentLookupViewModel = viewModel(),
-    onNext: (ComponentSelection) -> Unit
+    uiState: ComponentLookupFormUiState,
+    actions: ComponentLookupFormActions
 ) {
-    val suggestedComponents by viewModel.suggestedComponents.collectAsStateWithLifecycle()
-    val showSuggestedComponents by viewModel.shouldShowSuggestedProducts.collectAsStateWithLifecycle()
-    val newComponentName by viewModel.newComponentName.collectAsStateWithLifecycle()
-    val selectedComponent by viewModel.selectedComponent.collectAsStateWithLifecycle()
     ComponentLookupFormContent(
-        suggestedComponents = suggestedComponents,
-        showSuggestedComponents = showSuggestedComponents,
-        newComponentName = newComponentName,
-        selectedComponent = selectedComponent,
-        onNewComponentNameChange = viewModel::updateNewComponentName,
-        onSelectComponent = {
-            viewModel.onComponentSelected(it)
-            onNext(viewModel.getComponentSelectionResult())
+        suggestedComponents = uiState.suggestedComponents,
+        showSuggestedComponents = uiState.showSuggestedComponents,
+        newComponentName = uiState.newComponentName,
+        selectedComponent = uiState.selectedComponent,
+        onNewComponentNameChange = actions.onNewComponentNameChange,
+        onSelectComponent = { item ->
+            actions.onSelectComponent(item)
+            actions.onNext()
         },
-        onNext = {
-            onNext(viewModel.getComponentSelectionResult())
-        },
+        onNext = actions.onNext,
         modifier = modifier,
     )
 }

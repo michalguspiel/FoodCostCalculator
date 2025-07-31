@@ -69,6 +69,9 @@ import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishActions
 import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsModalSheet
 import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsScreenActions
 import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.ItemActions
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupFormActions
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupFormUiState
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
@@ -87,6 +90,7 @@ fun CreateDishStartScreen(
     viewModel: CreateDishV2ViewModel = viewModel(),
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
     existingProductFormViewModel: ExistingComponentFormViewModel = viewModel(),
+    componentLookupViewModel: ComponentLookupViewModel = viewModel()
 ) {
     val context = LocalContext.current
     val dishName by viewModel.dishName.collectAsState()
@@ -99,6 +103,21 @@ fun CreateDishStartScreen(
     val componentSelection by viewModel.componentSelection.collectAsState()
 
     val existingFormUiState by existingProductFormViewModel.uiState.collectAsState()
+
+    val componentLookupFormUiState = ComponentLookupFormUiState(
+        suggestedComponents = componentLookupViewModel.suggestedComponents.collectAsState().value,
+        showSuggestedComponents = componentLookupViewModel.shouldShowSuggestedProducts.collectAsState().value,
+        newComponentName = componentLookupViewModel.newComponentName.collectAsState().value,
+        selectedComponent = componentLookupViewModel.selectedComponent.collectAsState().value
+    )
+
+    val componentLookupFormActions = ComponentLookupFormActions(
+        onNewComponentNameChange = componentLookupViewModel::updateNewComponentName,
+        onSelectComponent = componentLookupViewModel::onComponentSelected,
+        onNext = { viewModel.setComponentSelection(componentLookupViewModel.getComponentSelectionResult()) },
+        onReset = componentLookupViewModel::reset
+    )
+
     val newProductFormUiState = NewProductFormUiState(
         productName = (componentSelection as? ComponentSelection.NewComponent)?.name ?: "",
         dishName = dishName,
@@ -217,6 +236,8 @@ fun CreateDishStartScreen(
                                 }
                             }
                         ),
+                        componentLookupFormUiState = componentLookupFormUiState,
+                        componentLookupFormActions = componentLookupFormActions
                     )
                 }
                 else -> {
