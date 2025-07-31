@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.ui.screens.dishes
 import android.os.Bundle
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.utils.Constants
 
 class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
@@ -43,14 +44,14 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
         analyticsRepository.logEvent(Constants.Analytics.DishV2.NEW_PRODUCT_SAVE_FAILURE_FROM_DISH)
     }
 
-    fun logProductAddedToDishList(productName: String, selectedSuggestedProduct: ProductDomain?, quantityAddedToDish: Double, unit: String){
+    fun logProductAddedToDishList(productName: String, selection: ComponentSelection?, quantityAddedToDish: Double, unit: String){
         analyticsRepository.logEvent(
             Constants.Analytics.DishV2.DISH_INGREDIENT_ADDED,
             Bundle().apply {
                 putString(Constants.Analytics.DishV2.DISH_INGREDIENT_NAME, productName)
                 putString(
                     Constants.Analytics.DishV2.DISH_INGREDIENT_TYPE,
-                    if (selectedSuggestedProduct == null) "new_in_context" else "existing"
+                    if (selection is ComponentSelection.NewComponent) "new_in_context" else "existing"
                 )
                 putDouble(Constants.Analytics.DishV2.DISH_INGREDIENT_QUANTITY, quantityAddedToDish)
                 putString(Constants.Analytics.DishV2.DISH_INGREDIENT_UNIT, unit)
@@ -112,19 +113,19 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
             })
     }
 
-    fun logSuggestionDismissed(){
-        analyticsRepository.logEvent(
-            Constants.Analytics.DishV2.SUGGESTIONS_MANUALLY_DISMISSED,
-            null
-        )
-    }
-
-    fun logAddIngredientClick(productToAdd: ProductDomain?){
+    fun logAddIngredientClick(component: ComponentSelection?){
         val bundle = Bundle()
-        if (productToAdd == null){
-            bundle.putString(Constants.Analytics.DishV2.ADD_INGREDIENT_TYPE_INTENT, "new_product")
-        } else {
-            bundle.putString(Constants.Analytics.DishV2.ADD_INGREDIENT_TYPE_INTENT, "existing_product")
+        when(component) {
+            is ComponentSelection.ExistingComponent -> {
+                bundle.putString(Constants.Analytics.DishV2.ADD_INGREDIENT_TYPE_INTENT, "existing_component")
+            }
+            is ComponentSelection.NewComponent -> {
+                bundle.putString(Constants.Analytics.DishV2.ADD_INGREDIENT_TYPE_INTENT, "new_component")
+            }
+
+            null -> {
+                bundle.putString(Constants.Analytics.DishV2.ADD_INGREDIENT_TYPE_INTENT, "unknown")
+            }
         }
         analyticsRepository.logEvent(Constants.Analytics.DishV2.ADD_INGREDIENT_CLICKED, bundle)
     }

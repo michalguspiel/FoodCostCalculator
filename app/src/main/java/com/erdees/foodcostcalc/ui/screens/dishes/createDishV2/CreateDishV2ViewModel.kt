@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2
 
 import androidx.annotation.StringRes
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.data.Preferences
@@ -20,16 +21,13 @@ import com.erdees.foodcostcalc.ui.errors.InvalidMarginFormatException
 import com.erdees.foodcostcalc.ui.errors.InvalidTaxFormatException
 import com.erdees.foodcostcalc.ui.errors.UserReportableError
 import com.erdees.foodcostcalc.ui.screens.dishes.DishAnalyticsHelper
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart.CreateDishIntent
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingItemFormData
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormData
-import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.Constants.UI.SEARCH_DEBOUNCE_MS
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.Utils
 import com.erdees.foodcostcalc.utils.onNumericValueChange
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.Eagerly
@@ -37,7 +35,6 @@ import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -49,13 +46,11 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import java.util.Locale
 
 /**
- * Note: Refactor this VM to use ScreenState instead of separate state holders isLoading and errorRes
- * TODO: Fix this so that it is able to handle adding half products as ingredients as well.
+ * TODO: Refactor this VM to use ScreenState instead of separate state holders isLoading and errorRes
  * */
-class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
+class CreateDishV2ViewModel : ViewModel(), KoinComponent {
 
     private val analyticsRepository: AnalyticsRepository by inject()
     private val productRepository: ProductRepository by inject()
@@ -64,6 +59,9 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
     private val dispatchers: MyDispatchers by inject()
     private val createProductUseCase: CreateProductUseCase by inject()
     private val analyticsHelper = DishAnalyticsHelper(analyticsRepository)
+
+    private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
+    val screenState: StateFlow<ScreenState> = _screenState
 
     private var _isLoading: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val isLoading = _isLoading.asStateFlow()
@@ -86,17 +84,10 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
 
     private var _saveDishSuccess: MutableStateFlow<Long?> = MutableStateFlow(null)
 
-    init {
-        analyticsHelper.logFlowStarted()
-    }
-
     /**
      * Emits the ID of the dish if it was successfully saved to the database, otherwise null.
      * */
     val saveDishSuccess = _saveDishSuccess.asStateFlow()
-
-    private var _intent: MutableStateFlow<CreateDishIntent?> = MutableStateFlow(null)
-    val intent = _intent.asStateFlow()
 
     val currency = preferences.currency.stateIn(viewModelScope, Lazily, null)
 
@@ -142,62 +133,12 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         onNumericValueChange(newTax, _taxPercentInput)
     }
 
-    private val _newProductName = MutableStateFlow("")
-    val newProductName = _newProductName
+    private var _componentSelection: MutableStateFlow<ComponentSelection?> = MutableStateFlow(null)
+    val componentSelection = _componentSelection.asStateFlow()
 
-    fun updateNewProductName(newValue: String) {
-        suggestionsManuallyDismissed.value = false
-        if (newValue.isBlank()) {
-            selectedSuggestedProduct.value = null
-        }
-
-        val productNameMatchesExistingProduct = products.value.find { it.name == newValue }
-        if (productNameMatchesExistingProduct == null) {
-            selectedSuggestedProduct.value = null
-        } else {
-            selectedSuggestedProduct.value = productNameMatchesExistingProduct
-        }
-
-        _newProductName.value = newValue
+    init {
+        analyticsHelper.logFlowStarted()
     }
-
-    val selectedSuggestedProduct = MutableStateFlow<ProductDomain?>(null)
-
-    private val suggestionsManuallyDismissed = MutableStateFlow(false)
-
-    fun onSuggestionsManuallyDismissed() {
-        suggestionsManuallyDismissed.value = true
-        analyticsHelper.logSuggestionDismissed()
-    }
-
-    @OptIn(FlowPreview::class)
-    val suggestedProducts =
-        combine(
-            products,
-            newProductName.debounce(SEARCH_DEBOUNCE_MS)
-                .onStart { emit("") }) { products, searchWord ->
-            products.filter {
-                it.name.lowercase(Locale.getDefault()).contains(searchWord.lowercase())
-            }
-        }.stateIn(
-            scope = viewModelScope, started = Lazily, initialValue = null
-        )
-
-    @OptIn(FlowPreview::class)
-    val shouldShowSuggestedProducts = combine(
-        newProductName.debounce(SEARCH_DEBOUNCE_MS),
-        suggestedProducts,
-        selectedSuggestedProduct,
-        suggestionsManuallyDismissed
-    ) { newProductName, suggestedProducts, selectedSuggestedProduct, suggestionsManuallyDismissed ->
-        newProductName.isNotBlank() &&
-                newProductName.length > 2 &&
-                suggestedProducts?.isNotEmpty() == true &&
-                selectedSuggestedProduct == null &&
-                !suggestionsManuallyDismissed
-    }.stateIn(
-        scope = viewModelScope, started = Lazily, initialValue = false
-    )
 
     val foodCost: StateFlow<Double> = _addedProducts.map { products ->
         products.sumOf { productAdded ->
@@ -227,37 +168,46 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         initialValue = 0.0
     )
 
-    fun onSuggestionSelected(product: ProductDomain) {
-        newProductName.value = product.name
-        selectedSuggestedProduct.value = product
-        analyticsHelper.logSuggestionSelected(product.name)
-    }
-
     /**
      * Called when user clicks add new ingredient in parent form
      * */
     fun onAddIngredientClick() {
-        analyticsHelper.logAddIngredientClick(selectedSuggestedProduct.value)
-        viewModelScope.launch {
-            val productToAdd = selectedSuggestedProduct.value
-            if (productToAdd == null) {
-                _intent.update { CreateDishIntent.AddNewProduct(newProductName.value) }
-            } else {
-                _intent.update { CreateDishIntent.AddProduct(productToAdd) }
-            }
+        val name = when(componentSelection.value){
+            is ComponentSelection.NewComponent -> (componentSelection.value as ComponentSelection.NewComponent).name
+            is ComponentSelection.ExistingComponent -> (componentSelection.value as ComponentSelection.ExistingComponent).item.name
+            null -> ""
         }
+        analyticsHelper.logAddIngredientClick(componentSelection.value)
+        updateScreenState(ScreenState.Interaction(InteractionType.ContextualAddComponent))
+    }
+
+    fun setComponentSelection(componentSelection: ComponentSelection?) {
+        _componentSelection.value = componentSelection
+    }
+
+    fun resetScreenState() {
+        _screenState.update { ScreenState.Idle }
+        _isLoading.update { false }
+        _componentSelection.value = null
+    }
+
+    fun updateScreenState(screenState: ScreenState) {
+        _screenState.value = screenState
     }
 
     /**
      * Called when the user submits the form to add a completely new product to the dish.
      * It coordinates saving the new product to the database and then adding it to the current dish's ingredient list.
      */
-    fun onAddNewProductClick(newProductFormData: NewProductFormData) {
+    fun onAddNewProduct(newProductFormData: NewProductFormData) {
         _isLoading.update { true }
-        analyticsHelper.logNewProductSaveAttempt(_newProductName.value)
+        val newComponent = (_componentSelection.value as? ComponentSelection.NewComponent)
+            ?: error("Component selection must be of type NewComponent to add a new product.")
+
+        analyticsHelper.logNewProductSaveAttempt(newComponent.name)
         viewModelScope.launch(dispatchers.ioDispatcher) {
             try {
-                createProductUseCase.invoke(_newProductName.value, newProductFormData)
+                createProductUseCase.invoke(newComponent.name, newProductFormData)
                     .onSuccess { newlyCreatedProduct ->
                         analyticsHelper.logNewProductSaveSuccess(newlyCreatedProduct)
 
@@ -280,24 +230,30 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         }
     }
 
-
     /**
-     * Called when the user confirms adding a pre-existing, selected product to the current dish.
+     * Called when the user confirms adding a pre-existing, selected component to the current dish.
      *
-     * @param existingProductFormData Data containing the quantity and unit for the product in the dish.
+     * @param existingComponentFormData Data containing the quantity and unit for the component in the dish.
      */
-    fun onAddExistingProductClick(existingProductFormData: ExistingItemFormData) {
+    fun onAddExistingComponent(existingComponentFormData: ExistingItemFormData) {
         _isLoading.update { true }
         viewModelScope.launch {
             try {
-                val productDomain = selectedSuggestedProduct.value
-                    ?: error("Attempted to add existing product but no product was selected.")
+                val componentSelection = _componentSelection.value as? ComponentSelection.ExistingComponent
+                    ?: error("Component selection must be of type ExistingComponent to add existing component.")
 
-                addProductToDishList(
-                    product = productDomain,
-                    quantityStr = existingProductFormData.quantityForDish,
-                    unit = existingProductFormData.unitForDish
-                )
+                when (val item = componentSelection.item) {
+                    is ProductDomain -> {
+                        addProductToDishList(
+                            product = item,
+                            quantityStr = existingComponentFormData.quantityForDish,
+                            unit = existingComponentFormData.unitForDish
+                        )
+                    }
+                    else -> {
+                        error("Unsupported component type: ${item::class.simpleName}")
+                    }
+                }
 
                 resetProductAdditionState()
             } catch (e: Exception) {
@@ -329,7 +285,7 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
         }
         analyticsHelper.logProductAddedToDishList(
             product.name,
-            selectedSuggestedProduct.value,
+            componentSelection.value,
             quantityAddedToDish,
             unit
         )
@@ -350,14 +306,8 @@ class CreateDishV2ViewModel : FCCBaseViewModel(), KoinComponent {
      */
     private fun resetProductAdditionState() {
         _isLoading.update { false }
-        _newProductName.value = ""
-        selectedSuggestedProduct.value = null
-        onSuggestionsManuallyDismissed() // Ensure suggestions are hidden
-        onModalDismissed() // If this is called from a modal, dismiss it
-    }
-
-    fun onModalDismissed() {
-        _intent.value = null
+        _componentSelection.value = null
+        resetScreenState()
     }
 
     /**

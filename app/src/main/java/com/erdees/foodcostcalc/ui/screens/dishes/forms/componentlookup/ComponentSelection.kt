@@ -11,3 +11,10 @@ sealed class ComponentSelection {
     data class ExistingComponent(val item: Item) : ComponentSelection()
     data class NewComponent(val name: String) : ComponentSelection()
 }
+
+fun ComponentSelection.getName(): String{
+    return when (this) {
+        is ComponentSelection.ExistingComponent -> item.name
+        is ComponentSelection.NewComponent -> name
+    }
+}
