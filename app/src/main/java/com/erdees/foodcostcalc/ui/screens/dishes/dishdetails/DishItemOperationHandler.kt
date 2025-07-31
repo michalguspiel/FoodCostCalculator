@@ -60,6 +60,38 @@ class DishItemOperationHandler(
                     )
                 }
             }
+
+            is ProductAddedToDish -> {
+                val index = currentDish.productsNotSaved.indexOf(currentlyEditedItem)
+                if (index != -1) {
+                    val updatedItem = currentlyEditedItem.copy(quantity = quantity)
+                    val updatedProductsNotSaved = currentDish.productsNotSaved.toMutableList()
+                        .apply { set(index, updatedItem) }
+                    updateUiState(
+                        uiState.copy(
+                            dish = currentDish.copy(productsNotSaved = updatedProductsNotSaved)
+                        )
+                    )
+                }
+            }
+
+            is HalfProductAddedToDish -> {
+                val index = currentDish.halfProductsNotSaved.indexOf(currentlyEditedItem)
+                if (index != -1) {
+                    val updatedItem = HalfProductAddedToDish(
+                        item = currentlyEditedItem.item,
+                        quantity = quantity,
+                        quantityUnit = currentlyEditedItem.quantityUnit
+                    )
+                    val updatedHalfProductsNotSaved = currentDish.halfProductsNotSaved.toMutableList()
+                        .apply { set(index, updatedItem) }
+                    updateUiState(
+                        uiState.copy(
+                            dish = currentDish.copy(halfProductsNotSaved = updatedHalfProductsNotSaved)
+                        )
+                    )
+                }
+            }
         }
     }
 
