@@ -1,11 +1,13 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
-import android.content.Context
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.JustRemovedItem
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishActionResult
@@ -14,48 +16,53 @@ import com.erdees.foodcostcalc.ext.showUndoDeleteSnackbar
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsUtil.getCopyDishPrefilledName
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormViewModel
+
+data class DishDetailsStateManagerActions(
+    val undoRemoveItem: () -> Unit,
+    val clearLastRemovedItem: () -> Unit,
+    val resetScreenState: () -> Unit,
+    val handleCopyDish: ((String) -> String) -> Unit,
+    val setItemContext: (Item) -> Unit
+)
 
 @Composable
 fun DishDetailsStateManager(
     uiState: DishDetailsUiState,
-    context: Context,
     navController: NavController,
     snackbarHostState: SnackbarHostState,
-    existingFormViewModel: ExistingComponentFormViewModel,
-    viewModel: DishDetailsViewModel,
+    actions: DishDetailsStateManagerActions,
 ) {
     HandleComponentSelectionChange(
         componentSelection = uiState.componentSelection,
-        existingFormViewModel = existingFormViewModel,
-        context = context
+        setItemContext = actions.setItemContext,
     )
 
     HandleItemRemovalWithUndo(
         lastRemovedItem = uiState.lastRemovedItem,
         snackbarHostState = snackbarHostState,
-        context = context,
-        viewModel = viewModel
+        undoRemoveItem = actions.undoRemoveItem,
+        clearLastRemovedItem = actions.clearLastRemovedItem
     )
 
     HandleScreenStateNavigation(
         screenState = uiState.screenState,
         navController = navController,
-        viewModel = viewModel,
-        context = context
+        resetScreenState = actions.resetScreenState,
+        handleCopyDish = actions.handleCopyDish,
     )
 }
 
 @Composable
 private fun HandleComponentSelectionChange(
     componentSelection: ComponentSelection?,
-    existingFormViewModel: ExistingComponentFormViewModel,
-    context: Context
+    setItemContext: (Item) -> Unit,
 ) {
+    val currentSetItemContext = rememberUpdatedState(setItemContext)
+
     LaunchedEffect(componentSelection) {
         componentSelection?.let {
             if (it is ComponentSelection.ExistingComponent) {
-                existingFormViewModel.setItemContext(it.item, context.resources)
+                currentSetItemContext.value(it.item)
             }
         }
     }
@@ -65,16 +72,20 @@ private fun HandleComponentSelectionChange(
 private fun HandleItemRemovalWithUndo(
     lastRemovedItem: JustRemovedItem?,
     snackbarHostState: SnackbarHostState,
-    context: Context,
-    viewModel: DishDetailsViewModel
+    undoRemoveItem: () -> Unit,
+    clearLastRemovedItem: () -> Unit
 ) {
+    val context = LocalContext.current
+    val currentUndoRemoveItem = rememberUpdatedState(undoRemoveItem)
+    val currentClearLastRemovedItem = rememberUpdatedState(clearLastRemovedItem)
+
     LaunchedEffect(lastRemovedItem) {
         val removedItem = lastRemovedItem?.item ?: return@LaunchedEffect
         snackbarHostState.showUndoDeleteSnackbar(
             message = context.getString(R.string.removed_item, removedItem.item.name),
             actionLabel = context.getString(R.string.undo),
-            actionPerformed = { viewModel.undoRemoveItem() },
-            ignored = { viewModel.clearLastRemovedItem() }
+            actionPerformed = { currentUndoRemoveItem.value() },
+            ignored = { currentClearLastRemovedItem.value() }
         )
     }
 }
@@ -83,14 +94,18 @@ private fun HandleItemRemovalWithUndo(
 private fun HandleScreenStateNavigation(
     screenState: ScreenState,
     navController: NavController,
-    viewModel: DishDetailsViewModel,
-    context: Context
+    resetScreenState: () -> Unit,
+    handleCopyDish: ((String) -> String) -> Unit,
 ) {
+    val context = LocalContext.current
+    val currentResetScreenState = rememberUpdatedState(resetScreenState)
+    val currentHandleCopyDish = rememberUpdatedState(handleCopyDish)
+
     LaunchedEffect(screenState) {
         val state = screenState as? ScreenState.Success<*> ?: return@LaunchedEffect
         val data = state.data as? DishActionResult ?: return@LaunchedEffect
 
-        viewModel.resetScreenState()
+        currentResetScreenState.value()
         when (data.type) {
             DishDetailsActionResultType.COPIED -> {
                 navController.navigate(FCCScreen.DishDetails(data.dishId, true)) {
@@ -105,7 +120,7 @@ private fun HandleScreenStateNavigation(
             }
 
             DishDetailsActionResultType.UPDATED_STAY -> {
-                viewModel.handleCopyDish { getCopyDishPrefilledName(it, context) }
+                currentHandleCopyDish.value { getCopyDishPrefilledName(it, context) }
             }
         }
     }

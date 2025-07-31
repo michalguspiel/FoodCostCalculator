@@ -30,11 +30,14 @@ fun EditDishTopBar(
     onCopyClick: () -> Unit,
     onShareClick: () -> Unit,
     onRecipeClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
-    TopAppBar(title = {
+    TopAppBar(
+        modifier = modifier,
+        title = {
         Text(
             text = dishName, modifier = Modifier.Companion.clickable { onNameClick() })
     }, actions = {

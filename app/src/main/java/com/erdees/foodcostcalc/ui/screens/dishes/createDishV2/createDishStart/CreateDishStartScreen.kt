@@ -81,6 +81,8 @@ private const val MaxSuggestedProducts = 3
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+// todo use new component lookup form composable plus viewmodel
+//  - so that halfproducts are there for free can be added
 fun CreateDishStartScreen(
     navController: NavController,
     viewModel: CreateDishV2ViewModel = viewModel(),

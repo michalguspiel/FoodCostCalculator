@@ -66,17 +66,19 @@ import timber.log.Timber
 @Screen
 @Composable
 fun DishDetailsScreen(
-    dishId: Long, navController:
+    dishId: Long,
+    navController:
     NavController,
     viewModel: DishDetailsViewModel = viewModel(),
     existingFormViewModel: ExistingComponentFormViewModel = viewModel(),
-    newProductFormViewModel: NewProductFormViewModel = viewModel()
+    newProductFormViewModel: NewProductFormViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
     val existingFormUiState by existingFormViewModel.uiState.collectAsState()
     val newProductFormUiState = NewProductFormUiState(
-        productName = (uiState.componentSelection as? ComponentSelection.NewComponent)?.name ?: "", // This will be set in the modal sheet based on componentSelection
+        productName = (uiState.componentSelection as? ComponentSelection.NewComponent)?.name
+            ?: "", // This will be set in the modal sheet based on componentSelection
         dishName = uiState.dish?.name ?: "",
         productCreationUnits = newProductFormViewModel.productCreationUnits.collectAsState().value,
         productAdditionUnits = newProductFormViewModel.productAdditionUnits.collectAsState().value,
@@ -102,11 +104,24 @@ fun DishDetailsScreen(
 
     DishDetailsStateManager(
         uiState = uiState,
-        context = context,
         navController = navController,
         snackbarHostState = snackbarHostState,
-        existingFormViewModel = existingFormViewModel,
-        viewModel = viewModel,
+        actions = DishDetailsStateManagerActions(
+            undoRemoveItem = viewModel::undoRemoveItem,
+            clearLastRemovedItem = viewModel::clearLastRemovedItem,
+            resetScreenState = viewModel::resetScreenState,
+            handleCopyDish = { name ->
+                viewModel.handleCopyDish {
+                    getCopyDishPrefilledName(
+                        it,
+                        context
+                    )
+                }
+            },
+            setItemContext = { item ->
+                existingFormViewModel.setItemContext(item, context.resources)
+            }
+        ),
     )
 
     EditDishScreenContent(
@@ -220,7 +235,7 @@ private fun EditDishScreenContent(
     newProductFormActions: NewProductFormActions,
     addComponentSheetState: SheetState,
     snackbarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     Scaffold(
@@ -241,7 +256,7 @@ private fun EditDishScreenContent(
             Column {
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
                     items(uiState.items, key = {
-                        when(it) {
+                        when (it) {
                             is UsedItem -> it.id
                             else -> System.identityHashCode(it)
                         }
@@ -500,7 +515,7 @@ private fun InteractionHandler(
 @PreviewLightDark
 @Composable
 private fun EditDishScreenContentPreview(
-    @PreviewParameter(EditDishScreenStateProvider::class) state: DishDetailsUiState
+    @PreviewParameter(EditDishScreenStateProvider::class) state: DishDetailsUiState,
 ) {
     val navController = rememberNavController()
 

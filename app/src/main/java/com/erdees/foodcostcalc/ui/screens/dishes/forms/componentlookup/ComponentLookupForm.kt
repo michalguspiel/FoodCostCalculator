@@ -58,7 +58,7 @@ fun ComponentLookupForm(
         newComponentName = newComponentName,
         selectedComponent = selectedComponent,
         onNewComponentNameChange = viewModel::updateNewComponentName,
-        onComponentSelected = {
+        onSelectComponent = {
             viewModel.onComponentSelected(it)
             onNext(viewModel.getComponentSelectionResult())
         },
@@ -76,7 +76,7 @@ private fun ComponentLookupFormContent(
     newComponentName: String,
     selectedComponent: Item?,
     onNewComponentNameChange: (String) -> Unit,
-    onComponentSelected: (Item) -> Unit,
+    onSelectComponent: (Item) -> Unit,
     onNext: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -108,7 +108,7 @@ private fun ComponentLookupFormContent(
                         SuggestionItem(
                             headlineText = item.name,
                             painter = painterResource(R.drawable.shopping_basket_24px),
-                        ) { onComponentSelected(item) }
+                        ) { onSelectComponent(item) }
                         if (index < suggestedComponents.products.size - 1) {
                             FCCSecondaryHorizontalDivider()
                         }
@@ -122,7 +122,7 @@ private fun ComponentLookupFormContent(
                         SuggestionItem(
                             headlineText = item.name,
                             painter = painterResource(R.drawable.blender_24),
-                        ) { onComponentSelected(item) }
+                        ) { onSelectComponent(item) }
                         if (index < suggestedComponents.halfProducts.size - 1) {
                             FCCSecondaryHorizontalDivider()
                         }
@@ -284,7 +284,7 @@ private fun ComponentLookupFormPreview() {
             showSuggestedComponents = true,
             newComponentName = "Fl",
             onNewComponentNameChange = {},
-            onComponentSelected = {},
+            onSelectComponent = {},
             onNext = {},
             selectedComponent = null,
             modifier = Modifier
