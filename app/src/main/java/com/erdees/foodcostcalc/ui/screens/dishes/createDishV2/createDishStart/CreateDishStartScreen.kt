@@ -58,6 +58,7 @@ import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.Section
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
@@ -320,11 +321,11 @@ private fun CreateDishStartScreenContent(
                                 R.string.add_next_ingredient
                             ),
                             style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 8.dp)
+                            modifier = Modifier.padding(bottom = 4.dp)
                         )
                     }
 
-                    FCCPrimaryButton(
+                    FCCOutlinedButton(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 24.dp),
