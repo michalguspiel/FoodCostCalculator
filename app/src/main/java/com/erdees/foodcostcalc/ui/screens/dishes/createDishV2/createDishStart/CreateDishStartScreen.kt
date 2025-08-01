@@ -274,6 +274,7 @@ private fun CreateDishStartScreenContent(
                 })
             }) { paddingValues ->
             Column(
+                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
@@ -281,9 +282,7 @@ private fun CreateDishStartScreenContent(
                     .padding(paddingValues)
             ) {
                 Column(
-                    Modifier
-                        .padding(horizontal = 12.dp)
-                        .weight(1f),
+                    Modifier.padding(horizontal = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     Column {

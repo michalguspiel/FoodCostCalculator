@@ -80,7 +80,6 @@ private fun ComponentLookupFormContent(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-
         Text(stringResource(R.string.add_component), style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         FCCTextField(
@@ -90,7 +89,7 @@ private fun ComponentLookupFormContent(
             value = newComponentName,
             onValueChange = onNewComponentNameChange
         )
-        LazyColumn {
+        LazyColumn(Modifier.weight(1f, fill = false)) {
             if (showSuggestedComponents) {
                 if (suggestedComponents.products.isNotEmpty()) {
                     item {

@@ -172,11 +172,6 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
      * Called when user clicks add new ingredient in parent form
      * */
     fun onAddIngredientClick() {
-        val name = when(componentSelection.value){
-            is ComponentSelection.NewComponent -> (componentSelection.value as ComponentSelection.NewComponent).name
-            is ComponentSelection.ExistingComponent -> (componentSelection.value as ComponentSelection.ExistingComponent).item.name
-            null -> ""
-        }
         analyticsHelper.logAddIngredientClick(componentSelection.value)
         updateScreenState(ScreenState.Interaction(InteractionType.ContextualAddComponent))
     }
