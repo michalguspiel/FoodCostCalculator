@@ -124,6 +124,8 @@ object Constants {
             const val DEFAULT_SETTINGS_PROMPT_SHOWN = "default_settings_prompt_shown"
             const val DEFAULT_SETTINGS_SAVED = "default_settings_saved"
             const val DEFAULT_SETTINGS_DISMISSED = "default_settings_dismissed"
+
+            const val EXISTING_COMPONENT_ADDED = "existing_component_added"
         }
 
         object Products {

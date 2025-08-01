@@ -19,6 +19,7 @@ import com.erdees.foodcostcalc.data.model.remote.FeatureRequest
 import com.erdees.foodcostcalc.data.model.remote.FeatureRequestStatus
 import com.erdees.foodcostcalc.domain.model.FeatureRequestDomain
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
@@ -299,6 +300,16 @@ object Mapper {
             quantity = quantity,
             quantityUnit = quantityUnit,
             productDishId = AUTO_GENERATED_ID,
+        )
+    }
+
+    fun HalfProductAddedToDish.toHalfProductDish(dishId: Long): HalfProductDish {
+        return HalfProductDish(
+            halfProductId = item.id,
+            dishId = dishId,
+            quantity = quantity,
+            quantityUnit = quantityUnit,
+            halfProductDishId = AUTO_GENERATED_ID,
         )
     }
 

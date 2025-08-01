@@ -24,3 +24,7 @@ class InvalidProductPriceException(
     message: String,
     @StringRes override val errorRes: Int = R.string.invalid_product_price_error
 ) : IllegalArgumentException(message), UserReportableError
+
+class FailedToAddComponent(
+    @StringRes override val errorRes: Int = R.string.error_failed_to_add_component
+) : IllegalStateException(), UserReportableError

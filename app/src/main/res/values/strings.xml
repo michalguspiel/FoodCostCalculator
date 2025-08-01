@@ -156,6 +156,24 @@
     <string name="more_options">More Options</string>
     <string name="removed_item">Removed %1$s</string>
 
+    <string name="add_product_with_name">Add Ingredient: %1$s</string>
+    <string name="add_half_product_with_name">Add Half Product: %1$s</string>
+    <string name="create_new_product">Create new ingredient</string>
+    <string name="create_new_product_placeholder">Create ingredient \'%1$s\'</string>
+    <string name="add_component">Add Component</string>
+    <string name="add_component_hint">Add a component to your dish</string>
+    <string name="no_suggestions">Nothing found… Don\'t worry you can create it right here!</string>
+    <string name="start_typing_to_see_suggestions">Start typing to see suggestions</string>
+    <string name="find_an_ingredient">Find an ingredient</string>
+    <string name="start_typing_to_search_or_create">Start typing to search or create.</string>
+    <string name="no_results_for">No results for "%1$s"</string>
+    <string name="search_or_create_component">Search or create component</string>
+    <string name="search_or_create_component_hint">Component name</string>
+    <string name="matching_half_products">Matching half products</string>
+    <string name="matching_ingredients">Matching ingredients</string>
+
+    <string name="error_failed_to_add_component">Failed to add component. Please try again.</string>
+
     <!-- Delete confirmation dialog -->
     <string name="delete_item_title">Delete \'%1$s\'?</string>
     <string name="delete_confirmation_message">Are you sure you want to permanently delete this item?</string>
@@ -209,6 +227,7 @@
     <string name="add_first_ingredient">Add First Ingredient</string>
     <string name="add_next_ingredient">Add Next Ingredient</string>
     <string name="added_ingredients">Added Ingredients</string>
+    <string name="ingredients_empty_state_headline">Your ingredients will appear here</string>
     <string name="continue_dish_creation">Next: Pricing</string>
 
     <string name="invalid_margin_format_error">Invalid margin format. Please enter a valid number.</string>

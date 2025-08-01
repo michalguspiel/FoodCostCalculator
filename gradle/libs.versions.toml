@@ -1,7 +1,7 @@
 [versions]
 kotlin = "2.0.10"
 compose_compiler = "1.5.15"
-compose_bom = "2025.04.01"
+compose_bom = "2025.07.00"
 navigation_compose = "2.8.9"
 coil = "2.7.0"
 appcompat = "1.7.0"
