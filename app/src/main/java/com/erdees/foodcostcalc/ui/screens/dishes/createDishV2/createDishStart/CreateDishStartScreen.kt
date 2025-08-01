@@ -1,12 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishStart
 
 import android.icu.util.Currency
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.animateContentSize
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -36,15 +30,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -57,12 +55,10 @@ import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.composables.Ingredients
-import com.erdees.foodcostcalc.ui.composables.Section
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
-import com.erdees.foodcostcalc.ui.composables.labels.SectionLabel
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.SingleServing
@@ -90,7 +86,7 @@ fun CreateDishStartScreen(
     viewModel: CreateDishV2ViewModel = viewModel(),
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
     existingProductFormViewModel: ExistingComponentFormViewModel = viewModel(),
-    componentLookupViewModel: ComponentLookupViewModel = viewModel()
+    componentLookupViewModel: ComponentLookupViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val dishName by viewModel.dishName.collectAsState()
@@ -126,7 +122,6 @@ fun CreateDishStartScreen(
     val scope = rememberCoroutineScope()
     val snackbarMessage = stringResource(id = R.string.onboarding_complete_snackbar_text)
 
-    // Initialize product creation units when the component sheet is opened
     LaunchedEffect(componentSelection) {
         if (componentSelection is ComponentSelection.NewComponent) {
             newProductFormViewModel.getProductCreationUnits(context.resources)
@@ -148,7 +143,6 @@ fun CreateDishStartScreen(
         newProductFormViewModel.getProductCreationUnits(context.resources)
     }
 
-    // Handle component selection changes for existing components
     LaunchedEffect(componentSelection) {
         (componentSelection as? ComponentSelection.ExistingComponent)?.let {
             existingProductFormViewModel.setItemContext(it.item, context.resources)
@@ -173,7 +167,6 @@ fun CreateDishStartScreen(
         }
     )
 
-    // Handle screen state interactions
     when (screenState) {
         is ScreenState.Interaction -> {
             when ((screenState as ScreenState.Interaction).interaction) {
@@ -214,10 +207,12 @@ fun CreateDishStartScreen(
                         newProductFormActions = NewProductFormActions(
                             onFormDataUpdate = newProductFormViewModel::updateFormData,
                             onProductCreationDropdownExpandedChange = {
-                                newProductFormViewModel.productCreationUnitDropdownExpanded.value = it
+                                newProductFormViewModel.productCreationUnitDropdownExpanded.value =
+                                    it
                             },
                             onProductAdditionDropdownExpandedChange = {
-                                newProductFormViewModel.productAdditionUnitDropdownExpanded.value = it
+                                newProductFormViewModel.productAdditionUnitDropdownExpanded.value =
+                                    it
                             },
                             onSaveProduct = { data ->
                                 scope.launch {
@@ -232,14 +227,12 @@ fun CreateDishStartScreen(
                         componentLookupFormActions = componentLookupFormActions
                     )
                 }
-                else -> {
-                    // Handle other interactions if needed
-                }
+
+                else -> {}
             }
         }
-        else -> {
-            // Handle other screen states if needed
-        }
+
+        else -> {}
     }
 }
 
@@ -253,14 +246,12 @@ private fun CreateDishStartScreenContent(
     onErrorDismiss: () -> Unit,
     onAddIngredientClick: () -> Unit,
     onContinueClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
+    val hasFocusBeenRequested = rememberSaveable { mutableStateOf(false) }
+    val dishNameFocusRequester = remember { FocusRequester() }
+    
     with(createDishStartScreenState) {
-        val dishNameFocusRequester = remember { FocusRequester() }
-        val sectionVisible by remember(addedProducts) {
-            mutableStateOf(addedProducts.isNotEmpty())
-        }
-
         Scaffold(
             modifier = modifier,
             topBar = {
@@ -292,7 +283,7 @@ private fun CreateDishStartScreenContent(
                 Column(
                     Modifier
                         .padding(horizontal = 12.dp)
-                        .padding(bottom = 48.dp),
+                        .weight(1f),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     Column {
@@ -303,68 +294,74 @@ private fun CreateDishStartScreenContent(
                         )
                         FCCTextField(
                             modifier = Modifier
-                                .focusRequester(dishNameFocusRequester),
+                                .focusRequester(dishNameFocusRequester)
+                                .onGloballyPositioned {
+                                    if (!hasFocusBeenRequested.value) {
+                                        dishNameFocusRequester.requestFocus()
+                                        hasFocusBeenRequested.value = true
+                                    }
+                                }
+                            ,
                             title = null,
                             value = dishName,
                             onValueChange = { updateDishName(it) },
                             keyboardOptions = KeyboardOptions(
                                 keyboardType = KeyboardType.Text,
                                 capitalization = KeyboardCapitalization.Words,
-                                imeAction = ImeAction.Next
+                                imeAction = ImeAction.Done
                             )
                         )
                     }
 
                     Column {
                         Text(
-                            if (addedProducts.isEmpty()) stringResource(R.string.add_first_ingredient) else stringResource(
-                                R.string.add_next_ingredient
-                            ),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(bottom = 4.dp)
+                            text = stringResource(R.string.added_ingredients),
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(bottom = 8.dp)
                         )
-                    }
 
-                    FCCOutlinedButton(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
-                        text = stringResource(R.string.add_product),
-                        onClick = { onAddIngredientClick() },
-                    )
-                }
-
-                Spacer(Modifier.weight(1f))
-
-                SnackbarHost(hostState = snackbarHostState, modifier = Modifier.padding(vertical = 12.dp))
-
-                Section(Modifier.animateContentSize(tween())) {
-                    AnimatedVisibility(
-                        visible = sectionVisible,
-                        enter = fadeIn(animationSpec = tween()) + slideInHorizontally(),
-                        exit = ExitTransition.None
-                    ) {
-                        Column {
-                            SectionLabel(stringResource(R.string.added_ingredients))
-                            Spacer(Modifier.size(8.dp))
+                        if (addedProducts.isEmpty()) {
+                            IngredientsEmptyState(modifier = Modifier.padding(vertical = 24.dp))
+                        } else {
                             Ingredients(
                                 addedProducts,
                                 persistentListOf(),
                                 SingleServing,
                                 currency,
-                                modifier = Modifier
+                                modifier = Modifier.padding(vertical = 24.dp)
                             )
                         }
+
+                        Spacer(modifier = Modifier.size(16.dp))
+
+                        FCCOutlinedButton(
+                            modifier = Modifier.fillMaxWidth(),
+                            text = if (addedProducts.isEmpty()) {
+                                stringResource(R.string.add_first_ingredient)
+                            } else {
+                                stringResource(R.string.add_more_ingredients)
+                            },
+                            onClick = { onAddIngredientClick() },
+                        )
                     }
+                }
+
+                Column(
+                    modifier = Modifier
+                        .padding(horizontal = 12.dp)
+                        .padding(top = 12.dp, bottom = 24.dp),
+                ) {
+                    SnackbarHost(
+                        hostState = snackbarHostState,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+
                     FCCPrimaryButton(
                         enabled = dishName.isNotBlank(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         text = stringResource(R.string.continue_dish_creation),
-                        onClick = {
-                            onContinueClick()
-                        })
+                        onClick = { onContinueClick() }
+                    )
                 }
             }
             if (errorRes != null) {
@@ -377,7 +374,31 @@ private fun CreateDishStartScreenContent(
     }
 }
 
-@Suppress("MagicNumber")
+@Composable
+private fun IngredientsEmptyState(
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Icon(
+            painter = painterResource(R.drawable.shopping_basket_24px),
+            contentDescription = null,
+            modifier = Modifier.size(32.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        Text(
+            text = stringResource(R.string.ingredients_empty_state_headline),
+            style = MaterialTheme.typography.bodyLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
 @Preview
 @Composable
 private fun CreateDishStartScreenContentPreview() {
@@ -393,6 +414,28 @@ private fun CreateDishStartScreenContentPreview() {
                         "kg",
                     )
                 ),
+                currency = Currency.getInstance("PLN"),
+                isFirstDish = false,
+                errorRes = null
+            ),
+            snackbarHostState = remember { SnackbarHostState() },
+            updateDishName = {},
+            onAddIngredientClick = {},
+            onContinueClick = {},
+            onErrorDismiss = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun CreateDishStartScreenContentEmptyListPreview() {
+    FCCTheme {
+        CreateDishStartScreenContent(
+            navController = rememberNavController(),
+            createDishStartScreenState = CreateDishStartScreenState(
+                dishName = "Spaghetti Bolognese",
+                addedProducts = persistentListOf(),
                 currency = Currency.getInstance("PLN"),
                 isFirstDish = false,
                 errorRes = null

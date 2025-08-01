@@ -227,6 +227,7 @@
     <string name="add_first_ingredient">Add First Ingredient</string>
     <string name="add_next_ingredient">Add Next Ingredient</string>
     <string name="added_ingredients">Added Ingredients</string>
+    <string name="ingredients_empty_state_headline">Your ingredients will appear here</string>
     <string name="continue_dish_creation">Next: Pricing</string>
 
     <string name="invalid_margin_format_error">Invalid margin format. Please enter a valid number.</string>
