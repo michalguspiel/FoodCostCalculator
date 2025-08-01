@@ -42,9 +42,9 @@ import com.erdees.foodcostcalc.ui.theme.FCCTheme
 
 @Composable
 fun ComponentLookupForm(
-    modifier: Modifier = Modifier,
     uiState: ComponentLookupFormUiState,
-    actions: ComponentLookupFormActions
+    actions: ComponentLookupFormActions,
+    modifier: Modifier = Modifier,
 ) {
     ComponentLookupFormContent(
         suggestedComponents = uiState.suggestedComponents,

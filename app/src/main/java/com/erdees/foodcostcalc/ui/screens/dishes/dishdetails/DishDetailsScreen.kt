@@ -189,15 +189,16 @@ fun DishDetailsScreen(
     )
 }
 
+@Suppress("LongParameterList")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditDishScreenContent(
     uiState: DishDetailsUiState,
+    actions: DishDetailsScreenActions,
     existingComponentFormUiState: ExistingComponentFormUiState,
+    existingComponentFormActions: ExistingComponentFormActions,
     dishId: Long,
     navController: NavController,
-    actions: DishDetailsScreenActions,
-    existingComponentFormActions: ExistingComponentFormActions,
     newProductFormUiState: NewProductFormUiState,
     newProductFormActions: NewProductFormActions,
     componentLookupFormUiState: ComponentLookupFormUiState,
