@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.editDish
+package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
 import android.icu.util.Currency
 import androidx.lifecycle.SavedStateHandle
@@ -16,7 +16,6 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
-import com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.DishDetailsViewModel
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.Utils
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -80,7 +79,7 @@ class DishDetailsViewModelTest {
     ): CompleteDish {
         val recipe = if (withRecipe) {
             RecipeWithSteps(
-                recipe = Recipe(1L,30,60, "Test Recipe", "Test Description"),
+                recipe = Recipe(1L, 30, 60, "Test Recipe", "Test Description"),
                 steps = listOf(RecipeStep(1L, 1L, "Test Step", 1))
             )
         } else null
@@ -263,7 +262,14 @@ class DishDetailsViewModelTest {
 
 
     private suspend fun TestScope.actAndVerifySetMargin(newPrice: Double, dishTax: Double) {
-        coEvery { mockDishRepository.getDish(any()) }.returns(flowOf(createDishModel(dishTax, newPrice / dishTax * 3.66)))
+        coEvery { mockDishRepository.getDish(any()) }.returns(
+            flowOf(
+                createDishModel(
+                    dishTax,
+                    newPrice / dishTax * 3.66
+                )
+            )
+        )
         viewModel = DishDetailsViewModel(savedStateHandle)
         advanceUntilIdle()
         // act
