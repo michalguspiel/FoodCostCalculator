@@ -10,7 +10,7 @@ import kotlinx.serialization.Serializable
  * */
 @Keep
 @Serializable
-class HalfProductAddedToDish(
+data class HalfProductAddedToDish(
     override val item: HalfProductDomain,
     override val quantity: Double,
     override val quantityUnit: String,

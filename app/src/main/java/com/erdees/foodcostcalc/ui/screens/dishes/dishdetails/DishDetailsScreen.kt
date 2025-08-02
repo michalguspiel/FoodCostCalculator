@@ -227,7 +227,7 @@ private fun EditDishScreenContent(
                 LazyColumn(Modifier.weight(fill = true, weight = 1f)) {
                     items(uiState.items, key = {
                         when (it) {
-                            is UsedItem -> it.id
+                            is UsedItem -> it.javaClass.simpleName + it.id
                             else -> System.identityHashCode(it)
                         }
                     }) { item ->
