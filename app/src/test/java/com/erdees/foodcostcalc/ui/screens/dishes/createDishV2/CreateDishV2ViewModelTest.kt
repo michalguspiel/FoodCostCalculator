@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails.createDishV2
+package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2
 
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
@@ -7,7 +7,6 @@ import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
-import com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.CreateDishV2ViewModel
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -73,18 +72,19 @@ class CreateDishV2ViewModelTest {
     }
 
     @Test
-    fun `onSaveDishClick calls showSetAsDefaultSettingsPrompt when not prompted before`() = runTest {
-        coEvery { mockPreferences.hasPromptedDefaultSettings } returns flowOf(false)
-        viewModel = CreateDishV2ViewModel()
-        advanceUntilIdle()
+    fun `onSaveDishClick calls showSetAsDefaultSettingsPrompt when not prompted before`() =
+        runTest {
+            coEvery { mockPreferences.hasPromptedDefaultSettings } returns flowOf(false)
+            viewModel = CreateDishV2ViewModel()
+            advanceUntilIdle()
 
-        viewModel.onSaveDishClick()
-        advanceUntilIdle()
+            viewModel.onSaveDishClick()
+            advanceUntilIdle()
 
-        val screenState = viewModel.screenState.first()
-        screenState.shouldBeInstanceOf<ScreenState.Interaction>()
-        screenState.interaction.shouldBeInstanceOf<InteractionType.SaveDefaultSettings>()
-    }
+            val screenState = viewModel.screenState.first()
+            screenState.shouldBeInstanceOf<ScreenState.Interaction>()
+            screenState.interaction.shouldBeInstanceOf<InteractionType.SaveDefaultSettings>()
+        }
 
     @Test
     fun `onSaveDishClick calls onSaveDish when already prompted`() = runTest {
