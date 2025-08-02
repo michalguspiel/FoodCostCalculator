@@ -35,6 +35,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCSecondaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
@@ -253,7 +254,7 @@ private fun ComponentLookupFormPreview() {
                         pricePerUnit = 2.5,
                         tax = 8.0,
                         waste = 5.0,
-                        unit = "kg"
+                        unit = MeasurementUnit.KILOGRAM
                     ),
                     ProductDomain(
                         id = 2L,
@@ -261,14 +262,14 @@ private fun ComponentLookupFormPreview() {
                         pricePerUnit = 3.0,
                         tax = 8.0,
                         waste = 3.0,
-                        unit = "kg"
+                        unit = MeasurementUnit.KILOGRAM
                     )
                 ),
                 halfProducts = listOf(
                     HalfProductDomain(
                         id = 1L,
                         name = "Dough",
-                        halfProductUnit = "per kg",
+                        halfProductUnit = MeasurementUnit.KILOGRAM,
                         products = emptyList()
                     )
                 )

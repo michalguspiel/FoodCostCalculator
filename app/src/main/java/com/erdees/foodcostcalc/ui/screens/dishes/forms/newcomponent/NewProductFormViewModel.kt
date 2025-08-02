@@ -1,9 +1,10 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent
 
-import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import com.erdees.foodcostcalc.domain.model.units.UnitCategory
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,8 +32,8 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
 
     val isAddButtonEnabled = formData.map {
         it.purchasePrice.toDoubleOrNull() != null &&
-                it.unitForDish.isNotEmpty() &&
-                it.purchaseUnit.isNotEmpty() &&
+                it.unitForDish != null &&
+                it.purchaseUnit != null &&
                 it.quantityAddedToDish.toDoubleOrNull() != null
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
@@ -40,7 +41,7 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
         _formData.update { newValue }
     }
 
-    val productCreationUnits = MutableStateFlow<Set<String>>(setOf())
+    val productCreationUnits = MutableStateFlow<Set<MeasurementUnit>>(setOf())
 
     val productAdditionUnits = formData
         .distinctUntilChanged { old, new ->
@@ -56,7 +57,7 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
                 .distinctUntilChanged(areEquivalent = { old, new -> old == new })
                 .filter { it.isNotEmpty() }
                 .collect { availableUnits ->
-                    if (formData.value.unitForDish.isEmpty()) {
+                    if (formData.value.unitForDish != null) {
                         _formData.update { it.copy(unitForDish = availableUnits.first()) }
                     }
                 }
@@ -66,18 +67,18 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
     /**
      * Function used to prepare selection of units for the product creation.
      * */
-    fun getProductCreationUnits(resources: Resources) {
+    fun getProductCreationUnits() {
         viewModelScope.launch {
             val metricUsed = preferences.metricUsed.first()
             val imperialUsed = preferences.imperialUsed.first()
-            productCreationUnits.update { Utils.getUnitsSet(resources, metricUsed, imperialUsed) }
+            productCreationUnits.update { Utils.getUnitsSet(metricUsed, imperialUsed) }
         }
     }
 
     /** Function used to prepare selection of units for the product addition,
      *  This is called every time product creation unit changes to provide relevant units in other dropdown.
      * */
-    private suspend fun getUnitList(unitType: UnitsUtils.UnitType): Set<String> {
+    private suspend fun getUnitList(unitType: UnitCategory): Set<MeasurementUnit> {
         val metricUnits = preferences.metricUsed.first()
         val imperialUnits = preferences.imperialUsed.first()
         return Utils.generateUnitSet(

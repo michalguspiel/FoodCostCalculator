@@ -23,6 +23,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.fields.UnitField
@@ -150,16 +151,17 @@ private fun NewProductIngredientModalContentDarkPreview() {
             NewProductFormUiState(
                 productName = "Sugar",
                 dishName = "Cake",
-                productAdditionUnits = setOf("kg", "g", "l", "ml"),
-                productCreationUnits = setOf("per kilogram", "per liter"),
+                productAdditionUnits = setOf(MeasurementUnit.KILOGRAM, MeasurementUnit.GRAM,
+                    MeasurementUnit.LITER, MeasurementUnit.MILLILITER),
+                productCreationUnits = setOf(MeasurementUnit.KILOGRAM, MeasurementUnit.LITER),
                 productAdditionDropdownExpanded = false,
                 productCreationDropdownExpanded = false,
                 formData = NewProductFormData(
                     purchasePrice = "12.99",
-                    purchaseUnit = "per kilogram",
+                    purchaseUnit = MeasurementUnit.KILOGRAM,
                     "10",
                     "200",
-                    "gram"
+                    MeasurementUnit.GRAM
                 ),
                 isAddButtonEnabled = true,
             ),

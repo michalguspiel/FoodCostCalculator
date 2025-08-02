@@ -42,6 +42,7 @@ import androidx.navigation.compose.rememberNavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
@@ -73,7 +74,7 @@ fun CreateProductScreen(
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.getUnits(context.resources)
+        viewModel.getUnits()
     }
 
     LaunchedEffect(screenState) {
@@ -338,8 +339,12 @@ private fun CreateProductScreenContentPreview() {
         productPrice = "15.99",
         productTax = "10",
         productWaste = "5",
-        units = setOf("kg", "g", "lbs", "oz", "pcs", "slice"),
-        selectedUnit = "kg",
+        units = setOf(MeasurementUnit.KILOGRAM,
+            MeasurementUnit.GRAM,
+            MeasurementUnit.POUND,
+            MeasurementUnit.OUNCE,
+            MeasurementUnit.PIECE),
+        selectedUnit = MeasurementUnit.KILOGRAM,
         screenState = ScreenState.Idle, // Or ScreenState.Success if you want to see the snackbar effect
         isAddButtonEnabled = true,
         isCountPiecePriceEnabled = true,
@@ -381,8 +386,8 @@ private fun CreateProductScreenContentTaxHiddenPreview() {
         productPrice = "3.50",
         productTax = "0", // Will be hidden
         productWaste = "2",
-        units = setOf("loaf", "slice", "g"),
-        selectedUnit = "loaf",
+        units = setOf(MeasurementUnit.KILOGRAM,MeasurementUnit.GRAM),
+        selectedUnit = MeasurementUnit.KILOGRAM,
         screenState = ScreenState.Idle,
         isAddButtonEnabled = true,
         isCountPiecePriceEnabled = false, // Example: piece price not relevant
@@ -414,8 +419,8 @@ private fun CreateProductScreenContentLoadingPreview() {
         productPrice = "",
         productTax = "",
         productWaste = "",
-        units = setOf("kg", "g"),
-        selectedUnit = "kg",
+        units = setOf(MeasurementUnit.KILOGRAM,MeasurementUnit.GRAM),
+        selectedUnit = MeasurementUnit.GRAM,
         screenState = ScreenState.Loading<Nothing>(),
         isAddButtonEnabled = false,
         isCountPiecePriceEnabled = false,

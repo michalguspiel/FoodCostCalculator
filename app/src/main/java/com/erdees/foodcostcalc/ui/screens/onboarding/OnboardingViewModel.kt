@@ -15,6 +15,7 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.data.repository.RecipeRepository
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.utils.Constants
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -79,10 +80,10 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
                 val dish = sampleDish(recipeId, context)
                 val dishId = dishRepository.addDish(dish)
                 val productDishes = listOf(
-                    ProductDish(0, addedProducts[0].productId, dishId, 150.0, "gram"),
-                    ProductDish(0, addedProducts[1].productId, dishId, 1.0, "piece"),
-                    ProductDish(0, addedProducts[2].productId, dishId, 1.0, "piece"),
-                    ProductDish(0, addedProducts[3].productId, dishId, 20.0, "gram")
+                    ProductDish(0, addedProducts[0].productId, dishId, 150.0, MeasurementUnit.GRAM),
+                    ProductDish(0, addedProducts[1].productId, dishId, 1.0, MeasurementUnit.PIECE),
+                    ProductDish(0, addedProducts[2].productId, dishId, 1.0, MeasurementUnit.PIECE),
+                    ProductDish(0, addedProducts[3].productId, dishId, 20.0, MeasurementUnit.GRAM)
                 )
                 productDishes.forEach {
                     productRepository.addProductDish(it)
@@ -107,10 +108,10 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
 
     @Suppress("MagicNumber")
     private fun sampleIngredients(context: Context) = listOf(
-        ProductBase(0, context.getString(R.string.onboarding_ingredient_minced_beef), 19.20, 0.0, 0.0, "per kilogram"),
-        ProductBase(0, context.getString(R.string.onboarding_ingredient_burger_bun), 0.7, 0.0, 0.0, "per piece"),
-        ProductBase(0, context.getString(R.string.onboarding_ingredient_cheese_slice), 0.5, 0.0, 0.0, "per piece"),
-        ProductBase(0, context.getString(R.string.onboarding_ingredient_lettuce), 3.99, 0.0, 15.0, "per kilogram")
+        ProductBase(0, context.getString(R.string.onboarding_ingredient_minced_beef), 19.20, 0.0, 0.0, MeasurementUnit.KILOGRAM),
+        ProductBase(0, context.getString(R.string.onboarding_ingredient_burger_bun), 0.7, 0.0, 0.0, MeasurementUnit.PIECE),
+        ProductBase(0, context.getString(R.string.onboarding_ingredient_cheese_slice), 0.5, 0.0, 0.0, MeasurementUnit.PIECE),
+        ProductBase(0, context.getString(R.string.onboarding_ingredient_lettuce), 3.99, 0.0, 15.0, MeasurementUnit.KILOGRAM)
     )
 
     @Suppress("MagicNumber")

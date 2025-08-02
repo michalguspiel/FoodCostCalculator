@@ -9,6 +9,7 @@ import com.erdees.foodcostcalc.data.model.local.joined.ProductAndProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 
 @Suppress("MagicNumber")
 private fun createDishModel(): CompleteDish {
@@ -17,8 +18,8 @@ private fun createDishModel(): CompleteDish {
         recipe = null,
         products = listOf(
             ProductAndProductDish(
-                productDish = ProductDish(0L, 0L, 0L, 1.0, "kilogram"),
-                product = ProductBase(0L, "Broccoli", 10.0, 0.0, 50.0, "per kilogram")
+                productDish = ProductDish(0L, 0L, 0L, 1.0, MeasurementUnit.KILOGRAM),
+                product = ProductBase(0L, "Broccoli", 10.0, 0.0, 50.0, MeasurementUnit.KILOGRAM)
             )
         ),
         halfProducts = emptyList(),

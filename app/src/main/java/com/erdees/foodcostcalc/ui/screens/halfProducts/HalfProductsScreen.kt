@@ -37,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -57,6 +56,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.TitleRow
@@ -153,7 +153,7 @@ fun HalfProductsScreen(
 
                     InteractionType.CreateHalfProduct -> {
                         CreateHalfProductDialog(
-                            units = viewModel.getUnitsSet(LocalContext.current),
+                            units = viewModel.getUnitsSet(),
                             onSave = { name, unit ->
                                 viewModel.addHalfProduct(name = name, unit = unit)
                             },
@@ -388,9 +388,9 @@ private fun PriceSummary(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateHalfProductDialog(
-    units: Set<String>,
+    units: Set<MeasurementUnit>,
     modifier: Modifier = Modifier,
-    onSave: (name: String, unit: String) -> Unit,
+    onSave: (name: String, unit: MeasurementUnit) -> Unit,
     onDismiss: () -> Unit
 ) {
     var name by remember {
@@ -398,7 +398,7 @@ fun CreateHalfProductDialog(
     }
 
     var selectedUnit by remember {
-        mutableStateOf(units.firstOrNull() ?: "")
+        mutableStateOf(units.first())
     }
 
     BasicAlertDialog(
@@ -459,21 +459,21 @@ private fun HalfProductsItemPreview() {
                 halfProductDomain = HalfProductDomain(
                     id = 1,
                     name = "Mayonnaise",
-                    halfProductUnit = "per kilogram",
+                    halfProductUnit = MeasurementUnit.GRAM,
                     products = listOf(
                         UsedProductDomain(
                             1,
                             2,
-                            ProductDomain(1, "Egg", 2.0, 0.5, 5.0, "kg"),
+                            ProductDomain(1, "Egg", 2.0, 0.5, 5.0, MeasurementUnit.KILOGRAM),
                             1.0,
-                            "pcs",
+                            MeasurementUnit.PIECE,
                             1.0,
                         ), UsedProductDomain(
                             1,
                             2,
-                            ProductDomain(2, "Oil", 15.0, 0.5, 5.0, "kg"),
+                            ProductDomain(2, "Oil", 15.0, 0.5, 5.0, MeasurementUnit.KILOGRAM),
                             100.0,
-                            "g",
+                            MeasurementUnit.GRAM,
                             null,
                         )
                     )
@@ -486,7 +486,7 @@ private fun HalfProductsItemPreview() {
                 onAddItemsClick = { }) {}
             HalfProductItem(
                 halfProductDomain = HalfProductDomain(
-                    id = 1, name = "Ketchup", halfProductUnit = "kg", products = emptyList()
+                    id = 1, name = "Ketchup", halfProductUnit = MeasurementUnit.KILOGRAM, products = emptyList()
                 ),
                 isExpanded = false,
                 quantity = 2.0,

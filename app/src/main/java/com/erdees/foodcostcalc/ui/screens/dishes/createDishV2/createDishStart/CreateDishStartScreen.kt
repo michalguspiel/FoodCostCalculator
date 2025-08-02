@@ -54,6 +54,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -124,7 +125,7 @@ fun CreateDishStartScreen(
 
     LaunchedEffect(componentSelection) {
         if (componentSelection is ComponentSelection.NewComponent) {
-            newProductFormViewModel.getProductCreationUnits(context.resources)
+            newProductFormViewModel.getProductCreationUnits()
         }
     }
 
@@ -140,12 +141,12 @@ fun CreateDishStartScreen(
     }
 
     LaunchedEffect(Unit) {
-        newProductFormViewModel.getProductCreationUnits(context.resources)
+        newProductFormViewModel.getProductCreationUnits()
     }
 
     LaunchedEffect(componentSelection) {
         (componentSelection as? ComponentSelection.ExistingComponent)?.let {
-            existingProductFormViewModel.setItemContext(it.item, context.resources)
+            existingProductFormViewModel.setItemContext(it.item)
         }
     }
 
@@ -408,9 +409,9 @@ private fun CreateDishStartScreenContentPreview() {
                 dishName = "Spaghetti Bolognese",
                 addedComponents = persistentListOf(
                     ProductAddedToDish(
-                        ProductDomain(0L, "Tomato", 3.99, 0.0, 10.0, "kg"),
+                        ProductDomain(0L, "Tomato", 3.99, 0.0, 10.0, MeasurementUnit.KILOGRAM),
                         0.5,
-                        "kg",
+                        MeasurementUnit.KILOGRAM,
                     )
                 ),
                 currency = Currency.getInstance("PLN"),

@@ -16,6 +16,7 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toDishDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.Utils
 import io.kotest.matchers.nulls.shouldNotBeNull
@@ -88,8 +89,8 @@ class DishDetailsViewModelTest {
             recipe = recipe,
             products = listOf(
                 ProductAndProductDish(
-                    productDish = ProductDish(0L, 0L, testDishId, 1.0, "kilogram"),
-                    product = ProductBase(0L, "Broccoli", productPrice, 0.0, 50.0, "per kilogram")
+                    productDish = ProductDish(0L, 0L, testDishId, 1.0, MeasurementUnit.KILOGRAM),
+                    product = ProductBase(0L, "Broccoli", productPrice, 0.0, 50.0, MeasurementUnit.KILOGRAM)
                 )
             ),
             halfProducts = emptyList(),

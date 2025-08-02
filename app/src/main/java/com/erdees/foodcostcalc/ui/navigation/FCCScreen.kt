@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc.ui.navigation
 
 import androidx.annotation.Keep
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -39,7 +40,7 @@ sealed class FCCScreen(
     data object DataBackup : FCCScreen(R.string.data_backup, R.drawable.online)
 
     @Serializable
-    data class AddItemToHalfProduct(val id: Long, val name: String, val unit: String) : FCCScreen()
+    data class AddItemToHalfProduct(val id: Long, val name: String, val unit: MeasurementUnit) : FCCScreen()
 
     @Serializable
     data class AddItemsToDish(val dishId: Long, val dishName: String) : FCCScreen()

@@ -1,10 +1,12 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent
 
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+
 data class NewProductFormUiState(
     val productName: String = "",
     val dishName: String = "",
-    val productCreationUnits: Set<String> = emptySet(),
-    val productAdditionUnits: Set<String> = emptySet(),
+    val productCreationUnits: Set<MeasurementUnit> = emptySet(),
+    val productAdditionUnits: Set<MeasurementUnit> = emptySet(),
     val formData: NewProductFormData = NewProductFormData(),
     val isAddButtonEnabled: Boolean = false,
     val productCreationDropdownExpanded: Boolean = false,

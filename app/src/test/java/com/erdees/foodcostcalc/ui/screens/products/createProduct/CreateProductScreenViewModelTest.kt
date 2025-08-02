@@ -4,6 +4,7 @@ import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import io.kotest.matchers.shouldBe
 import io.mockk.clearAllMocks
@@ -109,7 +110,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
             viewModel.updateProductName("Test Product")
             viewModel.updateProductPrice("10.0")
             viewModel.updateProductWaste("5.0")
-            viewModel.selectUnit("kg")
+            viewModel.selectUnit(MeasurementUnit.KILOGRAM)
             advanceUntilIdle()
 
             viewModel.addButtonEnabled.value shouldBe true
@@ -124,7 +125,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
 
             viewModel.updateProductName("Test Product")
             viewModel.updateProductWaste("5.0")
-            viewModel.selectUnit("kg")
+            viewModel.selectUnit(MeasurementUnit.KILOGRAM)
             advanceUntilIdle()
 
             viewModel.addButtonEnabled.value shouldBe false
@@ -140,7 +141,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
             viewModel.updateProductPrice("10.0")
             viewModel.updateProductTax("20.0")
             viewModel.updateProductWaste("5.0")
-            viewModel.selectUnit("kg")
+            viewModel.selectUnit(MeasurementUnit.KILOGRAM)
             advanceUntilIdle()
 
             viewModel.addButtonEnabled.value shouldBe true
@@ -156,7 +157,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
             viewModel.updateProductName("Test Product")
             viewModel.updateProductPrice("10.0")
             viewModel.updateProductWaste("5.0")
-            viewModel.selectUnit("kg")
+            viewModel.selectUnit(MeasurementUnit.KILOGRAM)
             viewModel.updateProductTax("")
             advanceUntilIdle()
 
@@ -188,7 +189,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
             viewModel.updateProductPrice("10.0")
             viewModel.updateProductTax("15.0")
             viewModel.updateProductWaste("5.0")
-            viewModel.selectUnit("kg")
+            viewModel.selectUnit(MeasurementUnit.KILOGRAM)
             advanceUntilIdle()
 
             viewModel.addProduct()
@@ -222,7 +223,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
         viewModel.updateProductName("Test Product")
         viewModel.updateProductPrice("10.0")
         viewModel.updateProductWaste("5.0")
-        viewModel.selectUnit("kg")
+        viewModel.selectUnit(MeasurementUnit.KILOGRAM)
         advanceUntilIdle()
         viewModel.addProduct()
         advanceUntilIdle()
@@ -233,7 +234,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
         capturedProduct.pricePerUnit shouldBe 10.0
         capturedProduct.tax shouldBe 0.0
         capturedProduct.waste shouldBe 5.0
-        capturedProduct.unit shouldBe "kg"
+        capturedProduct.unit shouldBe MeasurementUnit.KILOGRAM
 
         coVerify(exactly = 1) {
             analyticsRepository.logEvent(

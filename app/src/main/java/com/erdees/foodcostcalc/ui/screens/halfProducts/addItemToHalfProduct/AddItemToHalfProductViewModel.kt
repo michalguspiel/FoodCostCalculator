@@ -9,6 +9,8 @@ import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import com.erdees.foodcostcalc.domain.model.units.UnitCategory
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils.generateUnitSet
@@ -66,20 +68,20 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
         onNumericValueChange(newValue, _pieceWeight)
     }
 
-    private var _units = MutableStateFlow<Set<String>>(setOf())
-    val units: StateFlow<Set<String>> = _units
+    private var _units = MutableStateFlow<Set<MeasurementUnit>>(setOf())
+    val units: StateFlow<Set<MeasurementUnit>> = _units
 
-    private var _selectedUnit = MutableStateFlow("")
-    val selectedUnit: StateFlow<String> = _selectedUnit
+    private var _selectedUnit: MutableStateFlow<MeasurementUnit?> = MutableStateFlow(null)
+    val selectedUnit: StateFlow<MeasurementUnit?> = _selectedUnit
 
-    fun selectUnit(unit: String) {
+    fun selectUnit(unit: MeasurementUnit) {
         _selectedUnit.value = unit
     }
 
-    private var halfProductUnitType: UnitsUtils.UnitType? = null
+    private var halfProductUnitType: UnitCategory? = null
 
     /** Represents type of the unit such as weight, volume or simply a piece of a product.*/
-    private var unitType: UnitsUtils.UnitType? = null
+    private var unitType: UnitCategory? = null
 
     private fun updateUnitList() {
         viewModelScope.launch(dispatchers.ioDispatcher) {
@@ -91,12 +93,12 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
                     metricUnits,
                     imperialUnits
                 )
-                _selectedUnit.value = _units.value.firstOrNull() ?: ""
+                _selectedUnit.value = _units.value.firstOrNull()
             }
         }
     }
 
-    fun initializeWith(halfProductUnit: String) {
+    fun initializeWith(halfProductUnit: MeasurementUnit) {
         halfProductUnitType = UnitsUtils.getUnitType(halfProductUnit)
     }
 
@@ -113,7 +115,7 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
             selectedProduct
         ) { quantity, selectedUnit, selectedProduct ->
             quantity.toDoubleOrNull() != null &&
-                    selectedUnit.isNotEmpty() &&
+                    selectedUnit != null &&
                     selectedProduct != null
         }.stateIn(
             viewModelScope,
@@ -122,6 +124,9 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
         )
 
     fun addHalfProduct(id: Long) {
+
+        val selectedUnit = selectedUnit.value ?: error("Selected unit cannot be null")
+
         val pieceQuantity = if (pieceQuantityNeeded()) {
             pieceWeight.value.toDoubleOrNull() ?: 1.0
         } else {
@@ -133,7 +138,7 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
             productId = selectedProduct.value?.id ?: 0,
             halfProductId = id,
             quantity = quantity.value.toDouble(),
-            quantityUnit = selectedUnit.value,
+            quantityUnit = selectedUnit,
             weightPiece = pieceQuantity
         )
 
@@ -149,6 +154,6 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
     }
 
     fun pieceQuantityNeeded(): Boolean {
-        return selectedProduct.value?.unit == "per piece" && halfProductUnitType != UnitsUtils.UnitType.PIECE
+        return selectedProduct.value?.unit == MeasurementUnit.PIECE && halfProductUnitType != UnitCategory.COUNT
     }
 }

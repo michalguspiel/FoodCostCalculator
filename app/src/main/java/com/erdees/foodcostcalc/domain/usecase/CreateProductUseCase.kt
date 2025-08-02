@@ -32,6 +32,7 @@ class CreateProductUseCase(
         try {
             val price = formData.purchasePrice.toDoubleOrNull()
                 ?: throw InvalidProductPriceException("Product purchase price cannot be empty or invalid.")
+            formData.purchaseUnit ?: throw IllegalArgumentException("Purchase unit must be provided.")
 
             val productBase = ProductBase(
                 productId = 0,

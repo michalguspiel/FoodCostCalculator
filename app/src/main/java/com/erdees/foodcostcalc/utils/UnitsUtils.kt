@@ -3,86 +3,120 @@ package com.erdees.foodcostcalc.utils
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import com.erdees.foodcostcalc.domain.model.units.UnitCategory
 
 object UnitsUtils {
 
     @Composable
-    fun getPerUnitAbbreviation(unit: String): String {
+    fun getPerUnitAbbreviation(unit: MeasurementUnit): String {
         return when (unit) {
-            "per piece" -> stringResource(R.string.abbreviation_per_piece)
-            "per kilogram" -> stringResource(R.string.abbreviation_per_kilogram)
-            "per gram" -> stringResource(R.string.abbreviation_per_gram)
-            "per pound" -> stringResource(R.string.abbreviation_per_pound)
-            "per ounce" -> stringResource(R.string.abbreviation_per_ounce)
-            "per liter" -> stringResource(R.string.abbreviation_per_liter)
-            "per milliliter" -> stringResource(R.string.abbreviation_per_milliliter)
-            "per gallon" -> stringResource(R.string.abbreviation_per_gallon)
-            else -> stringResource(R.string.abbreviation_default)
+            MeasurementUnit.PIECE -> stringResource(R.string.abbreviation_per_piece)
+            MeasurementUnit.KILOGRAM -> stringResource(R.string.abbreviation_per_kilogram)
+            MeasurementUnit.GRAM -> stringResource(R.string.abbreviation_per_gram)
+            MeasurementUnit.POUND -> stringResource(R.string.abbreviation_per_pound)
+            MeasurementUnit.OUNCE -> stringResource(R.string.abbreviation_per_ounce)
+            MeasurementUnit.LITER -> stringResource(R.string.abbreviation_per_liter)
+            MeasurementUnit.MILLILITER -> stringResource(R.string.abbreviation_per_milliliter)
+            MeasurementUnit.GALLON -> stringResource(R.string.abbreviation_per_gallon)
+            MeasurementUnit.FLUID_OUNCE -> stringResource(R.string.abbreviation_default)
         }
     }
 
     @Composable
-    fun getUnitAbbreviation(unit: String): String {
-        return when (unit) {
-            "piece" -> stringResource(R.string.abbreviation_piece)
-            "kilogram" -> stringResource(R.string.abbreviation_kilogram)
-            "gram" -> stringResource(R.string.abbreviation_gram)
-            "pound" -> stringResource(R.string.abbreviation_pound)
-            "ounce" -> stringResource(R.string.abbreviation_ounce)
-            "liter" -> stringResource(R.string.abbreviation_liter)
-            "milliliter" -> stringResource(R.string.abbreviation_milliliter)
-            "gallon" -> stringResource(R.string.abbreviation_gallon)
-            else -> stringResource(R.string.abbreviation_default)
-        }
+    fun getUnitAbbreviation(unit: MeasurementUnit): String {
+        return stringResource(unit.symbolRes)
     }
 
     @Composable
-    fun getPerUnitAsDescription(unit: String): String {
+    fun getUnitDisplayName(unit: MeasurementUnit): String {
+        return stringResource(unit.displayNameRes)
+    }
+
+    @Composable
+    fun getPerUnitAsDescription(unit: MeasurementUnit): String {
         return when (unit) {
-            "per kilogram" -> stringResource(R.string.description_per_kilogram)
-            "per gram" -> stringResource(R.string.description_per_gram)
-            "per pound" -> stringResource(R.string.description_per_pound)
-            "per ounce" -> stringResource(R.string.description_per_ounce)
-            "per liter" -> stringResource(R.string.description_per_liter)
-            "per milliliter" -> stringResource(R.string.description_per_milliliter)
-            "per gallon" -> stringResource(R.string.description_per_gallon)
+            MeasurementUnit.KILOGRAM -> stringResource(R.string.description_per_kilogram)
+            MeasurementUnit.GRAM -> stringResource(R.string.description_per_gram)
+            MeasurementUnit.POUND -> stringResource(R.string.description_per_pound)
+            MeasurementUnit.OUNCE -> stringResource(R.string.description_per_ounce)
+            MeasurementUnit.LITER -> stringResource(R.string.description_per_liter)
+            MeasurementUnit.MILLILITER -> stringResource(R.string.description_per_milliliter)
+            MeasurementUnit.GALLON -> stringResource(R.string.description_per_gallon)
             else -> stringResource(R.string.description_default)
         }
     }
 
+    @Composable
+    fun getCategoryDisplayName(category: UnitCategory): String {
+        return stringResource(category.displayNameRes)
+    }
 
+    // Simplified - now uses enum categories directly
+    fun getUnitType(unit: MeasurementUnit?): UnitCategory? {
+        return unit?.category
+    }
+
+    /**
+     * Calculates the price of an item using the new enum-based unit system with built-in conversions
+     */
+    fun calculatePrice(
+        pricePerUnit: Double,
+        quantity: Double,
+        itemUnit: MeasurementUnit,
+        targetUnit: MeasurementUnit
+    ): Double {
+        return when (itemUnit.category) {
+            UnitCategory.COUNT -> pricePerUnit * quantity
+            else -> {
+                // Use built-in enum conversion if units are compatible
+                val convertedQuantity = itemUnit.convertTo(targetUnit, quantity) ?: quantity
+                pricePerUnit * convertedQuantity
+            }
+        }
+    }
+
+    // Legacy string-based methods for backward compatibility during migration
+    @Deprecated("Use MeasurementUnit enum version instead")
+    @Composable
+    fun getPerUnitAbbreviation(unit: String): String {
+        val enumUnit = MeasurementUnit.fromStringOrDefault(unit.removePrefix("per "))
+        return getPerUnitAbbreviation(enumUnit)
+    }
+
+    @Deprecated("Use MeasurementUnit enum version instead")
+    @Composable
+    fun getUnitAbbreviation(unit: String): String {
+        val enumUnit = MeasurementUnit.fromStringOrDefault(unit)
+        return getUnitAbbreviation(enumUnit)
+    }
+
+    @Deprecated("Use MeasurementUnit enum version instead")
+    @Composable
+    fun getPerUnitAsDescription(unit: String): String {
+        val enumUnit = MeasurementUnit.fromStringOrDefault(unit.removePrefix("per "))
+        return getPerUnitAsDescription(enumUnit)
+    }
+
+    @Deprecated("Use UnitCategory enum instead")
     enum class UnitType {
         WEIGHT,
         VOLUME,
         PIECE
     }
 
+    @Deprecated("Use MeasurementUnit.category instead")
     fun getUnitType(string: String?): UnitType? {
-        return when (string) {
-            "per kilogram", "per pound" -> {
-                UnitType.WEIGHT
-            }
-
-            "per liter", "per gallon" -> {
-                UnitType.VOLUME
-            }
-
-            "per piece" -> UnitType.PIECE
-
-            else -> null
+        if (string == null) return null
+        val enumUnit = MeasurementUnit.fromStringOrDefault(string.removePrefix("per "))
+        return when (enumUnit.category) {
+            UnitCategory.WEIGHT -> UnitType.WEIGHT
+            UnitCategory.VOLUME -> UnitType.VOLUME
+            UnitCategory.COUNT -> UnitType.PIECE
         }
     }
 
-    /**
-     * This function calculates the price of an item (product/half-product) inside a Dish or Half Product.
-     *
-     * @param pricePerUnit The price per unit of the product. This is a Double value.
-     * @param quantity The amount of the product used. This is a Double value.
-     * @param itemUnit The unit of measurement for the item.
-     * @param targetUnit The unit of measurement of the chosen target.
-     *
-     * @return The calculated price of the product. This is a Double value.
-     */
+    @Deprecated("Use enum-based calculatePrice instead")
     fun calculatePrice(
         pricePerUnit: Double,
         quantity: Double,
@@ -93,9 +127,8 @@ object UnitsUtils {
         else pricePerUnit * computeWeightAndVolumeToSameUnit(itemUnit, targetUnit, quantity)
     }
 
-    /** Computes weight / volume to the same unit
-     * approximate result for pure water of 4 degrees celsius.
-     * */
+    // All the legacy conversion methods can be removed as they're now handled by MeasurementUnit.convertTo()
+    @Deprecated("Use MeasurementUnit.convertTo() instead")
     fun computeWeightAndVolumeToSameUnit(
         finalUnit: String,
         anotherUnit: String,

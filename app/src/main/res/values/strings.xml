@@ -34,6 +34,36 @@
     <string name="volume">volume</string>
     <string name="piece">piece</string>
 
+    <!-- Unit display names for MeasurementUnit enum -->
+    <string name="unit_gram">Gram</string>
+    <string name="unit_kilogram">Kilogram</string>
+    <string name="unit_pound">Pound</string>
+    <string name="unit_ounce">Ounce</string>
+    <string name="unit_milliliter">Milliliter</string>
+    <string name="unit_liter">Liter</string>
+    <string name="unit_fluid_ounce">Fluid Ounce</string>
+    <string name="unit_gallon">Gallon</string>
+    <string name="unit_piece">Piece</string>
+
+    <!-- Unit symbols (all localized) -->
+    <string name="symbol_gram">g</string>
+    <string name="symbol_kilogram">kg</string>
+    <string name="symbol_pound">lb</string>
+    <string name="symbol_ounce">oz</string>
+    <string name="symbol_milliliter">ml</string>
+    <string name="symbol_liter">l</string>
+    <string name="symbol_fluid_ounce">fl oz</string>
+    <string name="symbol_gallon">gal</string>
+    <string name="symbol_piece">pcs</string>
+
+    <!-- Unit category names -->
+    <string name="unit_category_weight">Weight</string>
+    <string name="unit_category_volume">Volume</string>
+    <string name="unit_category_count">Count</string>
+
+    <!-- Empty Unit Content -->
+    <string name="unit_not_selected">Select unit</string>
+
     <!--Empty List Content-->
 
     <string name="empty_dish_list_content_title">Let\'s get cooking</string>
@@ -234,6 +264,7 @@
     <string name="invalid_tax_format_error">Invalid tax format. Please enter a valid number.</string>
     <string name="invalid_product_price_error">Invalid product price. Please enter a valid number.</string>
     <string name="unexpected_error_occurred">An unexpected error occurred.</string>
+    <string name="unit_for_dish">Unit for dish</string>
 
     <!-- Recipe Sharing -->
     <string name="recipe_sharing_prep_time">Preparation time: %1$s minutes.</string>

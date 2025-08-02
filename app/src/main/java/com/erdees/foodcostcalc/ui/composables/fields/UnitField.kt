@@ -21,16 +21,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 
 
 @Composable
 fun UnitField(
-    units: Set<String>,
-    selectedUnit: String,
+    units: Set<MeasurementUnit>,
+    selectedUnit: MeasurementUnit?,
     modifier: Modifier = Modifier,
     label: String = stringResource(id = R.string.unit),
-    selectUnit: (String) -> Unit
+    selectUnit: (MeasurementUnit) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
     UnitField(
@@ -48,12 +49,12 @@ fun UnitField(
 @Composable
 fun UnitField(
     expanded: Boolean,
-    units: Set<String>,
-    selectedUnit: String,
+    units: Set<MeasurementUnit>,
+    selectedUnit: MeasurementUnit?,
     modifier: Modifier = Modifier,
     label: String = stringResource(id = R.string.unit),
     onExpandChange: (Boolean) -> Unit = {},
-    selectUnit: (String) -> Unit = {},
+    selectUnit: (MeasurementUnit) -> Unit = {},
 ){
     Column(modifier = modifier) {
         FieldLabel(
@@ -70,7 +71,7 @@ fun UnitField(
                     modifier = Modifier
                         .fillMaxWidth()
                         .menuAnchor(),
-                    value = selectedUnit,
+                    value = stringResource(selectedUnit?.displayNameRes ?: R.string.unit_not_selected),
                     onValueChange = {},
                     readOnly = true,
                     singleLine = true,
@@ -87,7 +88,7 @@ fun UnitField(
                             selectUnit(unit)
                             onExpandChange(false)
                         }, text = {
-                            Text(unit)
+                            Text(stringResource(unit.displayNameRes))
                         })
                     }
                 }

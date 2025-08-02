@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Item
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.labels.FieldLabel
 import com.erdees.foodcostcalc.ui.screens.dishes.addItemToDish.SelectedTab
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
@@ -37,14 +38,14 @@ import com.erdees.foodcostcalc.ui.theme.FCCTheme
 @Composable
 fun AddItemFields(
     items: List<Item>,
-    units: Set<String>,
+    units: Set<MeasurementUnit>,
     quantity: String,
     selectedTab: SelectedTab,
     selectedItem: Item?,
-    selectedUnit: String,
+    selectedUnit: MeasurementUnit?,
     modifier: Modifier = Modifier,
     selectItem: (Item) -> Unit,
-    selectUnit: (String) -> Unit,
+    selectUnit: (MeasurementUnit) -> Unit,
     setQuantity: (String) -> Unit,
     extraField: @Composable () -> Unit = {}
 ) {
@@ -169,11 +170,11 @@ private fun PreviewFields() {
         Box(Modifier.background(Color.Gray)) {
             AddItemFields(
                 items = listOf(),
-                units = setOf("kg", "g"),
+                units = setOf(MeasurementUnit.KILOGRAM, MeasurementUnit.GRAM),
                 quantity = "1",
                 selectedTab = SelectedTab.ADD_PRODUCT,
                 selectedItem = null,
-                selectedUnit = "kg",
+                selectedUnit = MeasurementUnit.GRAM,
                 selectItem = {},
                 selectUnit = {},
                 setQuantity = {}

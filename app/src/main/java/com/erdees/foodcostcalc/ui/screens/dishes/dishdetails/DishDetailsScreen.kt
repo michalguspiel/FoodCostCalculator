@@ -110,7 +110,7 @@ fun DishDetailsScreen(
     // Initialize product creation units when the component sheet is opened
     LaunchedEffect(uiState.componentSelection) {
         if (uiState.componentSelection is ComponentSelection.NewComponent) {
-            newProductFormViewModel.getProductCreationUnits(context.resources)
+            newProductFormViewModel.getProductCreationUnits()
         }
     }
 
@@ -135,7 +135,7 @@ fun DishDetailsScreen(
                 }
             },
             setItemContext = { item ->
-                existingFormViewModel.setItemContext(item, context.resources)
+                existingFormViewModel.setItemContext(item)
             }
         ),
     )

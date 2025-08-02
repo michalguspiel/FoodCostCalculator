@@ -2,6 +2,8 @@ package com.erdees.foodcostcalc.utils
 
 import android.content.res.Resources
 import com.erdees.foodcostcalc.R
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import com.erdees.foodcostcalc.domain.model.units.UnitCategory
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -62,7 +64,29 @@ object Utils {
         return null
     }
 
-    /**Get units preferred by the user.*/
+    /**
+     * Returns a set of units based on user preferences.
+     * @return Set<MeasurementUnit> that work as a base unit for product/half product
+     * */
+    fun getUnitsSet(
+        isMetricUsed: Boolean,
+        isImperialUsed: Boolean
+    ): Set<MeasurementUnit> {
+        val chosenUnits = mutableSetOf<MeasurementUnit>()
+        chosenUnits += MeasurementUnit.PIECE
+
+        if (isMetricUsed) {
+            chosenUnits += MeasurementUnit.KILOGRAM
+            chosenUnits += MeasurementUnit.LITER
+        }
+        if (isImperialUsed) {
+            chosenUnits += MeasurementUnit.POUND
+            chosenUnits += MeasurementUnit.GALLON
+        }
+        return chosenUnits
+    }
+
+    @Deprecated("Use enum-based getUnitsSet instead")
     fun getUnitsSet(
         resources: Resources,
         isMetricUsed: Boolean,
@@ -78,11 +102,36 @@ object Utils {
         return chosenUnits.toSet()
     }
 
+    /**
+     * Returns a set of units based on the unit category and user preferences.
+     * Now returns MeasurementUnit enums instead of strings for type safety.
+     */
+    fun generateUnitSet(
+        unitCategory: UnitCategory?,
+        metricEnabled: Boolean,
+        imperialEnabled: Boolean
+    ): Set<MeasurementUnit> {
+        val units = mutableSetOf<MeasurementUnit>()
+        if (unitCategory == null) return units
 
-    // TODO, this should return list of enums which will be later on mapped to strings
-    // TODO, otherwise this can't be fixed with string resources,
-    // TODO, however, this also requires migrating database to use enums instead of strings
-    /**Returns a set of units based on the unit type and user preferences.*/
+        if (metricEnabled) {
+            when (unitCategory) {
+                UnitCategory.WEIGHT -> units += setOf(MeasurementUnit.KILOGRAM, MeasurementUnit.GRAM)
+                UnitCategory.VOLUME -> units += setOf(MeasurementUnit.MILLILITER, MeasurementUnit.LITER)
+                UnitCategory.COUNT -> units += MeasurementUnit.PIECE
+            }
+        }
+        if (imperialEnabled) {
+            when (unitCategory) {
+                UnitCategory.WEIGHT -> units += setOf(MeasurementUnit.POUND, MeasurementUnit.OUNCE)
+                UnitCategory.VOLUME -> units += setOf(MeasurementUnit.GALLON, MeasurementUnit.FLUID_OUNCE)
+                UnitCategory.COUNT -> units += MeasurementUnit.PIECE
+            }
+        }
+        return units
+    }
+
+    @Deprecated("Use enum-based generateUnitSet instead")
     fun generateUnitSet(
         unitType: UnitsUtils.UnitType?,
         metricEnabled: Boolean,

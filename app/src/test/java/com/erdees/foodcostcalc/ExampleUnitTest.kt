@@ -1,6 +1,6 @@
 package com.erdees.foodcostcalc
 
-
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.utils.UnitsUtils.calculatePrice
 import com.erdees.foodcostcalc.utils.UnitsUtils.computeWeightAndVolumeToSameUnit
 import org.junit.Assert.assertEquals
@@ -18,6 +18,7 @@ class ExampleUnitTest {
         assertEquals(3,1+1+1)
     }
 
+    // Legacy tests - keep for backward compatibility
     @Test
     fun computeLiterIsCorrect(){
         assertEquals(1.0, computeWeightAndVolumeToSameUnit("per liter","kilogram",1.0),0.01 )
@@ -68,7 +69,6 @@ class ExampleUnitTest {
         assertEquals(1.0, computeWeightAndVolumeToSameUnit("per gallon","fluid ounce",128.0),0.01 )
         assertEquals(1.0, computeWeightAndVolumeToSameUnit("per gallon","gallon",1.0),0.01 )
         assertEquals(1.0, computeWeightAndVolumeToSameUnit("per gallon","pound",8.34537847),0.01 )
-
     }
 
 
@@ -104,6 +104,85 @@ class ExampleUnitTest {
         assertEquals(10.0/128, calculatePrice(10.0,1.0,"per gallon","fluid ounce"),0.01)
     }
 
+    // NEW TESTS: Testing MeasurementUnit.convertTo() function with same test values
 
+    @Test
+    fun convertToFromLiterIsCorrect(){
+        // Same test values as computeLiterIsCorrect but using new convertTo function
+        assertEquals(1.0, MeasurementUnit.LITER.convertTo(MeasurementUnit.KILOGRAM, 1.0)!!, 0.01)
+        assertEquals(2.204, MeasurementUnit.LITER.convertTo(MeasurementUnit.GRAM, 2204.0)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.LITER.convertTo(MeasurementUnit.POUND, 2.204)!!, 0.01)
+        assertEquals(5.66990463, MeasurementUnit.LITER.convertTo(MeasurementUnit.OUNCE, 200.0)!!, 0.01)
+        assertEquals(2.204, MeasurementUnit.LITER.convertTo(MeasurementUnit.LITER, 2.204)!!, 0.01)
+        assertEquals(3.3330, MeasurementUnit.LITER.convertTo(MeasurementUnit.MILLILITER, 3333.0)!!, 0.01)
+        assertEquals(3.78541178, MeasurementUnit.LITER.convertTo(MeasurementUnit.GALLON, 1.0)!!, 0.01)
+        assertEquals(3.78541178, MeasurementUnit.LITER.convertTo(MeasurementUnit.FLUID_OUNCE, 128.0)!!, 0.01)
+    }
 
+    @Test
+    fun convertToFromPoundIsCorrect() {
+        // Same test values as computePoundIsCorrect but using new convertTo function
+        assertEquals(2.204, MeasurementUnit.POUND.convertTo(MeasurementUnit.KILOGRAM, 1.0)!!, 0.01)
+        assertEquals(0.00220462262, MeasurementUnit.POUND.convertTo(MeasurementUnit.GRAM, 1.0)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.POUND.convertTo(MeasurementUnit.POUND, 1.0)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.POUND.convertTo(MeasurementUnit.OUNCE, 16.0)!!, 0.01)
+        assertEquals(2.204, MeasurementUnit.POUND.convertTo(MeasurementUnit.LITER, 1.0)!!, 0.01)
+        assertEquals(2.204, MeasurementUnit.POUND.convertTo(MeasurementUnit.MILLILITER, 1000.0)!!, 0.01)
+        assertEquals(8.34537847, MeasurementUnit.POUND.convertTo(MeasurementUnit.GALLON, 1.0)!!, 0.01)
+        assertEquals(8.34537847/128, MeasurementUnit.POUND.convertTo(MeasurementUnit.FLUID_OUNCE, 1.0)!!, 0.01)
+        assertEquals(5.51155655, MeasurementUnit.POUND.convertTo(MeasurementUnit.KILOGRAM, 2.5)!!, 0.01)
+        assertEquals(5.51155655, MeasurementUnit.POUND.convertTo(MeasurementUnit.GRAM, 2500.0)!!, 0.01)
+    }
+
+    @Test
+    fun convertToFromKilogramIsCorrect(){
+        // Same test values as computeKilogramIsCorrect but using new convertTo function
+        assertEquals(1.0, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.KILOGRAM, 1.0)!!, 0.01)
+        assertEquals(2.204, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.GRAM, 2204.0)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.POUND, 2.204)!!, 0.01)
+        assertEquals(5.66990463, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.OUNCE, 200.0)!!, 0.01)
+        assertEquals(2.204, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.LITER, 2.204)!!, 0.01)
+        assertEquals(3.3330, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.MILLILITER, 3333.0)!!, 0.01)
+        assertEquals(3.78541178, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.GALLON, 1.0)!!, 0.01)
+        assertEquals(3.78541178, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.FLUID_OUNCE, 128.0)!!, 0.01)
+    }
+
+    @Test
+    fun convertToFromGallonIsCorrect(){
+        // Same test values as computeGallonIsCorrect but using new convertTo function
+        assertEquals(1.0, MeasurementUnit.GALLON.convertTo(MeasurementUnit.KILOGRAM, 3.78541178)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.GALLON.convertTo(MeasurementUnit.GRAM, 3785.41178)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.GALLON.convertTo(MeasurementUnit.LITER, 3.78541178)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.GALLON.convertTo(MeasurementUnit.MILLILITER, 3785.41178)!!, 0.01)
+        assertEquals(0.264172052, MeasurementUnit.GALLON.convertTo(MeasurementUnit.POUND, 2.204)!!, 0.01)
+        assertEquals(1.43791713, MeasurementUnit.GALLON.convertTo(MeasurementUnit.POUND, 12.0)!!, 0.01)
+        assertEquals(0.0074891517, MeasurementUnit.GALLON.convertTo(MeasurementUnit.OUNCE, 1.0)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.GALLON.convertTo(MeasurementUnit.FLUID_OUNCE, 128.0)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.GALLON.convertTo(MeasurementUnit.GALLON, 1.0)!!, 0.01)
+        assertEquals(1.0, MeasurementUnit.GALLON.convertTo(MeasurementUnit.POUND, 8.34537847)!!, 0.01)
+    }
+
+    // Additional tests for same-category conversions (these should also work)
+    @Test
+    fun convertToSameCategoryIsCorrect() {
+        // Weight conversions
+        assertEquals(1000.0, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.GRAM, 1.0)!!, 0.01)
+        assertEquals(2.20462262, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.POUND, 1.0)!!, 0.01)
+        assertEquals(35.2739619, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.OUNCE, 1.0)!!, 0.01)
+
+        // Volume conversions
+        assertEquals(1000.0, MeasurementUnit.LITER.convertTo(MeasurementUnit.MILLILITER, 1.0)!!, 0.01)
+        assertEquals(0.264172052, MeasurementUnit.LITER.convertTo(MeasurementUnit.GALLON, 1.0)!!, 0.01)
+        assertEquals(33.8140227, MeasurementUnit.LITER.convertTo(MeasurementUnit.FLUID_OUNCE, 1.0)!!, 0.01)
+    }
+
+    // Test that incompatible conversions return null
+    @Test
+    fun convertToIncompatibleReturnsNull() {
+        // COUNT units cannot convert to other categories
+        assertEquals(null, MeasurementUnit.PIECE.convertTo(MeasurementUnit.KILOGRAM, 1.0))
+        assertEquals(null, MeasurementUnit.PIECE.convertTo(MeasurementUnit.LITER, 1.0))
+        assertEquals(null, MeasurementUnit.KILOGRAM.convertTo(MeasurementUnit.PIECE, 1.0))
+        assertEquals(null, MeasurementUnit.LITER.convertTo(MeasurementUnit.PIECE, 1.0))
+    }
 }

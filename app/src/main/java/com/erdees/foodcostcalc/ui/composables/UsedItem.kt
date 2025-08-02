@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCDecorativeCircle
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import java.util.Locale
@@ -145,10 +146,10 @@ private fun UsedItemPreview() {
                     id = 1,
                     name = "Product",
                     pricePerUnit = 10.0,
-                    unit = "kg",
+                    unit = MeasurementUnit.KILOGRAM,
                     tax = 23.0,
                     waste = 20.0
-                ), quantity = 1.0, quantityUnit = "kg", weightPiece = 1.0
+                ), quantity = 1.0, quantityUnit =  MeasurementUnit.KILOGRAM, weightPiece = 1.0
             ),
             currency = Currency.getInstance(Locale.getDefault()),
             modifier = Modifier,
