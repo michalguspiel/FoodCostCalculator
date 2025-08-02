@@ -1,43 +1,181 @@
 @startuml
 
-entity "Product" as p {
-    *product_id : number
-    *name : text
-    *pricePerUnit : number
-    *tax : number
-    *waste : number
-    *unit : text
+' Base interfaces
+interface Item {
+    +id : Long
+    +name : String
 }
 
-entity "UsedProduct" as up {
-    *product : Product
-    *quantity: number,
-    *quantityUnit: text
-    *weightPiece: Double?
+interface AdItem {
 }
 
-entity "HalfProduct" as hp {
-    *half_product_id : number
-    *name : text
-    *halfProductUnit : text
-    *products : Product[]
+interface ItemUsageEntry {
+    +item : Item
+    +quantity : Double
+    +quantityUnit : String
+    +foodCost : Double
+    +formattedTotalPricePerServing(amountOfServings: Double, currency: Currency?) : String
+    +formatQuantityForTargetServing(servings: Double) : String
+    +formatQuantityForTargetServing(baseQuantity: Double, targetQuantity: Double) : String
 }
 
-entity "UsedHalfProduct" as uhp {
-    *halfProduct : HalfProduct
-    *quantity: number
-    *quantityUnit: text
+interface UsedItem {
+    +id : Long
+    +ownerId : Long
 }
 
-entity "Dish" as d {
-    *dish_id : number
-    *name : text
-    *marginPercent : number
-    *dishTax : number
-    *products : Product[]
-    *halfProducts : HalfProduct[]
+' Core domain entities
+entity ProductDomain {
+    +id : Long
+    +name : String
+    +pricePerUnit : Double
+    +tax : Double
+    +waste : Double
+    +unit : String
     --
-    +totalCost : number
+    -priceWithTax : Double
+    +priceAfterWasteAndTax : Double
 }
+
+entity EditableProductDomain {
+    +id : Long
+    +name : String
+    +pricePerUnit : String
+    +tax : String
+    +waste : String
+    +unit : String
+}
+
+entity HalfProductDomain {
+    +id : Long
+    +name : String
+    +halfProductUnit : String
+    +products : List<UsedProductDomain>
+    --
+    -singleRecipePrice : Double
+    +totalQuantity : Double
+    +pricePerUnit : Double
+    +formattedSingleRecipePrice(currency: Currency?) : String
+    +formattedPricePerUnit(currency: Currency?) : String
+    +formattedPricePresentedRecipe(baseQuantity: Double, targetQuantity: Double, currency: Currency?) : String
+}
+
+entity DishDomain {
+    +id : Long
+    +name : String
+    +marginPercent : Double
+    +taxPercent : Double
+    +products : List<UsedProductDomain>
+    +halfProducts : List<UsedHalfProductDomain>
+    +productsNotSaved : List<ProductAddedToDish>
+    +halfProductsNotSaved : List<HalfProductAddedToDish>
+    +recipe : RecipeDomain?
+    --
+    +foodCost : Double
+    +totalPrice : Double
+    +formattedFoodCostPerServings(amountOfServings: Int, currency: Currency?) : String
+    -finalPricePerServing(amountOfServings: Int) : Double
+    +formattedTotalPricePerServing(amountOfServings: Int, currency: Currency?) : String
+    +withUpdatedTotalPrice(newTotalPrice: Double) : DishDomain
+    -adjustMarginWithCorrectDecimals(initialRawMarginPercent: Double, targetTotalPrice: Double) : DishDomain
+}
+
+' Usage entities (temporary/not saved)
+entity ProductAddedToDish {
+    +item : ProductDomain
+    +quantity : Double
+    +quantityUnit : String
+    +foodCost : Double
+}
+
+entity HalfProductAddedToDish {
+    +item : HalfProductDomain
+    +quantity : Double
+    +quantityUnit : String
+    +foodCost : Double
+}
+
+' Persistent usage entities
+entity UsedProductDomain {
+    +id : Long
+    +ownerId : Long
+    +item : ProductDomain
+    +quantity : Double
+    +quantityUnit : String
+    +weightPiece : Double?
+    +foodCost : Double
+    --
+    +formattedTotalPriceForTargetQuantity(baseQuantity: Double, targetQuantity: Double, currency: Currency?) : String
+}
+
+entity UsedHalfProductDomain {
+    +id : Long
+    +ownerId : Long
+    +item : HalfProductDomain
+    +quantity : Double
+    +quantityUnit : String
+    +foodCost : Double
+}
+
+' Recipe entities
+entity RecipeDomain {
+    +recipeId : Long?
+    +prepTimeMinutes : Int?
+    +cookTimeMinutes : Int?
+    +description : String?
+    +steps : List<RecipeStepDomain>?
+    +tips : String?
+}
+
+entity EditableRecipe {
+    +prepTimeMinutes : String
+    +cookTimeMinutes : String
+    +description : String
+    +steps : List<RecipeStepDomain>
+    +tips : String
+}
+
+entity RecipeStepDomain {
+    +id : Long?
+    +order : Int
+    +stepDescription : String
+}
+
+' Inheritance relationships
+Item <|.. AdItem
+Item <|-- ProductDomain
+Item <|-- EditableProductDomain
+Item <|-- HalfProductDomain
+Item <|-- DishDomain
+
+ItemUsageEntry <|-- ProductAddedToDish
+ItemUsageEntry <|-- HalfProductAddedToDish
+ItemUsageEntry <|-- UsedItem
+
+UsedItem <|-- UsedProductDomain
+UsedItem <|-- UsedHalfProductDomain
+
+' Composition relationships
+DishDomain ||--o{ UsedProductDomain : "contains saved products"
+DishDomain ||--o{ UsedHalfProductDomain : "contains saved half products"
+DishDomain ||--o{ ProductAddedToDish : "contains unsaved products"
+DishDomain ||--o{ HalfProductAddedToDish : "contains unsaved half products"
+DishDomain ||--o| RecipeDomain : "has recipe"
+
+HalfProductDomain ||--o{ UsedProductDomain : "composed of products"
+
+ProductAddedToDish ||--|| ProductDomain : "references"
+HalfProductAddedToDish ||--|| HalfProductDomain : "references"
+UsedProductDomain ||--|| ProductDomain : "references"
+UsedHalfProductDomain ||--|| HalfProductDomain : "references"
+
+RecipeDomain ||--o{ RecipeStepDomain : "contains steps"
+
+' Notes
+note top of DishDomain : Main entity representing a complete dish\nwith ingredients, pricing, and recipe
+note top of HalfProductDomain : Intermediate product made from\nmultiple basic products
+note top of ProductDomain : Basic ingredient/product
+note right of ItemUsageEntry : Base interface for items\nbeing used in recipes
+note right of UsedItem : Persisted usage entries\nwith unique identifiers
 
 @enduml

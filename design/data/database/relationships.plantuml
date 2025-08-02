@@ -1,39 +1,124 @@
 @startuml
 
-entity "ProductBase" as p
-entity "Product_HalfProduct" as php
-entity "HalfProductBase" as hp
-entity "Product_Dish" as pd
-entity "HalfProduct_Dish" as hpd
-entity "DishBase" as d
+ ' Core Database Entities
+entity "ProductBase" as p {
+    Primary table for basic ingredients
+}
 
-entity "Recipe" as r
-entity "RecipeStep" as rs
+entity "HalfProductBase" as hp {
+    Intermediate products made from ProductBase
+}
 
-entity "ProductUsedInDish" as puid <<View>>
-entity "ProductUsedInHalfProduct" as puihp <<View>>
-entity "CompleteHalfProduct" as chp <<View>>
-entity "HalfProductUsedInDish" as hpdchp <<View>>
-entity "CompleteDish" as cd <<View>>
+entity "DishBase" as d {
+    Final dishes with pricing and margins
+}
 
-puid --|> p 
-puid --|> pd 
+entity "Recipe" as r {
+    Recipe instructions and timing
+}
 
-puihp --|> p 
-puihp --|> php 
+entity "RecipeStep" as rs {
+    Individual recipe steps
+}
 
-chp --|> hp 
-chp --|> puihp 
+' Association Tables (Many-to-Many relationships)
+entity "ProductDish" as pd {
+    Products used directly in dishes
+}
 
-hpdchp --|> hpd 
-hpdchp --|> chp 
+entity "ProductHalfProduct" as php {
+    Products used to make half products
+}
 
-cd --|> d 
-cd --|> puid 
-cd --|> hpdchp 
+entity "HalfProductDish" as hpd {
+    Half products used in dishes
+}
 
-d --|> r
-r --|> rs
+' Feature Request System
+entity "FeatureRequestEntity" as fre {
+    Local cache of feature requests
+}
 
+entity "UpvotedFeatureRequest" as ufr {
+    User's upvoted requests tracking
+}
+
+' Room Views (Complex joined queries)
+entity "ProductAndProductDish" as papd <<View>> {
+    Product + usage in dish
+}
+
+entity "ProductUsedInHalfProduct" as puihp <<View>> {
+    Product + usage in half product
+}
+
+entity "CompleteHalfProduct" as chp <<View>> {
+    Half product + all constituent products
+}
+
+entity "HalfProductUsedInDish" as hpuid <<View>> {
+    Half product + usage in dish + all products
+}
+
+entity "RecipeWithSteps" as rws <<View>> {
+    Recipe + all ordered steps
+}
+
+entity "CompleteDish" as cd <<View>> {
+    Complete dish with all data
+}
+
+' Primary Foreign Key Relationships (Database level)
+d ||--o| r : "recipeId (optional)"
+r ||--o{ rs : "recipeId"
+
+' Many-to-Many through junction tables
+p ||--o{ pd : "productId"
+d ||--o{ pd : "dishId"
+
+p ||--o{ php : "productId"
+hp ||--o{ php : "halfProductId"
+
+hp ||--o{ hpd : "halfProductId"
+d ||--o{ hpd : "dishId"
+
+' Room View Compositions (@Embedded + @Relation)
+pd ||--|| papd : "@Embedded productDish"
+p ||--|| papd : "@Relation product"
+
+php ||--|| puihp : "@Embedded productHalfProduct"
+p ||--|| puihp : "@Relation product"
+
+hp ||--|| chp : "@Embedded halfProductBase"
+puihp ||--o{ chp : "@Relation products"
+
+hpd ||--|| hpuid : "@Embedded halfProductDish"
+chp ||--|| hpuid : "@Relation halfProductsWithProductsBase"
+
+r ||--|| rws : "@Embedded recipe"
+rs ||--o{ rws : "@Relation steps"
+
+d ||--|| cd : "@Embedded dish"
+rws ||--o| cd : "@Relation recipe (optional)"
+papd ||--o{ cd : "@Relation products"
+hpuid ||--o{ cd : "@Relation halfProducts"
+
+' Data Flow Pattern
+note top of cd : "CompleteDish is the main aggregation view\nthat brings together all dish data:\n- Base dish info\n- Optional recipe with steps\n- Direct products used\n- Half products (with their constituent products)"
+
+note right of chp : "CompleteHalfProduct aggregates\na half product with all\nits constituent products"
+
+note bottom of php : "ProductHalfProduct supports\nweight-per-piece calculations\nfor count-based items"
+
+note left of fre : "Feature request entities\nsupport offline-first\nsync with Firestore"
+
+' Cascade Deletion Indicators
+note as cascade1
+    CASCADE DELETE RULES:
+    - Recipe deletion → Recipe steps deleted
+    - Product deletion → All usage records deleted
+    - HalfProduct deletion → All usage records deleted
+    - Dish deletion → All usage records deleted
+end note
 
 @enduml
