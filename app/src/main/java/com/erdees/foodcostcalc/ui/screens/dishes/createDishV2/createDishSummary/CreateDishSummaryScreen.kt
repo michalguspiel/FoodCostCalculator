@@ -97,7 +97,7 @@ fun CreateDishSummaryScreen(
     CreateDishSummaryContent(
         CreateDishSummaryScreenState(
             dishName = viewModel.dishName.collectAsState().value,
-            addedProducts = viewModel.addedProducts.collectAsState().value,
+            addedComponents = viewModel.addedComponents.collectAsState().value,
             foodCost = viewModel.foodCost.collectAsState().value,
             marginPercent = viewModel.marginPercentInput.collectAsState().value,
             taxPercent = viewModel.taxPercentInput.collectAsState().value,
@@ -166,7 +166,7 @@ fun CreateDishSummaryContent(
             verticalArrangement = Arrangement.SpaceBetween
         ) {
             Ingredients(
-                state.addedProducts,
+                state.addedComponents,
                 emptyList(),
                 servings = SingleServing,
                 currency = state.currency,
@@ -353,7 +353,7 @@ private fun CreateDishSummaryScreenPreview() {
 
         val previewState = CreateDishSummaryScreenState(
             dishName = "Lemonade",
-            addedProducts = listOf(sampleProduct1, sampleProduct2),
+            addedComponents = listOf(sampleProduct1, sampleProduct2),
             foodCost = 0.75,
             marginPercent = "300",
             taxPercent = "20",

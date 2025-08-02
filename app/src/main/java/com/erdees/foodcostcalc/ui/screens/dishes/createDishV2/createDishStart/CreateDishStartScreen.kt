@@ -90,7 +90,7 @@ fun CreateDishStartScreen(
 ) {
     val context = LocalContext.current
     val dishName by viewModel.dishName.collectAsState()
-    val addedProducts by viewModel.addedProducts.collectAsState()
+    val addedComponents by viewModel.addedComponents.collectAsState()
     val currency by viewModel.currency.collectAsState()
     val isFirstDish by viewModel.isFirstDish.collectAsState()
     val errorRes by viewModel.errorRes.collectAsState()
@@ -153,7 +153,7 @@ fun CreateDishStartScreen(
         navController,
         CreateDishStartScreenState(
             dishName,
-            addedProducts,
+            addedComponents,
             currency,
             isFirstDish,
             errorRes
@@ -274,6 +274,7 @@ private fun CreateDishStartScreenContent(
                 })
             }) { paddingValues ->
             Column(
+                verticalArrangement = Arrangement.SpaceBetween,
                 horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier
                     .fillMaxSize()
@@ -281,9 +282,7 @@ private fun CreateDishStartScreenContent(
                     .padding(paddingValues)
             ) {
                 Column(
-                    Modifier
-                        .padding(horizontal = 12.dp)
-                        .weight(1f),
+                    Modifier.padding(horizontal = 12.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp)
                 ) {
                     Column {
@@ -320,11 +319,11 @@ private fun CreateDishStartScreenContent(
                             modifier = Modifier.padding(bottom = 8.dp)
                         )
 
-                        if (addedProducts.isEmpty()) {
+                        if (addedComponents.isEmpty()) {
                             IngredientsEmptyState(modifier = Modifier.padding(vertical = 24.dp))
                         } else {
                             Ingredients(
-                                addedProducts,
+                                addedComponents,
                                 persistentListOf(),
                                 SingleServing,
                                 currency,
@@ -336,7 +335,7 @@ private fun CreateDishStartScreenContent(
 
                         FCCOutlinedButton(
                             modifier = Modifier.fillMaxWidth(),
-                            text = if (addedProducts.isEmpty()) {
+                            text = if (addedComponents.isEmpty()) {
                                 stringResource(R.string.add_first_ingredient)
                             } else {
                                 stringResource(R.string.add_more_ingredients)
@@ -407,7 +406,7 @@ private fun CreateDishStartScreenContentPreview() {
             navController = rememberNavController(),
             createDishStartScreenState = CreateDishStartScreenState(
                 dishName = "Spaghetti Bolognese",
-                addedProducts = persistentListOf(
+                addedComponents = persistentListOf(
                     ProductAddedToDish(
                         ProductDomain(0L, "Tomato", 3.99, 0.0, 10.0, "kg"),
                         0.5,
@@ -435,7 +434,7 @@ private fun CreateDishStartScreenContentEmptyListPreview() {
             navController = rememberNavController(),
             createDishStartScreenState = CreateDishStartScreenState(
                 dishName = "Spaghetti Bolognese",
-                addedProducts = persistentListOf(),
+                addedComponents = persistentListOf(),
                 currency = Currency.getInstance("PLN"),
                 isFirstDish = false,
                 errorRes = null

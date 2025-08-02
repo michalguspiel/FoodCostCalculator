@@ -58,6 +58,10 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
             })
     }
 
+    fun logHalfProductAddedToDishList() {
+        analyticsRepository.logEvent(Constants.Analytics.DishV2.HALF_PRODUCT_ADDED_TO_DISH)
+    }
+
     fun logHandleError(throwable: Throwable, errorResId: Int) {
         analyticsRepository.logEvent(
             Constants.Analytics.DishV2.ERROR_DISPLAYED_USER,

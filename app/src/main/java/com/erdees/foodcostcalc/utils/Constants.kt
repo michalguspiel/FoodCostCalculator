@@ -97,6 +97,7 @@ object Constants {
                 "dish_save_success"       // Already have DISH_CREATED, this is more specific to save action
             const val DISH_SAVE_FAILURE = "dish_save_failure"
             const val DISH_INGREDIENT_ADDED = "dish_ingredient_added"
+            const val HALF_PRODUCT_ADDED_TO_DISH = "half_product_added_to_dish" // When a half product is added to dish
             const val DISH_INGREDIENT_TYPE = "dish_ingredient_type" // "new" or "existing"
             const val DISH_INGREDIENT_NAME = "dish_ingredient_name"
             const val DISH_INGREDIENT_QUANTITY = "dish_ingredient_quantity"

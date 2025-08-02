@@ -8,11 +8,15 @@ import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.DishBase
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.DishRepository
+import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
+import com.erdees.foodcostcalc.domain.mapper.Mapper.toHalfProductDish
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDish
-import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
+import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductAddedToDish
+import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
@@ -54,6 +58,7 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
 
     private val analyticsRepository: AnalyticsRepository by inject()
     private val productRepository: ProductRepository by inject()
+    private val halfProductRepository: HalfProductRepository by inject()
     private val dishRepository: DishRepository by inject()
     private val preferences: Preferences by inject()
     private val dispatchers: MyDispatchers by inject()
@@ -91,18 +96,9 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
 
     val currency = preferences.currency.stateIn(viewModelScope, Lazily, null)
 
-    val products: StateFlow<List<ProductDomain>> =
-        productRepository.products.map { list ->
-            list.map { it.toProductDomain() }
-        }.stateIn(
-            viewModelScope,
-            Lazily,
-            listOf()
-        )
-
-    private val _addedProducts: MutableStateFlow<List<ProductAddedToDish>> =
+    private val _addedComponents: MutableStateFlow<List<ItemUsageEntry>> =
         MutableStateFlow(listOf())
-    val addedProducts = _addedProducts.asStateFlow()
+    val addedComponents = _addedComponents.asStateFlow()
 
     private var _dishName = MutableStateFlow("")
     val dishName = _dishName
@@ -140,9 +136,9 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
         analyticsHelper.logFlowStarted()
     }
 
-    val foodCost: StateFlow<Double> = _addedProducts.map { products ->
-        products.sumOf { productAdded ->
-            productAdded.foodCost
+    val foodCost: StateFlow<Double> = _addedComponents.map { components ->
+        components.sumOf { item ->
+            item.foodCost
         }
     }.stateIn(
         scope = viewModelScope,
@@ -172,11 +168,6 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
      * Called when user clicks add new ingredient in parent form
      * */
     fun onAddIngredientClick() {
-        val name = when(componentSelection.value){
-            is ComponentSelection.NewComponent -> (componentSelection.value as ComponentSelection.NewComponent).name
-            is ComponentSelection.ExistingComponent -> (componentSelection.value as ComponentSelection.ExistingComponent).item.name
-            null -> ""
-        }
         analyticsHelper.logAddIngredientClick(componentSelection.value)
         updateScreenState(ScreenState.Interaction(InteractionType.ContextualAddComponent))
     }
@@ -250,6 +241,15 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
                             unit = existingComponentFormData.unitForDish
                         )
                     }
+
+                    is HalfProductDomain -> {
+                        addHalfProductToDishList(
+                            halfProduct = item,
+                            quantityStr = existingComponentFormData.quantityForDish,
+                            unit = existingComponentFormData.unitForDish
+                        )
+                    }
+
                     else -> {
                         error("Unsupported component type: ${item::class.simpleName}")
                     }
@@ -280,7 +280,7 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
             quantity = quantityAddedToDish,
             quantityUnit = unit
         )
-        _addedProducts.update { currentList ->
+        _addedComponents.update { currentList ->
             currentList + productAddedToDish
         }
         analyticsHelper.logProductAddedToDishList(
@@ -291,6 +291,29 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
         )
     }
 
+    /**
+     * Adds a given half product to the list of components currently added to the dish for UI display.
+     *
+     * @param halfProduct The HalfProductDomain object to add.
+     * @param quantityStr The quantity of this half product to add to the dish.
+     * @param unit The unit for the quantity added to the dish.
+     * @throws IllegalStateException if the quantity is missing or invalid.
+     */
+    private fun addHalfProductToDishList(halfProduct: HalfProductDomain, quantityStr: String, unit: String) {
+        val quantityAddedToDish = quantityStr.toDoubleOrNull()
+            ?: error("Quantity for the half product in the dish cannot be empty or invalid.")
+
+        val halfProductAddedToDish = HalfProductAddedToDish(
+            item = halfProduct,
+            quantity = quantityAddedToDish,
+            quantityUnit = unit
+        )
+        Timber.i("Adding half product to dish list: $halfProductAddedToDish")
+        _addedComponents.update { currentList ->
+            currentList + halfProductAddedToDish
+        }
+        analyticsHelper.logHalfProductAddedToDishList()
+    }
 
     /**
      * Resets the state related to adding a new product to the dish.
@@ -324,17 +347,18 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
                     dishName.value,
                     marginPercentInput.value,
                     taxPercentInput.value,
-                    addedProducts.value.size
+                    addedComponents.value.size
                 )
                 val dishId = saveDishBase()
 
                 saveDishIngredients(dishId)
+                saveDishHalfProducts(dishId)
 
                 _isLoading.update { false }
                 _saveDishSuccess.update { dishId }
                 analyticsHelper.logDishSaveSuccess(
                     dishName.value,
-                    addedProducts.value.size,
+                    addedComponents.value.size,
                     dishRepository.getDishCount()
                 )
             } catch (e: Exception) {
@@ -380,15 +404,21 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
     }
 
     /**
-     * Iterates through the list of products added to the dish ([_addedProducts])
+     * Iterates through the list of products added to the dish ([_addedComponents])
      * and saves each one as a [ProductDish] entity linked to the given [dishId]
      * using the [productRepository].
      *
      * @param dishId The ID of the dish to which these ingredients belong.
      */
     private suspend fun saveDishIngredients(dishId: Long) {
-        _addedProducts.value.forEach { productAddedToDish ->
+        _addedComponents.value.filterIsInstance<ProductAddedToDish>().forEach { productAddedToDish ->
             productRepository.addProductDish(productAddedToDish.toProductDish(dishId))
+        }
+    }
+
+    private suspend fun saveDishHalfProducts(dishId: Long) {
+        _addedComponents.value.filterIsInstance<HalfProductAddedToDish>().forEach { halfProduct ->
+            halfProductRepository.addHalfProductDish(halfProduct.toHalfProductDish(dishId))
         }
     }
 

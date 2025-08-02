@@ -2,11 +2,11 @@ package com.erdees.foodcostcalc.ui.screens.dishes.createDishV2.createDishSummary
 
 import android.icu.util.Currency
 import androidx.annotation.StringRes
-import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
+import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
 
 data class CreateDishSummaryScreenState(
     val dishName: String = "",
-    val addedProducts: List<ProductAddedToDish> = emptyList(),
+    val addedComponents: List<ItemUsageEntry> = emptyList(),
     val foodCost: Double = 0.0,
     val marginPercent: String,
     val taxPercent: String,

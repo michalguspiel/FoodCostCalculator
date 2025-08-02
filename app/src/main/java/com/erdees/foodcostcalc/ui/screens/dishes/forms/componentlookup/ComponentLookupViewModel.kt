@@ -48,7 +48,7 @@ class ComponentLookupViewModel : ViewModel(), KoinComponent {
         )
 
     private val halfProducts: StateFlow<List<HalfProductDomain>> =
-        halfProductRepository.halfProducts.map { list ->
+        halfProductRepository.completeHalfProducts.map { list ->
             list.map { it.toHalfProductDomain() }
         }.stateIn(
             viewModelScope,
