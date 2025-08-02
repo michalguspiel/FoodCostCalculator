@@ -1,96 +1,169 @@
 @startuml
 
-entity "Product" as p {
-    *product_id : number <<generated>>
+' Core Entities
+entity "ProductBase" as p {
+    *productId : number <<generated>>
     --
-    *name : text
+    *product_name : text
     *pricePerUnit : number
     *tax : number
     *waste : number
     *unit : text
-}
-
-entity "Product_HalfProduct" as php {
-    *product_half_product_id : number <<generated>>
     --
-    *product_id : number 
-    *half_product_id : number 
-    *weightPiece: number?
-    *quantity : number?
-    *quantity_unit : text
+    <<computed>>
+    +priceAfterWasteAndTax : number
+    +formatedBruttoPrice : string
 }
 
-entity "HalfProduct" as hp {
-    *half_product_id : number <<generated>>
+entity "HalfProductBase" as hp {
+    *halfProductId : number <<generated>>
     --
     *name : text
     *halfProductUnit : text
 }
 
-entity "Product_Dish" as pd{
-    *product_dish_id : number <<generated>>
+entity "DishBase" as d {
+    *dishId : number <<generated>>
     --
-    *product_id : number
-    *dish_id :  number
-    *quantity : Double
-    *quantity_unit : text
+    *dish_name : text
+    *margin_percent : number = 100.0
+    *dish_tax : number = 0.0
+    *recipeId : number? <<FK>>
 }
 
-entity "HalfProduct_Dish" as hpd {
-    *half_product_dish_id :  number <<generated>>
+entity "Recipe" as r {
+    *recipeId : number <<generated>>
     --
-    *half_product_id :  number
-    *dish_id :  number
-    *quantity : Double
-    *quantity_unit : text
-}
-
-entity "Dish" as d {
-    *dish_id : number <<generated>>
-    --
-    *name : text
-    *marginPercent : number
-    *dishTax : number
-    *recipeId: number?
-}
-
-entity Product_ProductDish <<View>> {
-    *product : Product
-    *productDish: Product_Dish
-}
-entity Product_ProductHalfProduct <<View>>  {
-    *product : Product
-    *productHalfProduct: Product_HalfProduct
-}
-entity HalfProduct_Product_ProductHalfProduct <<View>>  {
-    *halfProduct : HalfProduct
-    *productProductHalfProduct: Product_ProductHalfProduct
-}
-
-entity HalfProductDish_HalfProduct_Product_ProductHalfProduct <<View>> {
-    *halfProduct : HalfProductDish
-    *HalfProductProductProductHalfProduct: HalfProduct_Product_ProductHalfProduct
-}
-
-entity CompleteDish <<View>> {
-    *dish : Dish
-    *products : Product_ProductDish[]
-    *halfProducts : HalfProductDish_HalfProduct_Product_ProductHalfProduct[]
-}
-
-entity Recipe  {
-    *id : number <<generated>>
     *prepTimeMinutes : number
-    *cookTimeMinutes: number
+    *cookTimeMinutes : number
     *description : text
     *tips : text
 }
 
-entity RecipeStep {
-    *id : number<<generated>>
-    *recipeId: number
+entity "RecipeStep" as rs {
+    *id : number <<generated>>
+    --
+    *recipeId : number <<FK>>
     *stepDescription : text
     *order : number
 }
+
+' Association Tables (Junction Tables)
+entity "ProductDish" as pd {
+    *productDishId : number <<generated>>
+    --
+    *productId : number <<FK>>
+    *dishId : number <<FK>>
+    *quantity : number
+    *quantityUnit : text
+}
+
+entity "ProductHalfProduct" as php {
+    *productHalfProductId : number <<generated>>
+    --
+    *productId : number <<FK>>
+    *halfProductId : number <<FK>>
+    *quantity : number
+    *quantityUnit : text
+    *weightPiece : number?
+    --
+    <<computed>>
+    +totalWeightForPiece : number?
+}
+
+entity "HalfProductDish" as hpd {
+    *halfProductDishId : number <<generated>>
+    --
+    *halfProductId : number <<FK>>
+    *dishId : number <<FK>>
+    *quantity : number
+    *quantityUnit : text
+}
+
+' Remote/Local sync entities
+entity "FeatureRequestEntity" as fre {
+    *id : text
+    --
+    *title : text
+    *description : text
+    *timestamp : date
+}
+
+entity "UpvotedFeatureRequest" as ufr {
+    *id : text
+}
+
+' Views (Joined entities for complex queries)
+entity "ProductAndProductDish" as papd <<View>> {
+    @Embedded productDish : ProductDish
+    @Relation product : ProductBase
+}
+
+entity "ProductUsedInHalfProduct" as puihp <<View>> {
+    @Embedded productHalfProduct : ProductHalfProduct
+    @Relation product : ProductBase
+}
+
+entity "CompleteHalfProduct" as chp <<View>> {
+    @Embedded halfProductBase : HalfProductBase
+    @Relation products : ProductUsedInHalfProduct[]
+}
+
+entity "HalfProductUsedInDish" as hpuid <<View>> {
+    @Embedded halfProductDish : HalfProductDish
+    @Relation halfProductsWithProductsBase : CompleteHalfProduct
+}
+
+entity "RecipeWithSteps" as rws <<View>> {
+    @Embedded recipe : Recipe
+    @Relation steps : RecipeStep[]
+}
+
+entity "CompleteDish" as cd <<View>> {
+    @Embedded dish : DishBase
+    @Relation recipe : RecipeWithSteps?
+    @Relation products : ProductAndProductDish[]
+    @Relation halfProducts : HalfProductUsedInDish[]
+}
+
+' Foreign Key Relationships
+d ||--o| r : "recipeId"
+r ||--o{ rs : "recipeId"
+
+p ||--o{ pd : "productId"
+d ||--o{ pd : "dishId"
+
+p ||--o{ php : "productId"
+hp ||--o{ php : "halfProductId"
+
+hp ||--o{ hpd : "halfProductId"
+d ||--o{ hpd : "dishId"
+
+' View Relationships (Room @Relation mappings)
+papd --|> pd : "@Embedded"
+papd --|> p : "@Relation"
+
+puihp --|> php : "@Embedded"
+puihp --|> p : "@Relation"
+
+chp --|> hp : "@Embedded"
+chp --|> puihp : "@Relation"
+
+hpuid --|> hpd : "@Embedded"
+hpuid --|> chp : "@Relation"
+
+rws --|> r : "@Embedded"
+rws --|> rs : "@Relation"
+
+cd --|> d : "@Embedded"
+cd --|> rws : "@Relation"
+cd --|> papd : "@Relation"
+cd --|> hpuid : "@Relation"
+
+' Notes
+note top of cd : Main view for complete dish\nwith all ingredients and recipe
+note right of chp : Half product with all\nits constituent products
+note bottom of php : Supports weight per piece\nfor items sold by count
+note left of fre : Local cache of remote\nfeature requests
 
 @enduml
