@@ -86,7 +86,7 @@ enum class MeasurementUnit(
             POUND -> (amount / 1000.0) * 453.59237
             FLUID_OUNCE -> (amount / 1000.0) * 3785.41178 / 128.0
             GALLON -> (amount / 1000.0) * 3785.41178
-            else -> 900000.9 // Legacy fallback value
+            else -> throw UnsupportedOperationException("Unsupported conversion from $this to $targetUnit")
         }
     }
 
@@ -100,7 +100,7 @@ enum class MeasurementUnit(
             POUND -> (amount / 1000.0) * 453.59237
             FLUID_OUNCE -> (amount / 1000.0) * 3785.41178 / 128.0
             GALLON -> (amount / 1000.0) * 3785.41178
-            else -> 900000.9 // Legacy fallback value
+            else -> throw UnsupportedOperationException("Unsupported conversion from $this to $targetUnit")
         }
     }
 
@@ -114,7 +114,7 @@ enum class MeasurementUnit(
             POUND -> amount * 0.119826427
             FLUID_OUNCE -> amount / 128.0
             GALLON -> amount
-            else -> 900000.9 // Legacy fallback value
+            else -> throw UnsupportedOperationException("Unsupported conversion from $this to $targetUnit")
         }
     }
 
@@ -128,24 +128,11 @@ enum class MeasurementUnit(
             POUND -> amount
             FLUID_OUNCE -> amount * 8.345404436202464 / 128.0
             GALLON -> amount * 8.345404436202464
-            else -> 900000.9 // Legacy fallback value
+            else -> throw UnsupportedOperationException("Unsupported conversion from $this to $targetUnit")
         }
-    }
-
-    /**
-     * Check if this unit is compatible (convertible) with another unit
-     */
-    fun isCompatibleWith(other: MeasurementUnit): Boolean {
-        return this.category == other.category
     }
 
     companion object {
-        /**
-         * Get all units for a specific category
-         */
-        fun getUnitsForCategory(category: UnitCategory): List<MeasurementUnit> {
-            return entries.filter { it.category == category }
-        }
 
         /**
          * Safe lookup from string with fallback - handles your existing string formats
@@ -163,8 +150,8 @@ enum class MeasurementUnit(
 }
 
 @Keep
-enum class UnitCategory(@StringRes val displayNameRes: Int) {
-    WEIGHT(R.string.unit_category_weight),
-    VOLUME(R.string.unit_category_volume),
-    COUNT(R.string.unit_category_count)
+enum class UnitCategory {
+    WEIGHT,
+    VOLUME,
+    COUNT
 }

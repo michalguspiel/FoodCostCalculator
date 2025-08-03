@@ -398,7 +398,7 @@ fun CreateHalfProductDialog(
     }
 
     var selectedUnit by remember {
-        mutableStateOf(units.first())
+        mutableStateOf(units.firstOrNull())
     }
 
     BasicAlertDialog(
@@ -443,7 +443,9 @@ fun CreateHalfProductDialog(
             Spacer(modifier = Modifier.size(24.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                 FCCTextButton(text = stringResource(id = R.string.save)) {
-                    onSave(name, selectedUnit)
+                    selectedUnit?.let {
+                        onSave(name, it)
+                    }
                 }
             }
         }
