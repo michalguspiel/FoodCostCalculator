@@ -8,12 +8,12 @@ import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
  * Handles safe serialization/deserialization with fallback for unknown values
  */
 class UnitConverters {
-
+    
     @TypeConverter
     fun fromMeasurementUnit(unit: MeasurementUnit): String {
         return unit.name
     }
-
+    
     @TypeConverter
     fun toMeasurementUnit(unitString: String): MeasurementUnit {
         return MeasurementUnit.fromStringOrDefault(unitString, MeasurementUnit.GRAM)

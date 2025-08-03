@@ -63,31 +63,92 @@ class Migration_5to6_UnitEnumMigration : Migration(5, 6){
         // Step 4: Drop old columns and rename new ones
 
         // Products table
-        database.execSQL("CREATE TABLE products_new AS SELECT productId, product_name, pricePerUnit, tax, waste, unit_new as unit FROM products")
+        database.execSQL(
+            """
+            CREATE TABLE products_new (
+                productId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                product_name TEXT NOT NULL,
+                pricePerUnit REAL NOT NULL,
+                tax REAL NOT NULL,
+                waste REAL NOT NULL,
+                unit TEXT NOT NULL
+            )
+            """.trimIndent()
+        )
+        database.execSQL("INSERT INTO products_new SELECT productId, product_name, pricePerUnit, tax, waste, unit_new FROM products")
         database.execSQL("DROP TABLE products")
         database.execSQL("ALTER TABLE products_new RENAME TO products")
 
-        // HalfProduct table
-        database.execSQL("CREATE TABLE HalfProduct_new AS SELECT halfProductId, name, halfProductUnit_new as halfProductUnit FROM HalfProduct")
+        // HalfProduct table - Fix: Use explicit CREATE with constraints
+        database.execSQL(
+            """
+            CREATE TABLE HalfProduct_new (
+                halfProductId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                name TEXT NOT NULL,
+                halfProductUnit TEXT NOT NULL
+            )
+            """.trimIndent()
+        )
+        database.execSQL("INSERT INTO HalfProduct_new SELECT halfProductId, name, halfProductUnit_new FROM HalfProduct")
         database.execSQL("DROP TABLE HalfProduct")
         database.execSQL("ALTER TABLE HalfProduct_new RENAME TO HalfProduct")
 
-        // Association tables
-        database.execSQL("CREATE TABLE Product_Dish_new AS SELECT productDishId, productId, dishId, quantity, quantityUnit_new as quantityUnit FROM Product_Dish")
+        // Product_Dish table - Fix: Use explicit CREATE with constraints
+        database.execSQL(
+            """
+            CREATE TABLE Product_Dish_new (
+                productDishId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                productId INTEGER NOT NULL,
+                dishId INTEGER NOT NULL,
+                quantity REAL NOT NULL,
+                quantityUnit TEXT NOT NULL,
+                FOREIGN KEY(productId) REFERENCES products(productId) ON DELETE CASCADE,
+                FOREIGN KEY(dishId) REFERENCES dishes(dishId) ON DELETE CASCADE
+            )
+            """.trimIndent()
+        )
+        database.execSQL("INSERT INTO Product_Dish_new SELECT productDishId, productId, dishId, quantity, quantityUnit_new FROM Product_Dish")
         database.execSQL("DROP TABLE Product_Dish")
         database.execSQL("ALTER TABLE Product_Dish_new RENAME TO Product_Dish")
 
-        database.execSQL("CREATE TABLE Product_HalfProduct_new AS SELECT productHalfProductId, productId, halfProductId, quantity, quantityUnit_new as quantityUnit, weightPiece FROM Product_HalfProduct")
+        // Product_HalfProduct table - Fix: Use explicit CREATE with constraints
+        database.execSQL(
+            """
+            CREATE TABLE Product_HalfProduct_new (
+                productHalfProductId INTEGER PRIMARY KEY NOT NULL,
+                productId INTEGER NOT NULL,
+                halfProductId INTEGER NOT NULL,
+                quantity REAL NOT NULL,
+                quantityUnit TEXT NOT NULL,
+                weightPiece REAL,
+                FOREIGN KEY(productId) REFERENCES products(productId) ON DELETE CASCADE,
+                FOREIGN KEY(halfProductId) REFERENCES HalfProduct(halfProductId) ON DELETE CASCADE
+            )
+            """.trimIndent()
+        )
+        database.execSQL("INSERT INTO Product_HalfProduct_new SELECT productHalfProductId, productId, halfProductId, quantity, quantityUnit_new, weightPiece FROM Product_HalfProduct")
         database.execSQL("DROP TABLE Product_HalfProduct")
         database.execSQL("ALTER TABLE Product_HalfProduct_new RENAME TO Product_HalfProduct")
 
-        database.execSQL("CREATE TABLE HalfProduct_Dish_new AS SELECT halfProductDishId, halfProductId, dishId, quantity, quantityUnit_new as quantityUnit FROM HalfProduct_Dish")
+        // HalfProduct_Dish table - Fix: Use explicit CREATE with constraints
+        database.execSQL(
+            """
+            CREATE TABLE HalfProduct_Dish_new (
+                halfProductDishId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                halfProductId INTEGER NOT NULL,
+                dishId INTEGER NOT NULL,
+                quantity REAL NOT NULL,
+                quantityUnit TEXT NOT NULL,
+                FOREIGN KEY(halfProductId) REFERENCES HalfProduct(halfProductId) ON DELETE CASCADE,
+                FOREIGN KEY(dishId) REFERENCES dishes(dishId) ON DELETE CASCADE
+            )
+            """.trimIndent()
+        )
+        database.execSQL("INSERT INTO HalfProduct_Dish_new SELECT halfProductDishId, halfProductId, dishId, quantity, quantityUnit_new FROM HalfProduct_Dish")
         database.execSQL("DROP TABLE HalfProduct_Dish")
         database.execSQL("ALTER TABLE HalfProduct_Dish_new RENAME TO HalfProduct_Dish")
 
         // Step 5: Recreate indexes
-        database.execSQL("CREATE INDEX IF NOT EXISTS index_products_productId ON products(productId)")
-        database.execSQL("CREATE INDEX IF NOT EXISTS index_HalfProduct_halfProductId ON HalfProduct(halfProductId)")
         database.execSQL("CREATE INDEX IF NOT EXISTS index_Product_Dish_productId ON Product_Dish(productId)")
         database.execSQL("CREATE INDEX IF NOT EXISTS index_Product_Dish_dishId ON Product_Dish(dishId)")
         database.execSQL("CREATE INDEX IF NOT EXISTS index_Product_HalfProduct_productId ON Product_HalfProduct(productId)")
