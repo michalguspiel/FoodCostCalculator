@@ -12,7 +12,7 @@ interface AdItem {
 interface ItemUsageEntry {
     +item : Item
     +quantity : Double
-    +quantityUnit : String
+    +quantityUnit : MeasurementUnit
     +foodCost : Double
     +formattedTotalPricePerServing(amountOfServings: Double, currency: Currency?) : String
     +formatQuantityForTargetServing(servings: Double) : String
@@ -31,7 +31,7 @@ entity ProductDomain {
     +pricePerUnit : Double
     +tax : Double
     +waste : Double
-    +unit : String
+    +unit : MeasurementUnit
     --
     -priceWithTax : Double
     +priceAfterWasteAndTax : Double
@@ -43,13 +43,13 @@ entity EditableProductDomain {
     +pricePerUnit : String
     +tax : String
     +waste : String
-    +unit : String
+    +unit : MeasurementUnit
 }
 
 entity HalfProductDomain {
     +id : Long
     +name : String
-    +halfProductUnit : String
+    +halfProductUnit : MeasurementUnit
     +products : List<UsedProductDomain>
     --
     -singleRecipePrice : Double
@@ -84,14 +84,14 @@ entity DishDomain {
 entity ProductAddedToDish {
     +item : ProductDomain
     +quantity : Double
-    +quantityUnit : String
+    +quantityUnit : MeasurementUnit
     +foodCost : Double
 }
 
 entity HalfProductAddedToDish {
     +item : HalfProductDomain
     +quantity : Double
-    +quantityUnit : String
+    +quantityUnit : MeasurementUnit
     +foodCost : Double
 }
 
@@ -101,7 +101,7 @@ entity UsedProductDomain {
     +ownerId : Long
     +item : ProductDomain
     +quantity : Double
-    +quantityUnit : String
+    +quantityUnit : MeasurementUnit
     +weightPiece : Double?
     +foodCost : Double
     --
@@ -113,7 +113,7 @@ entity UsedHalfProductDomain {
     +ownerId : Long
     +item : HalfProductDomain
     +quantity : Double
-    +quantityUnit : String
+    +quantityUnit : MeasurementUnit
     +foodCost : Double
 }
 
