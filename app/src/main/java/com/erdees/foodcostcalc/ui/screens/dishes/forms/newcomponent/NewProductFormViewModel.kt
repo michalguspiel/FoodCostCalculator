@@ -57,7 +57,7 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
                 .distinctUntilChanged(areEquivalent = { old, new -> old == new })
                 .filter { it.isNotEmpty() }
                 .collect { availableUnits ->
-                    if (formData.value.unitForDish != null) {
+                    if (formData.value.unitForDish == null) {
                         _formData.update { it.copy(unitForDish = availableUnits.first()) }
                     }
                 }
