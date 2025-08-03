@@ -207,7 +207,8 @@ private fun CreateProductScreenContent(
                     UnitField(
                         units = units,
                         selectedUnit = selectedUnit,
-                        selectUnit = { actions.selectUnit(it) })
+                        selectUnit = { actions.selectUnit(it) },
+                        label = stringResource(R.string.purchase_unit))
                 }
 
                 Column {

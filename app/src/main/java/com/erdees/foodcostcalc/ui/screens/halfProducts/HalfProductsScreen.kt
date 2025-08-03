@@ -89,7 +89,7 @@ import java.util.Locale
 @Composable
 fun HalfProductsScreen(
     navController: NavController,
-    viewModel: HalfProductsScreenViewModel = viewModel()
+    viewModel: HalfProductsScreenViewModel = viewModel(),
 ) {
     val listItems by viewModel.filteredHalfProductsInjectedWithAds.collectAsState()
     val searchKey by viewModel.searchKey.collectAsState()
@@ -211,7 +211,7 @@ private fun HalfProductsContent(
     onAdFailedToLoad: () -> Unit,
     onExpandToggle: (Item) -> Unit,
     onEditQuantity: (Long) -> Unit,
-    updateSearchKey: (String) -> Unit
+    updateSearchKey: (String) -> Unit,
 ) {
     Box(
         contentAlignment = Alignment.TopCenter
@@ -290,7 +290,7 @@ fun HalfProductItem(
     onExpandToggle: () -> Unit,
     onEditQuantity: () -> Unit,
     onAddItemsClick: () -> Unit,
-    onEditClick: () -> Unit
+    onEditClick: () -> Unit,
 ) {
     Card(
         modifier
@@ -365,7 +365,7 @@ private fun Ingredients(
 private fun PriceSummary(
     halfProductDomain: HalfProductDomain,
     currency: Currency?,
-    quantity: Double
+    quantity: Double,
 ) {
     PriceRow(
         description = stringResource(id = R.string.price_per_recipe),
@@ -379,7 +379,8 @@ private fun PriceSummary(
     Spacer(modifier = Modifier.height(4.dp))
     PriceRow(
         description = stringResource(
-            id = R.string.price_per_unit, halfProductDomain.halfProductUnit
+            id = R.string.price_per_unit,
+            stringResource(halfProductDomain.halfProductUnit.displayNameRes).lowercase(Locale.getDefault())
         ), price = halfProductDomain.formattedPricePerUnit(currency),
         style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
     )
@@ -391,7 +392,7 @@ fun CreateHalfProductDialog(
     units: Set<MeasurementUnit>,
     modifier: Modifier = Modifier,
     onSave: (name: String, unit: MeasurementUnit) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     var name by remember {
         mutableStateOf("")
@@ -437,7 +438,9 @@ fun CreateHalfProductDialog(
                 UnitField(
                     units = units,
                     selectedUnit = selectedUnit,
-                    selectUnit = { selectedUnit = it })
+                    selectUnit = { selectedUnit = it },
+                    label = stringResource(id = R.string.half_product_unit)
+                )
             }
 
             Spacer(modifier = Modifier.size(24.dp))
@@ -488,7 +491,10 @@ private fun HalfProductsItemPreview() {
                 onAddItemsClick = { }) {}
             HalfProductItem(
                 halfProductDomain = HalfProductDomain(
-                    id = 1, name = "Ketchup", halfProductUnit = MeasurementUnit.KILOGRAM, products = emptyList()
+                    id = 1,
+                    name = "Ketchup",
+                    halfProductUnit = MeasurementUnit.KILOGRAM,
+                    products = emptyList()
                 ),
                 isExpanded = false,
                 quantity = 2.0,

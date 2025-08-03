@@ -32,6 +32,7 @@ import org.junit.Test
 import org.koin.core.context.startKoin
 import org.koin.core.context.stopKoin
 import org.koin.dsl.module
+import java.util.Locale
 
 @ExperimentalCoroutinesApi
 class ComponentLookupFormViewModelTest {
@@ -173,7 +174,7 @@ class ComponentLookupFormViewModelTest {
 
         val suggestions = viewModel.suggestedComponents.first()
         suggestions.products.size shouldBe 2
-        suggestions.products.all { it.name.lowercase().contains("chicken") } shouldBe true
+        suggestions.products.all { it.name.lowercase(Locale.getDefault()).contains("chicken") } shouldBe true
     }
 
     @Test

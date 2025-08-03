@@ -48,12 +48,13 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.navigation.Screen
 import timber.log.Timber
+import java.util.Locale
 
 @Screen
 @Composable
 fun EditProductScreen(
     navController: NavController,
-    viewModel: EditProductViewModel = viewModel()
+    viewModel: EditProductViewModel = viewModel(),
 ) {
     val screenState by viewModel.screenState.collectAsState()
     val product by viewModel.product.collectAsState()
@@ -91,15 +92,17 @@ fun EditProductScreen(
         Box(
             modifier = Modifier.padding(paddingValues)
         ) {
-            EditProductContent(
-                product = product,
-                showTaxPercent = showTaxPercent,
-                saveButtonEnabled = saveButtonEnabled,
-                onPriceChange = viewModel::updatePrice,
-                onTaxChange = viewModel::updateTax,
-                onWasteChange = viewModel::updateWaste,
-                onSaveClick = viewModel::save
-            )
+            product?.let { product ->
+                EditProductContent(
+                    product = product,
+                    showTaxPercent = showTaxPercent,
+                    saveButtonEnabled = saveButtonEnabled,
+                    onPriceChange = viewModel::updatePrice,
+                    onTaxChange = viewModel::updateTax,
+                    onWasteChange = viewModel::updateWaste,
+                    onSaveClick = viewModel::save
+                )
+            } ?: ScreenLoadingOverlay()
 
             HandleScreenState(
                 screenState = screenState,
@@ -124,7 +127,7 @@ private fun EditProductTopBar(
     productName: String,
     onNameClick: () -> Unit,
     onDeleteClick: () -> Unit,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
 ) {
     TopAppBar(
         title = {
@@ -154,13 +157,13 @@ private fun EditProductTopBar(
 
 @Composable
 private fun EditProductContent(
-    product: EditableProductDomain?,
+    product: EditableProductDomain,
     showTaxPercent: Boolean,
     saveButtonEnabled: Boolean,
     onPriceChange: (String) -> Unit,
     onTaxChange: (String) -> Unit,
     onWasteChange: (String) -> Unit,
-    onSaveClick: () -> Unit
+    onSaveClick: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.SpaceBetween,
@@ -192,11 +195,11 @@ private fun EditProductContent(
 
 @Composable
 private fun ProductFormFields(
-    product: EditableProductDomain?,
+    product: EditableProductDomain,
     showTaxPercent: Boolean,
     onPriceChange: (String) -> Unit,
     onTaxChange: (String) -> Unit,
-    onWasteChange: (String) -> Unit
+    onWasteChange: (String) -> Unit,
 ) {
     Column(
         Modifier
@@ -205,14 +208,17 @@ private fun ProductFormFields(
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         Text(
-            text = stringResource(id = R.string.values_per_unit, product?.unit ?: ""),
+            text = stringResource(
+                id = R.string.values_per_unit,
+                stringResource(product.unit.displayNameRes).lowercase(Locale.getDefault())
+            ),
             style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
         FCCTextField(
             title = stringResource(id = R.string.price),
-            value = product?.pricePerUnit.toString(),
+            value = product.pricePerUnit.toString(),
             onValueChange = onPriceChange,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -220,10 +226,10 @@ private fun ProductFormFields(
             )
         )
 
-        if (showTaxPercent || product?.tax?.toDoubleOrNull() != 0.0) {
+        if (showTaxPercent || product.tax.toDoubleOrNull() != 0.0) {
             FCCTextField(
                 title = stringResource(id = R.string.tax_percent),
-                value = product?.tax.toString(),
+                value = product.tax.toString(),
                 onValueChange = onTaxChange,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Number,
@@ -234,7 +240,7 @@ private fun ProductFormFields(
 
         FCCTextField(
             title = stringResource(id = R.string.percent_of_waste),
-            value = product?.waste.toString(),
+            value = product.waste.toString(),
             onValueChange = onWasteChange,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -254,7 +260,7 @@ private fun HandleScreenState(
     onDismissDialog: () -> Unit,
     onDeleteConfirm: (Long) -> Unit,
     onDiscardChanges: () -> Unit,
-    onSaveChanges: () -> Unit
+    onSaveChanges: () -> Unit,
 ) {
     when (screenState) {
         is ScreenState.Interaction -> {
