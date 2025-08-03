@@ -13,11 +13,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -52,6 +55,7 @@ fun ExistingComponentForm(
     onAddComponent: (ExistingItemFormData) -> Unit = {},
     onCancel: () -> Unit,
 ) {
+    val quantityFocusRequested = rememberSaveable { mutableStateOf(false) }
     val quantityFocusRequester = remember { FocusRequester() }
     val unitForDishFocusRequester = remember { FocusRequester() }
     val scrollState = rememberScrollState()
@@ -86,7 +90,14 @@ fun ExistingComponentForm(
         Spacer(modifier = Modifier.height(8.dp))
 
         FCCTextField(
-            modifier = Modifier.focusRequester(quantityFocusRequester),
+            modifier = Modifier
+                .focusRequester(quantityFocusRequester)
+                .onGloballyPositioned {
+                if (!quantityFocusRequested.value) {
+                    quantityFocusRequester.requestFocus()
+                    quantityFocusRequested.value = false
+                }
+            },
             title = "Quantity for '$dishName'",
             value = formData.quantityForDish,
             onValueChange = { newValue ->

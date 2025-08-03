@@ -21,10 +21,16 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -73,6 +79,8 @@ private fun ComponentLookupFormContent(
     onNext: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val wasComponentNameFocusRequested = rememberSaveable { mutableStateOf(false) }
+    val componentNameFocusRequester = remember { FocusRequester() }
     Column(
         modifier = modifier
             .padding(16.dp)
@@ -84,7 +92,16 @@ private fun ComponentLookupFormContent(
         Text(stringResource(R.string.add_component), style = MaterialTheme.typography.titleMedium)
         Spacer(modifier = Modifier.height(8.dp))
         FCCTextField(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(componentNameFocusRequester)
+                .onGloballyPositioned{
+                    if (!wasComponentNameFocusRequested.value) {
+                        wasComponentNameFocusRequested.value = true
+                        componentNameFocusRequester.requestFocus()
+                    }
+                }
+            ,
             title = stringResource(R.string.search_or_create_component),
             placeholder = stringResource(R.string.search_or_create_component_hint),
             value = newComponentName,

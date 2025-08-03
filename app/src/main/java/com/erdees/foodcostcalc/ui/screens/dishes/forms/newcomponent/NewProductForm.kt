@@ -13,11 +13,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -40,6 +43,8 @@ fun NewProductForm(
     onFormDataUpdate: (NewProductFormData) -> Unit = {},
     onSaveProduct: (NewProductFormData) -> Unit = {},
 ) {
+    val wasPriceFocusRequested = rememberSaveable { mutableStateOf(false) }
+    val priceFocusRequester = remember { FocusRequester() }
     val purchaseUnitFocusRequester = remember { FocusRequester() }
     val productAdditionUnitFocusRequester = remember { FocusRequester() }
     val wastePercentFocusRequester = remember { FocusRequester() }
@@ -59,6 +64,15 @@ fun NewProductForm(
             FCCTextField(
                 title = "Purchase Price",
                 value = formData.purchasePrice,
+                modifier = Modifier
+                    .focusRequester(priceFocusRequester)
+                    .onGloballyPositioned{
+                        if (!wasPriceFocusRequested.value) {
+                            wasPriceFocusRequested.value = true
+                            priceFocusRequester.requestFocus()
+                        }
+                    }
+                ,
                 onValueChange = {
                     val newValue = onNumericValueChange(formData.purchasePrice, it)
                     onFormDataUpdate(formData.copy(purchasePrice = newValue))
