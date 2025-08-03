@@ -8,7 +8,7 @@ import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
  * Migration from String-based units to MeasurementUnit enum
  * Version 5 to 6: Convert string units to enum values
  */
-class Migration_5to6_UnitEnumMigration : Migration(5, 6){
+val Migration_5to6_UnitEnumMigration = object : Migration(5, 6){
     override fun migrate(database: SupportSQLiteDatabase) {
 
         // Step 1: Add temporary columns for new enum-based units

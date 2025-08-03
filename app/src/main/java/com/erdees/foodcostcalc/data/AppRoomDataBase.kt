@@ -76,7 +76,7 @@ abstract class AppRoomDataBase : RoomDatabase() {
             Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist(),
             Migration_3to_4_CreateRecipeTable(),
             Migration_4to_5_FeatureRequests(),
-            Migration_5to6_UnitEnumMigration()
+            Migration_5to6_UnitEnumMigration
         )
 
         fun getDatabase(context: Context): AppRoomDataBase {
