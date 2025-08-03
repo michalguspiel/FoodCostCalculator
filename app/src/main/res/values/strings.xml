@@ -116,6 +116,7 @@
 
     <string name="quantity">Quantity</string>
     <string name="unit">Unit</string>
+    <string name="purchase_unit">Purchase unit</string>
 
     <string name="add">Add</string>
     <string name="name">Name</string>
@@ -148,12 +149,12 @@
     <string name="box_price">Box price</string>
     <string name="box_quantity">Units in box</string>
     <string name="content_description_remove_product">remove ingredient</string>
-    <string name="values_per_unit">Values %1$s</string>
+    <string name="values_per_unit">Values per %1$s</string>
 
     <!-- HALF PRODUCTS FEATURE -->
 
     <string name="create_half_product">Create half product</string>
-    <string name="price_per_unit">Price %1$s</string>
+    <string name="price_per_unit">Price per %1$s</string>
     <string name="price_per_recipe">Price per recipe</string>
     <string name="recipe_per_quantity">Recipe per %1$s %2$s of product</string>
     <string name="content_description_create_half_product">Create half product</string>
@@ -162,6 +163,9 @@
 
     <string name="content_description_half_product_tip">half product tip</string>
     <string name="content_description_remove_half_product">remove half product</string>
+
+    <string name="half_product_unit">Recipe unit</string>
+
 
     <!-- DISHES FEATURE -->
 

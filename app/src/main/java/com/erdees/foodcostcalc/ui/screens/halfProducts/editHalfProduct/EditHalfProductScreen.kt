@@ -329,7 +329,7 @@ fun HalfProductDetails(
                 .weight(1f)
         )
         DetailItem(
-            label = stringResource(id = R.string.price_per_unit, halfProductDomain.halfProductUnit),
+            label = stringResource(id = R.string.price_per_unit, stringResource(halfProductDomain.halfProductUnit.displayNameRes).lowercase()),
             value = halfProductDomain.formattedPricePresentedRecipe(
                 halfProductDomain.totalQuantity,
                 1.0,

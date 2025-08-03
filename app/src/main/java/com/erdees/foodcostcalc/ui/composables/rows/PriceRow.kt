@@ -16,9 +16,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
+import java.util.Locale
 
 @Composable
 fun PriceRow(
@@ -39,13 +39,13 @@ fun PriceRow(
                 withStyle(
                     style = SpanStyle(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
-                        fontSize = style.fontSize.value.minus(3).sp
+                        fontSize = style.fontSize.times(0.8f)
                     )
                 ) {
                     append(
                         stringResource(
                             R.string.unit_per_format,
-                            secondaryText.lowercase()
+                            secondaryText.lowercase(Locale.getDefault())
                         )
                     )
                 }

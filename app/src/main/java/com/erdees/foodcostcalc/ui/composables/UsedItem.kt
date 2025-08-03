@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
@@ -116,7 +117,7 @@ fun UsedItem(
                 supportingContent = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = usedItem.quantity.toString() + " " + usedItem.quantityUnit
+                            text = usedItem.quantity.toString() + " " + stringResource(usedItem.quantityUnit.displayNameRes).lowercase(Locale.getDefault())
                         )
                         FCCDecorativeCircle(Modifier.padding(horizontal = 6.dp))
                         Text(
@@ -149,7 +150,7 @@ private fun UsedItemPreview() {
                     unit = MeasurementUnit.KILOGRAM,
                     tax = 23.0,
                     waste = 20.0
-                ), quantity = 1.0, quantityUnit =  MeasurementUnit.KILOGRAM, weightPiece = 1.0
+                ), quantity = 1.0, quantityUnit = MeasurementUnit.KILOGRAM, weightPiece = 1.0
             ),
             currency = Currency.getInstance(Locale.getDefault()),
             modifier = Modifier,

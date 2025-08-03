@@ -25,6 +25,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.util.Locale
 
 class DishesScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
@@ -63,7 +64,7 @@ class DishesScreenViewModel : FCCBaseViewModel(), KoinComponent {
             dishes, debouncedSearch.onStart { emit("") }
         ) { dishes, searchKey ->
             dishes?.filter {
-                it.name.lowercase().contains(searchKey.lowercase())
+                it.name.lowercase(Locale.getDefault()).contains(searchKey.lowercase())
             }
         }.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
