@@ -34,6 +34,8 @@
     <string name="volume">volume</string>
     <string name="piece">piece</string>
 
+    <string name="unit_per_format">(per %1$s)</string>
+
     <!-- Unit display names for MeasurementUnit enum -->
     <string name="unit_gram">Gram</string>
     <string name="unit_kilogram">Kilogram</string>
@@ -130,8 +132,8 @@
     <string name="product_netto_price">Price %1$s netto: %2$s.</string>
     <string name="product_foodcost_price">Price %1$s with foodcost: %2$s.</string>
 
-    <string name="netto_price">Net price %1$s</string>
-    <string name="total_price">Total price %1$s</string>
+    <string name="netto_price">Net price</string>
+    <string name="total_price">Price with Waste</string>
     <string name="content_description_create_product">Create ingredient</string>
     <string name="create_product">Create ingredient</string>
     <string name="product_name">Ingredient name</string>

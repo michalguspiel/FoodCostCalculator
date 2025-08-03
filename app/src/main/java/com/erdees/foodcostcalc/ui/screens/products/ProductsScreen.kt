@@ -39,7 +39,7 @@ import com.erdees.foodcostcalc.ui.composables.Ad
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.animations.SearchFieldTransition
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCAnimatedFAB
-import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
+import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCPrimaryHorizontalDivider
 import com.erdees.foodcostcalc.ui.composables.emptylist.EmptyListContent
 import com.erdees.foodcostcalc.ui.composables.fields.SearchField
@@ -57,7 +57,7 @@ import java.util.Locale
 @Screen
 fun ProductsScreen(
     navController: NavController,
-    viewModel: ProductsScreenViewModel = viewModel()
+    viewModel: ProductsScreenViewModel = viewModel(),
 ) {
     val searchKey by viewModel.searchKey.collectAsState()
     val listItems by viewModel.filteredProductsInjectedWithAds.collectAsState()
@@ -114,7 +114,7 @@ private fun ProductsScreenContent(
     isVisible: Boolean,
     searchKey: String,
     onAdFailedToLoad: () -> Unit,
-    updateSearchKey: (String) -> Unit
+    updateSearchKey: (String) -> Unit,
 ) {
     Box(
         contentAlignment = Alignment.TopCenter
@@ -163,7 +163,7 @@ fun ProductItem(
     productDomain: ProductDomain,
     currency: Currency?,
     modifier: Modifier = Modifier,
-    onEditClick: () -> Unit = {}
+    onEditClick: () -> Unit = {},
 ) {
     Card(modifier.fillMaxWidth(), content = {
         Column(Modifier.padding(vertical = 8.dp, horizontal = 12.dp)) {
@@ -172,12 +172,14 @@ fun ProductItem(
             Spacer(modifier = Modifier.height(8.dp))
 
             PriceRow(
-                description = stringResource(id = R.string.netto_price, productDomain.unit),
+                primaryText = stringResource(R.string.netto_price),
+                secondaryText = stringResource(productDomain.unit.displayNameRes),
                 price = formatPrice(productDomain.pricePerUnit, currency)
             )
             Spacer(modifier = Modifier.height(4.dp))
             PriceRow(
-                description = stringResource(id = R.string.total_price, productDomain.unit),
+                primaryText = stringResource(R.string.total_price),
+                secondaryText = stringResource(productDomain.unit.displayNameRes),
                 price = formatPrice(productDomain.priceAfterWasteAndTax, currency),
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
             )
@@ -188,7 +190,7 @@ fun ProductItem(
 
             Spacer(modifier = Modifier.height(12.dp))
             ButtonRow(applyDefaultPadding = false, primaryButton = {
-                FCCPrimaryButton(text = stringResource(id = R.string.edit)) {
+                FCCTextButton(text = stringResource(id = R.string.edit)) {
                     onEditClick()
                 }
             })
