@@ -8,7 +8,7 @@ entity "ProductBase" as p {
     *pricePerUnit : number
     *tax : number
     *waste : number
-    *unit : text
+    *unit : MeasurementUnit
     --
     <<computed>>
     +priceAfterWasteAndTax : number
@@ -19,7 +19,7 @@ entity "HalfProductBase" as hp {
     *halfProductId : number <<generated>>
     --
     *name : text
-    *halfProductUnit : text
+    *halfProductUnit : MeasurementUnit
 }
 
 entity "DishBase" as d {
@@ -55,7 +55,7 @@ entity "ProductDish" as pd {
     *productId : number <<FK>>
     *dishId : number <<FK>>
     *quantity : number
-    *quantityUnit : text
+    *quantityUnit : MeasurementUnit
 }
 
 entity "ProductHalfProduct" as php {
@@ -64,7 +64,7 @@ entity "ProductHalfProduct" as php {
     *productId : number <<FK>>
     *halfProductId : number <<FK>>
     *quantity : number
-    *quantityUnit : text
+    *quantityUnit : MeasurementUnit
     *weightPiece : number?
     --
     <<computed>>
@@ -77,7 +77,7 @@ entity "HalfProductDish" as hpd {
     *halfProductId : number <<FK>>
     *dishId : number <<FK>>
     *quantity : number
-    *quantityUnit : text
+    *quantityUnit : MeasurementUnit
 }
 
 ' Remote/Local sync entities
@@ -165,5 +165,6 @@ note top of cd : Main view for complete dish\nwith all ingredients and recipe
 note right of chp : Half product with all\nits constituent products
 note bottom of php : Supports weight per piece\nfor items sold by count
 note left of fre : Local cache of remote\nfeature requests
+note top of p : Uses UnitConverters for\nMeasurementUnit serialization
 
 @enduml
