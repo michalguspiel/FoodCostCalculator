@@ -62,6 +62,77 @@ enum class MeasurementUnit(
     }
 
     /**
+     * Legacy pricing equivalency calculation that matches the old computeWeightAndVolumeToSameUnit logic.
+     * This calculates "how many target-unit-equivalent portions does this amount represent for pricing purposes"
+     * rather than pure unit conversion.
+     */
+    fun computePricingEquivalent(targetUnit: MeasurementUnit, amount: Double): Double {
+        return when (this) {
+            KILOGRAM -> computeToKilogramEquivalent(targetUnit, amount)
+            LITER -> computeToLiterEquivalent(targetUnit, amount)
+            POUND -> computeToPoundEquivalent(targetUnit, amount)
+            GALLON -> computeToGallonEquivalent(targetUnit, amount)
+            else -> amount // Fallback for unsupported conversions
+        }
+    }
+
+    private fun computeToKilogramEquivalent(targetUnit: MeasurementUnit, amount: Double): Double {
+        return when (targetUnit) {
+            GRAM -> amount / 1000.0
+            KILOGRAM -> amount
+            MILLILITER -> amount / 1000.0
+            LITER -> amount
+            OUNCE -> (amount / 1000.0) * 28.3495
+            POUND -> (amount / 1000.0) * 453.59237
+            FLUID_OUNCE -> (amount / 1000.0) * 3785.41178 / 128.0
+            GALLON -> (amount / 1000.0) * 3785.41178
+            else -> 900000.9 // Legacy fallback value
+        }
+    }
+
+    private fun computeToLiterEquivalent(targetUnit: MeasurementUnit, amount: Double): Double {
+        return when (targetUnit) {
+            GRAM -> amount / 1000.0
+            KILOGRAM -> amount
+            MILLILITER -> amount / 1000.0
+            LITER -> amount
+            OUNCE -> (amount / 1000.0) * 28.3495
+            POUND -> (amount / 1000.0) * 453.59237
+            FLUID_OUNCE -> (amount / 1000.0) * 3785.41178 / 128.0
+            GALLON -> (amount / 1000.0) * 3785.41178
+            else -> 900000.9 // Legacy fallback value
+        }
+    }
+
+    private fun computeToGallonEquivalent(targetUnit: MeasurementUnit, amount: Double): Double {
+        return when (targetUnit) {
+            GRAM -> amount * 0.264172052 / 1000.0
+            KILOGRAM -> amount * 0.264172052
+            MILLILITER -> amount * 0.264172052 / 1000.0
+            LITER -> amount * 0.264172052
+            OUNCE -> amount * 0.119826427 / 16.0
+            POUND -> amount * 0.119826427
+            FLUID_OUNCE -> amount / 128.0
+            GALLON -> amount
+            else -> 900000.9 // Legacy fallback value
+        }
+    }
+
+    private fun computeToPoundEquivalent(targetUnit: MeasurementUnit, amount: Double): Double {
+        return when (targetUnit) {
+            GRAM -> amount / 453.59237
+            KILOGRAM -> amount * 2.20462262
+            MILLILITER -> amount / 453.59237
+            LITER -> amount * 2.20462262
+            OUNCE -> amount / 16.0
+            POUND -> amount
+            FLUID_OUNCE -> amount * 8.345404436202464 / 128.0
+            GALLON -> amount * 8.345404436202464
+            else -> 900000.9 // Legacy fallback value
+        }
+    }
+
+    /**
      * Check if this unit is compatible (convertible) with another unit
      */
     fun isCompatibleWith(other: MeasurementUnit): Boolean {
@@ -83,7 +154,7 @@ enum class MeasurementUnit(
             val cleanUnit = unitString.removePrefix("per ").trim('"')
             return try {
                 valueOf(cleanUnit.uppercase())
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 // Fallback to default if no match found
                 default
             }

@@ -29,11 +29,6 @@ object UnitsUtils {
     }
 
     @Composable
-    fun getUnitDisplayName(unit: MeasurementUnit): String {
-        return stringResource(unit.displayNameRes)
-    }
-
-    @Composable
     fun getPerUnitAsDescription(unit: MeasurementUnit): String {
         return when (unit) {
             MeasurementUnit.KILOGRAM -> stringResource(R.string.description_per_kilogram)
@@ -45,11 +40,6 @@ object UnitsUtils {
             MeasurementUnit.GALLON -> stringResource(R.string.description_per_gallon)
             else -> stringResource(R.string.description_default)
         }
-    }
-
-    @Composable
-    fun getCategoryDisplayName(category: UnitCategory): String {
-        return stringResource(category.displayNameRes)
     }
 
     // Simplified - now uses enum categories directly
@@ -69,9 +59,7 @@ object UnitsUtils {
         return when (itemUnit.category) {
             UnitCategory.COUNT -> pricePerUnit * quantity
             else -> {
-                // Use built-in enum conversion if units are compatible
-                val convertedQuantity = itemUnit.convertTo(targetUnit, quantity) ?: quantity
-                pricePerUnit * convertedQuantity
+                pricePerUnit * itemUnit.computePricingEquivalent(targetUnit,quantity)
             }
         }
     }
@@ -79,14 +67,14 @@ object UnitsUtils {
     // Legacy string-based methods for backward compatibility during migration
     @Deprecated("Use MeasurementUnit enum version instead")
     @Composable
-    fun getPerUnitAbbreviation(unit: String): String {
+    fun getPerUnitAbbreviationLegacy(unit: String): String {
         val enumUnit = MeasurementUnit.fromStringOrDefault(unit.removePrefix("per "))
         return getPerUnitAbbreviation(enumUnit)
     }
 
     @Deprecated("Use MeasurementUnit enum version instead")
     @Composable
-    fun getUnitAbbreviation(unit: String): String {
+    fun getUnitAbbreviationLegacy(unit: String): String {
         val enumUnit = MeasurementUnit.fromStringOrDefault(unit)
         return getUnitAbbreviation(enumUnit)
     }
@@ -106,7 +94,7 @@ object UnitsUtils {
     }
 
     @Deprecated("Use MeasurementUnit.category instead")
-    fun getUnitType(string: String?): UnitType? {
+    fun getUnitTypeLegacy(string: String?): UnitType? {
         if (string == null) return null
         val enumUnit = MeasurementUnit.fromStringOrDefault(string.removePrefix("per "))
         return when (enumUnit.category) {
@@ -117,19 +105,19 @@ object UnitsUtils {
     }
 
     @Deprecated("Use enum-based calculatePrice instead")
-    fun calculatePrice(
+    fun calculatePriceLegacy(
         pricePerUnit: Double,
         quantity: Double,
         itemUnit: String,
         targetUnit: String
     ): Double {
         return if (itemUnit == "per piece") pricePerUnit * quantity
-        else pricePerUnit * computeWeightAndVolumeToSameUnit(itemUnit, targetUnit, quantity)
+        else pricePerUnit * computeWeightAndVolumeToSameUnitLegacy(itemUnit, targetUnit, quantity)
     }
 
     // All the legacy conversion methods can be removed as they're now handled by MeasurementUnit.convertTo()
-    @Deprecated("Use MeasurementUnit.convertTo() instead")
-    fun computeWeightAndVolumeToSameUnit(
+    @Deprecated("Use MeasurementUnit.computePricingEquivalent instead")
+    fun computeWeightAndVolumeToSameUnitLegacy(
         finalUnit: String,
         anotherUnit: String,
         amount: Double
@@ -197,5 +185,4 @@ object UnitsUtils {
             else -> 900000.9
         }
     }
-
 }

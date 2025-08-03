@@ -201,7 +201,7 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
             capturedProduct.pricePerUnit shouldBe 10.0
             capturedProduct.tax shouldBe 15.0
             capturedProduct.waste shouldBe 5.0
-            capturedProduct.unit shouldBe "kg"
+            capturedProduct.unit shouldBe MeasurementUnit.KILOGRAM
 
             coVerify(exactly = 1) {
                 analyticsRepository.logEvent(

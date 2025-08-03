@@ -36,7 +36,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -89,7 +88,6 @@ fun CreateDishStartScreen(
     existingProductFormViewModel: ExistingComponentFormViewModel = viewModel(),
     componentLookupViewModel: ComponentLookupViewModel = viewModel(),
 ) {
-    val context = LocalContext.current
     val dishName by viewModel.dishName.collectAsState()
     val addedComponents by viewModel.addedComponents.collectAsState()
     val currency by viewModel.currency.collectAsState()

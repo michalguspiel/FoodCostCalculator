@@ -22,17 +22,12 @@ data class HalfProductDomain(
         if (halfProductUnit == MeasurementUnit.PIECE) 1.0
         else products.sumOf {
             if (it.quantityUnit == MeasurementUnit.PIECE) {
-                halfProductUnit.convertTo(
+                halfProductUnit.computePricingEquivalent(
                     halfProductUnit,
                     it.weightPiece?.times(it.quantity) ?: it.quantity
-                ) ?: throw IllegalArgumentException(
-                    "Cannot convert ${it.quantityUnit} to $halfProductUnit"
                 )
             } else {
-                it.quantityUnit.convertTo(halfProductUnit, it.quantity)
-                    ?: throw IllegalArgumentException(
-                        "Cannot convert ${it.quantityUnit} to $halfProductUnit"
-                    )
+                halfProductUnit.computePricingEquivalent(it.quantityUnit, it.quantity)
             }
         }
 
