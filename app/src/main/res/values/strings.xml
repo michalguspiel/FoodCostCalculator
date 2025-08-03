@@ -134,7 +134,7 @@
     <string name="product_foodcost_price">Price %1$s with foodcost: %2$s.</string>
 
     <string name="netto_price">Net price</string>
-    <string name="total_price">Price with Waste</string>
+    <string name="total_price">Gross price</string>
     <string name="content_description_create_product">Create ingredient</string>
     <string name="create_product">Create ingredient</string>
     <string name="product_name">Ingredient name</string>
