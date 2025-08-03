@@ -1,18 +1,19 @@
 package com.erdees.foodcostcalc.domain.model
 
 import android.icu.util.Currency
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.utils.Utils
 import java.text.DecimalFormat
 
 /**
- * Represents the details of how a specific item is being used,
- * including its quantity and calculated price for that usage,
- * before it's formally persisted with its own identity.
+ * Base interface for items being used in recipes/dishes
+ * Implemented by temporary usage entities (ProductAddedToDish, HalfProductAddedToDish)
+ * and persistent usage entities (UsedProductDomain, UsedHalfProductDomain)
  */
 interface ItemUsageEntry {
     val item: Item
     val quantity: Double
-    val quantityUnit: String
+    val quantityUnit: MeasurementUnit
     val foodCost: Double
 
     fun formattedTotalPricePerServing(amountOfServings: Double, currency: Currency?): String =

@@ -8,6 +8,7 @@ import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import io.kotest.matchers.shouldBe
@@ -65,7 +66,7 @@ class ComponentLookupFormViewModelTest {
         productId = 1L,
         name = "Chicken Breast",
         tax = 10.0,
-        unit = "per kilogram",
+        unit = MeasurementUnit.KILOGRAM,
         pricePerUnit = 15.0,
         waste = 5.0
     )
@@ -76,7 +77,7 @@ class ComponentLookupFormViewModelTest {
         pricePerUnit = 12.0,
         tax = 10.0,
         waste = 3.0,
-        unit = "per kilogram"
+        unit = MeasurementUnit.KILOGRAM
     )
 
     private val testProduct3 = ProductBase(
@@ -85,14 +86,14 @@ class ComponentLookupFormViewModelTest {
         pricePerUnit = 25.0,
         tax = 10.0,
         waste = 2.0,
-        unit = "per kilogram"
+        unit = MeasurementUnit.KILOGRAM
     )
 
     private val testHalfProduct1 = CompleteHalfProduct(
         halfProductBase = HalfProductBase(
             halfProductId = 1L,
             name = "Chicken Stock",
-            halfProductUnit = "liter"
+            halfProductUnit = MeasurementUnit.LITER
         ),
         products = emptyList()
     )
@@ -101,7 +102,7 @@ class ComponentLookupFormViewModelTest {
         halfProductBase = HalfProductBase(
             halfProductId = 2L,
             name = "Chicken Marinade",
-            halfProductUnit = "liter"
+            halfProductUnit = MeasurementUnit.LITER
         ),
         products = emptyList()
     )

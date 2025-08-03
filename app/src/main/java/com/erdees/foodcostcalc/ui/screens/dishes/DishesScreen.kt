@@ -65,6 +65,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ext.bringIntoViewWithOffset
 import com.erdees.foodcostcalc.ext.conditionally
 import com.erdees.foodcostcalc.ui.composables.Ad
@@ -584,16 +585,16 @@ private fun DishItemPreview() {
                         UsedProductDomain(
                             1,
                             2,
-                            ProductDomain(1, "Bun", 2.0, 0.5, 5.0, "kg"),
+                            ProductDomain(1, "Bun", 2.0, 0.5, 5.0,  MeasurementUnit.KILOGRAM),
                             1.0,
-                            "pcs",
+                            MeasurementUnit.PIECE,
                             1.0,
                         ), UsedProductDomain(
                             1,
                             2,
-                            ProductDomain(2, "Meat Patty", 15.0, 0.5, 5.0, "kg"),
+                            ProductDomain(2, "Meat Patty", 15.0, 0.5, 5.0,  MeasurementUnit.KILOGRAM),
                             100.0,
-                            "g",
+                            MeasurementUnit.GRAM,
                             null,
                         )
                     ),

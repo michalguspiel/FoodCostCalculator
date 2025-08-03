@@ -2,6 +2,7 @@ package com.erdees.foodcostcalc
 
 import com.erdees.foodcostcalc.domain.model.Ad
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
 import io.kotest.matchers.shouldBe
 import org.junit.Test
@@ -12,7 +13,7 @@ fun testProductDomain(id: Long = 0) = ProductDomain(
     pricePerUnit = 10.0,
     waste = 10.0,
     tax = 10.0,
-    unit = "kg"
+    unit = MeasurementUnit.KILOGRAM
 )
 
 class ListAdsInjectorManagerTests {

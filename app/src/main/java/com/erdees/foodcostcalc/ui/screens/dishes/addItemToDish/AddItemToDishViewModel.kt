@@ -13,11 +13,12 @@ import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import com.erdees.foodcostcalc.domain.model.units.UnitCategory
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import com.erdees.foodcostcalc.utils.UnitsUtils
 import com.erdees.foodcostcalc.utils.Utils.generateUnitSet
 import com.erdees.foodcostcalc.utils.onNumericValueChange
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
@@ -106,18 +107,17 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
         onNumericValueChange(newValue, _quantity)
     }
 
-    private var _units = MutableStateFlow<Set<String>>(setOf())
-    val units: StateFlow<Set<String>> = _units
+    private var _units = MutableStateFlow<Set<MeasurementUnit>>(setOf())
+    val units: StateFlow<Set<MeasurementUnit>> = _units
 
-    private var _selectedUnit = MutableStateFlow("")
-    val selectedUnit: StateFlow<String> = _selectedUnit
+    private var _selectedUnit: MutableStateFlow<MeasurementUnit?> = MutableStateFlow(null)
+    val selectedUnit: StateFlow<MeasurementUnit?> = _selectedUnit
 
-    fun selectUnit(unit: String) {
+    fun selectUnit(unit: MeasurementUnit) {
         _selectedUnit.value = unit
     }
 
-    /** Represents type of the unit such as weight, volume or simply a piece of a product.*/
-    private var unitType: UnitsUtils.UnitType? = null
+    private var unitType: UnitCategory? = null
 
     private fun updateUnitList() {
         viewModelScope.launch(dispatchers.ioDispatcher) {
@@ -129,7 +129,7 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
                     metricUnits,
                     imperialUnits
                 )
-                _selectedUnit.value = _units.value.firstOrNull() ?: ""
+                _selectedUnit.value = _units.value.firstOrNull()
             }
         }
     }
@@ -149,7 +149,7 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
             selectedItem
         ) { quantity, selectedUnit, selectedItem ->
             quantity.toDoubleOrNull() != null &&
-                    selectedUnit.isNotEmpty() &&
+                    selectedUnit != null &&
                     selectedItem != null
         }.stateIn(
             viewModelScope,
@@ -165,16 +165,17 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
     }
 
     private fun addProductToDish(dishId: Long) {
-        val productDish = ProductDish(
-            productDishId = 0,
-            productId = selectedItem.value?.id ?: 0,
-            dishId = dishId,
-            quantity = quantity.value.toDouble(),
-            quantityUnit = selectedUnit.value
-        )
-        _screenState.value = ScreenState.Loading<Nothing>()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.ioDispatcher) {
             try {
+                val selectedUnit = selectedUnit.value ?: error("No unit selected")
+                _screenState.value = ScreenState.Loading<Nothing>()
+                val productDish = ProductDish(
+                    productDishId = 0,
+                    productId = selectedItem.value?.id ?: 0,
+                    dishId = dishId,
+                    quantity = quantity.value.toDouble(),
+                    quantityUnit = selectedUnit
+                )
                 productRepository.addProductDish(productDish)
                 _screenState.value = ScreenState.Success(selectedItem.value?.name)
             } catch (e: Exception) {
@@ -184,16 +185,17 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
     }
 
     private fun addHalfProductToDish(dishId: Long) {
-        val halfProductDish = HalfProductDish(
-            halfProductDishId = 0,
-            halfProductId = selectedItem.value?.id ?: 0,
-            dishId = dishId,
-            quantity = quantity.value.toDouble(),
-            quantityUnit = selectedUnit.value
-        )
-        _screenState.value = ScreenState.Loading<Nothing>()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(dispatchers.ioDispatcher) {
             try {
+                val selectedUnit = selectedUnit.value ?: error("No unit selected")
+                val halfProductDish = HalfProductDish(
+                    halfProductDishId = 0,
+                    halfProductId = selectedItem.value?.id ?: 0,
+                    dishId = dishId,
+                    quantity = quantity.value.toDouble(),
+                    quantityUnit = selectedUnit
+                )
+                _screenState.value = ScreenState.Loading<Nothing>()
                 halfProductRepository.addHalfProductDish(halfProductDish)
                 _screenState.value = ScreenState.Success(selectedItem.value?.name)
             } catch (e: Exception) {

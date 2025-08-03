@@ -49,6 +49,7 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.fields.AddItemFields
@@ -65,7 +66,7 @@ fun AddItemToHalfProductScreen(
     navController: NavController,
     halfProductId: Long,
     halfProductName: String,
-    halfProductUnit: String,
+    halfProductUnit: MeasurementUnit,
     viewModel: AddItemToHalfProductViewModel = viewModel()
 ) {
 
@@ -202,7 +203,7 @@ fun AddItemToHalfProductScreen(
 
 @Composable
 fun PieceWeightField(
-    halfProductUnit: String,
+    halfProductUnit: MeasurementUnit,
     pieceWeight: String,
     modifier: Modifier = Modifier,
     setPieceWeight: (String) -> Unit,

@@ -228,10 +228,12 @@ class DishItemOperationHandler(
         val dish = uiState.dish ?: error("Cannot add product - current dish is null")
         val quantityAddedToDish = newProductFormData.quantityAddedToDish.toDoubleOrNull()
             ?: error("Quantity for the product in the dish cannot be empty or invalid.")
+        val unitForDish = newProductFormData.unitForDish
+            ?: error("Unit for the product in the dish cannot be empty.")
         val productAddedToDish = ProductAddedToDish(
             item = newProduct,
             quantity = quantityAddedToDish,
-            quantityUnit = newProductFormData.unitForDish
+            quantityUnit = unitForDish
         )
         val updatedProductsNotSaved =
             dish.productsNotSaved.toMutableList().apply { add(productAddedToDish) }
@@ -265,10 +267,12 @@ class DishItemOperationHandler(
         val dish = uiState.dish ?: return
         val quantityAddedToDish = existingComponentFormData.quantityForDish.toDoubleOrNull()
             ?: error("Quantity for the product in the dish cannot be empty or invalid.")
+        val unitForDish = existingComponentFormData.unitForDish
+            ?: error("Unit for the product in the dish cannot be empty.")
         val item = ProductAddedToDish(
             item = product,
             quantity = quantityAddedToDish,
-            quantityUnit = existingComponentFormData.unitForDish
+            quantityUnit = unitForDish
         )
         val updatedProductsNotSaved =
             dish.productsNotSaved.toMutableList().apply { add(item) }
@@ -285,10 +289,12 @@ class DishItemOperationHandler(
         val dish = uiState.dish ?: return
         val quantityAddedToDish = existingComponentFormData.quantityForDish.toDoubleOrNull()
             ?: error("Quantity for the product in the dish cannot be empty or invalid.")
+        val unitForDish = existingComponentFormData.unitForDish
+            ?: error("Unit for the product in the dish cannot be empty.")
         val item = HalfProductAddedToDish(
             item = halfProduct,
             quantity = quantityAddedToDish,
-            quantityUnit = existingComponentFormData.unitForDish
+            quantityUnit = unitForDish
         )
         val updatedHalfProductsNotSaved =
             dish.halfProductsNotSaved.toMutableList().apply { add(item) }

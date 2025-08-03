@@ -1,6 +1,5 @@
 package com.erdees.foodcostcalc.ui.screens.halfProducts
 
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.model.local.HalfProductBase
@@ -11,6 +10,7 @@ import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.tools.ListPresentationStateHandler
 import com.erdees.foodcostcalc.ui.viewModel.FCCBaseViewModel
 import com.erdees.foodcostcalc.utils.Constants
@@ -100,7 +100,7 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
     )
 
 
-    fun addHalfProduct(name: String, unit: String) {
+    fun addHalfProduct(name: String, unit: MeasurementUnit) {
         val halfProductBase = HalfProductBase(0, name, unit)
         with(halfProductBase) {
             addHalfProduct(this)
@@ -128,7 +128,7 @@ class HalfProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
         analyticsRepository.logEvent(Constants.Analytics.AD_FAILED_TO_LOAD, null)
     }
 
-    fun getUnitsSet(context: Context): Set<String> {
-        return Utils.getUnitsSet(context.resources, metricUsed.value, imperialUsed.value)
+    fun getUnitsSet(): Set<MeasurementUnit> {
+        return Utils.getUnitsSet(metricUsed.value, imperialUsed.value)
     }
 }

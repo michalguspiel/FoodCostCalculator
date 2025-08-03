@@ -29,6 +29,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
@@ -41,7 +42,7 @@ import com.erdees.foodcostcalc.utils.onNumericValueChange
 fun ExistingComponentForm(
     formData: ExistingItemFormData,
     isAddButtonEnabled: Boolean,
-    compatibleUnitsForDish: Set<String>,
+    compatibleUnitsForDish: Set<MeasurementUnit>,
     unitForDishDropdownExpanded: Boolean,
     selectedComponent: Item,
     dishName: String,
@@ -112,7 +113,7 @@ fun ExistingComponentForm(
 
         UnitField(
             modifier = Modifier.focusRequester(unitForDishFocusRequester),
-            label = "Unit for dish",
+            label = stringResource(R.string.unit_for_dish),
             units = compatibleUnitsForDish,
             expanded = unitForDishDropdownExpanded,
             onExpandChange = { isExpanded -> onUnitForDishDropdownExpandedChange(isExpanded) },
@@ -153,13 +154,14 @@ fun ExistingComponentForm(
 @Composable
 private fun ExistingProductIngredientFormPreview() {
     val previewProduct = ProductDomain(
-        id = 1L, name = "Flour", pricePerUnit = 2.5, tax = 0.0, unit = "kg", waste = 10.0
+        id = 1L, name = "Flour", pricePerUnit = 2.5, tax = 0.0, unit = MeasurementUnit.KILOGRAM, waste = 10.0
     )
     FCCTheme {
         ExistingComponentForm(
-            formData = ExistingItemFormData(quantityForDish = "100", unitForDish = "g"),
+            formData = ExistingItemFormData(quantityForDish = "100", unitForDish = MeasurementUnit.GRAM),
             isAddButtonEnabled = true,
-            compatibleUnitsForDish = setOf("g", "kg", "oz", "lb"),
+            compatibleUnitsForDish = setOf(MeasurementUnit.GRAM, MeasurementUnit.KILOGRAM,
+                MeasurementUnit.OUNCE, MeasurementUnit.POUND),
             unitForDishDropdownExpanded = false,
             selectedComponent = previewProduct,
             dishName = "Bread",

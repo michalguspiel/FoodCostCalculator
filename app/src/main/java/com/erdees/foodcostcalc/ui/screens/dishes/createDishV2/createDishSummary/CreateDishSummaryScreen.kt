@@ -53,6 +53,7 @@ import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.Ingredients
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -331,24 +332,24 @@ private fun CreateDishSummaryScreenPreview() {
                 id = 0L,
                 name = "Lemon",
                 pricePerUnit = 0.30,
-                unit = "per kilogram",
+                unit = MeasurementUnit.KILOGRAM,
                 waste = 35.0,
                 tax = 0.0
             ),
             quantity = 50.0,
-            quantityUnit = ("gram")
+            quantityUnit = (MeasurementUnit.GRAM)
         )
         val sampleProduct2 = ProductAddedToDish(
             item = ProductDomain(
                 id = 2L,
                 name = "Sugar",
                 pricePerUnit = 0.15,
-                unit = "per kilogram",
+                unit = MeasurementUnit.KILOGRAM,
                 waste = 0.0,
                 tax = 0.0
             ),
             quantity = 30.0,
-            quantityUnit = ("gram")
+            quantityUnit = (MeasurementUnit.GRAM)
         )
 
         val previewState = CreateDishSummaryScreenState(

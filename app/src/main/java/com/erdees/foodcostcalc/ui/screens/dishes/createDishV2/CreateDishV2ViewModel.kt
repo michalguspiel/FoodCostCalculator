@@ -20,6 +20,7 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.domain.usecase.CreateProductUseCase
 import com.erdees.foodcostcalc.ui.errors.InvalidMarginFormatException
 import com.erdees.foodcostcalc.ui.errors.InvalidTaxFormatException
@@ -192,12 +193,14 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
      */
     fun onAddNewProduct(newProductFormData: NewProductFormData) {
         _isLoading.update { true }
-        val newComponent = (_componentSelection.value as? ComponentSelection.NewComponent)
-            ?: error("Component selection must be of type NewComponent to add a new product.")
-
-        analyticsHelper.logNewProductSaveAttempt(newComponent.name)
         viewModelScope.launch(dispatchers.ioDispatcher) {
             try {
+                val unitForDish = newProductFormData.unitForDish
+                    ?: error("Unit for the dish cannot be null.")
+                val newComponent = (_componentSelection.value as? ComponentSelection.NewComponent)
+                    ?: error("Component selection must be of type NewComponent to add a new product.")
+
+                analyticsHelper.logNewProductSaveAttempt(newComponent.name)
                 createProductUseCase.invoke(newComponent.name, newProductFormData)
                     .onSuccess { newlyCreatedProduct ->
                         analyticsHelper.logNewProductSaveSuccess(newlyCreatedProduct)
@@ -205,7 +208,7 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
                         addProductToDishList(
                             newlyCreatedProduct,
                             newProductFormData.quantityAddedToDish,
-                            newProductFormData.unitForDish
+                            unitForDish
                         )
 
                         resetProductAdditionState()
@@ -230,6 +233,8 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
         _isLoading.update { true }
         viewModelScope.launch {
             try {
+                val unitForDish = existingComponentFormData.unitForDish
+                    ?: error("Unit for the dish cannot be null.")
                 val componentSelection = _componentSelection.value as? ComponentSelection.ExistingComponent
                     ?: error("Component selection must be of type ExistingComponent to add existing component.")
 
@@ -238,7 +243,7 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
                         addProductToDishList(
                             product = item,
                             quantityStr = existingComponentFormData.quantityForDish,
-                            unit = existingComponentFormData.unitForDish
+                            unit = unitForDish
                         )
                     }
 
@@ -271,7 +276,7 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
      * @param unit The unit for the quantity added to the dish.
      * @throws IllegalStateException if the quantity is missing or invalid.
      */
-    private fun addProductToDishList(product: ProductDomain, quantityStr: String, unit: String) {
+    private fun addProductToDishList(product: ProductDomain, quantityStr: String, unit: MeasurementUnit) {
         val quantityAddedToDish = quantityStr.toDoubleOrNull()
             ?: error("Quantity for the product in the dish cannot be empty or invalid.")
 
@@ -299,7 +304,7 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
      * @param unit The unit for the quantity added to the dish.
      * @throws IllegalStateException if the quantity is missing or invalid.
      */
-    private fun addHalfProductToDishList(halfProduct: HalfProductDomain, quantityStr: String, unit: String) {
+    private fun addHalfProductToDishList(halfProduct: HalfProductDomain, quantityStr: String, unit: MeasurementUnit) {
         val quantityAddedToDish = quantityStr.toDoubleOrNull()
             ?: error("Quantity for the half product in the dish cannot be empty or invalid.")
 

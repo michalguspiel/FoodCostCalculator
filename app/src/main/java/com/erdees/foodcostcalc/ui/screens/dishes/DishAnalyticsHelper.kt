@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.ui.screens.dishes
 import android.os.Bundle
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
 import com.erdees.foodcostcalc.utils.Constants
 
@@ -31,7 +32,6 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
             Constants.Analytics.DishV2.PRODUCT_CREATED,
             Bundle().apply {
                 putString(Constants.Analytics.PRODUCT_NAME, newlyCreatedProduct.name)
-                putString(Constants.Analytics.PRODUCT_UNIT, newlyCreatedProduct.unit)
                 putDouble(Constants.Analytics.PRODUCT_WASTE, newlyCreatedProduct.waste)
                 putDouble(
                     Constants.Analytics.PRODUCT_PRICE_PER_UNIT,
@@ -44,7 +44,7 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
         analyticsRepository.logEvent(Constants.Analytics.DishV2.NEW_PRODUCT_SAVE_FAILURE_FROM_DISH)
     }
 
-    fun logProductAddedToDishList(productName: String, selection: ComponentSelection?, quantityAddedToDish: Double, unit: String){
+    fun logProductAddedToDishList(productName: String, selection: ComponentSelection?, quantityAddedToDish: Double, unit: MeasurementUnit){
         analyticsRepository.logEvent(
             Constants.Analytics.DishV2.DISH_INGREDIENT_ADDED,
             Bundle().apply {
@@ -54,7 +54,7 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
                     if (selection is ComponentSelection.NewComponent) "new_in_context" else "existing"
                 )
                 putDouble(Constants.Analytics.DishV2.DISH_INGREDIENT_QUANTITY, quantityAddedToDish)
-                putString(Constants.Analytics.DishV2.DISH_INGREDIENT_UNIT, unit)
+                putString(Constants.Analytics.DishV2.DISH_INGREDIENT_UNIT, unit.name)
             })
     }
 
