@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.erdees.foodcostcalc.data.db.converters.InputMethodConverters
 import com.erdees.foodcostcalc.data.db.converters.UnitConverters
 import com.erdees.foodcostcalc.data.db.dao.dish.DishDao
 import com.erdees.foodcostcalc.data.db.dao.dish.HalfProductDishDao
@@ -19,6 +20,7 @@ import com.erdees.foodcostcalc.data.db.migrations.Migration_2to3_Remove_Ref_Tabl
 import com.erdees.foodcostcalc.data.db.migrations.Migration_3to_4_CreateRecipeTable
 import com.erdees.foodcostcalc.data.db.migrations.Migration_4to_5_FeatureRequests
 import com.erdees.foodcostcalc.data.db.migrations.Migration_5to6_UnitEnumMigration
+import com.erdees.foodcostcalc.data.db.migrations.Migration_6to7_ProductBaseSchema
 import com.erdees.foodcostcalc.data.model.local.DishBase
 import com.erdees.foodcostcalc.data.model.local.FeatureRequestEntity
 import com.erdees.foodcostcalc.data.model.local.HalfProductBase
@@ -47,11 +49,11 @@ import java.io.File
         FeatureRequestEntity::class,
         UpvotedFeatureRequest::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
     views = []
 )
-@TypeConverters(UnitConverters::class)
+@TypeConverters(UnitConverters::class, InputMethodConverters::class)
 abstract class AppRoomDataBase : RoomDatabase() {
 
     abstract fun productDao(): ProductDao
@@ -76,7 +78,8 @@ abstract class AppRoomDataBase : RoomDatabase() {
             Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist(),
             Migration_3to_4_CreateRecipeTable(),
             Migration_4to_5_FeatureRequests(),
-            Migration_5to6_UnitEnumMigration
+            Migration_5to6_UnitEnumMigration,
+            Migration_6to7_ProductBaseSchema
         )
 
         fun getDatabase(context: Context): AppRoomDataBase {

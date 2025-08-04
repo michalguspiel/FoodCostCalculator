@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.domain.usecase
 import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.errors.InvalidProductPriceException
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormData
@@ -37,10 +38,14 @@ class CreateProductUseCase(
             val productBase = ProductBase(
                 productId = 0,
                 name = productName,
-                pricePerUnit = price,
+                canonicalPricePerBaseUnit = price,
                 tax = 0.0,
                 waste = formData.wastePercent.toDoubleOrNull() ?: 0.0,
-                unit = formData.purchaseUnit
+                unit = formData.purchaseUnit,
+                inputMethod = InputMethod.UNIT,
+                packagePrice = null,//todo
+                packageQuantity = null,//todo
+                packageUnit = null,//todo
             )
 
             val newProductId = productRepository.addProduct(productBase)

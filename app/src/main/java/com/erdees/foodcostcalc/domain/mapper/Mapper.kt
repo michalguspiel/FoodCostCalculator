@@ -23,6 +23,7 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
@@ -49,7 +50,7 @@ object Mapper {
         return ProductDomain(
             id = productId,
             name = name,
-            pricePerUnit = pricePerUnit,
+            pricePerUnit = canonicalPricePerBaseUnit,
             tax = tax,
             waste = waste,
             unit = unit
@@ -76,10 +77,14 @@ object Mapper {
         return ProductBase(
             productId = id,
             name = name,
-            pricePerUnit = pricePerUnit.toDouble(),
+            canonicalPricePerBaseUnit = pricePerUnit.toDouble(),
             tax = tax.toDouble(),
             waste = waste.toDouble(),
-            unit = unit
+            unit = unit,
+            inputMethod = InputMethod.UNIT,//todo,
+            packagePrice = null,//todo,
+            packageQuantity = null,//todo,
+            packageUnit = null,//todo,
         )
     }
 
