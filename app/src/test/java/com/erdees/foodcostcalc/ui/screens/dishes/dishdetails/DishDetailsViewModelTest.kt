@@ -94,10 +94,10 @@ class DishDetailsViewModelTest {
                     product = ProductBase(
                         productId = 0L,
                         name = "Broccoli",
-                        pricePerUnit = productPrice,
+                        canonicalPrice = productPrice,
                         tax = 0.0,
                         waste = 50.0,
-                        unit = MeasurementUnit.KILOGRAM,
+                        canonicalUnit = MeasurementUnit.KILOGRAM,
                         inputMethod = InputMethod.UNIT,
                         packagePrice = null,
                         packageQuantity = null,

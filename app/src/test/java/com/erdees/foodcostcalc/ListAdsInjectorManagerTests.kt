@@ -11,10 +11,10 @@ import org.junit.Test
 fun testProductDomain(id: Long = 0) = ProductDomain(
     id = id,
     name = "Test Product",
-    pricePerUnit = 10.0,
+    canonicalPrice = 10.0,
     waste = 10.0,
     tax = 10.0,
-    unit = MeasurementUnit.KILOGRAM,
+    canonicalUnit = MeasurementUnit.KILOGRAM,
     packagePrice = null,
     packageQuantity = null,
     packageUnit = null,
