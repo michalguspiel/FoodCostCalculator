@@ -132,6 +132,39 @@ enum class MeasurementUnit(
         }
     }
 
+    /**
+     * Given a package price, quantity, and unit, this function calculates the
+     * canonical price per one of the app's standard base units
+     * (KILOGRAM, LITER, PIECE).
+     *
+     * @param packagePrice The total price of the package (e.g., 2.0 euro).
+     * @param packageQuantity The size of the package (e.g., 330).
+     * @return A Pair containing the calculated canonical price and its corresponding canonical unit.
+     * @throws IllegalArgumentException if the package quantity is zero.
+     */
+    fun calculateCanonicalPrice(
+        packagePrice: Double,
+        packageQuantity: Double
+    ): Pair<Double, MeasurementUnit> {
+        require(packageQuantity != 0.0) { "Package quantity cannot be zero." }
+
+        val pricePerBaseUnit = packagePrice / (packageQuantity * baseUnitMultiplier)
+
+        return when (category) {
+            UnitCategory.WEIGHT -> {
+                val pricePerKg = pricePerBaseUnit * KILOGRAM.baseUnitMultiplier
+                Pair(pricePerKg, KILOGRAM)
+            }
+            UnitCategory.VOLUME -> {
+                val pricePerLiter = pricePerBaseUnit * LITER.baseUnitMultiplier
+                Pair(pricePerLiter, LITER)
+            }
+            UnitCategory.COUNT -> {
+                Pair(pricePerBaseUnit, PIECE)
+            }
+        }
+    }
+
     companion object {
 
         /**

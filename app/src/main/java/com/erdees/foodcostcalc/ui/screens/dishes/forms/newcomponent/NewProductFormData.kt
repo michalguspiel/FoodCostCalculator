@@ -7,5 +7,5 @@ data class NewProductFormData(
     val purchaseUnit: MeasurementUnit? = null,
     val wastePercent: String = "",
     val quantityAddedToDish: String = "",
-    val unitForDish: MeasurementUnit? = null,
+    val quantityAddedToDishUnit: MeasurementUnit? = null,
 )

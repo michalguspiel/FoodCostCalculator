@@ -27,7 +27,7 @@ private fun createDishModel(): CompleteDish {
                     packagePrice = null,
                     packageQuantity = null,
                     packageUnit = null,
-                    canonicalPricePerBaseUnit = 10.0,
+                    pricePerUnit = 10.0,
                     tax = 0.0,
                     waste = 0.0,
                     unit = MeasurementUnit.KILOGRAM

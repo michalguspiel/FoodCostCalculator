@@ -151,7 +151,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         val product = ProductBase(
             productId = 0,
             name = productName.value,
-            canonicalPricePerBaseUnit = price,
+            pricePerUnit = price,
             tax = tax,
             waste = waste,
             unit = unit,
@@ -195,7 +195,7 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         bundle.putString(Constants.Analytics.PRODUCT_TAX, product.tax.toString())
         bundle.putString(Constants.Analytics.PRODUCT_WASTE, product.waste.toString())
         bundle.putString(Constants.Analytics.PRODUCT_UNIT, product.unit.name)
-        bundle.putString(Constants.Analytics.PRODUCT_PRICE_PER_UNIT, product.canonicalPricePerBaseUnit.toString())
+        bundle.putString(Constants.Analytics.PRODUCT_PRICE_PER_UNIT, product.pricePerUnit.toString())
         analyticsRepository.logEvent(Constants.Analytics.PRODUCT_CREATED, bundle)
     }
 

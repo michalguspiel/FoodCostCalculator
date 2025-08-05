@@ -113,7 +113,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
         ProductBase(
             productId = 0,
             name = context.getString(R.string.onboarding_ingredient_minced_beef),
-            canonicalPricePerBaseUnit =   19.20,
+            pricePerUnit = 19.20,
             tax = 0.0,
             waste = 0.0,
             unit = MeasurementUnit.KILOGRAM,
@@ -125,7 +125,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
         ProductBase(
             productId = 0,
             name = context.getString(R.string.onboarding_ingredient_burger_bun),
-            canonicalPricePerBaseUnit = 0.7,
+            pricePerUnit = 0.7,
             waste = 0.0,
             tax = 0.0,
             unit = MeasurementUnit.PIECE,
@@ -137,7 +137,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
         ProductBase(
             productId= 0,
             name = context.getString(R.string.onboarding_ingredient_cheese_slice),
-            canonicalPricePerBaseUnit =  0.5,
+            pricePerUnit =  0.5,
             tax = 0.0,
             waste = 0.0,
             unit = MeasurementUnit.PIECE,
@@ -149,7 +149,7 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
         ProductBase(
             productId = 0,
             name = context.getString(R.string.onboarding_ingredient_lettuce),
-            canonicalPricePerBaseUnit = 3.99,
+            pricePerUnit = 3.99,
             tax = 0.0,
             waste = 15.0,
             unit = MeasurementUnit.KILOGRAM,

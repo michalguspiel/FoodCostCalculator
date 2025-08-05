@@ -7,6 +7,8 @@ import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.ui.errors.InvalidProductPriceException
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormData
+import com.erdees.foodcostcalc.ui.screens.products.PackagePriceState
+import com.erdees.foodcostcalc.ui.screens.products.UnitPriceState
 import com.erdees.foodcostcalc.utils.MyDispatchers
 import kotlinx.coroutines.withContext
 
@@ -33,25 +35,91 @@ class CreateProductUseCase(
         try {
             val price = formData.purchasePrice.toDoubleOrNull()
                 ?: throw InvalidProductPriceException("Product purchase price cannot be empty or invalid.")
-            formData.purchaseUnit ?: throw IllegalArgumentException("Purchase unit must be provided.")
+            formData.purchaseUnit
+                ?: throw IllegalArgumentException("Purchase unit must be provided.")
 
             val productBase = ProductBase(
                 productId = 0,
                 name = productName,
-                canonicalPricePerBaseUnit = price,
                 tax = 0.0,
                 waste = formData.wastePercent.toDoubleOrNull() ?: 0.0,
                 unit = formData.purchaseUnit,
                 inputMethod = InputMethod.UNIT,
                 packagePrice = null,//todo
                 packageQuantity = null,//todo
-                packageUnit = null,//todo
+                packageUnit = null,
+                pricePerUnit = price,//todo
             )
 
             val newProductId = productRepository.addProduct(productBase)
             val createdProduct = productBase.copy(productId = newProductId).toProductDomain()
 
             Result.success(createdProduct)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend operator fun invoke(
+        unitPriceState: UnitPriceState
+    ): Result<ProductDomain> = withContext(myDispatchers.ioDispatcher) {
+        try {
+            val price = unitPriceState.unitPrice.toDoubleOrNull()
+                ?: throw InvalidProductPriceException("Product purchase price cannot be empty or invalid.")
+            val productBase = ProductBase(
+                productId = 0,
+                name = unitPriceState.name,
+                tax = unitPriceState.tax.toDoubleOrNull() ?: 0.0,
+                waste = unitPriceState.waste.toDoubleOrNull() ?: 0.0,
+                unit = unitPriceState.unitPriceUnit,
+                inputMethod = InputMethod.UNIT,
+                packagePrice = null,
+                packageQuantity = null,
+                packageUnit = null,
+                pricePerUnit = price,
+            )
+
+            val newProductId = productRepository.addProduct(productBase)
+            val createdProduct = productBase.copy(productId = newProductId).toProductDomain()
+
+            Result.success(createdProduct)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend operator fun invoke(
+        packagePriceState: PackagePriceState,
+    ): Result<ProductDomain> = withContext(myDispatchers.ioDispatcher) {
+        try {
+            with(packagePriceState) {
+                val price = packagePriceState.packagePrice.toDoubleOrNull()
+                    ?: throw InvalidProductPriceException("Product purchase price cannot be empty or invalid.")
+                val packageQuantity = packagePriceState.packageQuantity.toDoubleOrNull()
+                    ?: throw InvalidProductPriceException("Product package quantity cannot be empty or invalid.")
+
+                val (pricePerUnit, unit) = packageUnit.calculateCanonicalPrice(
+                    packagePrice = price,
+                    packageQuantity = packageQuantity
+                )
+
+                val productBase = ProductBase(
+                    productId = 0,
+                    name = name,
+                    tax = tax.toDoubleOrNull() ?: 0.0,
+                    waste = waste.toDoubleOrNull() ?: 0.0,
+                    unit = unit,
+                    inputMethod = InputMethod.PACKAGE,
+                    packagePrice = price,
+                    packageQuantity = packageQuantity,
+                    packageUnit = packageUnit,
+                    pricePerUnit = pricePerUnit,
+                )
+                val newProductId = productRepository.addProduct(productBase)
+                val createdProduct = productBase.copy(productId = newProductId).toProductDomain()
+                Result.success(createdProduct)
+            }
+
         } catch (e: Exception) {
             Result.failure(e)
         }

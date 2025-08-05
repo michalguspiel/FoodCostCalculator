@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc
 
 import com.erdees.foodcostcalc.domain.model.Ad
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.utils.ads.ListAdsInjectorManager
@@ -13,7 +14,11 @@ fun testProductDomain(id: Long = 0) = ProductDomain(
     pricePerUnit = 10.0,
     waste = 10.0,
     tax = 10.0,
-    unit = MeasurementUnit.KILOGRAM
+    unit = MeasurementUnit.KILOGRAM,
+    packagePrice = null,
+    packageQuantity = null,
+    packageUnit = null,
+    inputMethod = InputMethod.UNIT
 )
 
 class ListAdsInjectorManagerTests {

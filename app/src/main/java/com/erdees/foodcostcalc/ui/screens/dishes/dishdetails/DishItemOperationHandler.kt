@@ -228,7 +228,7 @@ class DishItemOperationHandler(
         val dish = uiState.dish ?: error("Cannot add product - current dish is null")
         val quantityAddedToDish = newProductFormData.quantityAddedToDish.toDoubleOrNull()
             ?: error("Quantity for the product in the dish cannot be empty or invalid.")
-        val unitForDish = newProductFormData.unitForDish
+        val unitForDish = newProductFormData.quantityAddedToDishUnit
             ?: error("Unit for the product in the dish cannot be empty.")
         val productAddedToDish = ProductAddedToDish(
             item = newProduct,

@@ -33,6 +33,7 @@ import com.erdees.foodcostcalc.BuildConfig
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Ad
 import com.erdees.foodcostcalc.domain.model.AdItem
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.Ad
@@ -209,7 +210,11 @@ private fun ProductItemPreview() {
                 pricePerUnit = 12.23,
                 tax = 0.23,
                 waste = 0.1,
-                unit = MeasurementUnit.KILOGRAM
+                unit = MeasurementUnit.KILOGRAM,
+                inputMethod = InputMethod.UNIT,
+                packagePrice = null,
+                packageQuantity = null,
+                packageUnit = null,
             ),
             currency = Currency.getInstance(Locale.getDefault())
         )

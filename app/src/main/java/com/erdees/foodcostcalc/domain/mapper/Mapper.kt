@@ -24,8 +24,10 @@ import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
 import com.erdees.foodcostcalc.domain.model.product.InputMethod
+import com.erdees.foodcostcalc.domain.model.product.PackagePriceEditableProduct
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
+import com.erdees.foodcostcalc.domain.model.product.UnitPriceEditableProduct
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.EditableRecipe
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
@@ -50,22 +52,37 @@ object Mapper {
         return ProductDomain(
             id = productId,
             name = name,
-            pricePerUnit = canonicalPricePerBaseUnit,
+            inputMethod = inputMethod,
+            packagePrice = packagePrice,
+            packageQuantity = packageQuantity,
+            packageUnit = packageUnit,
+            pricePerUnit = pricePerUnit,
+            unit = unit,
             tax = tax,
-            waste = waste,
-            unit = unit
+            waste = waste
         )
     }
 
     fun ProductDomain.toEditableProductDomain(): EditableProductDomain {
-        return EditableProductDomain(
-            id = id,
-            name = name,
-            pricePerUnit = pricePerUnit.toString(),
-            tax = tax.toString(),
-            waste = waste.toString(),
-            unit = unit
-        )
+        return when (inputMethod) {
+            InputMethod.UNIT -> UnitPriceEditableProduct(
+                id = id,
+                name = name,
+                tax = tax.toString(),
+                waste = waste.toString(),
+                unitPrice = pricePerUnit.toString(),
+                unitPriceUnit = unit
+            )
+            InputMethod.PACKAGE -> PackagePriceEditableProduct(
+                id = id,
+                name = name,
+                tax = tax.toString(),
+                waste = waste.toString(),
+                packagePrice = packagePrice?.toString() ?: "",
+                packageQuantity = packageQuantity?.toString() ?: "",
+                packageUnit = packageUnit ?: unit
+            )
+        }
     }
 
     /**
@@ -74,18 +91,38 @@ object Mapper {
      * @throws NumberFormatException if any of the values in EditableProductDomain cannot be converted to Double
      * */
     fun EditableProductDomain.toProductBase(): ProductBase {
-        return ProductBase(
-            productId = id,
-            name = name,
-            canonicalPricePerBaseUnit = pricePerUnit.toDouble(),
-            tax = tax.toDouble(),
-            waste = waste.toDouble(),
-            unit = unit,
-            inputMethod = InputMethod.UNIT,//todo,
-            packagePrice = null,//todo,
-            packageQuantity = null,//todo,
-            packageUnit = null,//todo,
-        )
+        return when (this) {
+            is UnitPriceEditableProduct -> ProductBase(
+                productId = id,
+                name = name,
+                inputMethod = InputMethod.UNIT,
+                packagePrice = null,
+                packageQuantity = null,
+                packageUnit = null,
+                pricePerUnit = unitPrice.toDouble(),
+                unit = unitPriceUnit,
+                tax = tax.toDouble(),
+                waste = waste.toDouble()
+            )
+            is PackagePriceEditableProduct -> {
+                val pkgPrice = packagePrice.toDouble()
+                val pkgQuantity = packageQuantity.toDouble()
+                val (canonicalPrice, canonicalUnit) = packageUnit.calculateCanonicalPrice(pkgPrice, pkgQuantity)
+
+                ProductBase(
+                    productId = id,
+                    name = name,
+                    inputMethod = InputMethod.PACKAGE,
+                    packagePrice = pkgPrice,
+                    packageQuantity = pkgQuantity,
+                    packageUnit = packageUnit,
+                    pricePerUnit = canonicalPrice,
+                    unit = canonicalUnit,
+                    tax = tax.toDouble(),
+                    waste = waste.toDouble()
+                )
+            }
+        }
     }
 
     fun HalfProductBase.toHalfProductDomain(): HalfProductDomain {
@@ -227,7 +264,7 @@ object Mapper {
         )
     }
 
-    fun RecipeDomain.toSteps() : List<RecipeStep> {
+    fun RecipeDomain.toSteps(): List<RecipeStep> {
         return steps?.map { it.toRecipeStep(recipeId = recipeId ?: 0) } ?: emptyList()
     }
 

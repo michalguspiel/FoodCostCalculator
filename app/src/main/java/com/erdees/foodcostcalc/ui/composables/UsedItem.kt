@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.domain.model.ItemUsageEntry
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
@@ -149,7 +150,11 @@ private fun UsedItemPreview() {
                     pricePerUnit = 10.0,
                     unit = MeasurementUnit.KILOGRAM,
                     tax = 23.0,
-                    waste = 20.0
+                    waste = 20.0,
+                    inputMethod = InputMethod.UNIT,
+                    packagePrice = null,
+                    packageQuantity = null,
+                    packageUnit = null
                 ), quantity = 1.0, quantityUnit = MeasurementUnit.KILOGRAM, weightPiece = 1.0
             ),
             currency = Currency.getInstance(Locale.getDefault()),

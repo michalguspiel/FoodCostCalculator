@@ -124,9 +124,9 @@ fun NewProductForm(
                 units = productAdditionUnits,
                 expanded = productAdditionDropdownExpanded,
                 onExpandChange = { onProductAdditionDropdownExpandedChange(it) },
-                selectedUnit = formData.unitForDish,
+                selectedUnit = formData.quantityAddedToDishUnit,
                 selectUnit = {
-                    onFormDataUpdate(formData.copy(unitForDish = it))
+                    onFormDataUpdate(formData.copy(quantityAddedToDishUnit = it))
                 })
 
             ButtonRow(

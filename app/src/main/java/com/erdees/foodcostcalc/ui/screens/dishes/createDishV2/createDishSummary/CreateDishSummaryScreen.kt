@@ -51,6 +51,7 @@ import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
@@ -334,7 +335,11 @@ private fun CreateDishSummaryScreenPreview() {
                 pricePerUnit = 0.30,
                 unit = MeasurementUnit.KILOGRAM,
                 waste = 35.0,
-                tax = 0.0
+                tax = 0.0,
+                inputMethod = InputMethod.UNIT,
+                packagePrice = null,
+                packageQuantity = null,
+                packageUnit = null
             ),
             quantity = 50.0,
             quantityUnit = (MeasurementUnit.GRAM)
@@ -346,7 +351,11 @@ private fun CreateDishSummaryScreenPreview() {
                 pricePerUnit = 0.15,
                 unit = MeasurementUnit.KILOGRAM,
                 waste = 0.0,
-                tax = 0.0
+                tax = 0.0,
+                inputMethod = InputMethod.UNIT,
+                packagePrice = null,
+                packageQuantity = null,
+                packageUnit = null
             ),
             quantity = 30.0,
             quantityUnit = (MeasurementUnit.GRAM)

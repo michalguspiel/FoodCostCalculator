@@ -10,10 +10,20 @@ import kotlinx.serialization.Serializable
 data class ProductDomain(
     override val id: Long,
     override val name: String,
+
+    // User's original input (for display and editing)
+    val inputMethod: InputMethod,
+    val packagePrice: Double?,
+    val packageQuantity: Double?,
+    val packageUnit: MeasurementUnit?,
+
+    // The Single Source of Truth for Calculations
     val pricePerUnit: Double,
+    val unit: MeasurementUnit,
+
+    // Existing fields
     val tax: Double,
     val waste: Double,
-    val unit: MeasurementUnit, // Changed from String to MeasurementUnit
 ) : Item {
 
     private val priceWithTax = pricePerUnit * (1 + tax / 100)
