@@ -8,6 +8,7 @@ import com.erdees.foodcostcalc.data.repository.HalfProductRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentLookupViewModel
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.ComponentSelection
@@ -67,27 +68,39 @@ class ComponentLookupFormViewModelTest {
         productId = 1L,
         name = "Chicken Breast",
         tax = 10.0,
-        unit = MeasurementUnit.KILOGRAM,
-        pricePerUnit = 15.0,
-        waste = 5.0
+        canonicalUnit = MeasurementUnit.KILOGRAM,
+        canonicalPrice = 15.0,
+        waste = 5.0,
+        inputMethod = InputMethod.UNIT,
+        packagePrice = null,
+        packageQuantity = null,
+        packageUnit = null
     )
 
     private val testProduct2 = ProductBase(
         productId = 2L,
         name = "Chicken Thigh",
-        pricePerUnit = 12.0,
+        canonicalPrice = 12.0,
         tax = 10.0,
         waste = 3.0,
-        unit = MeasurementUnit.KILOGRAM
+        canonicalUnit = MeasurementUnit.KILOGRAM,
+        inputMethod = InputMethod.UNIT,
+        packagePrice = null,
+        packageQuantity = null,
+        packageUnit = null
     )
 
     private val testProduct3 = ProductBase(
         productId = 3L,
         name = "Beef Steak",
-        pricePerUnit = 25.0,
+        canonicalPrice = 25.0,
         tax = 10.0,
         waste = 2.0,
-        unit = MeasurementUnit.KILOGRAM
+        canonicalUnit = MeasurementUnit.KILOGRAM,
+        inputMethod = InputMethod.UNIT,
+        packagePrice = null,
+        packageQuantity = null,
+        packageUnit = null
     )
 
     private val testHalfProduct1 = CompleteHalfProduct(
@@ -174,7 +187,9 @@ class ComponentLookupFormViewModelTest {
 
         val suggestions = viewModel.suggestedComponents.first()
         suggestions.products.size shouldBe 2
-        suggestions.products.all { it.name.lowercase(Locale.getDefault()).contains("chicken") } shouldBe true
+        suggestions.products.all {
+            it.name.lowercase(Locale.getDefault()).contains("chicken")
+        } shouldBe true
     }
 
     @Test
@@ -262,31 +277,33 @@ class ComponentLookupFormViewModelTest {
     }
 
     @Test
-    fun `getComponentSelectionResult should return ExistingComponent when component is selected`() = runTest {
-        initializeViewModel()
-        advanceUntilIdle()
+    fun `getComponentSelectionResult should return ExistingComponent when component is selected`() =
+        runTest {
+            initializeViewModel()
+            advanceUntilIdle()
 
-        val productDomain = testProduct1.toProductDomain()
-        viewModel.onComponentSelected(productDomain)
-        advanceUntilIdle()
+            val productDomain = testProduct1.toProductDomain()
+            viewModel.onComponentSelected(productDomain)
+            advanceUntilIdle()
 
-        val result = viewModel.getComponentSelectionResult()
-        result.shouldBeInstanceOf<ComponentSelection.ExistingComponent>()
-        result.item shouldBe productDomain
-    }
+            val result = viewModel.getComponentSelectionResult()
+            result.shouldBeInstanceOf<ComponentSelection.ExistingComponent>()
+            result.item shouldBe productDomain
+        }
 
     @Test
-    fun `getComponentSelectionResult should return NewComponent when no component is selected`() = runTest {
-        initializeViewModel()
-        advanceUntilIdle()
+    fun `getComponentSelectionResult should return NewComponent when no component is selected`() =
+        runTest {
+            initializeViewModel()
+            advanceUntilIdle()
 
-        viewModel.updateNewComponentName("New Component")
-        advanceUntilIdle()
+            viewModel.updateNewComponentName("New Component")
+            advanceUntilIdle()
 
-        val result = viewModel.getComponentSelectionResult()
-        result.shouldBeInstanceOf<ComponentSelection.NewComponent>()
-        result.name shouldBe "New Component"
-    }
+            val result = viewModel.getComponentSelectionResult()
+            result.shouldBeInstanceOf<ComponentSelection.NewComponent>()
+            result.name shouldBe "New Component"
+        }
 
     @Test
     fun `updateSelectedComponent should match exact product name`() = runTest {

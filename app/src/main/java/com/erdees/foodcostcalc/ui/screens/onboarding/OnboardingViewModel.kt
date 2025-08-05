@@ -15,6 +15,7 @@ import com.erdees.foodcostcalc.data.repository.DishRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.data.repository.RecipeRepository
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
 import com.erdees.foodcostcalc.utils.Constants
@@ -91,7 +92,9 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
                 _uiState.value = OnboardingUiState.Success(dishId)
                 Timber.i("Sample dish created successfully with id $dishId. Navigating...")
             } catch (e: Exception) {
-                _uiState.value = OnboardingUiState.Error(e.message ?: context.getString(R.string.onboarding_unknown_error))
+                _uiState.value = OnboardingUiState.Error(
+                    e.message ?: context.getString(R.string.onboarding_unknown_error)
+                )
                 Timber.e(e, "Error creating sample dish.")
             }
         }
@@ -106,17 +109,64 @@ class OnboardingViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    @Suppress("MagicNumber")
     private fun sampleIngredients(context: Context) = listOf(
-        ProductBase(0, context.getString(R.string.onboarding_ingredient_minced_beef), 19.20, 0.0, 0.0, MeasurementUnit.KILOGRAM),
-        ProductBase(0, context.getString(R.string.onboarding_ingredient_burger_bun), 0.7, 0.0, 0.0, MeasurementUnit.PIECE),
-        ProductBase(0, context.getString(R.string.onboarding_ingredient_cheese_slice), 0.5, 0.0, 0.0, MeasurementUnit.PIECE),
-        ProductBase(0, context.getString(R.string.onboarding_ingredient_lettuce), 3.99, 0.0, 15.0, MeasurementUnit.KILOGRAM)
+        ProductBase(
+            productId = 0,
+            name = context.getString(R.string.onboarding_ingredient_minced_beef),
+            canonicalPrice = 19.20,
+            tax = 0.0,
+            waste = 0.0,
+            canonicalUnit = MeasurementUnit.KILOGRAM,
+            inputMethod = InputMethod.UNIT,
+            packagePrice = null,
+            packageQuantity = null,
+            packageUnit = null
+        ),
+        ProductBase(
+            productId = 0,
+            name = context.getString(R.string.onboarding_ingredient_burger_bun),
+            canonicalPrice = 0.7,
+            waste = 0.0,
+            tax = 0.0,
+            canonicalUnit = MeasurementUnit.PIECE,
+            inputMethod = InputMethod.UNIT,
+            packagePrice = null,
+            packageQuantity = null,
+            packageUnit = null
+        ),
+        ProductBase(
+            productId= 0,
+            name = context.getString(R.string.onboarding_ingredient_cheese_slice),
+            canonicalPrice =  0.5,
+            tax = 0.0,
+            waste = 0.0,
+            canonicalUnit = MeasurementUnit.PIECE,
+            inputMethod = InputMethod.UNIT,
+            packagePrice = null,
+            packageQuantity = null,
+            packageUnit = null
+        ),
+        ProductBase(
+            productId = 0,
+            name = context.getString(R.string.onboarding_ingredient_lettuce),
+            canonicalPrice = 3.99,
+            tax = 0.0,
+            waste = 15.0,
+            canonicalUnit = MeasurementUnit.KILOGRAM,
+            inputMethod = InputMethod.UNIT,
+            packagePrice = null,
+            packageQuantity = null,
+            packageUnit = null
+        )
     )
 
     @Suppress("MagicNumber")
     private fun sampleDish(recipeId: Long, context: Context) = DishBase(
-        0, context.getString(R.string.onboarding_dish_classic_cheeseburger), marginPercent = 360.0, dishTax = 12.0, recipeId = recipeId
+        0,
+        context.getString(R.string.onboarding_dish_classic_cheeseburger),
+        marginPercent = 360.0,
+        dishTax = 12.0,
+        recipeId = recipeId
     )
 
     fun resetUiState() {

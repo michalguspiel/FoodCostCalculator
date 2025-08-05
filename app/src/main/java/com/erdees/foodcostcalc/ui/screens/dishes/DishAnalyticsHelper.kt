@@ -35,7 +35,7 @@ class DishAnalyticsHelper(val analyticsRepository: AnalyticsRepository) {
                 putDouble(Constants.Analytics.PRODUCT_WASTE, newlyCreatedProduct.waste)
                 putDouble(
                     Constants.Analytics.PRODUCT_PRICE_PER_UNIT,
-                    newlyCreatedProduct.pricePerUnit
+                    newlyCreatedProduct.canonicalPrice
                 )
             })
     }

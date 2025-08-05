@@ -9,6 +9,7 @@ import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.data.repository.ProductRepository
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
@@ -142,14 +143,23 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
     }
 
     fun addProduct() {
-
         val price = productPrice.value.toDoubleOrNull() ?: return
         val tax = productTax.value.toDoubleOrNull() ?: 0.0
         val waste = productWaste.value.toDoubleOrNull() ?: return
         val unit = selectedUnit.value ?: return
 
         val product = ProductBase(
-            0, productName.value, price, tax, waste, unit
+            productId = 0,
+            name = productName.value,
+            canonicalPrice = price,
+            tax = tax,
+            waste = waste,
+            canonicalUnit = unit,
+            // todo: handle input method and package details properly
+            inputMethod = InputMethod.UNIT,
+            packageUnit = null,
+            packagePrice = null,
+            packageQuantity = null
         )
         addProduct(product)
         sendDataAboutProduct(product)
@@ -184,8 +194,8 @@ class CreateProductScreenViewModel : ViewModel(), KoinComponent {
         bundle.putString(Constants.Analytics.PRODUCT_NAME, product.name)
         bundle.putString(Constants.Analytics.PRODUCT_TAX, product.tax.toString())
         bundle.putString(Constants.Analytics.PRODUCT_WASTE, product.waste.toString())
-        bundle.putString(Constants.Analytics.PRODUCT_UNIT, product.unit.name)
-        bundle.putString(Constants.Analytics.PRODUCT_PRICE_PER_UNIT, product.pricePerUnit.toString())
+        bundle.putString(Constants.Analytics.PRODUCT_UNIT, product.canonicalUnit.name)
+        bundle.putString(Constants.Analytics.PRODUCT_PRICE_PER_UNIT, product.canonicalPrice.toString())
         analyticsRepository.logEvent(Constants.Analytics.PRODUCT_CREATED, bundle)
     }
 

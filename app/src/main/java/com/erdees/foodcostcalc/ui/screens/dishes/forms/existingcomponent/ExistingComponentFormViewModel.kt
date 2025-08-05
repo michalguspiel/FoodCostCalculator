@@ -65,7 +65,7 @@ class ExistingComponentFormViewModel : ViewModel(), KoinComponent {
             // Determine the unit type from the product's own unit (e.g., if product is in "kg", show "g", "kg", "oz", "lb")
             val baseUnit = when (item) {
                 is HalfProductDomain -> item.halfProductUnit
-                is ProductDomain -> item.unit
+                is ProductDomain -> item.canonicalUnit
                 else -> throw IllegalArgumentException("Unsupported item type: ${item::class.java.simpleName}")
             }
             val unitType = UnitsUtils.getUnitType(baseUnit)

@@ -150,6 +150,9 @@
     <string name="box_quantity">Units in box</string>
     <string name="content_description_remove_product">remove ingredient</string>
     <string name="values_per_unit">Values per %1$s</string>
+    <string name="package_values">Package values per %1$s</string>
+    <string name="package_price">Package price</string>
+    <string name="package_quantity">Package quantity (%1$s)</string>
 
     <!-- HALF PRODUCTS FEATURE -->
 

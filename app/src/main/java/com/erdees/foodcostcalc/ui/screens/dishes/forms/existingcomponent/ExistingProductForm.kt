@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
@@ -165,14 +166,28 @@ fun ExistingComponentForm(
 @Composable
 private fun ExistingProductIngredientFormPreview() {
     val previewProduct = ProductDomain(
-        id = 1L, name = "Flour", pricePerUnit = 2.5, tax = 0.0, unit = MeasurementUnit.KILOGRAM, waste = 10.0
+        id = 1L,
+        name = "Flour",
+        canonicalPrice = 2.5,
+        tax = 0.0,
+        canonicalUnit = MeasurementUnit.KILOGRAM,
+        waste = 10.0,
+        inputMethod = InputMethod.UNIT,
+        packagePrice = null,
+        packageQuantity = null,
+        packageUnit = null
     )
     FCCTheme {
         ExistingComponentForm(
-            formData = ExistingItemFormData(quantityForDish = "100", unitForDish = MeasurementUnit.GRAM),
+            formData = ExistingItemFormData(
+                quantityForDish = "100",
+                unitForDish = MeasurementUnit.GRAM
+            ),
             isAddButtonEnabled = true,
-            compatibleUnitsForDish = setOf(MeasurementUnit.GRAM, MeasurementUnit.KILOGRAM,
-                MeasurementUnit.OUNCE, MeasurementUnit.POUND),
+            compatibleUnitsForDish = setOf(
+                MeasurementUnit.GRAM, MeasurementUnit.KILOGRAM,
+                MeasurementUnit.OUNCE, MeasurementUnit.POUND
+            ),
             unitForDishDropdownExpanded = false,
             selectedComponent = previewProduct,
             dishName = "Bread",

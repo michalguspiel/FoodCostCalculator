@@ -51,6 +51,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
@@ -249,7 +250,7 @@ private fun CreateDishStartScreenContent(
 ) {
     val hasFocusBeenRequested = rememberSaveable { mutableStateOf(false) }
     val dishNameFocusRequester = remember { FocusRequester() }
-    
+
     with(createDishStartScreenState) {
         Scaffold(
             modifier = modifier,
@@ -298,8 +299,7 @@ private fun CreateDishStartScreenContent(
                                         dishNameFocusRequester.requestFocus()
                                         hasFocusBeenRequested.value = true
                                     }
-                                }
-                            ,
+                                },
                             title = null,
                             value = dishName,
                             onValueChange = { updateDishName(it) },
@@ -407,7 +407,18 @@ private fun CreateDishStartScreenContentPreview() {
                 dishName = "Spaghetti Bolognese",
                 addedComponents = persistentListOf(
                     ProductAddedToDish(
-                        ProductDomain(0L, "Tomato", 3.99, 0.0, 10.0, MeasurementUnit.KILOGRAM),
+                        ProductDomain(
+                            id = 0L,
+                            name = "Tomato",
+                            canonicalPrice = 3.99,
+                            tax = 0.0,
+                            waste = 10.0,
+                            canonicalUnit = MeasurementUnit.KILOGRAM,
+                            inputMethod = InputMethod.UNIT,
+                            packagePrice = null,
+                            packageQuantity = null,
+                            packageUnit = null,
+                        ),
                         0.5,
                         MeasurementUnit.KILOGRAM,
                     )

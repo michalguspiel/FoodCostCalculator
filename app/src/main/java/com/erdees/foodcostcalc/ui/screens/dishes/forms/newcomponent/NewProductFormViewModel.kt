@@ -32,7 +32,7 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
 
     val isAddButtonEnabled = formData.map {
         it.purchasePrice.toDoubleOrNull() != null &&
-                it.unitForDish != null &&
+                it.quantityAddedToDishUnit != null &&
                 it.purchaseUnit != null &&
                 it.quantityAddedToDish.toDoubleOrNull() != null
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
@@ -57,8 +57,8 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
                 .distinctUntilChanged(areEquivalent = { old, new -> old == new })
                 .filter { it.isNotEmpty() }
                 .collect { availableUnits ->
-                    if (formData.value.unitForDish == null) {
-                        _formData.update { it.copy(unitForDish = availableUnits.first()) }
+                    if (formData.value.quantityAddedToDishUnit == null) {
+                        _formData.update { it.copy(quantityAddedToDishUnit = availableUnits.first()) }
                     }
                 }
         }

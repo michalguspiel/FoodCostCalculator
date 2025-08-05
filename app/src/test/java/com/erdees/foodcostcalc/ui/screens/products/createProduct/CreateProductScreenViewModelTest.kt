@@ -198,10 +198,10 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
             coVerify { productRepository.addProduct(capture(productBaseSlot)) }
             val capturedProduct = productBaseSlot.captured
             capturedProduct.name shouldBe "Test Product"
-            capturedProduct.pricePerUnit shouldBe 10.0
+            capturedProduct.canonicalPrice shouldBe 10.0
             capturedProduct.tax shouldBe 15.0
             capturedProduct.waste shouldBe 5.0
-            capturedProduct.unit shouldBe MeasurementUnit.KILOGRAM
+            capturedProduct.canonicalUnit shouldBe MeasurementUnit.KILOGRAM
 
             coVerify(exactly = 1) {
                 analyticsRepository.logEvent(
@@ -231,10 +231,10 @@ class CreateProductScreenViewModelTestJUnitStyleWithMockK {
         coVerify { productRepository.addProduct(any()) }
         val capturedProduct = productBaseSlot.captured
         capturedProduct.name shouldBe "Test Product"
-        capturedProduct.pricePerUnit shouldBe 10.0
+        capturedProduct.canonicalPrice shouldBe 10.0
         capturedProduct.tax shouldBe 0.0
         capturedProduct.waste shouldBe 5.0
-        capturedProduct.unit shouldBe MeasurementUnit.KILOGRAM
+        capturedProduct.canonicalUnit shouldBe MeasurementUnit.KILOGRAM
 
         coVerify(exactly = 1) {
             analyticsRepository.logEvent(

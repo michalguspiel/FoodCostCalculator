@@ -63,6 +63,7 @@ import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.dish.DishDomain
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
@@ -110,14 +111,14 @@ data class DishesScreenCallbacks(
     val makeFabVisible: () -> Unit,
     val hideFab: () -> Unit,
     val onAddItemClick: (dishId: Long, dishName: String) -> Unit,
-    val onEditClick: (dishId: Long) -> Unit
+    val onEditClick: (dishId: Long) -> Unit,
 )
 
 @Composable
 @Screen
 fun DishesScreen(
     navController: NavController,
-    viewModel: DishesScreenViewModel = viewModel()
+    viewModel: DishesScreenViewModel = viewModel(),
 ) {
     val fullUiShown = rememberSaveable { mutableStateOf(true) }
     val nestedScrollConnection = rememberNestedScrollConnection { fullUiShown.value = it }
@@ -259,7 +260,7 @@ fun AskForReviewEffect(
     onReviewLaunch: () -> Unit,
     onFailure: (Throwable) -> Unit,
     context: Context = LocalContext.current,
-    activity: Activity? = LocalActivity.current
+    activity: Activity? = LocalActivity.current,
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
     val currentOnReviewLaunched by rememberUpdatedState(onReviewLaunch)
@@ -298,7 +299,7 @@ private fun DishesScreenContent(
     isVisible: Boolean,
     searchKey: String,
     callbacks: DishesScreenCallbacks,
-    spotlight: Spotlight
+    spotlight: Spotlight,
 ) {
     Box(
         contentAlignment = Alignment.TopCenter
@@ -362,7 +363,7 @@ private fun DishItem(
     callbacks: DishesScreenCallbacks,
     modifier: Modifier = Modifier,
     spotlight: Spotlight,
-    isFirstDish: Boolean = false
+    isFirstDish: Boolean = false,
 ) {
     val isCompactHeight = with(LocalDensity.current) {
         LocalWindowInfo.current.containerSize.height.toDp() < Constants.UI.COMPACT_HEIGHT_THRESHOLD_DP.dp
@@ -553,7 +554,7 @@ private fun PriceSummary(
     dishDomain: DishDomain,
     servings: Int,
     currency: Currency?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         PriceRow(
@@ -583,16 +584,38 @@ private fun DishItemPreview() {
                     halfProducts = emptyList(),
                     products = listOf(
                         UsedProductDomain(
-                            1,
-                            2,
-                            ProductDomain(1, "Bun", 2.0, 0.5, 5.0,  MeasurementUnit.KILOGRAM),
-                            1.0,
-                            MeasurementUnit.PIECE,
-                            1.0,
+                            id = 0,
+                            ownerId = 0,
+                            item = ProductDomain(
+                                id = 1,
+                                name = "Bun",
+                                canonicalPrice = 2.0,
+                                canonicalUnit = MeasurementUnit.KILOGRAM,
+                                tax = 0.5,
+                                waste = 5.0,
+                                inputMethod = InputMethod.UNIT,
+                                packagePrice = null,
+                                packageQuantity = null,
+                                packageUnit = null
+                            ),
+                            quantity = 1.0,
+                            quantityUnit = MeasurementUnit.KILOGRAM,
+                            weightPiece = 1.0
                         ), UsedProductDomain(
                             1,
                             2,
-                            ProductDomain(2, "Meat Patty", 15.0, 0.5, 5.0,  MeasurementUnit.KILOGRAM),
+                            ProductDomain(
+                                id = 2,
+                                name = "Meat Patty",
+                                inputMethod = InputMethod.UNIT,
+                                canonicalPrice = 15.0,
+                                tax = 0.5,
+                                waste = 5.0,
+                                canonicalUnit = MeasurementUnit.KILOGRAM,
+                                packagePrice = null,
+                                packageQuantity = null,
+                                packageUnit = null,
+                            ),
                             100.0,
                             MeasurementUnit.GRAM,
                             null,

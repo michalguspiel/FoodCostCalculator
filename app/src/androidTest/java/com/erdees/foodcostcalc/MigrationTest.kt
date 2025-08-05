@@ -8,6 +8,7 @@ import com.erdees.foodcostcalc.data.AppRoomDataBase
 import com.erdees.foodcostcalc.data.db.migrations.Migration_1to2_RefactorDatabase
 import com.erdees.foodcostcalc.data.db.migrations.Migration_2to3_Remove_Ref_Tables_Where_Ref_Does_Not_Exist
 import com.erdees.foodcostcalc.data.db.migrations.Migration_5to6_UnitEnumMigration
+import com.erdees.foodcostcalc.data.db.migrations.Migration_6to7_ProductBaseSchema
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import org.junit.Before
 import org.junit.Test
@@ -190,7 +191,7 @@ class MigrationTest {
         }
 
         // Migrate the database to version 6
-        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, Migration_5to6_UnitEnumMigration())
+        val db = helper.runMigrationsAndValidate(TEST_DB, 6, true, Migration_5to6_UnitEnumMigration)
 
         // Verify the migration results
         db.apply {
@@ -358,6 +359,139 @@ class MigrationTest {
 
             assert(actualTables.containsAll(expectedTables)) {
                 "Missing tables. Expected: $expectedTables, Actual: $actualTables"
+            }
+
+            close()
+        }
+    }
+
+    @Test
+    fun testMigration_6_to_7() {
+        // Create the database with version 6 schema and insert test data
+        helper.createDatabase(TEST_DB, 6).apply {
+            // Insert test products with the old schema (pricePerUnit)
+            execSQL("""
+                INSERT INTO products (productId, product_name, pricePerUnit, tax, waste, unit) 
+                VALUES 
+                (1, 'Minced Beef', 19.2, 0.0, 0.0, 'KILOGRAM'),
+                (2, 'Burger Bun', 0.7, 5.0, 2.5, 'PIECE'),
+                (3, 'Cheese Slice', 0.5, 10.0, 1.0, 'PIECE'),
+                (4, 'Lettuce', 3.99, 0.0, 15.0, 'KILOGRAM'),
+                (5, 'Olive Oil', 12.5, 8.0, 0.0, 'LITER')
+            """.trimIndent())
+
+            close()
+        }
+
+        // Migrate the database to version 7
+        val db = helper.runMigrationsAndValidate(TEST_DB, 7, true, Migration_6to7_ProductBaseSchema)
+
+        // Verify the migration results
+        db.apply {
+            // Test that all data is preserved and new fields are correctly set
+            val productsCursor = query("SELECT productId, product_name, input_method, package_price, package_quantity, package_unit, canonical_price, canonical_unit, tax, waste FROM products ORDER BY productId")
+
+            val expectedProducts = listOf(
+                Triple(1L, "Minced Beef", 19.2),
+                Triple(2L, "Burger Bun", 0.7),
+                Triple(3L, "Cheese Slice", 0.5),
+                Triple(4L, "Lettuce", 3.99),
+                Triple(5L, "Olive Oil", 12.5)
+            )
+
+            var index = 0
+            while (productsCursor.moveToNext()) {
+                val productId = productsCursor.getLong(0)
+                val productName = productsCursor.getString(1)
+                val inputMethod = productsCursor.getString(2)
+                val packagePrice = if (productsCursor.isNull(3)) null else productsCursor.getDouble(3)
+                val packageQuantity = if (productsCursor.isNull(4)) null else productsCursor.getDouble(4)
+                val packageUnit = if (productsCursor.isNull(5)) null else productsCursor.getString(5)
+                val canonicalPrice = productsCursor.getDouble(6)
+                val canonicalUnit = productsCursor.getString(7)
+                val tax = productsCursor.getDouble(8)
+                val waste = productsCursor.getDouble(9)
+
+                val expected = expectedProducts[index]
+
+                // Verify data integrity
+                assert(productId == expected.first) { "Product ID mismatch: expected ${expected.first}, got $productId" }
+                assert(productName == expected.second) { "Product name mismatch: expected ${expected.second}, got $productName" }
+                assert(canonicalPrice == expected.third) { "Canonical price mismatch: expected ${expected.third}, got $canonicalPrice" }
+
+                // Verify new fields
+                assert(inputMethod == "UNIT") { "Input method should default to UNIT, got $inputMethod" }
+                assert(packagePrice == null) { "Package price should be null for migrated data, got $packagePrice" }
+                assert(packageQuantity == null) { "Package quantity should be null for migrated data, got $packageQuantity" }
+                assert(packageUnit == null) { "Package unit should be null for migrated data, got $packageUnit" }
+
+                // Verify existing fields are preserved
+                when (productId) {
+                    1L -> {
+                        assert(tax == 0.0) { "Tax mismatch for product 1" }
+                        assert(waste == 0.0) { "Waste mismatch for product 1" }
+                        assert(canonicalUnit == "KILOGRAM") { "Canonical unit mismatch for product 1" }
+                    }
+                    2L -> {
+                        assert(tax == 5.0) { "Tax mismatch for product 2" }
+                        assert(waste == 2.5) { "Waste mismatch for product 2" }
+                        assert(canonicalUnit == "PIECE") { "Canonical unit mismatch for product 2" }
+                    }
+                    3L -> {
+                        assert(tax == 10.0) { "Tax mismatch for product 3" }
+                        assert(waste == 1.0) { "Waste mismatch for product 3" }
+                        assert(canonicalUnit == "PIECE") { "Canonical unit mismatch for product 3" }
+                    }
+                    4L -> {
+                        assert(tax == 0.0) { "Tax mismatch for product 4" }
+                        assert(waste == 15.0) { "Waste mismatch for product 4" }
+                        assert(canonicalUnit == "KILOGRAM") { "Canonical unit mismatch for product 4" }
+                    }
+                    5L -> {
+                        assert(tax == 8.0) { "Tax mismatch for product 5" }
+                        assert(waste == 0.0) { "Waste mismatch for product 5" }
+                        assert(canonicalUnit == "LITER") { "Canonical unit mismatch for product 5" }
+                    }
+                }
+
+                index++
+            }
+            productsCursor.close()
+
+            // Verify that all products were migrated
+            assert(index == 5) { "Expected 5 products, but got $index" }
+
+            // Verify data count is preserved
+            val countCursor = query("SELECT COUNT(*) FROM products")
+            countCursor.moveToFirst()
+            assert(countCursor.getInt(0) == 5) { "Products count mismatch - expected 5" }
+            countCursor.close()
+
+            // Verify table structure - check that the old columns don't exist and new columns do exist
+            val pragmaCursor = query("PRAGMA table_info(products)")
+            val columns = mutableSetOf<String>()
+            while (pragmaCursor.moveToNext()) {
+                columns.add(pragmaCursor.getString(1)) // Column name is at index 1
+            }
+            pragmaCursor.close()
+
+            // Verify new schema
+            val expectedColumns = setOf(
+                "productId", "product_name", "input_method", "package_price",
+                "package_quantity", "package_unit", "canonical_price", "canonical_unit",
+                "tax", "waste"
+            )
+
+            assert(columns.containsAll(expectedColumns)) {
+                "Missing expected columns. Expected: $expectedColumns, Found: $columns"
+            }
+
+            // Verify old columns are gone
+            assert(!columns.contains("pricePerUnit")) {
+                "Old column 'pricePerUnit' should not exist after migration"
+            }
+            assert(!columns.contains("unit")) {
+                "Old column 'unit' should not exist after migration (renamed to canonical_unit)"
             }
 
             close()

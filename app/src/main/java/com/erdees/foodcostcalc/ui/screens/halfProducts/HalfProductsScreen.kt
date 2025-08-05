@@ -54,6 +54,7 @@ import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.ItemPresentationState
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
@@ -469,14 +470,36 @@ private fun HalfProductsItemPreview() {
                         UsedProductDomain(
                             1,
                             2,
-                            ProductDomain(1, "Egg", 2.0, 0.5, 5.0, MeasurementUnit.KILOGRAM),
+                            ProductDomain(
+                                id = 1L,
+                                name = "Egg",
+                                canonicalPrice = 2.5,
+                                tax = 0.0,
+                                canonicalUnit = MeasurementUnit.PIECE,
+                                waste = 10.0,
+                                inputMethod = InputMethod.UNIT,
+                                packagePrice = null,
+                                packageQuantity = null,
+                                packageUnit = null,
+                            ),
                             1.0,
                             MeasurementUnit.PIECE,
                             1.0,
                         ), UsedProductDomain(
                             1,
                             2,
-                            ProductDomain(2, "Oil", 15.0, 0.5, 5.0, MeasurementUnit.KILOGRAM),
+                            ProductDomain(
+                                id = 1L,
+                                name = "Oil",
+                                canonicalPrice = 15.0,
+                                tax = 0.0,
+                                canonicalUnit = MeasurementUnit.LITER,
+                                waste = 1.0,
+                                inputMethod = InputMethod.UNIT,
+                                packagePrice = null,
+                                packageQuantity = null,
+                                packageUnit = null,
+                            ),
                             100.0,
                             MeasurementUnit.GRAM,
                             null,

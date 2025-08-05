@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductDomain
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.product.ProductDomain
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCOutlinedButton
@@ -268,18 +269,26 @@ private fun ComponentLookupFormPreview() {
                     ProductDomain(
                         id = 1L,
                         name = "Flour",
-                        pricePerUnit = 2.5,
+                        canonicalPrice = 2.5,
                         tax = 8.0,
                         waste = 5.0,
-                        unit = MeasurementUnit.KILOGRAM
+                        canonicalUnit = MeasurementUnit.KILOGRAM,
+                        inputMethod = InputMethod.UNIT,
+                        packagePrice = null,
+                        packageQuantity = null,
+                        packageUnit = null
                     ),
                     ProductDomain(
                         id = 2L,
                         name = "Sugar",
-                        pricePerUnit = 3.0,
+                        canonicalPrice = 3.0,
                         tax = 8.0,
                         waste = 3.0,
-                        unit = MeasurementUnit.KILOGRAM
+                        canonicalUnit = MeasurementUnit.KILOGRAM,
+                        inputMethod = InputMethod.UNIT,
+                        packagePrice = null,
+                        packageQuantity = null,
+                        packageUnit = null
                     )
                 ),
                 halfProducts = listOf(

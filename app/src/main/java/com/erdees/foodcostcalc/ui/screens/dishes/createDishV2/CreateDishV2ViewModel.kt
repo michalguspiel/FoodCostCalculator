@@ -195,7 +195,7 @@ class CreateDishV2ViewModel : ViewModel(), KoinComponent {
         _isLoading.update { true }
         viewModelScope.launch(dispatchers.ioDispatcher) {
             try {
-                val unitForDish = newProductFormData.unitForDish
+                val unitForDish = newProductFormData.quantityAddedToDishUnit
                     ?: error("Unit for the dish cannot be null.")
                 val newComponent = (_componentSelection.value as? ComponentSelection.NewComponent)
                     ?: error("Component selection must be of type NewComponent to add a new product.")

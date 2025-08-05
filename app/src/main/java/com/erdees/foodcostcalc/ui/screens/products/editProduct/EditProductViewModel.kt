@@ -13,6 +13,8 @@ import com.erdees.foodcostcalc.domain.mapper.Mapper.toProductDomain
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
+import com.erdees.foodcostcalc.domain.model.product.PackagePriceEditableProduct
+import com.erdees.foodcostcalc.domain.model.product.UnitPriceEditableProduct
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen.Companion.PRODUCT_ID_KEY
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.MyDispatchers
@@ -58,7 +60,6 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
             null
         )
 
-    // Store original product state for comparison
     private var originalProduct: EditableProductDomain? = null
 
     private var _editableName: MutableStateFlow<String> = MutableStateFlow("")
@@ -83,7 +84,7 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                     .first()
                 with(product.toProductDomain()) {
                     _product.value = this.toEditableProductDomain()
-                    originalProduct = this.toEditableProductDomain() // Store original state
+                    originalProduct = this.toEditableProductDomain()
                     _editableName.value = this.name
                 }
                 _screenState.update { ScreenState.Idle }
@@ -106,43 +107,115 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
 
 
     fun saveName() {
-        _product.value = _product.value?.copy(name = _editableName.value)
+        when (val product = _product.value) {
+            is UnitPriceEditableProduct -> _product.value = product.copy(
+                name = _editableName.value
+            )
+
+            is PackagePriceEditableProduct -> _product.value = product.copy(
+                name = _editableName.value
+            )
+
+            null -> {} // Handle null case
+        }
         resetScreenState()
     }
 
     fun updatePrice(price: String) {
-        val newPrice = onNumericValueChange(
-            newValue = price,
-            oldValue = product.value?.pricePerUnit.toString()
-        )
-        _product.value = _product.value?.copy(pricePerUnit = newPrice)
+        when (val currentProduct = _product.value) {
+            is UnitPriceEditableProduct -> {
+                val newPrice = onNumericValueChange(
+                    newValue = price,
+                    oldValue = currentProduct.unitPrice
+                )
+                _product.value = currentProduct.copy(unitPrice = newPrice)
+            }
+            is PackagePriceEditableProduct -> {
+                val newPrice = onNumericValueChange(
+                    newValue = price,
+                    oldValue = currentProduct.packagePrice
+                )
+                _product.value = currentProduct.copy(packagePrice = newPrice)
+            }
+            null -> {} // Handle null case
+        }
+    }
+
+    fun updatePackageQuantity(quantity: String) {
+        when (val currentProduct = _product.value) {
+            is PackagePriceEditableProduct -> {
+                val newQuantity = onNumericValueChange(
+                    newValue = quantity,
+                    oldValue = currentProduct.packageQuantity
+                )
+                _product.value = currentProduct.copy(packageQuantity = newQuantity)
+            }
+            is UnitPriceEditableProduct -> {} // Not applicable
+            null -> {} // Handle null case
+        }
     }
 
     fun updateTax(tax: String) {
-        val newTax = onNumericValueChange(
-            newValue = tax,
-            oldValue = product.value?.tax.toString()
-        )
-        _product.value = _product.value?.copy(tax = newTax)
+        when (val currentProduct = _product.value) {
+            is UnitPriceEditableProduct -> {
+                val newTax = onNumericValueChange(
+                    newValue = tax,
+                    oldValue = currentProduct.tax
+                )
+                _product.value = currentProduct.copy(tax = newTax)
+            }
+            is PackagePriceEditableProduct -> {
+                val newTax = onNumericValueChange(
+                    newValue = tax,
+                    oldValue = currentProduct.tax
+                )
+                _product.value = currentProduct.copy(tax = newTax)
+            }
+            null -> {} // Handle null case
+        }
     }
 
     fun updateWaste(waste: String) {
-        val newWaste = onNumericValueChange(
-            newValue = waste,
-            oldValue = product.value?.waste.toString()
-        )
-        _product.value = _product.value?.copy(waste = newWaste)
+        when (val currentProduct = _product.value) {
+            is UnitPriceEditableProduct -> {
+                val newWaste = onNumericValueChange(
+                    newValue = waste,
+                    oldValue = currentProduct.waste
+                )
+                _product.value = currentProduct.copy(waste = newWaste)
+            }
+            is PackagePriceEditableProduct -> {
+                val newWaste = onNumericValueChange(
+                    newValue = waste,
+                    oldValue = currentProduct.waste
+                )
+                _product.value = currentProduct.copy(waste = newWaste)
+            }
+            null -> {} // Handle null case
+        }
     }
 
     fun setInteractionEditName() {
         _screenState.value = ScreenState.Interaction(InteractionType.EditName)
     }
 
-    val saveButtonEnabled = product.map {
-        it?.name?.isNotBlank() == true &&
-                it.pricePerUnit.toDoubleOrNull() != null &&
-                it.waste.toDoubleOrNull() != null &&
-                it.tax.toDoubleOrNull() != null
+    val saveButtonEnabled = product.map { product ->
+        when (product) {
+            is UnitPriceEditableProduct -> {
+                product.name.isNotBlank() &&
+                        product.unitPrice.toDoubleOrNull() != null &&
+                        product.waste.toDoubleOrNull() != null &&
+                        product.tax.toDoubleOrNull() != null
+            }
+            is PackagePriceEditableProduct -> {
+                product.name.isNotBlank() &&
+                        product.packagePrice.toDoubleOrNull() != null &&
+                        product.packageQuantity.toDoubleOrNull() != null &&
+                        product.waste.toDoubleOrNull() != null &&
+                        product.tax.toDoubleOrNull() != null
+            }
+            null -> false
+        }
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     fun save() {
