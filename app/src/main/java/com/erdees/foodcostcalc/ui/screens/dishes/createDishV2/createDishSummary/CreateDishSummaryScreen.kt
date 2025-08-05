@@ -332,8 +332,8 @@ private fun CreateDishSummaryScreenPreview() {
             item = ProductDomain(
                 id = 0L,
                 name = "Lemon",
-                pricePerUnit = 0.30,
-                unit = MeasurementUnit.KILOGRAM,
+                canonicalPrice = 0.30,
+                canonicalUnit = MeasurementUnit.KILOGRAM,
                 waste = 35.0,
                 tax = 0.0,
                 inputMethod = InputMethod.UNIT,
@@ -348,8 +348,8 @@ private fun CreateDishSummaryScreenPreview() {
             item = ProductDomain(
                 id = 2L,
                 name = "Sugar",
-                pricePerUnit = 0.15,
-                unit = MeasurementUnit.KILOGRAM,
+                canonicalPrice = 0.15,
+                canonicalUnit = MeasurementUnit.KILOGRAM,
                 waste = 0.0,
                 tax = 0.0,
                 inputMethod = InputMethod.UNIT,

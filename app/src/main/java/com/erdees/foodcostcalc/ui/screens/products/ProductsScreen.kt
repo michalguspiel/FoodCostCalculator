@@ -174,13 +174,13 @@ fun ProductItem(
 
             PriceRow(
                 primaryText = stringResource(R.string.netto_price),
-                secondaryText = stringResource(productDomain.unit.displayNameRes),
-                price = formatPrice(productDomain.pricePerUnit, currency)
+                secondaryText = stringResource(productDomain.canonicalUnit.displayNameRes),
+                price = formatPrice(productDomain.canonicalPrice, currency)
             )
             Spacer(modifier = Modifier.height(4.dp))
             PriceRow(
                 primaryText = stringResource(R.string.total_price),
-                secondaryText = stringResource(productDomain.unit.displayNameRes),
+                secondaryText = stringResource(productDomain.canonicalUnit.displayNameRes),
                 price = formatPrice(productDomain.priceAfterWasteAndTax, currency),
                 style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Medium)
             )
@@ -207,10 +207,10 @@ private fun ProductItemPreview() {
             productDomain = ProductDomain(
                 id = 1,
                 name = "Product",
-                pricePerUnit = 12.23,
+                canonicalPrice = 12.23,
                 tax = 0.23,
                 waste = 0.1,
-                unit = MeasurementUnit.KILOGRAM,
+                canonicalUnit = MeasurementUnit.KILOGRAM,
                 inputMethod = InputMethod.UNIT,
                 packagePrice = null,
                 packageQuantity = null,

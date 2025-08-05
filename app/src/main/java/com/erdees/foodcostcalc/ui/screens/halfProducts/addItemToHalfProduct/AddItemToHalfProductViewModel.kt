@@ -104,7 +104,7 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
 
     fun selectProduct(product: ProductDomain?) {
         _selectedProduct.value = product
-        unitType = UnitsUtils.getUnitType(product?.unit)
+        unitType = UnitsUtils.getUnitType(product?.canonicalUnit)
         updateUnitList()
     }
 
@@ -154,6 +154,6 @@ class AddItemToHalfProductViewModel : ViewModel(), KoinComponent {
     }
 
     fun pieceQuantityNeeded(): Boolean {
-        return selectedProduct.value?.unit == MeasurementUnit.PIECE && halfProductUnitType != UnitCategory.COUNT
+        return selectedProduct.value?.canonicalUnit == MeasurementUnit.PIECE && halfProductUnitType != UnitCategory.COUNT
     }
 }

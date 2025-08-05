@@ -147,8 +147,8 @@ private fun UsedItemPreview() {
                 id = 0, ownerId = 0, item = ProductDomain(
                     id = 1,
                     name = "Product",
-                    pricePerUnit = 10.0,
-                    unit = MeasurementUnit.KILOGRAM,
+                    canonicalPrice = 10.0,
+                    canonicalUnit = MeasurementUnit.KILOGRAM,
                     tax = 23.0,
                     waste = 20.0,
                     inputMethod = InputMethod.UNIT,

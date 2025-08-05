@@ -410,10 +410,10 @@ private fun CreateDishStartScreenContentPreview() {
                         ProductDomain(
                             id = 0L,
                             name = "Tomato",
-                            pricePerUnit = 3.99,
+                            canonicalPrice = 3.99,
                             tax = 0.0,
                             waste = 10.0,
-                            unit = MeasurementUnit.KILOGRAM,
+                            canonicalUnit = MeasurementUnit.KILOGRAM,
                             inputMethod = InputMethod.UNIT,
                             packagePrice = null,
                             packageQuantity = null,

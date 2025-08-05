@@ -19,7 +19,7 @@ data class ProductAddedToDish(
     override val foodCost = calculatePrice(
         item.priceAfterWasteAndTax,
         quantity,
-        item.unit,
+        item.canonicalUnit,
         quantityUnit,
     )
 }

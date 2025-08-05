@@ -24,7 +24,7 @@ data class UsedProductDomain(
     override val foodCost = calculatePrice(
         item.priceAfterWasteAndTax,
         quantity,
-        item.unit,
+        item.canonicalUnit,
         quantityUnit,
     )
 

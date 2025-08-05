@@ -17,16 +17,15 @@ data class ProductDomain(
     val packageQuantity: Double?,
     val packageUnit: MeasurementUnit?,
 
-    // The Single Source of Truth for Calculations
-    val pricePerUnit: Double,
-    val unit: MeasurementUnit,
+    val canonicalPrice: Double,
+    val canonicalUnit: MeasurementUnit,
 
     // Existing fields
     val tax: Double,
     val waste: Double,
 ) : Item {
 
-    private val priceWithTax = pricePerUnit * (1 + tax / 100)
+    private val priceWithTax = canonicalPrice * (1 + tax / 100)
 
     val priceAfterWasteAndTax =
         priceWithTax / (1 - waste / 100)

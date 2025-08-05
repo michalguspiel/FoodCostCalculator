@@ -157,9 +157,9 @@ private fun ExistingProductIngredientFormPreview() {
     val previewProduct = ProductDomain(
         id = 1L,
         name = "Flour",
-        pricePerUnit = 2.5,
+        canonicalPrice = 2.5,
         tax = 0.0,
-        unit = MeasurementUnit.KILOGRAM,
+        canonicalUnit = MeasurementUnit.KILOGRAM,
         waste = 10.0,
         inputMethod = InputMethod.UNIT,
         packagePrice = null,

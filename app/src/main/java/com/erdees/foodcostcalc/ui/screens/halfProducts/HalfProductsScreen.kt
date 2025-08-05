@@ -473,9 +473,9 @@ private fun HalfProductsItemPreview() {
                             ProductDomain(
                                 id = 1L,
                                 name = "Egg",
-                                pricePerUnit = 2.5,
+                                canonicalPrice = 2.5,
                                 tax = 0.0,
-                                unit = MeasurementUnit.PIECE,
+                                canonicalUnit = MeasurementUnit.PIECE,
                                 waste = 10.0,
                                 inputMethod = InputMethod.UNIT,
                                 packagePrice = null,
@@ -491,9 +491,9 @@ private fun HalfProductsItemPreview() {
                             ProductDomain(
                                 id = 1L,
                                 name = "Oil",
-                                pricePerUnit = 15.0,
+                                canonicalPrice = 15.0,
                                 tax = 0.0,
-                                unit = MeasurementUnit.LITER,
+                                canonicalUnit = MeasurementUnit.LITER,
                                 waste = 1.0,
                                 inputMethod = InputMethod.UNIT,
                                 packagePrice = null,

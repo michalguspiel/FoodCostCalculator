@@ -56,8 +56,8 @@ object Mapper {
             packagePrice = packagePrice,
             packageQuantity = packageQuantity,
             packageUnit = packageUnit,
-            pricePerUnit = pricePerUnit,
-            unit = unit,
+            canonicalPrice = pricePerUnit,
+            canonicalUnit = unit,
             tax = tax,
             waste = waste
         )
@@ -70,8 +70,8 @@ object Mapper {
                 name = name,
                 tax = tax.toString(),
                 waste = waste.toString(),
-                unitPrice = pricePerUnit.toString(),
-                unitPriceUnit = unit
+                unitPrice = canonicalPrice.toString(),
+                unitPriceUnit = canonicalUnit
             )
             InputMethod.PACKAGE -> PackagePriceEditableProduct(
                 id = id,
@@ -80,7 +80,7 @@ object Mapper {
                 waste = waste.toString(),
                 packagePrice = packagePrice?.toString() ?: "",
                 packageQuantity = packageQuantity?.toString() ?: "",
-                packageUnit = packageUnit ?: unit
+                packageUnit = packageUnit ?: canonicalUnit
             )
         }
     }

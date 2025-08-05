@@ -135,7 +135,7 @@ class AddItemToDishViewModel : ViewModel(), KoinComponent {
     }
 
     private fun setProductUnitType(productDomain: ProductDomain) {
-        unitType = UnitsUtils.getUnitType(productDomain.unit)
+        unitType = UnitsUtils.getUnitType(productDomain.canonicalUnit)
     }
 
     private fun setHalfProductUnitType(halfProductDomain: HalfProductDomain) {
