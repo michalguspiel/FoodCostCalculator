@@ -56,8 +56,8 @@ object Mapper {
             packagePrice = packagePrice,
             packageQuantity = packageQuantity,
             packageUnit = packageUnit,
-            canonicalPrice = pricePerUnit,
-            canonicalUnit = unit,
+            canonicalPrice = canonicalPrice,
+            canonicalUnit = canonicalUnit,
             tax = tax,
             waste = waste
         )
@@ -99,8 +99,8 @@ object Mapper {
                 packagePrice = null,
                 packageQuantity = null,
                 packageUnit = null,
-                pricePerUnit = unitPrice.toDouble(),
-                unit = unitPriceUnit,
+                canonicalPrice = unitPrice.toDouble(),
+                canonicalUnit = unitPriceUnit,
                 tax = tax.toDouble(),
                 waste = waste.toDouble()
             )
@@ -116,8 +116,8 @@ object Mapper {
                     packagePrice = pkgPrice,
                     packageQuantity = pkgQuantity,
                     packageUnit = packageUnit,
-                    pricePerUnit = canonicalPrice,
-                    unit = canonicalUnit,
+                    canonicalPrice = canonicalPrice,
+                    canonicalUnit = canonicalUnit,
                     tax = tax.toDouble(),
                     waste = waste.toDouble()
                 )

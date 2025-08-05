@@ -6,7 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 /**
  * Migration from version 6 to 7: Refine ProductBase schema
  * - Add input_method, package_price, package_quantity, package_unit fields
- * - Keep pricePerUnit as price_per_unit (no rename needed)
+ * - Rename pricePerUnit to canonical_price and unit to canonical_unit
  */
 val Migration_6to7_ProductBaseSchema = object : Migration(6, 7) {
     override fun migrate(database: SupportSQLiteDatabase) {
@@ -21,8 +21,8 @@ val Migration_6to7_ProductBaseSchema = object : Migration(6, 7) {
                 package_price REAL,
                 package_quantity REAL,
                 package_unit TEXT,
-                price_per_unit REAL NOT NULL,
-                unit TEXT NOT NULL,
+                canonical_price REAL NOT NULL,
+                canonical_unit TEXT NOT NULL,
                 tax REAL NOT NULL,
                 waste REAL NOT NULL
             )
@@ -33,7 +33,8 @@ val Migration_6to7_ProductBaseSchema = object : Migration(6, 7) {
         // For existing rows:
         // - input_method defaults to 'UNIT'
         // - package_* fields are NULL
-        // - pricePerUnit stays as price_per_unit
+        // - pricePerUnit becomes canonical_price
+        // - unit becomes canonical_unit
         database.execSQL(
             """
             INSERT INTO products_new (
@@ -43,8 +44,8 @@ val Migration_6to7_ProductBaseSchema = object : Migration(6, 7) {
                 package_price,
                 package_quantity,
                 package_unit,
-                price_per_unit, 
-                unit,
+                canonical_price,
+                canonical_unit,
                 tax, 
                 waste
             )
@@ -55,8 +56,8 @@ val Migration_6to7_ProductBaseSchema = object : Migration(6, 7) {
                 NULL as package_price,
                 NULL as package_quantity,
                 NULL as package_unit,
-                pricePerUnit as price_per_unit, 
-                unit,
+                pricePerUnit as canonical_price,
+                unit as canonical_unit,
                 tax, 
                 waste
             FROM products

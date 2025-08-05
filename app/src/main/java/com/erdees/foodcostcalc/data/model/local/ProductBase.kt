@@ -22,8 +22,8 @@ data class ProductBase(
   @ColumnInfo(name = "package_quantity") val packageQuantity: Double?,
   @ColumnInfo(name = "package_unit") val packageUnit: MeasurementUnit?,
 
-  @ColumnInfo(name = "price_per_unit") val pricePerUnit: Double,
-  @ColumnInfo(name = "unit") val unit: MeasurementUnit,
+  @ColumnInfo(name = "canonical_price") val canonicalPrice: Double,
+  @ColumnInfo(name = "canonical_unit") val canonicalUnit: MeasurementUnit,
 
   val tax: Double,
   val waste: Double

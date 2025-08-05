@@ -389,7 +389,7 @@ class MigrationTest {
         // Verify the migration results
         db.apply {
             // Test that all data is preserved and new fields are correctly set
-            val productsCursor = query("SELECT productId, product_name, input_method, package_price, package_quantity, package_unit, price_per_unit, unit, tax, waste FROM products ORDER BY productId")
+            val productsCursor = query("SELECT productId, product_name, input_method, package_price, package_quantity, package_unit, canonical_price, canonical_unit, tax, waste FROM products ORDER BY productId")
 
             val expectedProducts = listOf(
                 Triple(1L, "Minced Beef", 19.2),
@@ -407,8 +407,8 @@ class MigrationTest {
                 val packagePrice = if (productsCursor.isNull(3)) null else productsCursor.getDouble(3)
                 val packageQuantity = if (productsCursor.isNull(4)) null else productsCursor.getDouble(4)
                 val packageUnit = if (productsCursor.isNull(5)) null else productsCursor.getString(5)
-                val pricePerUnit = productsCursor.getDouble(6)
-                val unit = productsCursor.getString(7)
+                val canonicalPrice = productsCursor.getDouble(6)
+                val canonicalUnit = productsCursor.getString(7)
                 val tax = productsCursor.getDouble(8)
                 val waste = productsCursor.getDouble(9)
 
@@ -417,7 +417,7 @@ class MigrationTest {
                 // Verify data integrity
                 assert(productId == expected.first) { "Product ID mismatch: expected ${expected.first}, got $productId" }
                 assert(productName == expected.second) { "Product name mismatch: expected ${expected.second}, got $productName" }
-                assert(pricePerUnit == expected.third) { "Price per unit mismatch: expected ${expected.third}, got $pricePerUnit" }
+                assert(canonicalPrice == expected.third) { "Canonical price mismatch: expected ${expected.third}, got $canonicalPrice" }
 
                 // Verify new fields
                 assert(inputMethod == "UNIT") { "Input method should default to UNIT, got $inputMethod" }
@@ -430,27 +430,27 @@ class MigrationTest {
                     1L -> {
                         assert(tax == 0.0) { "Tax mismatch for product 1" }
                         assert(waste == 0.0) { "Waste mismatch for product 1" }
-                        assert(unit == "KILOGRAM") { "Unit mismatch for product 1" }
+                        assert(canonicalUnit == "KILOGRAM") { "Canonical unit mismatch for product 1" }
                     }
                     2L -> {
                         assert(tax == 5.0) { "Tax mismatch for product 2" }
                         assert(waste == 2.5) { "Waste mismatch for product 2" }
-                        assert(unit == "PIECE") { "Unit mismatch for product 2" }
+                        assert(canonicalUnit == "PIECE") { "Canonical unit mismatch for product 2" }
                     }
                     3L -> {
                         assert(tax == 10.0) { "Tax mismatch for product 3" }
                         assert(waste == 1.0) { "Waste mismatch for product 3" }
-                        assert(unit == "PIECE") { "Unit mismatch for product 3" }
+                        assert(canonicalUnit == "PIECE") { "Canonical unit mismatch for product 3" }
                     }
                     4L -> {
                         assert(tax == 0.0) { "Tax mismatch for product 4" }
                         assert(waste == 15.0) { "Waste mismatch for product 4" }
-                        assert(unit == "KILOGRAM") { "Unit mismatch for product 4" }
+                        assert(canonicalUnit == "KILOGRAM") { "Canonical unit mismatch for product 4" }
                     }
                     5L -> {
                         assert(tax == 8.0) { "Tax mismatch for product 5" }
                         assert(waste == 0.0) { "Waste mismatch for product 5" }
-                        assert(unit == "LITER") { "Unit mismatch for product 5" }
+                        assert(canonicalUnit == "LITER") { "Canonical unit mismatch for product 5" }
                     }
                 }
 
@@ -467,7 +467,7 @@ class MigrationTest {
             assert(countCursor.getInt(0) == 5) { "Products count mismatch - expected 5" }
             countCursor.close()
 
-            // Verify table structure - check that the old column doesn't exist and new columns do exist
+            // Verify table structure - check that the old columns don't exist and new columns do exist
             val pragmaCursor = query("PRAGMA table_info(products)")
             val columns = mutableSetOf<String>()
             while (pragmaCursor.moveToNext()) {
@@ -478,7 +478,7 @@ class MigrationTest {
             // Verify new schema
             val expectedColumns = setOf(
                 "productId", "product_name", "input_method", "package_price",
-                "package_quantity", "package_unit", "price_per_unit", "unit",
+                "package_quantity", "package_unit", "canonical_price", "canonical_unit",
                 "tax", "waste"
             )
 
@@ -486,9 +486,12 @@ class MigrationTest {
                 "Missing expected columns. Expected: $expectedColumns, Found: $columns"
             }
 
-            // Verify old column is gone
+            // Verify old columns are gone
             assert(!columns.contains("pricePerUnit")) {
                 "Old column 'pricePerUnit' should not exist after migration"
+            }
+            assert(!columns.contains("unit")) {
+                "Old column 'unit' should not exist after migration (renamed to canonical_unit)"
             }
 
             close()

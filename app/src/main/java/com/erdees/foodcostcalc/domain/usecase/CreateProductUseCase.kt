@@ -43,12 +43,12 @@ class CreateProductUseCase(
                 name = productName,
                 tax = 0.0,
                 waste = formData.wastePercent.toDoubleOrNull() ?: 0.0,
-                unit = formData.purchaseUnit,
+                canonicalUnit = formData.purchaseUnit,
                 inputMethod = InputMethod.UNIT,
                 packagePrice = null,//todo
                 packageQuantity = null,//todo
                 packageUnit = null,
-                pricePerUnit = price,//todo
+                canonicalPrice = price,//todo
             )
 
             val newProductId = productRepository.addProduct(productBase)
@@ -71,12 +71,12 @@ class CreateProductUseCase(
                 name = unitPriceState.name,
                 tax = unitPriceState.tax.toDoubleOrNull() ?: 0.0,
                 waste = unitPriceState.waste.toDoubleOrNull() ?: 0.0,
-                unit = unitPriceState.unitPriceUnit,
+                canonicalUnit = unitPriceState.unitPriceUnit,
                 inputMethod = InputMethod.UNIT,
                 packagePrice = null,
                 packageQuantity = null,
                 packageUnit = null,
-                pricePerUnit = price,
+                canonicalPrice = price,
             )
 
             val newProductId = productRepository.addProduct(productBase)
@@ -98,7 +98,7 @@ class CreateProductUseCase(
                 val packageQuantity = packagePriceState.packageQuantity.toDoubleOrNull()
                     ?: throw InvalidProductPriceException("Product package quantity cannot be empty or invalid.")
 
-                val (pricePerUnit, unit) = packageUnit.calculateCanonicalPrice(
+                val (canonicalPrice, canonicalUnit) = packageUnit.calculateCanonicalPrice(
                     packagePrice = price,
                     packageQuantity = packageQuantity
                 )
@@ -108,12 +108,12 @@ class CreateProductUseCase(
                     name = name,
                     tax = tax.toDoubleOrNull() ?: 0.0,
                     waste = waste.toDoubleOrNull() ?: 0.0,
-                    unit = unit,
+                    canonicalUnit = canonicalUnit,
                     inputMethod = InputMethod.PACKAGE,
                     packagePrice = price,
                     packageQuantity = packageQuantity,
                     packageUnit = packageUnit,
-                    pricePerUnit = pricePerUnit,
+                    canonicalPrice = canonicalPrice,
                 )
                 val newProductId = productRepository.addProduct(productBase)
                 val createdProduct = productBase.copy(productId = newProductId).toProductDomain()

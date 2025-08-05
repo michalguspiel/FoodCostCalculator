@@ -12,7 +12,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 
-@Suppress("MagicNumber")
+// todo create domain model directly
 private fun createDishModel(): CompleteDish {
     return CompleteDish(
         dish = DishBase(0L, "Broccoli Chicken", 200.0, 10.0, null),
@@ -27,10 +27,10 @@ private fun createDishModel(): CompleteDish {
                     packagePrice = null,
                     packageQuantity = null,
                     packageUnit = null,
-                    pricePerUnit = 10.0,
+                    canonicalPrice = 10.0,
                     tax = 0.0,
                     waste = 0.0,
-                    unit = MeasurementUnit.KILOGRAM
+                    canonicalUnit = MeasurementUnit.KILOGRAM
                 )
             )
         ),
