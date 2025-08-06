@@ -152,7 +152,7 @@
     <string name="values_per_unit">Values per %1$s</string>
     <string name="package_values">Package values per %1$s</string>
     <string name="package_price">Package price</string>
-    <string name="package_quantity">Package quantity (%1$s)</string>
+    <string name="package_quantity">Package quantity %1$s</string>
 
     <!-- HALF PRODUCTS FEATURE -->
 
@@ -350,6 +350,18 @@
     <string name="sign_in">Sign in</string>
     <string name="sign_field_title">Google Account</string>
     <string name="sign_out">Sign out</string>
+
+    <!-- CREATE INGREDIENT SCREEN -->
+    <string name="create_ingredient">Create Ingredient</string>
+    <string name="by_package">By Package</string>
+    <string name="by_unit">By Unit</string>
+    <string name="package_unit">Package unit</string>
+    <string name="unit_price">Unit price</string>
+    <string name="unit_price_unit">Unit price unit</string>
+    <string name="calculated_unit_price">Calculated as: %1$s / %2$s</string>
+    <string name="apply_tax_at_purchase">Apply tax at purchase</string>
+    <string name="save_ingredient">Save Ingredient</string>
+    <string name="calculate">Calculate</string>
 
     <!-- SUBSCRIPTION -->
     <string name="subscription">Subscription</string>

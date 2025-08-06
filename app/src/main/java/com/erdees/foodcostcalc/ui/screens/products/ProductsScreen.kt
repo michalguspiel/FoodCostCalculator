@@ -74,7 +74,7 @@ fun ProductsScreen(
                     isVisible = isVisible.value,
                     contentDescription = stringResource(id = R.string.content_description_create_product)
                 ) {
-                    navController.navigate(FCCScreen.CreateProduct)
+                    navController.navigate(FCCScreen.CreateIngredient)
                 }
             }
         }
@@ -87,7 +87,7 @@ fun ProductsScreen(
             listItems?.let { listItems ->
                 if (isEmptyListContentVisible) {
                     EmptyListContent(screen = FCCScreen.Products) {
-                        navController.navigate(FCCScreen.CreateProduct)
+                        navController.navigate(FCCScreen.CreateIngredient)
                     }
                 } else {
                     ProductsScreenContent(

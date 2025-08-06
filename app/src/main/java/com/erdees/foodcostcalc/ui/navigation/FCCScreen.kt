@@ -33,7 +33,7 @@ sealed class FCCScreen(
 
     /** Rest */
     @Serializable
-    data object CreateProduct : FCCScreen()
+    data object CreateIngredient : FCCScreen()
 
     @Keep
     @Serializable

@@ -29,6 +29,7 @@ import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfP
 import com.erdees.foodcostcalc.ui.screens.onboarding.OnboardingScreen
 import com.erdees.foodcostcalc.ui.screens.onlineBackup.DataBackupScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
+import com.erdees.foodcostcalc.ui.screens.products.createIngredient.CreateIngredientScreen
 import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductScreen
 import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeScreen
@@ -104,8 +105,8 @@ fun FCCNavigation(
             EditHalfProductScreen(navController = navController)
         }
 
-        composable<FCCScreen.CreateProduct> {
-            CreateProductScreen(navController = navController)
+        composable<FCCScreen.CreateIngredient> {
+            CreateIngredientScreen(navController = navController)
         }
 
         composable<FCCScreen.CreateDishStart>(
