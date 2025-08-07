@@ -269,6 +269,7 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
     fun calculateWaste(totalQuantity: Double?, wasteQuantity: Double?) {
         totalQuantity ?: return
         wasteQuantity ?: return
+        if (totalQuantity == 0.0) return
         val result = (100 * wasteQuantity) / totalQuantity
         onWasteChanged(formatResultAndCheckCommas(result))
         resetScreenState()
