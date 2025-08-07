@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
@@ -31,12 +32,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
@@ -149,7 +153,8 @@ private fun CreateIngredientScreenContent(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
-    val focusRequester = remember { FocusRequester() }
+    val wasInitialFocusRequested = rememberSaveable { mutableStateOf(false) }
+    val ingredientNameFocusRequester = remember { FocusRequester() }
 
     Scaffold(
         modifier = modifier,
@@ -172,7 +177,15 @@ private fun CreateIngredientScreenContent(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             FCCTextField(
-                modifier = Modifier.focusRequester(focusRequester),
+                modifier = Modifier
+                    .focusRequester(ingredientNameFocusRequester)
+                    .onGloballyPositioned {
+                        if (!wasInitialFocusRequested.value) {
+                            wasInitialFocusRequested.value = true
+                            ingredientNameFocusRequester.requestFocus()
+                        }
+                    }
+                ,
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Text,
                     capitalization = KeyboardCapitalization.Words,
@@ -219,6 +232,7 @@ private fun CreateIngredientScreenContent(
 
             WasteField(
                 waste = uiState.waste,
+                showTaxField = showTaxField,
                 onWasteChanged = onWasteChanged,
                 onCalculateWaste = onCalculateWaste
             )
@@ -254,6 +268,8 @@ private fun CreateIngredientScreenContent(
     )
 }
 
+private const val SingleChoiceSegmentedButtonRowMaxWidth = 200
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PriceModeToggle(
@@ -266,7 +282,9 @@ private fun PriceModeToggle(
     }
 
     SingleChoiceSegmentedButtonRow(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .fillMaxWidth()
+            .widthIn(max = SingleChoiceSegmentedButtonRowMaxWidth.dp)
     ) {
         SegmentedButton(
             shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
@@ -389,6 +407,7 @@ private fun UnitPriceForm(
 @Composable
 private fun WasteField(
     waste: String,
+    showTaxField: Boolean,
     onWasteChanged: (String) -> Unit,
     onCalculateWaste: () -> Unit,
     modifier: Modifier = Modifier,
@@ -404,7 +423,7 @@ private fun WasteField(
             value = waste,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Next
+                imeAction = if (showTaxField) ImeAction.Next else ImeAction.Done
             ),
             onValueChange = onWasteChanged
         )
