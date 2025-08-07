@@ -86,6 +86,32 @@ object Utils {
         return chosenUnits
     }
 
+    /**
+     * Returns a complete set of units based on user preferences.
+     * @return Set<MeasurementUnit> that work as a base unit for product/half product
+     * */
+    fun getCompleteUnitsSet(
+        isMetricUsed: Boolean,
+        isImperialUsed: Boolean
+    ): Set<MeasurementUnit> {
+        val chosenUnits = mutableSetOf<MeasurementUnit>()
+        chosenUnits += MeasurementUnit.PIECE
+
+        if (isMetricUsed) {
+            chosenUnits += MeasurementUnit.KILOGRAM
+            chosenUnits += MeasurementUnit.GRAM
+            chosenUnits += MeasurementUnit.LITER
+            chosenUnits += MeasurementUnit.MILLILITER
+        }
+        if (isImperialUsed) {
+            chosenUnits += MeasurementUnit.POUND
+            chosenUnits += MeasurementUnit.OUNCE
+            chosenUnits += MeasurementUnit.GALLON
+            chosenUnits += MeasurementUnit.FLUID_OUNCE
+        }
+        return chosenUnits
+    }
+
     @Deprecated("Use enum-based getUnitsSet instead")
     fun getUnitsSet(
         resources: Resources,
