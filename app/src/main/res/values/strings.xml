@@ -140,7 +140,7 @@
     <string name="product_name">Ingredient name</string>
     <string name="price">Price</string>
     <string name="tax_percent">Tax %</string>
-    <string name="percent_of_waste">% of waste</string>
+    <string name="percent_of_waste">% of waste (optional)</string>
     <string name="count_waste">Get waste</string>
     <string name="count_piece_price">Unit price</string>
     <string name="quantity_before_processing">Quantity before processing</string>

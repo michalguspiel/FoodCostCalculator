@@ -71,6 +71,22 @@ import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Utils
 import java.util.Locale
 
+data class CreateIngredientScreenActions(
+    val onNameChange: (String) -> Unit = {},
+    val onTaxChange: (String) -> Unit = {},
+    val onWasteChange: (String) -> Unit = {},
+    val onPackagePriceChange: (String) -> Unit = {},
+    val onPackageQuantityChange: (String) -> Unit = {},
+    val onPackageUnitChange: (MeasurementUnit) -> Unit = {},
+    val onUnitPriceChange: (String) -> Unit = {},
+    val onUnitPriceUnitChange: (MeasurementUnit) -> Unit = {},
+    val onTogglePriceMode: () -> Unit = {},
+    val onSaveIngredient: () -> Unit = {},
+    val onCalculateWaste: () -> Unit = {},
+    val onCalculateWasteResult: (Double?, Double?) -> Unit = { _, _ -> },
+    val onResetScreenState: () -> Unit = {},
+)
+
 @Screen
 @Composable
 fun CreateIngredientScreen(
@@ -101,6 +117,22 @@ fun CreateIngredientScreen(
         }
     }
 
+    val actions = CreateIngredientScreenActions(
+        onNameChange = viewModel::onNameChanged,
+        onTaxChange = viewModel::onTaxChanged,
+        onWasteChange = viewModel::onWasteChanged,
+        onPackagePriceChange = viewModel::onPackagePriceChanged,
+        onPackageQuantityChange = viewModel::onPackageQuantityChanged,
+        onPackageUnitChange = viewModel::onPackageUnitChanged,
+        onUnitPriceChange = viewModel::onUnitPriceChanged,
+        onUnitPriceUnitChange = viewModel::onUnitPriceUnitChanged,
+        onTogglePriceMode = viewModel::togglePriceMode,
+        onSaveIngredient = viewModel::saveIngredient,
+        onCalculateWaste = viewModel::onCalculateWaste,
+        onCalculateWasteResult = viewModel::calculateWaste,
+        onResetScreenState = viewModel::resetScreenState,
+    )
+
     CreateIngredientScreenContent(
         navController = navController,
         uiState = uiState,
@@ -110,19 +142,7 @@ fun CreateIngredientScreen(
         showTaxField = showTaxField,
         isSaveButtonEnabled = isSaveButtonEnabled,
         snackbarHostState = snackbarHostState,
-        onNameChanged = viewModel::onNameChanged,
-        onTaxChanged = viewModel::onTaxChanged,
-        onWasteChanged = viewModel::onWasteChanged,
-        onPackagePriceChanged = viewModel::onPackagePriceChanged,
-        onPackageQuantityChanged = viewModel::onPackageQuantityChanged,
-        onPackageUnitChanged = viewModel::onPackageUnitChanged,
-        onUnitPriceChanged = viewModel::onUnitPriceChanged,
-        onUnitPriceUnitChanged = viewModel::onUnitPriceUnitChanged,
-        onTogglePriceMode = viewModel::togglePriceMode,
-        onSaveIngredient = viewModel::saveIngredient,
-        onCalculateWaste = viewModel::onCalculateWaste,
-        onCalculateWasteResult = viewModel::calculateWaste,
-        onResetScreenState = viewModel::resetScreenState,
+        actions = actions,
     )
 }
 
@@ -137,19 +157,7 @@ private fun CreateIngredientScreenContent(
     showTaxField: Boolean,
     isSaveButtonEnabled: Boolean,
     snackbarHostState: SnackbarHostState,
-    onNameChanged: (String) -> Unit,
-    onTaxChanged: (String) -> Unit,
-    onWasteChanged: (String) -> Unit,
-    onPackagePriceChanged: (String) -> Unit,
-    onPackageQuantityChanged: (String) -> Unit,
-    onPackageUnitChanged: (MeasurementUnit) -> Unit,
-    onUnitPriceChanged: (String) -> Unit,
-    onUnitPriceUnitChanged: (MeasurementUnit) -> Unit,
-    onTogglePriceMode: () -> Unit,
-    onSaveIngredient: () -> Unit,
-    onCalculateWaste: () -> Unit,
-    onCalculateWasteResult: (Double?, Double?) -> Unit,
-    onResetScreenState: () -> Unit,
+    actions: CreateIngredientScreenActions,
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberScrollState()
@@ -166,106 +174,110 @@ private fun CreateIngredientScreenContent(
                 }
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        bottomBar = {
+            Column(
+                Modifier.padding(horizontal = 16.dp)
+            ) {
+                SnackbarHost(snackbarHostState)
+                FCCPrimaryButton(
+                    enabled = isSaveButtonEnabled,
+                    onClick = actions.onSaveIngredient,
+                    text = stringResource(id = R.string.save_ingredient),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp)
+                )
+            }
+        },
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(horizontal = 16.dp)
-                .verticalScroll(scrollState),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            FCCTextField(
+        Box(modifier = Modifier.padding(paddingValues)) {
+            Column(
                 modifier = Modifier
-                    .focusRequester(ingredientNameFocusRequester)
-                    .onGloballyPositioned {
-                        if (!wasInitialFocusRequested.value) {
-                            wasInitialFocusRequested.value = true
-                            ingredientNameFocusRequester.requestFocus()
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .verticalScroll(scrollState),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                FCCTextField(
+                    modifier = Modifier
+                        .focusRequester(ingredientNameFocusRequester)
+                        .onGloballyPositioned {
+                            if (!wasInitialFocusRequested.value) {
+                                wasInitialFocusRequested.value = true
+                                ingredientNameFocusRequester.requestFocus()
+                            }
+                        },
+                    keyboardOptions = KeyboardOptions(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Words,
+                        imeAction = ImeAction.Next
+                    ),
+                    title = stringResource(id = R.string.product_name),
+                    value = uiState.name,
+                    onValueChange = actions.onNameChange
+                )
+
+                PriceModeToggle(
+                    isPackageMode = uiState is PackagePriceState,
+                    onToggle = actions.onTogglePriceMode
+                )
+
+                AnimatedContent(
+                    targetState = uiState,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "FormContent",
+                    contentKey = { state -> state::class }
+                ) { state ->
+                    when (state) {
+                        is PackagePriceState -> {
+                            PackagePriceForm(
+                                state = state,
+                                units = units,
+                                currency = currency,
+                                onPackagePriceChange = actions.onPackagePriceChange,
+                                onPackageQuantityChange = actions.onPackageQuantityChange,
+                                onPackageUnitChange = actions.onPackageUnitChange,
+                            )
+                        }
+
+                        is UnitPriceState -> {
+                            UnitPriceForm(
+                                state = state,
+                                units = units,
+                                onUnitPriceChange = actions.onUnitPriceChange,
+                                onUnitPriceUnitChange = actions.onUnitPriceUnitChange
+                            )
                         }
                     }
-                ,
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Text,
-                    capitalization = KeyboardCapitalization.Words,
-                    imeAction = ImeAction.Next
-                ),
-                title = stringResource(id = R.string.product_name),
-                value = uiState.name,
-                onValueChange = onNameChanged
-            )
+                }
 
-            PriceModeToggle(
-                isPackageMode = uiState is PackagePriceState,
-                onToggle = onTogglePriceMode
-            )
+                WasteField(
+                    waste = uiState.waste,
+                    showTaxField = showTaxField,
+                    onWasteChange = actions.onWasteChange,
+                    onCalculateWaste = actions.onCalculateWaste
+                )
 
-            AnimatedContent(
-                targetState = uiState,
-                transitionSpec = { fadeIn() togetherWith fadeOut() },
-                label = "FormContent",
-                contentKey = { state -> state::class }
-            ) { state ->
-                when (state) {
-                    is PackagePriceState -> {
-                        PackagePriceForm(
-                            state = state,
-                            units = units,
-                            currency = currency,
-                            onPackagePriceChanged = onPackagePriceChanged,
-                            onPackageQuantityChanged = onPackageQuantityChanged,
-                            onPackageUnitChanged = onPackageUnitChanged,
-                        )
-                    }
-
-                    is UnitPriceState -> {
-                        UnitPriceForm(
-                            state = state,
-                            units = units,
-                            onUnitPriceChanged = onUnitPriceChanged,
-                            onUnitPriceUnitChanged = onUnitPriceUnitChanged
-                        )
-                    }
+                if (showTaxField) {
+                    FCCTextField(
+                        title = stringResource(id = R.string.tax_percent),
+                        value = uiState.tax,
+                        keyboardOptions = KeyboardOptions(
+                            keyboardType = KeyboardType.Number,
+                            imeAction = ImeAction.Done
+                        ),
+                        onValueChange = actions.onTaxChange
+                    )
                 }
             }
 
-            WasteField(
-                waste = uiState.waste,
-                showTaxField = showTaxField,
-                onWasteChanged = onWasteChanged,
-                onCalculateWaste = onCalculateWaste
-            )
-
-            if (showTaxField) {
-                FCCTextField(
-                    title = stringResource(id = R.string.tax_percent),
-                    value = uiState.tax,
-                    keyboardOptions = KeyboardOptions(
-                        keyboardType = KeyboardType.Number,
-                        imeAction = ImeAction.Done
-                    ),
-                    onValueChange = onTaxChanged
-                )
-            }
-
-            // Save button
-            FCCPrimaryButton(
-                enabled = isSaveButtonEnabled,
-                onClick = onSaveIngredient,
-                text = stringResource(id = R.string.save_ingredient),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp)
+            ScreenStateHandler(
+                screenState = screenState,
+                onResetScreenState = actions.onResetScreenState,
+                onCalculateWasteResult = actions.onCalculateWasteResult
             )
         }
     }
-
-    ScreenStateHandler(
-        screenState = screenState,
-        onResetScreenState = onResetScreenState,
-        onCalculateWasteResult = onCalculateWasteResult
-    )
 }
 
 private const val SingleChoiceSegmentedButtonRowMaxWidth = 200
@@ -318,9 +330,9 @@ private fun PackagePriceForm(
     state: PackagePriceState,
     currency: Currency?,
     units: Set<MeasurementUnit>,
-    onPackagePriceChanged: (String) -> Unit,
-    onPackageQuantityChanged: (String) -> Unit,
-    onPackageUnitChanged: (MeasurementUnit) -> Unit,
+    onPackagePriceChange: (String) -> Unit,
+    onPackageQuantityChange: (String) -> Unit,
+    onPackageUnitChange: (MeasurementUnit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -334,7 +346,7 @@ private fun PackagePriceForm(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            onValueChange = onPackagePriceChanged
+            onValueChange = onPackagePriceChange
         )
 
         FCCTextField(
@@ -347,13 +359,13 @@ private fun PackagePriceForm(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            onValueChange = onPackageQuantityChanged
+            onValueChange = onPackageQuantityChange
         )
 
         UnitField(
             units = units,
             selectedUnit = state.packageUnit,
-            selectUnit = onPackageUnitChanged,
+            selectUnit = onPackageUnitChange,
             label = stringResource(R.string.package_unit)
         )
 
@@ -377,8 +389,8 @@ private fun PackagePriceForm(
 private fun UnitPriceForm(
     state: UnitPriceState,
     units: Set<MeasurementUnit>,
-    onUnitPriceChanged: (String) -> Unit,
-    onUnitPriceUnitChanged: (MeasurementUnit) -> Unit,
+    onUnitPriceChange: (String) -> Unit,
+    onUnitPriceUnitChange: (MeasurementUnit) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -392,13 +404,13 @@ private fun UnitPriceForm(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            onValueChange = onUnitPriceChanged
+            onValueChange = onUnitPriceChange
         )
 
         UnitField(
             units = units,
             selectedUnit = state.unitPriceUnit,
-            selectUnit = onUnitPriceUnitChanged,
+            selectUnit = onUnitPriceUnitChange,
             label = stringResource(R.string.unit_price_unit)
         )
     }
@@ -408,7 +420,7 @@ private fun UnitPriceForm(
 private fun WasteField(
     waste: String,
     showTaxField: Boolean,
-    onWasteChanged: (String) -> Unit,
+    onWasteChange: (String) -> Unit,
     onCalculateWaste: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -425,7 +437,7 @@ private fun WasteField(
                 keyboardType = KeyboardType.Number,
                 imeAction = if (showTaxField) ImeAction.Next else ImeAction.Done
             ),
-            onValueChange = onWasteChanged
+            onValueChange = onWasteChange
         )
 
         FCCTextButton(
@@ -493,19 +505,7 @@ private fun CreateIngredientScreenPreview() {
             showTaxField = false,
             isSaveButtonEnabled = true,
             snackbarHostState = remember { SnackbarHostState() },
-            onNameChanged = {},
-            onTaxChanged = {},
-            onWasteChanged = {},
-            onPackagePriceChanged = {},
-            onPackageQuantityChanged = {},
-            onPackageUnitChanged = {},
-            onUnitPriceChanged = {},
-            onUnitPriceUnitChanged = {},
-            onTogglePriceMode = {},
-            onSaveIngredient = {},
-            onCalculateWaste = {},
-            onCalculateWasteResult = { _, _ -> },
-            onResetScreenState = {},
+            actions = CreateIngredientScreenActions(),
             currency = Currency.getInstance(Locale.getDefault())
         )
     }
