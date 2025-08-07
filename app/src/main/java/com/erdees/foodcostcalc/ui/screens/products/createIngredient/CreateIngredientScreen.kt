@@ -247,7 +247,6 @@ private fun CreateIngredientScreenContent(
         }
     }
 
-    // Screen state handler for dialogs and overlays
     ScreenStateHandler(
         screenState = screenState,
         onResetScreenState = onResetScreenState,

@@ -30,7 +30,6 @@ import com.erdees.foodcostcalc.ui.screens.onboarding.OnboardingScreen
 import com.erdees.foodcostcalc.ui.screens.onlineBackup.DataBackupScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
 import com.erdees.foodcostcalc.ui.screens.products.createIngredient.CreateIngredientScreen
-import com.erdees.foodcostcalc.ui.screens.products.createProduct.CreateProductScreen
 import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen

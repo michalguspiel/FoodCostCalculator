@@ -98,6 +98,11 @@ class CreateProductUseCase(
                 val packageQuantity = packagePriceState.packageQuantity.toDoubleOrNull()
                     ?: throw InvalidProductPriceException("Product package quantity cannot be empty or invalid.")
 
+                // Prevent division by zero
+                if (packageQuantity <= 0) {
+                    throw InvalidProductPriceException("Package quantity must be greater than zero.")
+                }
+
                 val (canonicalPrice, canonicalUnit) = packageUnit.calculateCanonicalPrice(
                     packagePrice = price,
                     packageQuantity = packageQuantity

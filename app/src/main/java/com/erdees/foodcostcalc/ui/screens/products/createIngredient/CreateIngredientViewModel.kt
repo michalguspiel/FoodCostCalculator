@@ -63,17 +63,16 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
     ) { state, showTax ->
         when (state) {
             is PackagePriceState -> {
+                val packageQuantity = state.packageQuantity.toDoubleOrNull()
                 state.name.isNotBlank() &&
                         state.packagePrice.toDoubleOrNull() != null &&
-                        state.packageQuantity.toDoubleOrNull() != null &&
-                        state.waste.toDoubleOrNull() != null &&
+                        packageQuantity != null && packageQuantity > 0 &&
                         (!showTax || state.tax.toDoubleOrNull() != null)
             }
 
             is UnitPriceState -> {
                 state.name.isNotBlank() &&
                         state.unitPrice.toDoubleOrNull() != null &&
-                        state.waste.toDoubleOrNull() != null &&
                         (!showTax || state.tax.toDoubleOrNull() != null)
             }
         }
@@ -276,7 +275,12 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
     }
 
     private fun resetFormFields() {
-        _uiState.value = PackagePriceState()
+        val current = _uiState.value
+
+        _uiState.value = when(current){
+            is PackagePriceState -> PackagePriceState()
+            is UnitPriceState -> UnitPriceState()
+        }
     }
 
     private fun updateStateWithPackageData(
@@ -288,7 +292,7 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
         val packageQuantity = quantity.toDoubleOrNull()
         val packagePrice = price.toDoubleOrNull()
         val (canonicalPrice, canonicalUnit) =
-            if (packagePrice != null && packageQuantity != null) {
+            if (packagePrice != null && packageQuantity != null && packageQuantity > 0) {
                 unit.calculateCanonicalPrice(
                     packagePrice, packageQuantity
                 )

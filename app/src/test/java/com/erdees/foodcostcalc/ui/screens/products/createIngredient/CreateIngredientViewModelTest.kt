@@ -78,7 +78,7 @@ class CreateIngredientViewModelTest {
         val initialState = viewModel.uiState.value
         initialState.shouldBeInstanceOf<PackagePriceState>()
 
-        with(initialState as PackagePriceState) {
+        with(initialState) {
             id shouldBe 0L
             name shouldBe ""
             tax shouldBe ""
@@ -220,6 +220,7 @@ class CreateIngredientViewModelTest {
 
     @Test
     fun `isSaveButtonEnabled should be false when required fields are missing in PackagePriceState`() = runTest(testDispatcher) {
+        every { preferences.showProductTax } returns MutableStateFlow(false)
         initializeViewModel()
         advanceUntilIdle()
 
@@ -231,10 +232,20 @@ class CreateIngredientViewModelTest {
         advanceUntilIdle()
         viewModel.isSaveButtonEnabled.first() shouldBe false
 
-        // Add price but still missing quantity and waste
+        // Add price but still missing quantity
         viewModel.onPackagePriceChanged("10.0")
         advanceUntilIdle()
         viewModel.isSaveButtonEnabled.first() shouldBe false
+
+        // Add quantity as 0 so still disabled
+        viewModel.onPackageQuantityChanged("0")
+        advanceUntilIdle()
+        viewModel.isSaveButtonEnabled.first() shouldBe false
+
+        // Set proper quantity and enable save button
+        viewModel.onPackageQuantityChanged("2.0")
+        advanceUntilIdle()
+        viewModel.isSaveButtonEnabled.first() shouldBe true
     }
 
     @Test
