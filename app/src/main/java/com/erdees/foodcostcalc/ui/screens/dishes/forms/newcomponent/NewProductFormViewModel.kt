@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
@@ -26,21 +25,18 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
 
     private val preferences: Preferences by inject()
 
-    // Core state
     private val _currentStep = MutableStateFlow(NewProductWizardStep.DEFINE_PURCHASE)
     val currentStep: StateFlow<NewProductWizardStep> = _currentStep
 
     private val _formData = MutableStateFlow(NewProductFormData())
     val formData: StateFlow<NewProductFormData> = _formData
 
-    // Dropdown states
     private val _productCreationDropdownExpanded = MutableStateFlow(false)
     val productCreationDropdownExpanded: StateFlow<Boolean> = _productCreationDropdownExpanded
 
     private val _productAdditionDropdownExpanded = MutableStateFlow(false)
     val productAdditionDropdownExpanded: StateFlow<Boolean> = _productAdditionDropdownExpanded
 
-    // Units
     private val _productCreationUnits = MutableStateFlow<Set<MeasurementUnit>>(setOf())
     val productCreationUnits: StateFlow<Set<MeasurementUnit>> = _productCreationUnits
 
@@ -99,18 +95,6 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
             }
         }
     }.stateIn(viewModelScope, SharingStarted.Lazily, false)
-
-    init {
-        viewModelScope.launch {
-            productAdditionUnits
-                .filter { it.isNotEmpty() }
-                .collect { availableUnits ->
-                    if (formData.value.quantityAddedToDishUnit == null) {
-                        _formData.update { it.copy(quantityAddedToDishUnit = availableUnits.first()) }
-                    }
-                }
-        }
-    }
 
     fun goToNextStep() {
         when (_currentStep.value) {
@@ -171,12 +155,11 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
         _productAdditionDropdownExpanded.value = expanded
     }
 
-    // Existing functions
     fun getProductCreationUnits() {
         viewModelScope.launch {
             val metricUsed = preferences.metricUsed.first()
             val imperialUsed = preferences.imperialUsed.first()
-            _productCreationUnits.update { Utils.getUnitsSet(metricUsed, imperialUsed) }
+            _productCreationUnits.update { Utils.getCompleteUnitsSet(metricUsed, imperialUsed) }
         }
     }
 
