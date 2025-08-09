@@ -112,11 +112,29 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    // Navigation functions
     fun goToNextStep() {
         when (_currentStep.value) {
             NewProductWizardStep.DEFINE_PURCHASE -> {
                 _currentStep.value = NewProductWizardStep.DEFINE_USAGE
+
+                viewModelScope.launch {
+                    val currentFormData = formData.value
+                    val purchaseUnit = currentFormData.purchaseUnit
+                    val currentDishUnit = currentFormData.quantityAddedToDishUnit
+
+                    if (purchaseUnit != null &&
+                        (currentDishUnit == null || currentDishUnit.category != purchaseUnit.category)) {
+
+                        val availableUnits = getUnitList(purchaseUnit.category)
+                        val newDishUnit = availableUnits.firstOrNull()
+
+                        if (newDishUnit != null) {
+                            _formData.update {
+                                it.copy(quantityAddedToDishUnit = newDishUnit)
+                            }
+                        }
+                    }
+                }
             }
 
             NewProductWizardStep.DEFINE_USAGE -> {
@@ -141,7 +159,6 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
         _currentStep.value = NewProductWizardStep.DEFINE_PURCHASE
     }
 
-    // Form data updates
     fun updateFormData(newValue: NewProductFormData) {
         _formData.update { newValue }
     }
