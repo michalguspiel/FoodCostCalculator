@@ -9,7 +9,6 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -157,14 +156,19 @@ private fun DefinePurchaseStep(
             }
         }
 
-        // Waste field with calculate button
-        WasteField(
-            waste = state.formData.wastePercent,
-            onWasteChange = { newWaste ->
-                actions.onFormDataUpdate(state.formData.copy(wastePercent = newWaste))
-            },
-            onCalculateWaste = { /* TODO: Implement waste calculation */ },
-            modifier = Modifier.focusRequester(wasteFocusRequester)
+        // Waste field
+        FCCTextField(
+            modifier = Modifier.focusRequester(wasteFocusRequester),
+            title = "Waste % (Optional)",
+            value = state.formData.wastePercent,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number,
+                imeAction = ImeAction.Done
+            ),
+            onValueChange = { newWaste ->
+                val sanitizedValue = onNumericValueChange(state.formData.wastePercent, newWaste)
+                actions.onFormDataUpdate(state.formData.copy(wastePercent = sanitizedValue))
+            }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -374,38 +378,6 @@ private fun UnitPricingForm(
     }
 }
 
-@Composable
-private fun WasteField(
-    waste: String,
-    onWasteChange: (String) -> Unit,
-    onCalculateWaste: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.Bottom
-    ) {
-        FCCTextField(
-            modifier = Modifier.weight(1f),
-            title = "Waste % (Optional)",
-            value = waste,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
-            ),
-            onValueChange = { newWaste ->
-                val sanitizedValue = onNumericValueChange(waste, newWaste)
-                onWasteChange(sanitizedValue)
-            }
-        )
-
-        FCCTextButton(
-            text = "Calculate",
-            onClick = onCalculateWaste
-        )
-    }
-}
 
 @Preview(showBackground = true, name = "Define Purchase Step")
 @PreviewLightDark
