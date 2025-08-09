@@ -5,4 +5,9 @@ data class NewProductFormActions(
     val onProductCreationDropdownExpandedChange: (Boolean) -> Unit = {},
     val onProductAdditionDropdownExpandedChange: (Boolean) -> Unit = {},
     val onSaveProduct: (NewProductFormData) -> Unit = {},
+
+    // Wizard navigation actions
+    val onNextStep: () -> Unit = {},
+    val onPreviousStep: () -> Unit = {},
+    val onCancel: () -> Unit = {},
 )

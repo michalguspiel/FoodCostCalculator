@@ -3,6 +3,7 @@ package com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.domain.model.units.UnitCategory
 import com.erdees.foodcostcalc.utils.UnitsUtils
@@ -10,6 +11,7 @@ import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
@@ -24,24 +26,23 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
 
     private val preferences: Preferences by inject()
 
-    val productCreationUnitDropdownExpanded: MutableStateFlow<Boolean> = MutableStateFlow(false)
-    val productAdditionUnitDropdownExpanded: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    // Core state
+    private val _currentStep = MutableStateFlow(NewProductWizardStep.DEFINE_PURCHASE)
+    val currentStep: StateFlow<NewProductWizardStep> = _currentStep
 
     private val _formData = MutableStateFlow(NewProductFormData())
     val formData: StateFlow<NewProductFormData> = _formData
 
-    val isAddButtonEnabled = formData.map {
-        it.purchasePrice.toDoubleOrNull() != null &&
-                it.quantityAddedToDishUnit != null &&
-                it.purchaseUnit != null &&
-                it.quantityAddedToDish.toDoubleOrNull() != null
-    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+    // Dropdown states
+    private val _productCreationDropdownExpanded = MutableStateFlow(false)
+    val productCreationDropdownExpanded: StateFlow<Boolean> = _productCreationDropdownExpanded
 
-    fun updateFormData(newValue: NewProductFormData) {
-        _formData.update { newValue }
-    }
+    private val _productAdditionDropdownExpanded = MutableStateFlow(false)
+    val productAdditionDropdownExpanded: StateFlow<Boolean> = _productAdditionDropdownExpanded
 
-    val productCreationUnits = MutableStateFlow<Set<MeasurementUnit>>(setOf())
+    // Units
+    private val _productCreationUnits = MutableStateFlow<Set<MeasurementUnit>>(setOf())
+    val productCreationUnits: StateFlow<Set<MeasurementUnit>> = _productCreationUnits
 
     val productAdditionUnits = formData
         .distinctUntilChanged { old, new ->
@@ -51,10 +52,58 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
             unitType?.let { getUnitList(it) } ?: emptySet()
         }.stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
 
+    private fun isPackagePriceValid(data: NewProductFormData): Boolean {
+        return data.packagePrice.toDoubleOrNull() != null &&
+                data.packageQuantity.toDoubleOrNull() != null &&
+                data.packageQuantity.toDouble() > 0 &&
+                data.packageUnit != null
+    }
+
+    private fun isUnitPriceValid(data: NewProductFormData): Boolean {
+        return data.unitPrice.toDoubleOrNull() != null &&
+                data.unitPriceUnit != null
+    }
+
+    // Button states
+    val isNextButtonEnabled = combine(
+        formData,
+        _currentStep
+    ) { data, step ->
+        when (step) {
+            NewProductWizardStep.DEFINE_PURCHASE -> {
+                val hasValidPrice = when (data.inputMethod) {
+                    InputMethod.PACKAGE -> isPackagePriceValid(data)
+                    InputMethod.UNIT -> isUnitPriceValid(data)
+                }
+                hasValidPrice
+            }
+
+            NewProductWizardStep.DEFINE_USAGE -> false
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
+    val isCreateButtonEnabled = combine(
+        formData,
+        _currentStep
+    ) { data, step ->
+        when (step) {
+            NewProductWizardStep.DEFINE_PURCHASE -> false // Not applicable for step 1
+            NewProductWizardStep.DEFINE_USAGE -> {
+                val hasValidStep1 = when (data.inputMethod) {
+                    InputMethod.PACKAGE -> isPackagePriceValid(data)
+                    InputMethod.UNIT -> isUnitPriceValid(data)
+                }
+                val hasValidStep2 = data.quantityAddedToDish.toDoubleOrNull() != null &&
+                        data.quantityAddedToDishUnit != null
+
+                hasValidStep1 && hasValidStep2
+            }
+        }
+    }.stateIn(viewModelScope, SharingStarted.Lazily, false)
+
     init {
         viewModelScope.launch {
             productAdditionUnits
-                .distinctUntilChanged(areEquivalent = { old, new -> old == new })
                 .filter { it.isNotEmpty() }
                 .collect { availableUnits ->
                     if (formData.value.quantityAddedToDishUnit == null) {
@@ -64,20 +113,57 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    /**
-     * Function used to prepare selection of units for the product creation.
-     * */
+    // Navigation functions
+    fun goToNextStep() {
+        when (_currentStep.value) {
+            NewProductWizardStep.DEFINE_PURCHASE -> {
+                _currentStep.value = NewProductWizardStep.DEFINE_USAGE
+            }
+
+            NewProductWizardStep.DEFINE_USAGE -> {
+                // Already at last step
+            }
+        }
+    }
+
+    fun goToPreviousStep() {
+        when (_currentStep.value) {
+            NewProductWizardStep.DEFINE_PURCHASE -> {
+                // Already at first step
+            }
+
+            NewProductWizardStep.DEFINE_USAGE -> {
+                _currentStep.value = NewProductWizardStep.DEFINE_PURCHASE
+            }
+        }
+    }
+
+    fun resetToFirstStep() {
+        _currentStep.value = NewProductWizardStep.DEFINE_PURCHASE
+    }
+
+    // Form data updates
+    fun updateFormData(newValue: NewProductFormData) {
+        _formData.update { newValue }
+    }
+
+    fun setProductCreationDropdownExpanded(expanded: Boolean) {
+        _productCreationDropdownExpanded.value = expanded
+    }
+
+    fun setProductAdditionDropdownExpanded(expanded: Boolean) {
+        _productAdditionDropdownExpanded.value = expanded
+    }
+
+    // Existing functions
     fun getProductCreationUnits() {
         viewModelScope.launch {
             val metricUsed = preferences.metricUsed.first()
             val imperialUsed = preferences.imperialUsed.first()
-            productCreationUnits.update { Utils.getUnitsSet(metricUsed, imperialUsed) }
+            _productCreationUnits.update { Utils.getUnitsSet(metricUsed, imperialUsed) }
         }
     }
 
-    /** Function used to prepare selection of units for the product addition,
-     *  This is called every time product creation unit changes to provide relevant units in other dropdown.
-     * */
     private suspend fun getUnitList(unitType: UnitCategory): Set<MeasurementUnit> {
         val metricUnits = preferences.metricUsed.first()
         val imperialUnits = preferences.imperialUsed.first()
@@ -88,7 +174,8 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
         )
     }
 
-    fun onAddIngredientClick(){
+    fun onAddIngredientClick() {
         _formData.value = NewProductFormData()
+        _currentStep.value = NewProductWizardStep.DEFINE_PURCHASE
     }
 }
