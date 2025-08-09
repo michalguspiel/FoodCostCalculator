@@ -217,8 +217,9 @@ private fun CreateIngredientScreenContent(
                     option2Text = stringResource(id = R.string.by_unit),
                     selectedIndex = if (uiState is PackagePriceState) 0 else 1,
                     onSelectionChange = { index ->
-                        if ((index == 0 && uiState !is PackagePriceState) ||
-                            (index == 1 && uiState is PackagePriceState)) {
+                        val shouldToggle = (index == 0 && uiState !is PackagePriceState) ||
+                                         (index == 1 && uiState is PackagePriceState)
+                        if (shouldToggle) {
                             actions.onTogglePriceMode()
                         }
                     }

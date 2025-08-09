@@ -107,26 +107,40 @@ class CreateProductUseCase(
     private fun calculateCanonicalPriceAndUnit(formData: NewProductFormData): Pair<Double, MeasurementUnit> {
         return when (formData.inputMethod) {
             InputMethod.PACKAGE -> {
-                val packageUnit = formData.packageUnit
-                    ?: throw InvalidProductPriceException("Product package unit cannot be empty.")
-                val packagePrice = formData.packagePrice.toDoubleOrNull()
-                    ?: throw InvalidProductPriceException("Product package price cannot be empty or invalid.")
-                val packageQuantity = formData.packageQuantity.toDoubleOrNull()
-                    ?: throw InvalidProductPriceException("Product package quantity cannot be empty or invalid.")
-
+                val (packageUnit, packagePrice, packageQuantity) = safeUnwrapPackageData(formData)
                 packageUnit.calculateCanonicalPrice(
                     packagePrice = packagePrice,
                     packageQuantity = packageQuantity
                 )
             }
             InputMethod.UNIT -> {
-                val price = formData.unitPrice.toDoubleOrNull()
-                    ?: throw InvalidProductPriceException("Product purchase price cannot be empty or invalid.")
-                val unit = formData.unitPriceUnit
-                    ?: throw InvalidProductPriceException("Product unit price unit cannot be empty.")
-                price to unit
+                val (unitPriceUnit, price) = safeUnwrapUnitData(formData)
+                price to unitPriceUnit
             }
         }
+    }
+
+    private fun safeUnwrapPackageData(formData: NewProductFormData): Triple<MeasurementUnit, Double, Double> {
+        val packageUnit = formData.packageUnit
+        val packagePrice = formData.packagePrice.toDoubleOrNull()
+        val packageQuantity = formData.packageQuantity.toDoubleOrNull()
+
+        if (packageUnit == null || packagePrice == null || packageQuantity == null) {
+            throw InvalidProductPriceException("Product package unit, price, and quantity must all be valid.")
+        }
+
+        return Triple(packageUnit, packagePrice, packageQuantity)
+    }
+
+    private fun safeUnwrapUnitData(formData: NewProductFormData): Pair<MeasurementUnit, Double> {
+        val unitPriceUnit = formData.unitPriceUnit
+        val price = formData.unitPrice.toDoubleOrNull()
+
+        if (unitPriceUnit == null || price == null) {
+            throw InvalidProductPriceException("Product unit price unit and price must both be valid.")
+        }
+
+        return unitPriceUnit to price
     }
 
     /**
