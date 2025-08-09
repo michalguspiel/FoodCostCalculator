@@ -64,7 +64,6 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
                 data.unitPriceUnit != null
     }
 
-    // Button states
     val isNextButtonEnabled = combine(
         formData,
         _currentStep

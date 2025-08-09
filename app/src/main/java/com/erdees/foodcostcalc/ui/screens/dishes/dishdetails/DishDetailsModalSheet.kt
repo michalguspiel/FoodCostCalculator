@@ -20,7 +20,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.Existin
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormUiState
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductWizard
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductForm
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +76,7 @@ fun DishDetailsModalSheet(
                 }
 
                 is ComponentSelection.NewComponent -> {
-                    NewProductWizard(
+                    NewProductForm(
                         state = newProductFormUiState.copy(
                             productName = safeSelection.name,
                             dishName = dishName

@@ -217,7 +217,10 @@ fun CreateDishStartScreen(
                                     viewModel.onAddNewProduct(data)
                                     newProductFormViewModel.onAddIngredientClick()
                                 }
-                            }
+                            },
+                            onCancel = viewModel::resetScreenState,
+                            onNextStep = newProductFormViewModel::goToNextStep,
+                            onPreviousStep = newProductFormViewModel::goToPreviousStep,
                         ),
                         componentLookupFormUiState = componentLookupFormUiState,
                         componentLookupFormActions = componentLookupFormActions

@@ -89,15 +89,14 @@ fun DishDetailsScreen(
     )
 
     val newProductFormUiState = NewProductFormUiState(
-        productName = (uiState.componentSelection as? ComponentSelection.NewComponent)?.name
-            ?: "", // This will be set in the modal sheet based on componentSelection
+        productName = (uiState.componentSelection as? ComponentSelection.NewComponent)?.name ?: "",
         dishName = uiState.dish?.name ?: "",
         productCreationUnits = newProductFormViewModel.productCreationUnits.collectAsState().value,
         productAdditionUnits = newProductFormViewModel.productAdditionUnits.collectAsState().value,
         formData = newProductFormViewModel.formData.collectAsState().value,
         productCreationDropdownExpanded = newProductFormViewModel.productCreationDropdownExpanded.collectAsState().value,
         productAdditionDropdownExpanded = newProductFormViewModel.productAdditionDropdownExpanded.collectAsState().value,
-        isNextButtonEnabled = newProductFormViewModel.productCreationDropdownExpanded.collectAsState().value,
+        isNextButtonEnabled = newProductFormViewModel.isNextButtonEnabled.collectAsState().value,
         isCreateButtonEnabled = newProductFormViewModel.isCreateButtonEnabled.collectAsState().value,
         currentStep = newProductFormViewModel.currentStep.collectAsState().value
     )
@@ -520,7 +519,7 @@ private fun EditDishScreenContentPreview(
             existingComponentFormUiState = ExistingComponentFormUiState(),
             existingComponentFormActions = ExistingComponentFormActions(),
             newProductFormUiState = NewProductFormUiState(currentStep = NewProductWizardStep.DEFINE_PURCHASE),
-            newProductFormActions = NewProductFormActions(),
+            newProductFormActions = NewProductFormActions.Empty,
             componentLookupFormUiState = ComponentLookupFormUiState(),
             componentLookupFormActions = ComponentLookupFormActions(),
             addComponentSheetState = rememberModalBottomSheetState()

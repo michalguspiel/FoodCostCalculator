@@ -153,6 +153,7 @@
     <string name="package_values">Package values per %1$s</string>
     <string name="package_price">Package price</string>
     <string name="package_quantity">Package quantity %1$s</string>
+    <string name="package_quantity_empty">Package quantity</string>
 
     <!-- HALF PRODUCTS FEATURE -->
 
@@ -410,4 +411,12 @@
     <string name="onboarding_ingredient_cheese_slice">Cheese Slice</string>
     <string name="onboarding_ingredient_lettuce">Lettuce</string>
     <string name="onboarding_dish_classic_cheeseburger">Classic Cheeseburger</string>
+
+    <!-- NEW PRODUCT FORM -->
+    <string name="next_add_to_dish">Next</string>
+    <string name="create_and_add_ingredient">Add Ingredient</string>
+    <string name="how_much_using_in_dish">How much are you using in this dish?</string>
+    <string name="create_add_product_title">Create &amp; Add: %1$s</string>
+    <string name="add_product_to_dish_title">Add %1$s to %2$s"</string>
+
 </resources>

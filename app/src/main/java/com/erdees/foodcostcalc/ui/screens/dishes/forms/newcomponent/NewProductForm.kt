@@ -45,7 +45,7 @@ import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.onNumericValueChange
 
 @Composable
-fun NewProductWizard(
+fun NewProductForm(
     state: NewProductFormUiState,
     actions: NewProductFormActions,
     modifier: Modifier = Modifier,
@@ -54,10 +54,16 @@ fun NewProductWizard(
         modifier = modifier.padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Dynamic title based on current step
         val title = when (state.currentStep) {
-            NewProductWizardStep.DEFINE_PURCHASE -> "Create & Add: ${state.productName}"
-            NewProductWizardStep.DEFINE_USAGE -> "Add \"${state.productName}\" to \"${state.dishName}\""
+            NewProductWizardStep.DEFINE_PURCHASE -> stringResource(
+                id = R.string.create_add_product_title,
+                state.productName
+            )
+            NewProductWizardStep.DEFINE_USAGE -> stringResource(
+                id = R.string.add_product_to_dish_title,
+                state.productName,
+                state.dishName
+            )
         }
 
         Text(
@@ -159,7 +165,7 @@ private fun DefinePurchaseStep(
         // Waste field
         FCCTextField(
             modifier = Modifier.focusRequester(wasteFocusRequester),
-            title = "Waste % (Optional)",
+            title = stringResource(id = R.string.percent_of_waste),
             value = state.formData.wastePercent,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
@@ -179,7 +185,7 @@ private fun DefinePurchaseStep(
             applyDefaultPadding = false,
             primaryButton = {
                 FCCPrimaryButton(
-                    text = "Next: Add to Dish",
+                    text = stringResource(id = R.string.next_add_to_dish),
                     enabled = state.isNextButtonEnabled,
                     onClick = actions.onNextStep,
                     modifier = Modifier.weight(1f)
@@ -187,7 +193,7 @@ private fun DefinePurchaseStep(
             },
             secondaryButton = {
                 FCCTextButton(
-                    text = "Cancel",
+                    text = stringResource(id = R.string.cancel),
                     onClick = actions.onCancel,
                     modifier = Modifier.weight(1f)
                 )
@@ -209,8 +215,8 @@ private fun DefineUsageStep(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "How much are you using in this dish?",
-            style = MaterialTheme.typography.bodyLarge,
+            text = stringResource(id = R.string.how_much_using_in_dish),
+            style = MaterialTheme.typography.bodySmall,
             fontStyle = FontStyle.Italic,
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -218,7 +224,7 @@ private fun DefineUsageStep(
 
         FCCTextField(
             value = state.formData.quantityAddedToDish,
-            title = "Quantity for '${state.dishName}'",
+            title = stringResource(id = R.string.quantity),
             onValueChange = { newQuantity ->
                 val sanitizedValue = onNumericValueChange(state.formData.quantityAddedToDish, newQuantity)
                 actions.onFormDataUpdate(state.formData.copy(quantityAddedToDish = sanitizedValue))
@@ -236,7 +242,7 @@ private fun DefineUsageStep(
 
         UnitField(
             modifier = Modifier.focusRequester(unitFocusRequester),
-            label = "Unit for dish",
+            label = stringResource(id = R.string.unit_for_dish),
             units = state.productAdditionUnits,
             expanded = state.productAdditionDropdownExpanded,
             onExpandChange = actions.onProductAdditionDropdownExpandedChange,
@@ -254,7 +260,7 @@ private fun DefineUsageStep(
             applyDefaultPadding = false,
             primaryButton = {
                 FCCPrimaryButton(
-                    text = "Create & Add Ingredient",
+                    text = stringResource(id = R.string.create_and_add_ingredient),
                     enabled = state.isCreateButtonEnabled,
                     onClick = { actions.onSaveProduct(state.formData) },
                     modifier = Modifier.weight(1f)
@@ -262,7 +268,7 @@ private fun DefineUsageStep(
             },
             secondaryButton = {
                 FCCTextButton(
-                    text = "Back",
+                    text = stringResource(id = R.string.back),
                     onClick = actions.onPreviousStep,
                     modifier = Modifier.weight(1f)
                 )
@@ -285,7 +291,7 @@ private fun PackagePricingForm(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         FCCTextField(
-            title = "Package Price",
+            title = stringResource(id = R.string.package_price),
             value = state.formData.packagePrice,
             onValueChange = { newPrice ->
                 val sanitizedValue = onNumericValueChange(state.formData.packagePrice, newPrice)
@@ -301,8 +307,11 @@ private fun PackagePricingForm(
             modifier = Modifier.focusRequester(priceFocusRequester)
         )
 
+        val packageQuantityText = state.formData.packageUnit?.symbolRes?.let {
+            stringResource(R.string.package_quantity, stringResource(it))
+        } ?: stringResource(R.string.package_quantity_empty)
         FCCTextField(
-            title = "Package Quantity",
+            title = packageQuantityText,
             value = state.formData.packageQuantity,
             onValueChange = { newQuantity ->
                 val sanitizedValue = onNumericValueChange(state.formData.packageQuantity, newQuantity)
@@ -321,7 +330,7 @@ private fun PackagePricingForm(
 
         UnitField(
             modifier = Modifier.focusRequester(unitFocusRequester),
-            label = "Package Unit",
+            label = stringResource(id = R.string.package_unit),
             expanded = state.productCreationDropdownExpanded,
             onExpandChange = actions.onProductCreationDropdownExpandedChange,
             units = state.productCreationUnits,
@@ -346,7 +355,7 @@ private fun UnitPricingForm(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         FCCTextField(
-            title = "Unit Price",
+            title = stringResource(id = R.string.unit_price),
             value = state.formData.unitPrice,
             onValueChange = { newPrice ->
                 val sanitizedValue = onNumericValueChange(state.formData.unitPrice, newPrice)
@@ -365,7 +374,7 @@ private fun UnitPricingForm(
 
         UnitField(
             modifier = Modifier.focusRequester(unitFocusRequester),
-            label = "Unit Price Unit",
+            label = stringResource(id = R.string.unit_price_unit),
             expanded = state.productCreationDropdownExpanded,
             onExpandChange = actions.onProductCreationDropdownExpandedChange,
             units = state.productCreationUnits,
@@ -384,7 +393,7 @@ private fun UnitPricingForm(
 @Composable
 private fun DefinePurchaseStepPreview() {
     FCCTheme {
-        NewProductWizard(
+        NewProductForm(
             state = NewProductFormUiState(
                 productName = "Sugar",
                 dishName = "Chocolate Cake",
@@ -402,7 +411,7 @@ private fun DefinePurchaseStepPreview() {
                 ),
                 isNextButtonEnabled = true
             ),
-            actions = NewProductFormActions()
+            actions = NewProductFormActions.Empty
         )
     }
 }
@@ -412,7 +421,7 @@ private fun DefinePurchaseStepPreview() {
 @Composable
 private fun DefineUsageStepPreview() {
     FCCTheme {
-        NewProductWizard(
+        NewProductForm(
             state = NewProductFormUiState(
                 productName = "Sugar",
                 dishName = "Chocolate Cake",
@@ -427,7 +436,7 @@ private fun DefineUsageStepPreview() {
                 ),
                 isCreateButtonEnabled = true
             ),
-            actions = NewProductFormActions()
+            actions = NewProductFormActions.Empty
         )
     }
 }
