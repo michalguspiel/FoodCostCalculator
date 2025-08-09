@@ -17,7 +17,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -108,13 +107,6 @@ fun DishDetailsScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val addComponentSheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val scope = rememberCoroutineScope()
-
-    // Initialize product creation units when the component sheet is opened
-    LaunchedEffect(uiState.componentSelection) {
-        if (uiState.componentSelection is ComponentSelection.NewComponent) {
-            newProductFormViewModel.getProductCreationUnits()
-        }
-    }
 
     BackHandler {
         viewModel.handleBackNavigation { navController.popBackStack() }

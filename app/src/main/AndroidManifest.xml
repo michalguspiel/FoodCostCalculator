@@ -25,7 +25,7 @@
     <activity
       android:name="com.erdees.foodcostcalc.ui.FCCActivity"
       android:exported="true"
-      android:windowSoftInputMode="adjustPan">
+      android:windowSoftInputMode="adjustResize">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />

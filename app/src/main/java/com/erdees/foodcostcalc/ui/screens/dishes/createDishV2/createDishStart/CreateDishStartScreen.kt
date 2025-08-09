@@ -124,12 +124,6 @@ fun CreateDishStartScreen(
     val scope = rememberCoroutineScope()
     val snackbarMessage = stringResource(id = R.string.onboarding_complete_snackbar_text)
 
-    LaunchedEffect(componentSelection) {
-        if (componentSelection is ComponentSelection.NewComponent) {
-            newProductFormViewModel.getProductCreationUnits()
-        }
-    }
-
     LaunchedEffect(onboardingState) {
         Timber.i("CreateDishStartScreen LaunchedEffect: onboardingState = $onboardingState")
         // If we are in this screen with OnboardingState.STARTED it means user has just completed it.
@@ -139,10 +133,6 @@ fun CreateDishStartScreen(
                 snackbarHostState.showSnackbar(snackbarMessage)
             }
         }
-    }
-
-    LaunchedEffect(Unit) {
-        newProductFormViewModel.getProductCreationUnits()
     }
 
     LaunchedEffect(componentSelection) {

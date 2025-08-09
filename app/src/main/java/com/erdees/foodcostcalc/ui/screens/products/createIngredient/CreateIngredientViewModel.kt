@@ -5,22 +5,21 @@ import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.domain.usecase.CreateProductUseCase
 import com.erdees.foodcostcalc.ui.screens.products.EditableProductUiState
 import com.erdees.foodcostcalc.ui.screens.products.PackagePriceState
 import com.erdees.foodcostcalc.ui.screens.products.UnitPriceState
-import com.erdees.foodcostcalc.utils.Utils
+import com.erdees.foodcostcalc.ui.screens.products.delegates.NewProductFormBridgeDelegate
+import com.erdees.foodcostcalc.ui.screens.products.delegates.PackagePricingDelegate
+import com.erdees.foodcostcalc.ui.screens.products.delegates.ProductFormDelegate
+import com.erdees.foodcostcalc.ui.screens.products.delegates.UnitPricingDelegate
 import com.erdees.foodcostcalc.utils.Utils.formatResultAndCheckCommas
-import com.erdees.foodcostcalc.utils.onNumericValueChange
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.SharingStarted.Companion.Lazily
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -32,211 +31,64 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
     private val preferences: Preferences by inject()
     private val createProductUseCase: CreateProductUseCase by inject()
 
-    private val _uiState = MutableStateFlow<EditableProductUiState>(PackagePriceState())
-    val uiState: StateFlow<EditableProductUiState> = _uiState
+    private val productFormDelegate = ProductFormDelegate(preferences, viewModelScope)
+    private val packagePricingDelegate = PackagePricingDelegate(viewModelScope)
+    private val unitPricingDelegate = UnitPricingDelegate(viewModelScope)
+
+    private val bridgeDelegate = NewProductFormBridgeDelegate(
+        productFormDelegate,
+        packagePricingDelegate,
+        unitPricingDelegate,
+        viewModelScope
+    )
 
     private val _screenState = MutableStateFlow<ScreenState>(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
 
-    val currency = preferences.currency.stateIn(viewModelScope, Lazily, null)
+    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    private val _units = MutableStateFlow<Set<MeasurementUnit>>(setOf())
-    val units: StateFlow<Set<MeasurementUnit>> = _units.onStart {
-        loadUnits()
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        setOf()
-    )
+    val units: StateFlow<Set<MeasurementUnit>> = productFormDelegate.units
+    val showTaxField: StateFlow<Boolean> = productFormDelegate.showTaxField
 
-    val showTaxField: StateFlow<Boolean> = preferences.showProductTax
-        .onEach { initializeTaxField(it) }
-        .stateIn(
-            viewModelScope,
-            SharingStarted.Eagerly,
-            true
-        )
+    val uiState: StateFlow<EditableProductUiState> = bridgeDelegate.toEditableProductUiState()
 
     val isSaveButtonEnabled: StateFlow<Boolean> = combine(
-        uiState,
-        showTaxField
-    ) { state, showTax ->
-        when (state) {
-            is PackagePriceState -> {
-                val packageQuantity = state.packageQuantity.toDoubleOrNull()
-                state.name.isNotBlank() &&
-                        state.packagePrice.toDoubleOrNull() != null &&
-                        packageQuantity != null && packageQuantity > 0 &&
-                        (!showTax || state.tax.toDoubleOrNull() != null)
-            }
+        productFormDelegate.createBaseValidation(),
+        bridgeDelegate.createValidation()
+    ) { baseValid, formValid ->
+        baseValid && formValid
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
-            is UnitPriceState -> {
-                state.name.isNotBlank() &&
-                        state.unitPrice.toDoubleOrNull() != null &&
-                        (!showTax || state.tax.toDoubleOrNull() != null)
+    fun onNameChanged(newName: String) = productFormDelegate.updateName(newName)
+    fun onTaxChanged(newTax: String) = productFormDelegate.updateTax(newTax)
+    fun onWasteChanged(newWaste: String) = productFormDelegate.updateWaste(newWaste)
+    fun togglePriceMode() {
+        val currentMethod = uiState.value.let { state ->
+            when (state) {
+                is PackagePriceState -> InputMethod.PACKAGE
+                is UnitPriceState -> InputMethod.UNIT
             }
         }
-    }.stateIn(
-        viewModelScope,
-        SharingStarted.Eagerly,
-        false
-    )
-
-    private fun loadUnits() {
-        viewModelScope.launch {
-            val metricUsed = preferences.metricUsed.first()
-            val imperialUsed = preferences.imperialUsed.first()
-            _units.value = Utils.getCompleteUnitsSet(metricUsed, imperialUsed)
+        val newMethod = when (currentMethod) {
+            InputMethod.PACKAGE -> InputMethod.UNIT
+            InputMethod.UNIT -> InputMethod.PACKAGE
         }
+        productFormDelegate.setInputMethod(newMethod)
     }
+
+    fun onPackagePriceChanged(newPrice: String) = packagePricingDelegate.updatePackagePrice(newPrice)
+    fun onPackageQuantityChanged(newQuantity: String) = packagePricingDelegate.updatePackageQuantity(newQuantity)
+    fun onPackageUnitChanged(newUnit: MeasurementUnit) = packagePricingDelegate.updatePackageUnit(newUnit)
+
+    fun onUnitPriceChanged(newPrice: String) = unitPricingDelegate.updateUnitPrice(newPrice)
+    fun onUnitPriceUnitChanged(newUnit: MeasurementUnit) = unitPricingDelegate.updateUnitPriceUnit(newUnit)
 
     fun resetScreenState() {
         _screenState.value = ScreenState.Idle
     }
 
-    fun onNameChanged(newName: String) {
-        _uiState.value = when (val current = _uiState.value) {
-            is PackagePriceState -> current.copy(name = newName)
-            is UnitPriceState -> current.copy(name = newName)
-        }
-    }
-
-    fun onTaxChanged(newTax: String) {
-        if (showTaxField.value) {
-            _uiState.value = when (val current = _uiState.value) {
-                is PackagePriceState -> current.copy(
-                    tax = onNumericValueChange(
-                        current.tax,
-                        newTax
-                    )
-                )
-
-                is UnitPriceState -> current.copy(tax = onNumericValueChange(current.tax, newTax))
-            }
-        }
-    }
-
-    fun onWasteChanged(newWaste: String) {
-        _uiState.value = when (val current = _uiState.value) {
-            is PackagePriceState -> current.copy(
-                waste = onNumericValueChange(
-                    current.waste,
-                    newWaste
-                )
-            )
-
-            is UnitPriceState -> current.copy(waste = onNumericValueChange(current.waste, newWaste))
-        }
-    }
-
-    fun onPackagePriceChanged(newPrice: String) {
-        val current = _uiState.value
-        if (current is PackagePriceState) {
-            updateStateWithPackageData(
-                packagePriceState = current,
-                quantity = current.packageQuantity,
-                price = newPrice,
-                unit = current.packageUnit
-            )
-        }
-    }
-
-    fun onPackageQuantityChanged(newQuantity: String) {
-        val current = _uiState.value
-        if (current is PackagePriceState) {
-                updateStateWithPackageData(
-                    packagePriceState = current,
-                    quantity = newQuantity,
-                    price = current.packagePrice,
-                    unit = current.packageUnit
-                )
-        }
-    }
-
-    fun onPackageUnitChanged(newUnit: MeasurementUnit) {
-        val current = _uiState.value
-        if (current is PackagePriceState) {
-            updateStateWithPackageData(
-                packagePriceState = current,
-                quantity = current.packageQuantity,
-                price = current.packagePrice,
-                unit = newUnit
-            )
-        }
-    }
-
-    fun onUnitPriceChanged(newPrice: String) {
-        val current = _uiState.value
-        if (current is UnitPriceState) {
-            val newPrice = onNumericValueChange(current.unitPrice, newPrice)
-            _uiState.value =
-                current.copy(unitPrice = newPrice)
-        }
-    }
-
-    fun onUnitPriceUnitChanged(newUnit: MeasurementUnit) {
-        val current = _uiState.value
-        if (current is UnitPriceState) {
-            _uiState.value = current.copy(unitPriceUnit = newUnit)
-        }
-    }
-
-    private fun initializeTaxField(show: Boolean) {
-        if (show) {
-            return
-        }
-        val zeroTax = "0.0"
-        _uiState.value = when (val current = _uiState.value) {
-            is PackagePriceState -> current.copy(tax = zeroTax)
-            is UnitPriceState -> current.copy(tax = zeroTax)
-        }
-    }
-
-    fun togglePriceMode() {
-        val current = _uiState.value
-        _uiState.value = when (current) {
-            is PackagePriceState -> UnitPriceState(
-                id = current.id,
-                name = current.name,
-                tax = current.tax,
-                waste = current.waste,
-                unitPrice = "",
-                unitPriceUnit = MeasurementUnit.KILOGRAM
-            )
-
-            is UnitPriceState -> PackagePriceState(
-                id = current.id,
-                name = current.name,
-                tax = current.tax,
-                waste = current.waste,
-                packagePrice = "",
-                packageQuantity = "",
-                packageUnit = MeasurementUnit.KILOGRAM,
-                canonicalPrice = null,
-                canonicalUnit = null
-            )
-        }
-    }
-
-    fun getCalculatedUnitPrice(): String? {
-        val current = _uiState.value
-        return if (current is PackagePriceState) {
-            val price = current.packagePrice.toDoubleOrNull()
-            val quantity = current.packageQuantity.toDoubleOrNull()
-            if (price != null && quantity != null && quantity > 0) {
-                val unitPrice = price / quantity
-                val formatter = DecimalFormat("#.##")
-                formatter.format(unitPrice)
-            } else {
-                null
-            }
-        } else {
-            null
-        }
-    }
-
     fun saveIngredient() {
-        val currentState = _uiState.value
+        val currentState = uiState.value
         _screenState.value = ScreenState.Loading<Nothing>()
 
         viewModelScope.launch {
@@ -252,8 +104,7 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
                         resetFormFields()
                     },
                     onFailure = { error ->
-                        _screenState.value =
-                            ScreenState.Error(Error(error.message ?: "Unknown error"))
+                        _screenState.value = ScreenState.Error(Error(error.message ?: "Unknown error"))
                     }
                 )
             } catch (e: Exception) {
@@ -275,38 +126,26 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
         resetScreenState()
     }
 
-    private fun resetFormFields() {
-        val current = _uiState.value
-
-        _uiState.value = when(current){
-            is PackagePriceState -> PackagePriceState()
-            is UnitPriceState -> UnitPriceState()
+    fun getCalculatedUnitPrice(): String? {
+        val current = uiState.value
+        return if (current is PackagePriceState) {
+            val price = current.packagePrice.toDoubleOrNull()
+            val quantity = current.packageQuantity.toDoubleOrNull()
+            if (price != null && quantity != null && quantity > 0) {
+                val unitPrice = price / quantity
+                val formatter = DecimalFormat("#.##")
+                formatter.format(unitPrice)
+            } else {
+                null
+            }
+        } else {
+            null
         }
     }
 
-    private fun updateStateWithPackageData(
-        packagePriceState: PackagePriceState,
-        quantity: String,
-        price: String,
-        unit: MeasurementUnit,
-    ) {
-        val packageQuantity = quantity.toDoubleOrNull()
-        val packagePrice = price.toDoubleOrNull()
-        val (canonicalPrice, canonicalUnit) =
-            if (packagePrice != null && packageQuantity != null && packageQuantity > 0) {
-                unit.calculateCanonicalPrice(
-                    packagePrice, packageQuantity
-                )
-            } else {
-                Pair(null, null)
-            }
-
-        _uiState.value = packagePriceState.copy(
-            packageUnit = unit,
-            packageQuantity = quantity,
-            packagePrice = price,
-            canonicalPrice = canonicalPrice,
-            canonicalUnit = canonicalUnit
-        )
+    private fun resetFormFields() {
+        productFormDelegate.reset()
+        packagePricingDelegate.reset()
+        unitPricingDelegate.reset()
     }
 }
