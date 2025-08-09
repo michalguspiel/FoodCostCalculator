@@ -44,13 +44,11 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
     private val _quantityAddedToDishUnit = MutableStateFlow<MeasurementUnit?>(null)
 
     val formData: StateFlow<NewProductFormData> = combine(
-        bridgeDelegate.createFormDataState(_quantityAddedToDish.value, _quantityAddedToDishUnit.value),
-        productFormDelegate.waste,
+        bridgeDelegate.createFormDataState(),
         _quantityAddedToDish,
         _quantityAddedToDishUnit
-    ) { baseFormData, waste, quantity, unit ->
+    ) { baseFormData, quantity, unit ->
         baseFormData.copy(
-            wastePercent = waste,
             quantityAddedToDish = quantity,
             quantityAddedToDishUnit = unit
         )

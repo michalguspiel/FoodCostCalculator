@@ -41,6 +41,8 @@ private data class UnitPricingState(
 private data class DelegateStateSnapshot(
     val inputMethod: InputMethod,
     val name: String,
+    val tax: String,
+    val waste: String,
     val packagePrice: String,
     val packageQuantity: String,
     val packageUnit: MeasurementUnit,
@@ -112,6 +114,8 @@ class NewProductFormBridgeDelegate(
         DelegateStateSnapshot(
             inputMethod = productForm.inputMethod,
             name = productForm.name,
+            tax = productForm.tax,
+            waste = productForm.waste,
             packagePrice = packagePricing.packagePrice,
             packageQuantity = packagePricing.packageQuantity,
             packageUnit = packagePricing.packageUnit,
@@ -123,6 +127,8 @@ class NewProductFormBridgeDelegate(
         DelegateStateSnapshot(
             inputMethod = InputMethod.PACKAGE,
             name = "",
+            tax = "",
+            waste = "",
             packagePrice = "",
             packageQuantity = "",
             packageUnit = MeasurementUnit.KILOGRAM,
@@ -135,12 +141,9 @@ class NewProductFormBridgeDelegate(
     /**
      * Converts delegate states to NewProductFormData
      */
-    fun createFormDataState(
-        quantityAddedToDish: String,
-        quantityAddedToDishUnit: MeasurementUnit?
-    ): StateFlow<NewProductFormData> {
+    fun createFormDataState(): StateFlow<NewProductFormData> {
         return delegateSnapshot.map { snapshot ->
-            snapshot.toNewProductFormData(quantityAddedToDish, quantityAddedToDishUnit)
+            snapshot.toNewProductFormData()
         }.stateIn(scope, SharingStarted.Eagerly, NewProductFormData())
     }
 
@@ -209,22 +212,16 @@ class NewProductFormBridgeDelegate(
     /**
      * Converts current delegate state to EditableProductUiState for compatibility
      */
-    fun toEditableProductUiState(): StateFlow<EditableProductUiState> = combine(
-        delegateSnapshot,
-        productFormDelegate.tax,
-        productFormDelegate.waste
-    ) { snapshot, tax, waste ->
-        snapshot.toEditableProductUiState(tax, waste)
-    }.stateIn(scope, SharingStarted.Eagerly, PackagePriceState(name = ""))
+    fun toEditableProductUiState(): StateFlow<EditableProductUiState> =
+        delegateSnapshot.map { snapshot ->
+            snapshot.toEditableProductUiState()
+        }.stateIn(scope, SharingStarted.Eagerly, PackagePriceState(name = ""))
 }
 
 /**
  * Extension functions for cleaner state conversion
  */
-private fun DelegateStateSnapshot.toNewProductFormData(
-    quantityAddedToDish: String,
-    quantityAddedToDishUnit: MeasurementUnit?
-): NewProductFormData {
+private fun DelegateStateSnapshot.toNewProductFormData(): NewProductFormData {
     return NewProductFormData(
         inputMethod = inputMethod,
         packagePrice = packagePrice,
@@ -232,19 +229,16 @@ private fun DelegateStateSnapshot.toNewProductFormData(
         packageUnit = packageUnit,
         unitPrice = unitPrice,
         unitPriceUnit = unitPriceUnit,
-        wastePercent = "", // This will be filled by the ViewModel
-        quantityAddedToDish = quantityAddedToDish,
-        quantityAddedToDishUnit = quantityAddedToDishUnit
+        wastePercent = waste,
+        quantityAddedToDish = "", // Will be filled by ViewModel
+        quantityAddedToDishUnit = null // Will be filled by ViewModel
     )
 }
 
-private fun DelegateStateSnapshot.toEditableProductUiState(
-    tax: String,
-    waste: String
-): EditableProductUiState {
+private fun DelegateStateSnapshot.toEditableProductUiState(): EditableProductUiState {
     return when (inputMethod) {
         InputMethod.PACKAGE -> PackagePriceState(
-            name = name, // Now using name directly from snapshot
+            name = name,
             tax = tax,
             waste = waste,
             packagePrice = packagePrice,
@@ -254,7 +248,7 @@ private fun DelegateStateSnapshot.toEditableProductUiState(
             canonicalUnit = canonicalPriceAndUnit.second
         )
         InputMethod.UNIT -> UnitPriceState(
-            name = name, // Now using name directly from snapshot
+            name = name,
             tax = tax,
             waste = waste,
             unitPrice = unitPrice,
