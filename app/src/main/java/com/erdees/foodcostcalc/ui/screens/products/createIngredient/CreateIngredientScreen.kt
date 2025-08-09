@@ -61,7 +61,6 @@ import com.erdees.foodcostcalc.ui.navigation.Screen
 import com.erdees.foodcostcalc.ui.screens.products.EditableProductUiState
 import com.erdees.foodcostcalc.ui.screens.products.PackagePriceState
 import com.erdees.foodcostcalc.ui.screens.products.UnitPriceState
-import com.erdees.foodcostcalc.ui.screens.products.createProduct.CalculateWasteDialog
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Utils
 import java.util.Locale

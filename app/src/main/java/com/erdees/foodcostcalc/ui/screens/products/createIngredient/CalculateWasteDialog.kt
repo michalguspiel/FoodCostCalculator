@@ -1,4 +1,4 @@
-package com.erdees.foodcostcalc.ui.screens.products.createProduct
+package com.erdees.foodcostcalc.ui.screens.products.createIngredient
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
