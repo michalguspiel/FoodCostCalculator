@@ -20,19 +20,19 @@ private data class ProductFormState(
     val inputMethod: InputMethod,
     val name: String,
     val tax: String,
-    val waste: String
+    val waste: String,
 )
 
 private data class PackagePricingState(
     val packagePrice: String,
     val packageQuantity: String,
     val packageUnit: MeasurementUnit,
-    val canonicalPriceAndUnit: Pair<Double?, MeasurementUnit?>
+    val canonicalPriceAndUnit: Pair<Double?, MeasurementUnit?>,
 )
 
 private data class UnitPricingState(
     val unitPrice: String,
-    val unitPriceUnit: MeasurementUnit
+    val unitPriceUnit: MeasurementUnit,
 )
 
 /**
@@ -48,7 +48,7 @@ private data class DelegateStateSnapshot(
     val packageUnit: MeasurementUnit,
     val unitPrice: String,
     val unitPriceUnit: MeasurementUnit,
-    val canonicalPriceAndUnit: Pair<Double?, MeasurementUnit?>
+    val canonicalPriceAndUnit: Pair<Double?, MeasurementUnit?>,
 )
 
 /**
@@ -59,7 +59,7 @@ class NewProductFormBridgeDelegate(
     private val productFormDelegate: ProductFormDelegate,
     private val packagePricingDelegate: PackagePricingDelegate,
     private val unitPricingDelegate: UnitPricingDelegate,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
 ) {
 
     private val productFormState: StateFlow<ProductFormState> = combine(
@@ -69,7 +69,8 @@ class NewProductFormBridgeDelegate(
         productFormDelegate.waste
     ) { inputMethod, name, tax, waste ->
         ProductFormState(inputMethod, name, tax, waste)
-    }.stateIn(scope, SharingStarted.Eagerly,
+    }.stateIn(
+        scope, SharingStarted.Eagerly,
         ProductFormState(
             inputMethod = InputMethod.PACKAGE,
             name = "",
@@ -85,7 +86,8 @@ class NewProductFormBridgeDelegate(
         packagePricingDelegate.canonicalPriceAndUnit
     ) { price, quantity, unit, canonical ->
         PackagePricingState(price, quantity, unit, canonical)
-    }.stateIn(scope, SharingStarted.Eagerly,
+    }.stateIn(
+        scope, SharingStarted.Eagerly,
         PackagePricingState(
             packagePrice = "",
             packageQuantity = "",
@@ -99,7 +101,8 @@ class NewProductFormBridgeDelegate(
         unitPricingDelegate.unitPriceUnit
     ) { price, unit ->
         UnitPricingState(price, unit)
-    }.stateIn(scope, SharingStarted.Eagerly,
+    }.stateIn(
+        scope, SharingStarted.Eagerly,
         UnitPricingState(
             unitPrice = "",
             unitPriceUnit = MeasurementUnit.KILOGRAM
@@ -123,7 +126,8 @@ class NewProductFormBridgeDelegate(
             unitPriceUnit = unitPricing.unitPriceUnit,
             canonicalPriceAndUnit = packagePricing.canonicalPriceAndUnit
         )
-    }.stateIn(scope, SharingStarted.Eagerly,
+    }.stateIn(
+        scope, SharingStarted.Eagerly,
         DelegateStateSnapshot(
             inputMethod = InputMethod.PACKAGE,
             name = "",
@@ -151,15 +155,9 @@ class NewProductFormBridgeDelegate(
      * Syncs a NewProductFormData update back to the delegates
      */
     fun syncFromFormData(formData: NewProductFormData) {
-        // Update waste field
-        if (productFormDelegate.waste.value != formData.wastePercent) {
-            productFormDelegate.updateWaste(formData.wastePercent)
-        }
-        if (productFormDelegate.inputMethod.value != formData.inputMethod) {
-            productFormDelegate.setInputMethod(formData.inputMethod)
-        }
+        productFormDelegate.updateWaste(formData.wastePercent)
+        productFormDelegate.setInputMethod(formData.inputMethod)
 
-        // Sync based on input method
         when (formData.inputMethod) {
             InputMethod.PACKAGE -> syncPackageFields(formData)
             InputMethod.UNIT -> syncUnitFields(formData)
@@ -168,30 +166,16 @@ class NewProductFormBridgeDelegate(
 
     private fun syncPackageFields(formData: NewProductFormData) {
         with(packagePricingDelegate) {
-            if (packagePrice.value != formData.packagePrice) {
-                updatePackagePrice(formData.packagePrice)
-            }
-            if (packageQuantity.value != formData.packageQuantity) {
-                updatePackageQuantity(formData.packageQuantity)
-            }
-            formData.packageUnit?.let { unit ->
-                if (packageUnit.value != unit) {
-                    updatePackageUnit(unit)
-                }
-            }
+            updatePackagePrice(formData.packagePrice)
+            updatePackageQuantity(formData.packageQuantity)
+            formData.packageUnit?.let { updatePackageUnit(it) }
         }
     }
 
     private fun syncUnitFields(formData: NewProductFormData) {
         with(unitPricingDelegate) {
-            if (unitPrice.value != formData.unitPrice) {
-                updateUnitPrice(formData.unitPrice)
-            }
-            formData.unitPriceUnit?.let { unit ->
-                if (unitPriceUnit.value != unit) {
-                    updateUnitPriceUnit(unit)
-                }
-            }
+            updateUnitPrice(formData.unitPrice)
+            formData.unitPriceUnit?.let { updateUnitPriceUnit(it) }
         }
     }
 
@@ -230,8 +214,8 @@ private fun DelegateStateSnapshot.toNewProductFormData(): NewProductFormData {
         unitPrice = unitPrice,
         unitPriceUnit = unitPriceUnit,
         wastePercent = waste,
-        quantityAddedToDish = "", // Will be filled by ViewModel
-        quantityAddedToDishUnit = null // Will be filled by ViewModel
+        quantityAddedToDish = "",
+        quantityAddedToDishUnit = null
     )
 }
 
@@ -247,6 +231,7 @@ private fun DelegateStateSnapshot.toEditableProductUiState(): EditableProductUiS
             canonicalPrice = canonicalPriceAndUnit.first,
             canonicalUnit = canonicalPriceAndUnit.second
         )
+
         InputMethod.UNIT -> UnitPriceState(
             name = name,
             tax = tax,
