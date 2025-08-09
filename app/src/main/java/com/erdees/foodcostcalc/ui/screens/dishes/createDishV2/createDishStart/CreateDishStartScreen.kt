@@ -112,9 +112,11 @@ fun CreateDishStartScreen(
         productCreationUnits = newProductFormViewModel.productCreationUnits.collectAsState().value,
         productAdditionUnits = newProductFormViewModel.productAdditionUnits.collectAsState().value,
         formData = newProductFormViewModel.formData.collectAsState().value,
-        isAddButtonEnabled = newProductFormViewModel.isAddButtonEnabled.collectAsState().value,
-        productCreationDropdownExpanded = newProductFormViewModel.productCreationUnitDropdownExpanded.collectAsState().value,
-        productAdditionDropdownExpanded = newProductFormViewModel.productAdditionUnitDropdownExpanded.collectAsState().value,
+        productCreationDropdownExpanded = newProductFormViewModel.productCreationDropdownExpanded.collectAsState().value,
+        productAdditionDropdownExpanded = newProductFormViewModel.productAdditionDropdownExpanded.collectAsState().value,
+        isNextButtonEnabled = newProductFormViewModel.isNextButtonEnabled.collectAsState().value,
+        isCreateButtonEnabled = newProductFormViewModel.isCreateButtonEnabled.collectAsState().value,
+        currentStep = newProductFormViewModel.currentStep.collectAsState().value
     )
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -206,14 +208,8 @@ fun CreateDishStartScreen(
                         newProductFormUiState = newProductFormUiState,
                         newProductFormActions = NewProductFormActions(
                             onFormDataUpdate = newProductFormViewModel::updateFormData,
-                            onProductCreationDropdownExpandedChange = {
-                                newProductFormViewModel.productCreationUnitDropdownExpanded.value =
-                                    it
-                            },
-                            onProductAdditionDropdownExpandedChange = {
-                                newProductFormViewModel.productAdditionUnitDropdownExpanded.value =
-                                    it
-                            },
+                            onProductCreationDropdownExpandedChange = newProductFormViewModel::setProductCreationDropdownExpanded,
+                            onProductAdditionDropdownExpandedChange = newProductFormViewModel::setProductAdditionDropdownExpanded,
                             onSaveProduct = { data ->
                                 scope.launch {
                                     addComponentSheetState.hide()
@@ -221,7 +217,10 @@ fun CreateDishStartScreen(
                                     viewModel.onAddNewProduct(data)
                                     newProductFormViewModel.onAddIngredientClick()
                                 }
-                            }
+                            },
+                            onCancel = viewModel::resetScreenState,
+                            onNextStep = newProductFormViewModel::goToNextStep,
+                            onPreviousStep = newProductFormViewModel::goToPreviousStep,
                         ),
                         componentLookupFormUiState = componentLookupFormUiState,
                         componentLookupFormActions = componentLookupFormActions

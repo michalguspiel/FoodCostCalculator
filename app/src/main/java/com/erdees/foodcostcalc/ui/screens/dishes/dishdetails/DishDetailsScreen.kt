@@ -62,6 +62,7 @@ import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.Existin
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormUiState
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormViewModel
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductWizardStep
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -76,7 +77,7 @@ fun DishDetailsScreen(
     viewModel: DishDetailsViewModel = viewModel(),
     existingFormViewModel: ExistingComponentFormViewModel = viewModel(),
     newProductFormViewModel: NewProductFormViewModel = viewModel(),
-    componentLookupViewModel: ComponentLookupViewModel = viewModel()
+    componentLookupViewModel: ComponentLookupViewModel = viewModel(),
 ) {
     val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsState()
@@ -88,15 +89,16 @@ fun DishDetailsScreen(
     )
 
     val newProductFormUiState = NewProductFormUiState(
-        productName = (uiState.componentSelection as? ComponentSelection.NewComponent)?.name
-            ?: "", // This will be set in the modal sheet based on componentSelection
+        productName = (uiState.componentSelection as? ComponentSelection.NewComponent)?.name ?: "",
         dishName = uiState.dish?.name ?: "",
         productCreationUnits = newProductFormViewModel.productCreationUnits.collectAsState().value,
         productAdditionUnits = newProductFormViewModel.productAdditionUnits.collectAsState().value,
         formData = newProductFormViewModel.formData.collectAsState().value,
-        isAddButtonEnabled = newProductFormViewModel.isAddButtonEnabled.collectAsState().value,
-        productCreationDropdownExpanded = newProductFormViewModel.productCreationUnitDropdownExpanded.collectAsState().value,
-        productAdditionDropdownExpanded = newProductFormViewModel.productAdditionUnitDropdownExpanded.collectAsState().value,
+        productCreationDropdownExpanded = newProductFormViewModel.productCreationDropdownExpanded.collectAsState().value,
+        productAdditionDropdownExpanded = newProductFormViewModel.productAdditionDropdownExpanded.collectAsState().value,
+        isNextButtonEnabled = newProductFormViewModel.isNextButtonEnabled.collectAsState().value,
+        isCreateButtonEnabled = newProductFormViewModel.isCreateButtonEnabled.collectAsState().value,
+        currentStep = newProductFormViewModel.currentStep.collectAsState().value
     )
 
     val dishDetailsActions = viewModel.createActions(
@@ -167,18 +169,25 @@ fun DishDetailsScreen(
         newProductFormUiState = newProductFormUiState,
         newProductFormActions = NewProductFormActions(
             onFormDataUpdate = newProductFormViewModel::updateFormData,
-            onProductCreationDropdownExpandedChange = {
-                newProductFormViewModel.productCreationUnitDropdownExpanded.value = it
-            },
-            onProductAdditionDropdownExpandedChange = {
-                newProductFormViewModel.productAdditionUnitDropdownExpanded.value = it
-            },
+            onProductCreationDropdownExpandedChange = newProductFormViewModel::setProductCreationDropdownExpanded,
+            onProductAdditionDropdownExpandedChange = newProductFormViewModel::setProductAdditionDropdownExpanded,
             onSaveProduct = { data ->
                 scope.launch {
                     addComponentSheetState.hide()
                 }.invokeOnCompletion {
                     viewModel.onAddNewProduct(data)
                     newProductFormViewModel.onAddIngredientClick()
+                }
+            },
+            onNextStep = newProductFormViewModel::goToNextStep,
+            onPreviousStep = newProductFormViewModel::goToPreviousStep,
+            onCancel = {
+                scope.launch {
+                    addComponentSheetState.hide()
+                }.invokeOnCompletion {
+                    viewModel.resetScreenState()
+                    viewModel.setComponentSelection(null)
+                    newProductFormViewModel.resetToFirstStep()
                 }
             }
         ),
@@ -301,7 +310,7 @@ private fun EditDishScreenContent(
                 newProductFormActions = newProductFormActions,
                 addComponentSheetState = addComponentSheetState,
                 navController = navController,
-                componentLookupFormUiState =  componentLookupFormUiState,
+                componentLookupFormUiState = componentLookupFormUiState,
                 componentLookupFormActions = componentLookupFormActions
             )
 
@@ -324,7 +333,7 @@ private fun ScreenStateHandler(
     addComponentSheetState: SheetState,
     navController: NavController,
     componentLookupFormUiState: ComponentLookupFormUiState,
-    componentLookupFormActions: ComponentLookupFormActions
+    componentLookupFormActions: ComponentLookupFormActions,
 ) {
     when (uiState.screenState) {
         is ScreenState.Loading<*> -> ScreenLoadingOverlay()
@@ -369,7 +378,7 @@ private fun InteractionHandler(
     addComponentSheetState: SheetState,
     navController: NavController,
     componentLookupFormUiState: ComponentLookupFormUiState,
-    componentLookupFormActions: ComponentLookupFormActions
+    componentLookupFormActions: ComponentLookupFormActions,
 ) {
     Timber.i("InteractionHandler: interaction = $interaction")
     when (interaction) {
@@ -509,8 +518,8 @@ private fun EditDishScreenContentPreview(
             snackbarHostState = SnackbarHostState(),
             existingComponentFormUiState = ExistingComponentFormUiState(),
             existingComponentFormActions = ExistingComponentFormActions(),
-            newProductFormUiState = NewProductFormUiState(),
-            newProductFormActions = NewProductFormActions(),
+            newProductFormUiState = NewProductFormUiState(currentStep = NewProductWizardStep.DEFINE_PURCHASE),
+            newProductFormActions = NewProductFormActions.Empty,
             componentLookupFormUiState = ComponentLookupFormUiState(),
             componentLookupFormActions = ComponentLookupFormActions(),
             addComponentSheetState = rememberModalBottomSheetState()

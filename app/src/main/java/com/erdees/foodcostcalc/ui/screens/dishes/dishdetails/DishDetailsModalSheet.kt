@@ -18,9 +18,9 @@ import com.erdees.foodcostcalc.ui.screens.dishes.forms.componentlookup.Component
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentForm
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.existingcomponent.ExistingComponentFormUiState
-import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductForm
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormActions
 import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductFormUiState
+import com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent.NewProductForm
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -81,13 +81,18 @@ fun DishDetailsModalSheet(
                             productName = safeSelection.name,
                             dishName = dishName
                         ),
-                        onProductCreationDropdownExpandedChange = newProductFormActions.onProductCreationDropdownExpandedChange,
-                        onProductAdditionDropdownExpandedChange = newProductFormActions.onProductAdditionDropdownExpandedChange,
-                        onFormDataUpdate = newProductFormActions.onFormDataUpdate,
-                        onSaveProduct = { data ->
-                            newProductFormActions.onSaveProduct(data)
-                            componentLookupFormActions.onReset()
-                        }
+                        actions = NewProductFormActions(
+                            onFormDataUpdate = newProductFormActions.onFormDataUpdate,
+                            onProductCreationDropdownExpandedChange = newProductFormActions.onProductCreationDropdownExpandedChange,
+                            onProductAdditionDropdownExpandedChange = newProductFormActions.onProductAdditionDropdownExpandedChange,
+                            onSaveProduct = { data ->
+                                newProductFormActions.onSaveProduct(data)
+                                componentLookupFormActions.onReset()
+                            },
+                            onNextStep = newProductFormActions.onNextStep,
+                            onPreviousStep = newProductFormActions.onPreviousStep,
+                            onCancel = newProductFormActions.onCancel
+                        )
                     )
                 }
 

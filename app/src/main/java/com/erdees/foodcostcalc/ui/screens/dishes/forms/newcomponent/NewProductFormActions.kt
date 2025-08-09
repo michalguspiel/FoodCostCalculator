@@ -1,8 +1,25 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.forms.newcomponent
 
 data class NewProductFormActions(
-    val onFormDataUpdate: (NewProductFormData) -> Unit = {},
-    val onProductCreationDropdownExpandedChange: (Boolean) -> Unit = {},
-    val onProductAdditionDropdownExpandedChange: (Boolean) -> Unit = {},
-    val onSaveProduct: (NewProductFormData) -> Unit = {},
-)
+    val onFormDataUpdate: (NewProductFormData) -> Unit,
+    val onProductCreationDropdownExpandedChange: (Boolean) -> Unit,
+    val onProductAdditionDropdownExpandedChange: (Boolean) -> Unit,
+    val onSaveProduct: (NewProductFormData) -> Unit,
+
+    // Wizard navigation actions
+    val onNextStep: () -> Unit,
+    val onPreviousStep: () -> Unit,
+    val onCancel: () -> Unit,
+){
+    companion object {
+        val Empty = NewProductFormActions(
+            onFormDataUpdate = {},
+            onProductCreationDropdownExpandedChange = {},
+            onProductAdditionDropdownExpandedChange = {},
+            onSaveProduct = {},
+            onNextStep = {},
+            onPreviousStep = {},
+            onCancel = {}
+        )
+    }
+}

@@ -1,7 +1,5 @@
 package com.erdees.foodcostcalc.utils
 
-import android.content.res.Resources
-import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.domain.model.units.UnitCategory
 import java.math.BigDecimal
@@ -112,22 +110,6 @@ object Utils {
         return chosenUnits
     }
 
-    @Deprecated("Use enum-based getUnitsSet instead")
-    fun getUnitsSet(
-        resources: Resources,
-        isMetricUsed: Boolean,
-        isImperialUsed: Boolean
-    ): Set<String> {
-        var chosenUnits = resources.getStringArray(R.array.piece)
-        if (isMetricUsed) {
-            chosenUnits += resources.getStringArray(R.array.addProductUnitsMetric)
-        }
-        if (isImperialUsed) {
-            chosenUnits += resources.getStringArray(R.array.addProductUnitsUS)
-        }
-        return chosenUnits.toSet()
-    }
-
     /**
      * Returns a set of units based on the unit category and user preferences.
      * Now returns MeasurementUnit enums instead of strings for type safety.
@@ -143,7 +125,7 @@ object Utils {
         if (metricEnabled) {
             when (unitCategory) {
                 UnitCategory.WEIGHT -> units += setOf(MeasurementUnit.KILOGRAM, MeasurementUnit.GRAM)
-                UnitCategory.VOLUME -> units += setOf(MeasurementUnit.MILLILITER, MeasurementUnit.LITER)
+                UnitCategory.VOLUME -> units += setOf(MeasurementUnit.LITER, MeasurementUnit.MILLILITER)
                 UnitCategory.COUNT -> units += MeasurementUnit.PIECE
             }
         }
@@ -156,32 +138,6 @@ object Utils {
         }
         return units
     }
-
-    @Deprecated("Use enum-based generateUnitSet instead")
-    fun generateUnitSet(
-        unitType: UnitsUtils.UnitType?,
-        metricEnabled: Boolean,
-        imperialEnabled: Boolean
-    ): Set<String> {
-        val units = mutableSetOf<String>()
-        if (unitType == null) return units
-        if (metricEnabled) {
-            when (unitType) {
-                UnitsUtils.UnitType.WEIGHT -> units += setOf("kilogram", "gram")
-                UnitsUtils.UnitType.VOLUME -> units += setOf("milliliter", "liter")
-                UnitsUtils.UnitType.PIECE -> units += "piece"
-            }
-        }
-        if (imperialEnabled) {
-            when (unitType) {
-                UnitsUtils.UnitType.WEIGHT -> units += setOf("pound", "ounce")
-                UnitsUtils.UnitType.VOLUME -> units += arrayListOf("gallon", "fluid ounce")
-                UnitsUtils.UnitType.PIECE -> units += "piece"
-            }
-        }
-        return units
-    }
-
 
     fun formatPriceWithoutSymbol(
         number: Double?,
