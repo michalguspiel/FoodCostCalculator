@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -73,7 +75,6 @@ fun NewProductForm(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Animated content transition between steps
         AnimatedContent(
             targetState = state.currentStep,
             transitionSpec = {
@@ -112,6 +113,7 @@ private fun DefinePurchaseStep(
     state: NewProductFormUiState,
     actions: NewProductFormActions
 ) {
+    val scrollState = rememberScrollState()
     val priceFocusRequester = remember { FocusRequester() }
     val quantityFocusRequester = remember { FocusRequester() }
     val unitFocusRequester = remember { FocusRequester() }
@@ -119,9 +121,9 @@ private fun DefinePurchaseStep(
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.verticalScroll(scrollState)
     ) {
-        // Pricing method toggle
         TwoOptionToggle(
             option1Text = stringResource(id = R.string.by_package),
             option2Text = stringResource(id = R.string.by_unit),
@@ -139,7 +141,6 @@ private fun DefinePurchaseStep(
             }
         )
 
-        // Conditional pricing forms
         when (state.formData.inputMethod) {
             InputMethod.PACKAGE -> {
                 PackagePricingForm(
@@ -162,7 +163,6 @@ private fun DefinePurchaseStep(
             }
         }
 
-        // Waste field
         FCCTextField(
             modifier = Modifier.focusRequester(wasteFocusRequester),
             title = stringResource(id = R.string.percent_of_waste),
@@ -179,7 +179,6 @@ private fun DefinePurchaseStep(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Step 1 buttons
         ButtonRow(
             modifier = Modifier.fillMaxWidth(),
             applyDefaultPadding = false,
@@ -207,12 +206,14 @@ private fun DefineUsageStep(
     state: NewProductFormUiState,
     actions: NewProductFormActions
 ) {
+    val scrollState = rememberScrollState()
     val quantityFocusRequester = remember { FocusRequester() }
     val unitFocusRequester = remember { FocusRequester() }
 
     Column(
+        modifier = Modifier.verticalScroll(scrollState),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = stringResource(id = R.string.how_much_using_in_dish),
@@ -254,7 +255,6 @@ private fun DefineUsageStep(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Step 2 buttons
         ButtonRow(
             modifier = Modifier.fillMaxWidth(),
             applyDefaultPadding = false,
@@ -287,8 +287,10 @@ private fun PackagePricingForm(
     unitFocusRequester: FocusRequester,
     wasteFocusRequester: FocusRequester
 ) {
+    val scrollState = rememberScrollState()
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+        modifier = Modifier.verticalScroll(scrollState)
     ) {
         FCCTextField(
             title = stringResource(id = R.string.package_price),
