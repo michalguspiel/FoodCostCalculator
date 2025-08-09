@@ -124,22 +124,22 @@ class CreateProductUseCase(
         val packageUnit = formData.packageUnit
         val packagePrice = formData.packagePrice.toDoubleOrNull()
         val packageQuantity = formData.packageQuantity.toDoubleOrNull()
-
+        
         if (packageUnit == null || packagePrice == null || packageQuantity == null) {
             throw InvalidProductPriceException("Product package unit, price, and quantity must all be valid.")
         }
-
+        
         return Triple(packageUnit, packagePrice, packageQuantity)
     }
 
     private fun safeUnwrapUnitData(formData: NewProductFormData): Pair<MeasurementUnit, Double> {
         val unitPriceUnit = formData.unitPriceUnit
         val price = formData.unitPrice.toDoubleOrNull()
-
+        
         if (unitPriceUnit == null || price == null) {
             throw InvalidProductPriceException("Product unit price unit and price must both be valid.")
         }
-
+        
         return unitPriceUnit to price
     }
 
