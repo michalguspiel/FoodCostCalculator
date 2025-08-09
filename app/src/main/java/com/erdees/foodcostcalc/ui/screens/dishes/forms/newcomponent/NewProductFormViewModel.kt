@@ -154,6 +154,10 @@ class NewProductFormViewModel : ViewModel(), KoinComponent {
         productFormDelegate.reset()
         packagePricingDelegate.reset()
         unitPricingDelegate.reset()
+
+        _quantityAddedToDish.value = ""
+        _quantityAddedToDishUnit.value = null
+
         _currentStep.value = NewProductWizardStep.DEFINE_PURCHASE
     }
 }
