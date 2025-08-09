@@ -100,20 +100,6 @@ class ProductFormDelegateTest {
     }
 
     @Test
-    fun `toggleInputMethod should toggle between PACKAGE and UNIT`() = runTest {
-        initializeDelegate()
-
-        // Initially PACKAGE
-        delegate.inputMethod.first() shouldBe InputMethod.PACKAGE
-
-        delegate.toggleInputMethod()
-        delegate.inputMethod.first() shouldBe InputMethod.UNIT
-
-        delegate.toggleInputMethod()
-        delegate.inputMethod.first() shouldBe InputMethod.PACKAGE
-    }
-
-    @Test
     fun `setInputMethod should set specific input method`() = runTest {
         initializeDelegate()
 

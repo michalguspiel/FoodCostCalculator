@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.domain.usecase.CreateProductUseCase
 import com.erdees.foodcostcalc.ui.screens.products.EditableProductUiState
@@ -61,7 +62,19 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
     fun onNameChanged(newName: String) = productFormDelegate.updateName(newName)
     fun onTaxChanged(newTax: String) = productFormDelegate.updateTax(newTax)
     fun onWasteChanged(newWaste: String) = productFormDelegate.updateWaste(newWaste)
-    fun togglePriceMode() = productFormDelegate.toggleInputMethod()
+    fun togglePriceMode() {
+        val currentMethod = uiState.value.let { state ->
+            when (state) {
+                is PackagePriceState -> InputMethod.PACKAGE
+                is UnitPriceState -> InputMethod.UNIT
+            }
+        }
+        val newMethod = when (currentMethod) {
+            InputMethod.PACKAGE -> InputMethod.UNIT
+            InputMethod.UNIT -> InputMethod.PACKAGE
+        }
+        productFormDelegate.setInputMethod(newMethod)
+    }
 
     fun onPackagePriceChanged(newPrice: String) = packagePricingDelegate.updatePackagePrice(newPrice)
     fun onPackageQuantityChanged(newQuantity: String) = packagePricingDelegate.updatePackageQuantity(newQuantity)

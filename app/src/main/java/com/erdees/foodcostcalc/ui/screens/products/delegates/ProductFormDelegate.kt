@@ -69,13 +69,6 @@ class ProductFormDelegate(
         _waste.value = newWaste
     }
     
-    fun toggleInputMethod() {
-        _inputMethod.value = when (_inputMethod.value) {
-            InputMethod.PACKAGE -> InputMethod.UNIT
-            InputMethod.UNIT -> InputMethod.PACKAGE
-        }
-    }
-    
     fun setInputMethod(method: InputMethod) {
         _inputMethod.value = method
     }
