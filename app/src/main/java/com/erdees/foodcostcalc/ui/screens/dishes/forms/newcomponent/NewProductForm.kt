@@ -14,20 +14,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -45,6 +38,7 @@ import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
+import com.erdees.foodcostcalc.ui.composables.buttons.TwoOptionToggle
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.composables.fields.UnitField
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
@@ -123,9 +117,19 @@ private fun DefinePurchaseStep(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Pricing method toggle
-        PricingMethodToggle(
-            pricingMethod = state.formData.inputMethod,
-            onPricingMethodChange = { method ->
+        TwoOptionToggle(
+            option1Text = stringResource(id = R.string.by_package),
+            option2Text = stringResource(id = R.string.by_unit),
+            selectedIndex = when (state.formData.inputMethod) {
+                InputMethod.PACKAGE -> 0
+                InputMethod.UNIT -> 1
+            },
+            onSelectionChange = { index ->
+                val method = when (index) {
+                    0 -> InputMethod.PACKAGE
+                    1 -> InputMethod.UNIT
+                    else -> InputMethod.PACKAGE
+                }
                 actions.onFormDataUpdate(state.formData.copy(inputMethod = method))
             }
         )
@@ -263,53 +267,6 @@ private fun DefineUsageStep(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun PricingMethodToggle(
-    pricingMethod: InputMethod,
-    onPricingMethodChange: (InputMethod) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    var selectedIndex by remember(pricingMethod) {
-        mutableIntStateOf(
-            when (pricingMethod) {
-                InputMethod.PACKAGE -> 0
-                InputMethod.UNIT -> 1
-            }
-        )
-    }
-
-    SingleChoiceSegmentedButtonRow(
-        modifier = modifier
-            .fillMaxWidth()
-            .widthIn(max = 200.dp)
-    ) {
-        SegmentedButton(
-            shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
-            onClick = {
-                if (selectedIndex != 0) {
-                    selectedIndex = 0
-                    onPricingMethodChange(InputMethod.PACKAGE)
-                }
-            },
-            selected = selectedIndex == 0
-        ) {
-            Text(stringResource(id = R.string.by_package))
-        }
-        SegmentedButton(
-            shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
-            onClick = {
-                if (selectedIndex != 1) {
-                    selectedIndex = 1
-                    onPricingMethodChange(InputMethod.UNIT)
-                }
-            },
-            selected = selectedIndex == 1
-        ) {
-            Text(stringResource(id = R.string.by_unit))
-        }
-    }
-}
 
 @Composable
 private fun PackagePricingForm(
