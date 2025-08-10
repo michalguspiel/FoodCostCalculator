@@ -26,6 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
@@ -61,6 +62,7 @@ fun NewProductForm(
                 id = R.string.create_add_product_title,
                 state.productName
             )
+
             NewProductWizardStep.DEFINE_USAGE -> stringResource(
                 id = R.string.add_product_to_dish_title,
                 state.productName,
@@ -96,10 +98,11 @@ fun NewProductForm(
                         actions = actions
                     )
                 }
+
                 NewProductWizardStep.DEFINE_USAGE -> {
                     DefineUsageStep(
                         state = state,
-                        actions = actions
+                        actions = actions,
                     )
                 }
             }
@@ -111,12 +114,13 @@ fun NewProductForm(
 @Composable
 private fun DefinePurchaseStep(
     state: NewProductFormUiState,
-    actions: NewProductFormActions
+    actions: NewProductFormActions,
 ) {
     val scrollState = rememberScrollState()
     val priceFocusRequester = remember { FocusRequester() }
     val quantityFocusRequester = remember { FocusRequester() }
     val unitFocusRequester = remember { FocusRequester() }
+    val wasteFocusRequester = remember { FocusRequester() }
 
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -148,25 +152,36 @@ private fun DefinePurchaseStep(
                     priceFocusRequester = priceFocusRequester,
                     quantityFocusRequester = quantityFocusRequester,
                     unitFocusRequester = unitFocusRequester,
+                    onUnitSelected = {
+                        wasteFocusRequester.requestFocus()
+                    }
                 )
             }
+
             InputMethod.UNIT -> {
                 UnitPricingForm(
                     state = state,
                     actions = actions,
                     priceFocusRequester = priceFocusRequester,
                     unitFocusRequester = unitFocusRequester,
+                    onUnitSelected = {
+                        wasteFocusRequester.requestFocus()
+                    }
                 )
             }
         }
 
         FCCTextField(
+            modifier = Modifier.focusRequester(wasteFocusRequester),
             title = stringResource(id = R.string.percent_of_waste),
             value = state.formData.wastePercent,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Number,
-                imeAction = ImeAction.Done
+                imeAction = ImeAction.Done,
             ),
+            keyboardActions = KeyboardActions(onDone = {
+                actions.onNextStep()
+            }),
             onValueChange = { newWaste ->
                 val sanitizedValue = onNumericValueChange(state.formData.wastePercent, newWaste)
                 actions.onFormDataUpdate(state.formData.copy(wastePercent = sanitizedValue))
@@ -200,7 +215,7 @@ private fun DefinePurchaseStep(
 @Composable
 private fun DefineUsageStep(
     state: NewProductFormUiState,
-    actions: NewProductFormActions
+    actions: NewProductFormActions,
 ) {
     val scrollState = rememberScrollState()
     val quantityFocusRequester = remember { FocusRequester() }
@@ -223,7 +238,8 @@ private fun DefineUsageStep(
             value = state.formData.quantityAddedToDish,
             title = stringResource(id = R.string.quantity),
             onValueChange = { newQuantity ->
-                val sanitizedValue = onNumericValueChange(state.formData.quantityAddedToDish, newQuantity)
+                val sanitizedValue =
+                    onNumericValueChange(state.formData.quantityAddedToDish, newQuantity)
                 actions.onFormDataUpdate(state.formData.copy(quantityAddedToDish = sanitizedValue))
             },
             keyboardOptions = KeyboardOptions(
@@ -234,7 +250,13 @@ private fun DefineUsageStep(
                 unitFocusRequester.requestFocus()
                 actions.onProductAdditionDropdownExpandedChange(true)
             }),
-            modifier = Modifier.focusRequester(quantityFocusRequester)
+            modifier = Modifier
+                .focusRequester(quantityFocusRequester)
+                .onGloballyPositioned {
+                    if (state.formData.quantityAddedToDish.isEmpty()) {
+                        quantityFocusRequester.requestFocus()
+                    }
+                }
         )
 
         UnitField(
@@ -281,6 +303,7 @@ private fun PackagePricingForm(
     priceFocusRequester: FocusRequester,
     quantityFocusRequester: FocusRequester,
     unitFocusRequester: FocusRequester,
+    onUnitSelected: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -309,7 +332,8 @@ private fun PackagePricingForm(
             title = packageQuantityText,
             value = state.formData.packageQuantity,
             onValueChange = { newQuantity ->
-                val sanitizedValue = onNumericValueChange(state.formData.packageQuantity, newQuantity)
+                val sanitizedValue =
+                    onNumericValueChange(state.formData.packageQuantity, newQuantity)
                 actions.onFormDataUpdate(state.formData.copy(packageQuantity = sanitizedValue))
             },
             keyboardOptions = KeyboardOptions(
@@ -332,6 +356,7 @@ private fun PackagePricingForm(
             selectedUnit = state.formData.packageUnit,
             selectUnit = { unit ->
                 actions.onFormDataUpdate(state.formData.copy(packageUnit = unit))
+                onUnitSelected()
             }
         )
     }
@@ -343,6 +368,7 @@ private fun UnitPricingForm(
     actions: NewProductFormActions,
     priceFocusRequester: FocusRequester,
     unitFocusRequester: FocusRequester,
+    onUnitSelected: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -374,6 +400,7 @@ private fun UnitPricingForm(
             selectedUnit = state.formData.unitPriceUnit,
             selectUnit = { unit ->
                 actions.onFormDataUpdate(state.formData.copy(unitPriceUnit = unit))
+                onUnitSelected()
             }
         )
     }
