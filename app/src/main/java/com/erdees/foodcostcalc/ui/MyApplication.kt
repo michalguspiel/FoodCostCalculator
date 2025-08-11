@@ -21,6 +21,7 @@ import com.google.android.gms.ads.RequestConfiguration
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.initialize
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +61,9 @@ class MyApplication : Application() {
                     .build()
             )
             Timber.i("StrictMode set")
+        }
+        if (BuildConfig.DEBUG) {
+            FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = false
         }
 
         Firebase.initialize(this)
