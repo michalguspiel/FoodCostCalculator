@@ -59,6 +59,13 @@ class CreateIngredientViewModel : ViewModel(), KoinComponent {
         baseValid && formValid
     }.stateIn(viewModelScope, SharingStarted.Eagerly, false)
 
+    private val _unitDropdownExpanded = MutableStateFlow(false)
+    val unitDropdownExpanded: StateFlow<Boolean> = _unitDropdownExpanded
+
+    fun onUnitDropdownExpandedChange(expanded: Boolean) {
+        _unitDropdownExpanded.value = expanded
+    }
+
     fun onNameChanged(newName: String) = productFormDelegate.updateName(newName)
     fun onTaxChanged(newTax: String) = productFormDelegate.updateTax(newTax)
     fun onWasteChanged(newWaste: String) = productFormDelegate.updateWaste(newWaste)

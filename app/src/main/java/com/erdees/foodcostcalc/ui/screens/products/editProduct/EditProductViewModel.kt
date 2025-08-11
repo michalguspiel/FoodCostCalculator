@@ -43,6 +43,7 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
     private val myDispatchers: MyDispatchers by inject()
+    val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
     private var _screenState: MutableStateFlow<ScreenState> = MutableStateFlow(ScreenState.Idle)
     val screenState: StateFlow<ScreenState> = _screenState
@@ -211,6 +212,7 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
                 product.name.isNotBlank() &&
                         product.packagePrice.toDoubleOrNull() != null &&
                         product.packageQuantity.toDoubleOrNull() != null &&
+                        product.packageQuantity.toDouble() > 0.0 &&
                         product.waste.toDoubleOrNull() != null &&
                         product.tax.toDoubleOrNull() != null
             }
@@ -307,8 +309,6 @@ class EditProductViewModel(private val savedStateHandle: SavedStateHandle) : Vie
      * Called when user confirms to save changes in the unsaved changes dialog
      */
     fun saveAndNavigate() {
-        // Save and then navigate
         save()
-        // The navigation will be handled in the LaunchedEffect in the UI that observes ScreenState.Success
     }
 }

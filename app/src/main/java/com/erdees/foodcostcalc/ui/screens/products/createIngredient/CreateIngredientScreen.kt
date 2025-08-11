@@ -13,10 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -37,7 +37,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -50,6 +49,7 @@ import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.InteractionType
 import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import com.erdees.foodcostcalc.ui.composables.FCCInfoCaption
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
@@ -79,6 +79,7 @@ data class CreateIngredientScreenActions(
     val onCalculateWaste: () -> Unit = {},
     val onCalculateWasteResult: (Double?, Double?) -> Unit = { _, _ -> },
     val onResetScreenState: () -> Unit = {},
+    val onUnitDropdownExpandedChange: (Boolean) -> Unit = {},
 )
 
 @Screen
@@ -95,6 +96,7 @@ fun CreateIngredientScreen(
     val units by viewModel.units.collectAsState()
     val showTaxField by viewModel.showTaxField.collectAsState()
     val isSaveButtonEnabled by viewModel.isSaveButtonEnabled.collectAsState()
+    val unitDropdownExpanded by viewModel.unitDropdownExpanded.collectAsState()
 
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -125,6 +127,7 @@ fun CreateIngredientScreen(
         onCalculateWaste = viewModel::onCalculateWaste,
         onCalculateWasteResult = viewModel::calculateWaste,
         onResetScreenState = viewModel::resetScreenState,
+        onUnitDropdownExpandedChange = viewModel::onUnitDropdownExpandedChange,
     )
 
     CreateIngredientScreenContent(
@@ -132,6 +135,7 @@ fun CreateIngredientScreen(
         uiState = uiState,
         screenState = screenState,
         units = units,
+        unitDropdownExpanded = unitDropdownExpanded,
         currency = currency,
         showTaxField = showTaxField,
         isSaveButtonEnabled = isSaveButtonEnabled,
@@ -147,6 +151,7 @@ private fun CreateIngredientScreenContent(
     uiState: EditableProductUiState,
     screenState: ScreenState,
     units: Set<MeasurementUnit>,
+    unitDropdownExpanded: Boolean,
     currency: Currency?,
     showTaxField: Boolean,
     isSaveButtonEnabled: Boolean,
@@ -157,6 +162,7 @@ private fun CreateIngredientScreenContent(
     val scrollState = rememberScrollState()
     val wasInitialFocusRequested = rememberSaveable { mutableStateOf(false) }
     val ingredientNameFocusRequester = remember { FocusRequester() }
+    val wasteFocusRequester = remember { FocusRequester() }
 
     Scaffold(
         modifier = modifier,
@@ -217,7 +223,7 @@ private fun CreateIngredientScreenContent(
                     selectedIndex = if (uiState is PackagePriceState) 0 else 1,
                     onSelectionChange = { index ->
                         val shouldToggle = (index == 0 && uiState !is PackagePriceState) ||
-                                         (index == 1 && uiState is PackagePriceState)
+                                (index == 1 && uiState is PackagePriceState)
                         if (shouldToggle) {
                             actions.onTogglePriceMode()
                         }
@@ -235,10 +241,12 @@ private fun CreateIngredientScreenContent(
                             PackagePriceForm(
                                 state = state,
                                 units = units,
+                                unitDropdownExpanded = unitDropdownExpanded,
                                 currency = currency,
-                                onPackagePriceChange = actions.onPackagePriceChange,
-                                onPackageQuantityChange = actions.onPackageQuantityChange,
-                                onPackageUnitChange = actions.onPackageUnitChange,
+                                actions = actions,
+                                onUnitSet = {
+                                    wasteFocusRequester.requestFocus()
+                                }
                             )
                         }
 
@@ -246,8 +254,11 @@ private fun CreateIngredientScreenContent(
                             UnitPriceForm(
                                 state = state,
                                 units = units,
-                                onUnitPriceChange = actions.onUnitPriceChange,
-                                onUnitPriceUnitChange = actions.onUnitPriceUnitChange
+                                unitDropdownExpanded = unitDropdownExpanded,
+                                actions = actions,
+                                onUnitSet = {
+                                    wasteFocusRequester.requestFocus()
+                                }
                             )
                         }
                     }
@@ -257,7 +268,8 @@ private fun CreateIngredientScreenContent(
                     waste = uiState.waste,
                     showTaxField = showTaxField,
                     onWasteChange = actions.onWasteChange,
-                    onCalculateWaste = actions.onCalculateWaste
+                    onCalculateWaste = actions.onCalculateWaste,
+                    focusRequester = wasteFocusRequester
                 )
 
                 if (showTaxField) {
@@ -287,9 +299,9 @@ private fun PackagePriceForm(
     state: PackagePriceState,
     currency: Currency?,
     units: Set<MeasurementUnit>,
-    onPackagePriceChange: (String) -> Unit,
-    onPackageQuantityChange: (String) -> Unit,
-    onPackageUnitChange: (MeasurementUnit) -> Unit,
+    unitDropdownExpanded: Boolean,
+    actions: CreateIngredientScreenActions,
+    onUnitSet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -303,7 +315,7 @@ private fun PackagePriceForm(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            onValueChange = onPackagePriceChange
+            onValueChange = actions.onPackagePriceChange
         )
 
         FCCTextField(
@@ -316,27 +328,33 @@ private fun PackagePriceForm(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            onValueChange = onPackageQuantityChange
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    actions.onUnitDropdownExpandedChange(true)
+                }
+            ),
+            onValueChange = actions.onPackageQuantityChange
         )
 
         UnitField(
             units = units,
+            expanded = unitDropdownExpanded,
             selectedUnit = state.packageUnit,
-            selectUnit = onPackageUnitChange,
+            selectUnit = {
+                actions.onPackageUnitChange(it)
+                onUnitSet()
+            },
+            onExpandChange = actions.onUnitDropdownExpandedChange,
             label = stringResource(R.string.package_unit)
         )
 
         if (state.canonicalPrice != null && state.canonicalUnit != null) {
-            Text(
+            FCCInfoCaption(
                 text = stringResource(
                     id = R.string.calculated_unit_price,
                     Utils.formatPrice(state.canonicalPrice, currency),
                     stringResource(id = state.canonicalUnit.displayNameRes)
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                fontStyle = FontStyle.Italic,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 4.dp)
+                )
             )
         }
     }
@@ -346,8 +364,9 @@ private fun PackagePriceForm(
 private fun UnitPriceForm(
     state: UnitPriceState,
     units: Set<MeasurementUnit>,
-    onUnitPriceChange: (String) -> Unit,
-    onUnitPriceUnitChange: (MeasurementUnit) -> Unit,
+    unitDropdownExpanded: Boolean,
+    actions: CreateIngredientScreenActions,
+    onUnitSet: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -361,13 +380,23 @@ private fun UnitPriceForm(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Next
             ),
-            onValueChange = onUnitPriceChange
+            keyboardActions = KeyboardActions(
+                onNext = {
+                    actions.onUnitDropdownExpandedChange(true)
+                }
+            ),
+            onValueChange = actions.onUnitPriceChange
         )
 
         UnitField(
             units = units,
+            expanded = unitDropdownExpanded,
             selectedUnit = state.unitPriceUnit,
-            selectUnit = onUnitPriceUnitChange,
+            selectUnit = {
+                actions.onUnitPriceUnitChange(it)
+                onUnitSet()
+            },
+            onExpandChange = actions.onUnitDropdownExpandedChange,
             label = stringResource(R.string.unit_price_unit)
         )
     }
@@ -379,6 +408,7 @@ private fun WasteField(
     showTaxField: Boolean,
     onWasteChange: (String) -> Unit,
     onCalculateWaste: () -> Unit,
+    focusRequester: FocusRequester,
     modifier: Modifier = Modifier,
 ) {
     Row(
@@ -387,7 +417,9 @@ private fun WasteField(
         verticalAlignment = Alignment.Bottom
     ) {
         FCCTextField(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier
+                .weight(1f)
+                .focusRequester(focusRequester),
             title = stringResource(id = R.string.percent_of_waste),
             value = waste,
             keyboardOptions = KeyboardOptions(
@@ -463,7 +495,8 @@ private fun CreateIngredientScreenPreview() {
             isSaveButtonEnabled = true,
             snackbarHostState = remember { SnackbarHostState() },
             actions = CreateIngredientScreenActions(),
-            currency = Currency.getInstance(Locale.getDefault())
+            currency = Currency.getInstance(Locale.getDefault()),
+            unitDropdownExpanded = false
         )
     }
 }

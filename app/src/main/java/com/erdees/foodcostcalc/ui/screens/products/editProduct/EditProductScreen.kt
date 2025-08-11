@@ -1,5 +1,6 @@
 package com.erdees.foodcostcalc.ui.screens.products.editProduct
 
+import android.icu.util.Currency
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.clickable
@@ -41,6 +42,7 @@ import com.erdees.foodcostcalc.domain.model.ScreenState
 import com.erdees.foodcostcalc.domain.model.product.EditableProductDomain
 import com.erdees.foodcostcalc.domain.model.product.PackagePriceEditableProduct
 import com.erdees.foodcostcalc.domain.model.product.UnitPriceEditableProduct
+import com.erdees.foodcostcalc.ui.composables.FCCInfoCaption
 import com.erdees.foodcostcalc.ui.composables.ScreenLoadingOverlay
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.dialogs.ErrorDialog
@@ -49,6 +51,7 @@ import com.erdees.foodcostcalc.ui.composables.dialogs.FCCUnsavedChangesDialog
 import com.erdees.foodcostcalc.ui.composables.dialogs.ValueEditDialog
 import com.erdees.foodcostcalc.ui.composables.fields.FCCTextField
 import com.erdees.foodcostcalc.ui.navigation.Screen
+import com.erdees.foodcostcalc.utils.Utils
 import timber.log.Timber
 import java.util.Locale
 
@@ -64,6 +67,7 @@ fun EditProductScreen(
     val saveButtonEnabled by viewModel.saveButtonEnabled.collectAsState()
     val saveNameButtonEnabled by viewModel.saveNameButtonEnabled.collectAsState()
     val showTaxPercent by viewModel.showTaxPercent.collectAsState()
+    val currency by viewModel.currency.collectAsState()
 
     BackHandler {
         viewModel.handleBackNavigation { navController.popBackStack() }
@@ -99,6 +103,7 @@ fun EditProductScreen(
                     product = product,
                     showTaxPercent = showTaxPercent,
                     saveButtonEnabled = saveButtonEnabled,
+                    currency = currency,
                     onPriceChange = viewModel::updatePrice,
                     onPackageQuantityChange = viewModel::updatePackageQuantity,
                     onTaxChange = viewModel::updateTax,
@@ -163,6 +168,7 @@ private fun EditProductContent(
     product: EditableProductDomain,
     showTaxPercent: Boolean,
     saveButtonEnabled: Boolean,
+    currency: Currency?,
     onPriceChange: (String) -> Unit,
     onPackageQuantityChange: (String) -> Unit,
     onTaxChange: (String) -> Unit,
@@ -192,6 +198,7 @@ private fun EditProductContent(
                 ProductFormFields(
                     product = product,
                     showTaxPercent = showTaxPercent,
+                    currency = currency,
                     onPriceChange = onPriceChange,
                     onPackageQuantityChange = onPackageQuantityChange,
                     onTaxChange = onTaxChange,
@@ -216,6 +223,7 @@ private fun EditProductContent(
 private fun ProductFormFields(
     product: PackagePriceEditableProduct,
     showTaxPercent: Boolean,
+    currency: Currency?,
     onPriceChange: (String) -> Unit,
     onPackageQuantityChange: (String) -> Unit,
     onTaxChange: (String) -> Unit,
@@ -258,6 +266,16 @@ private fun ProductFormFields(
                 imeAction = ImeAction.Next
             )
         )
+
+        if (product.canonicalPrice != null && product.canonicalUnit != null) {
+            FCCInfoCaption(
+                text = stringResource(
+                    id = R.string.calculated_unit_price,
+                    Utils.formatPrice(product.canonicalPrice, currency),
+                    stringResource(id = product.canonicalUnit.displayNameRes)
+                )
+            )
+        }
 
         if (showTaxPercent || product.tax.toDoubleOrNull() != 0.0) {
             FCCTextField(

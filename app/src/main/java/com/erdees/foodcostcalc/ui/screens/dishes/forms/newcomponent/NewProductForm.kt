@@ -152,7 +152,7 @@ private fun DefinePurchaseStep(
                     priceFocusRequester = priceFocusRequester,
                     quantityFocusRequester = quantityFocusRequester,
                     unitFocusRequester = unitFocusRequester,
-                    onUnitSelected = {
+                    onUnitSelect = {
                         wasteFocusRequester.requestFocus()
                     }
                 )
@@ -164,7 +164,7 @@ private fun DefinePurchaseStep(
                     actions = actions,
                     priceFocusRequester = priceFocusRequester,
                     unitFocusRequester = unitFocusRequester,
-                    onUnitSelected = {
+                    onUnitSelect = {
                         wasteFocusRequester.requestFocus()
                     }
                 )
@@ -303,7 +303,7 @@ private fun PackagePricingForm(
     priceFocusRequester: FocusRequester,
     quantityFocusRequester: FocusRequester,
     unitFocusRequester: FocusRequester,
-    onUnitSelected: () -> Unit,
+    onUnitSelect: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -356,7 +356,7 @@ private fun PackagePricingForm(
             selectedUnit = state.formData.packageUnit,
             selectUnit = { unit ->
                 actions.onFormDataUpdate(state.formData.copy(packageUnit = unit))
-                onUnitSelected()
+                onUnitSelect()
             }
         )
     }
@@ -368,7 +368,7 @@ private fun UnitPricingForm(
     actions: NewProductFormActions,
     priceFocusRequester: FocusRequester,
     unitFocusRequester: FocusRequester,
-    onUnitSelected: () -> Unit,
+    onUnitSelect: () -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -400,7 +400,7 @@ private fun UnitPricingForm(
             selectedUnit = state.formData.unitPriceUnit,
             selectUnit = { unit ->
                 actions.onFormDataUpdate(state.formData.copy(unitPriceUnit = unit))
-                onUnitSelected()
+                onUnitSelect()
             }
         )
     }
