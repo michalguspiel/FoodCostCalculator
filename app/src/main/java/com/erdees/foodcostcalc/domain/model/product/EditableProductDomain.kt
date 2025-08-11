@@ -27,4 +27,20 @@ data class PackagePriceEditableProduct(
     val packagePrice: String,
     val packageQuantity: String,
     val packageUnit: MeasurementUnit
-) : EditableProductDomain
+) : EditableProductDomain {
+
+    private val canonicalPriceAndUnit = getCanonicalPrice()
+    val canonicalPrice = canonicalPriceAndUnit.first
+    val canonicalUnit = canonicalPriceAndUnit.second
+
+    private fun getCanonicalPrice(): Pair<Double?, MeasurementUnit?> {
+        val packagePrice = this.packagePrice.toDoubleOrNull()
+        val packageQuantity = this.packageQuantity.toDoubleOrNull()
+
+        if (packagePrice == null || packageQuantity == null || packageQuantity == 0.0) {
+            return Pair(null, null)
+        }
+
+        return packageUnit.calculateCanonicalPrice(packagePrice, packageQuantity)
+    }
+}
