@@ -1,9 +1,13 @@
 package com.erdees.foodcostcalc.ui.screens.dishes.dishdetails
 
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.domain.model.ScreenState
+import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
 
 class DishPropertySaver {
+
+    private val analyticsRepository: AnalyticsRepository by inject(AnalyticsRepository::class.java)
 
     enum class PropertyType {
         TAX, MARGIN, NAME, TOTAL_PRICE
@@ -19,7 +23,7 @@ class DishPropertySaver {
     fun saveProperty(
         propertyType: PropertyType,
         uiState: DishDetailsUiState,
-        updateUiState: (DishDetailsUiState) -> Unit
+        updateUiState: (DishDetailsUiState) -> Unit,
     ) {
         if (uiState.dish == null) {
             Timber.e("Cannot save property - current dish is null")
@@ -69,7 +73,7 @@ class DishPropertySaver {
                     )
                 } else {
                     uiState.copy(
-                        dish = uiState.dish.withUpdatedTotalPrice(value),
+                        dish = uiState.dish.withUpdatedTotalPrice(value, analyticsRepository),
                         screenState = ScreenState.Idle
                     )
                 }
