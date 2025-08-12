@@ -23,11 +23,8 @@ object Constants {
 
         const val DISH_CREATED = "dish_created"
         const val HALF_PRODUCT_CREATED = "half_product_created"
-        const val PRODUCT_CREATED = "product_created"
         const val PRODUCT_NAME = "product_name"
-        const val PRODUCT_UNIT = "product_unit"
         const val PRODUCT_WASTE = "product_waste"
-        const val PRODUCT_TAX = "product_tax"
         const val PRODUCT_PRICE_PER_UNIT = "product_price_per_unit"
         const val SCREEN_NAME = "screen_name"
         const val NAV_EVENT = "navigation_event"
@@ -86,6 +83,7 @@ object Constants {
         }
 
         object DishV2 {
+            const val UPDATE_TOTAL_PRICE_ZERO_FOOD_COST = "update_total_price_zero_food_cost"
             const val COPY = "dish_copy"
             const val DELETE = "dish_delete_clicked"
             const val DELETED = "dish_deleted"
@@ -113,7 +111,6 @@ object Constants {
             const val ERROR_MESSAGE_RES_ID =
                 "error_message_res_id"
             const val SUGGESTION_SELECTED = "suggestion_selected"
-            const val SUGGESTIONS_MANUALLY_DISMISSED = "suggestions_manually_dismissed"
 
             const val NUMBER_OF_INGREDIENTS = "number_of_ingredients"
             const val DISH_MARGIN = "dish_margin"
@@ -159,7 +156,6 @@ object Constants {
         const val ONBOARDING_STATE = "onboarding_state"
         const val HAS_PROMPTED_DEFAULT_SETTINGS = "has_prompted_default_settings"
     }
-
 
     const val BASIC_MARGIN = 100
     const val BASIC_TAX = 23

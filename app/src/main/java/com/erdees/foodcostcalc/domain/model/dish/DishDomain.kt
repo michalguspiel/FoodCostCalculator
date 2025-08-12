@@ -2,12 +2,14 @@ package com.erdees.foodcostcalc.domain.model.dish
 
 import android.icu.util.Currency
 import androidx.annotation.Keep
+import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
 import com.erdees.foodcostcalc.domain.model.Item
 import com.erdees.foodcostcalc.domain.model.halfProduct.HalfProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.halfProduct.UsedHalfProductDomain
 import com.erdees.foodcostcalc.domain.model.product.ProductAddedToDish
 import com.erdees.foodcostcalc.domain.model.product.UsedProductDomain
 import com.erdees.foodcostcalc.domain.model.recipe.RecipeDomain
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Utils
 import kotlinx.serialization.Serializable
 import timber.log.Timber
@@ -54,19 +56,15 @@ data class DishDomain(
     }
 
     @Suppress("MagicNumber")
-    fun withUpdatedTotalPrice(newTotalPrice: Double): DishDomain {
-        val taxFactor = 1 + taxPercent / PERCENT_MULTIPLIER
-
-        val sellingPriceBeforeTax = newTotalPrice / taxFactor
-        val calculatedMarginPercent: Double = if (foodCost == 0.0) {
-            if (sellingPriceBeforeTax == 0.0) {
-                PERCENT_MULTIPLIER
-            } else {
-                if (sellingPriceBeforeTax > 0) Double.POSITIVE_INFINITY else Double.NEGATIVE_INFINITY
-            }
-        } else {
-            (sellingPriceBeforeTax / foodCost) * PERCENT_MULTIPLIER
+    fun withUpdatedTotalPrice(newTotalPrice: Double, analyticsRepository: AnalyticsRepository): DishDomain {
+        if (foodCost == 0.0) {
+            analyticsRepository.logEvent(Constants.Analytics.DishV2.UPDATE_TOTAL_PRICE_ZERO_FOOD_COST)
+            return this
         }
+
+        val taxFactor = 1 + taxPercent / PERCENT_MULTIPLIER
+        val sellingPriceBeforeTax = newTotalPrice / taxFactor
+        val calculatedMarginPercent = (sellingPriceBeforeTax / foodCost) * PERCENT_MULTIPLIER
 
         return adjustMarginWithCorrectDecimals(calculatedMarginPercent, newTotalPrice)
     }
@@ -98,9 +96,14 @@ data class DishDomain(
         }
 
         Timber.w(
-            "Could not achieve exact total price within TOLERANCE. " +
-                    "Target: $targetTotalPrice, Best Achieved: ${bestAttemptDish.totalPrice} " +
-                    "with margin ${bestAttemptDish.marginPercent} (tried up to ${currentPrecision - 1} decimal points for margin)."
+            """
+            Failed to converge on target total price within tolerance.
+            Target: $targetTotalPrice
+            Best achieved: ${bestAttemptDish.totalPrice}
+            Difference: $closestDifference (Tolerance: $TOLERANCE)
+            Margin used: ${bestAttemptDish.marginPercent}
+            Max precision for margin: ${currentPrecision - 1} decimal points.
+            """.trimIndent()
         )
         return bestAttemptDish
     }
