@@ -24,7 +24,7 @@ android {
 
     namespace = "com.erdees.foodcostcalc"
 
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.erdees.foodcostcalc"
@@ -182,7 +182,6 @@ dependencies {
     implementation(libs.activity.ktx)
 
     // Play Store Review
-    implementation(libs.play.review)
     implementation(libs.play.review.ktx)
 
     // Splashscreen
@@ -202,8 +201,8 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.appcheck)
     implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.analytics.ktx)
-    implementation(libs.firebase.firestore.ktx)
+    implementation(libs.firebase.analytics)
+    implementation(libs.firebase.firestore)
 
     // Ads
     implementation(libs.play.services.ads)
