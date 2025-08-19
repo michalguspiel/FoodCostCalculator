@@ -37,7 +37,6 @@ google-services = "4.4.3"
 ksp = "2.0.10-1.0.24"
 crashlytics = "3.0.6"
 androidx_datastore = "1.1.7"
-firebase_firestore = "26.0.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -86,7 +85,7 @@ serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serializ
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase_bom" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
 firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebase_firestore" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "ads" }
 guava-listenablefuture = { group = "com.google.guava", name = "listenablefuture", version.ref = "guava_listenablefuture" }
 billing-ktx = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
