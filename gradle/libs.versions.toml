@@ -37,7 +37,7 @@ google-services = "4.4.3"
 ksp = "2.0.10-1.0.24"
 crashlytics = "3.0.6"
 androidx_datastore = "1.1.7"
-firebaseFirestoreKtx = "25.1.4"
+firebase_firestore = "26.0.0"
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -75,7 +75,6 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-testing = { group = "androidx.room", name = "room-testing", version.ref = "room" }
 activity-ktx = { group = "androidx.activity", name = "activity-ktx", version.ref = "activity_ktx" }
-play-review = { group = "com.google.android.play", name = "review", version.ref = "review" }
 play-review-ktx = { group = "com.google.android.play", name = "review-ktx", version.ref = "review" }
 core-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "splashscreen" }
 play-services-drive = { group = "com.google.android.gms", name = "play-services-drive", version.ref = "play_services_drive" }
@@ -86,8 +85,8 @@ google-api-services-drive = { group = "com.google.apis", name = "google-api-serv
 serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "serialization_json" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebase_bom" }
 firebase-crashlytics = { group = "com.google.firebase", name = "firebase-crashlytics" }
-firebase-analytics-ktx = { group = "com.google.firebase", name = "firebase-analytics-ktx" }
-firebase-firestore-ktx = { group = "com.google.firebase", name = "firebase-firestore-ktx", version.ref = "firebaseFirestoreKtx" }
+firebase-analytics = { group = "com.google.firebase", name = "firebase-analytics" }
+firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebase_firestore" }
 play-services-ads = { group = "com.google.android.gms", name = "play-services-ads", version.ref = "ads" }
 guava-listenablefuture = { group = "com.google.guava", name = "listenablefuture", version.ref = "guava_listenablefuture" }
 billing-ktx = { group = "com.android.billingclient", name = "billing-ktx", version.ref = "billing" }
