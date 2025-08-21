@@ -16,11 +16,6 @@ sealed class GatedFeature {
     data object PdfExport : GatedFeature()
     
     /**
-     * Advanced analytics feature for detailed cost analysis and reporting.
-     */
-    data object AdvancedAnalytics : GatedFeature()
-    
-    /**
      * Unlimited recipe storage beyond the free tier limits.
      */
     data object UnlimitedRecipes : GatedFeature()
