@@ -192,6 +192,33 @@ class RecipeRepositoryTest {
         coVerify { recipeDao.getRecipeWithSteps(recipeId) }
     }
 
+    @Test
+    fun `upsertRecipeSteps with large number of steps should work correctly`() = runTest {
+        // Given
+        val recipeId = 1L
+        val recipeSteps = (1..10).map { stepNumber ->
+            createTestRecipeStep(0L, recipeId, "Step $stepNumber", stepNumber)
+        }
+
+        // When
+        testRepository.upsertRecipeSteps(recipeSteps)
+
+        // Then
+        coVerify { recipeDao.upsert(recipeSteps) }
+    }
+
+    @Test
+    fun `deleteRecipeStepsByIds with large list should work correctly`() = runTest {
+        // Given
+        val stepIds = (1L..20L).toList()
+
+        // When
+        testRepository.deleteRecipeStepsByIds(stepIds)
+
+        // Then
+        coVerify { recipeDao.deleteRecipeStepsByIds(stepIds) }
+    }
+
     private fun createTestRecipe(id: Long, description: String) = Recipe(
         recipeId = id,
         prepTimeMinutes = 15,

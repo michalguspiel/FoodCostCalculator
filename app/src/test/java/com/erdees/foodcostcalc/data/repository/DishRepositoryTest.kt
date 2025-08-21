@@ -225,6 +225,31 @@ class DishRepositoryTest {
         coVerify { dishDao.addDish(dish) }
     }
 
+    @Test
+    fun `getDishCount should handle zero count`() = runTest {
+        // Given
+        coEvery { dishDao.getDishCount() } returns 0
+
+        // When
+        val result = testRepository.getDishCount()
+
+        // Then
+        result shouldBe 0
+        coVerify { dishDao.getDishCount() }
+    }
+
+    @Test
+    fun `dishes flow should handle empty list`() = runTest {
+        // Given
+        every { dishDao.getCompleteDishes() } returns flowOf(emptyList())
+
+        // When
+        val result = testRepository.dishes.first()
+
+        // Then
+        result shouldBe emptyList()
+    }
+
     private fun createTestDish(id: Long, name: String) = DishBase(
         dishId = id,
         name = name,

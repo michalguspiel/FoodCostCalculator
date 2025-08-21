@@ -182,6 +182,31 @@ class ProductRepositoryTest {
         coVerify { productDishDao.addProductDish(productDish) }
     }
 
+    @Test
+    fun `getProduct with non-existent id should still call dao`() = runTest {
+        // Given
+        val nonExistentId = 999L
+        every { productDao.getProduct(nonExistentId) } returns flowOf()
+
+        // When
+        testRepository.getProduct(nonExistentId)
+
+        // Then - should still call the DAO even if no product exists
+        io.mockk.verify { productDao.getProduct(nonExistentId) }
+    }
+
+    @Test
+    fun `products flow should handle empty list`() = runTest {
+        // Given
+        every { productDao.getProducts() } returns flowOf(emptyList())
+
+        // When
+        val result = testRepository.products.first()
+
+        // Then
+        result shouldBe emptyList()
+    }
+
     private fun createTestProduct(id: Long, name: String) = ProductBase(
         productId = id,
         name = name,

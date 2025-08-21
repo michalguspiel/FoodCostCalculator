@@ -221,6 +221,30 @@ class HalfProductRepositoryTest {
         coVerify { productHalfProductDao.addProductHalfProduct(productHalfProduct) }
     }
 
+    @Test
+    fun `completeHalfProducts flow should handle empty list`() = runTest {
+        // Given
+        every { halfProductDao.getCompleteHalfProducts() } returns flowOf(emptyList())
+
+        // When
+        val result = testRepository.completeHalfProducts.first()
+
+        // Then
+        result shouldBe emptyList()
+    }
+
+    @Test
+    fun `halfProducts flow should handle empty list`() = runTest {
+        // Given
+        every { halfProductDao.getHalfProductBase() } returns flowOf(emptyList())
+
+        // When
+        val result = testRepository.halfProducts.first()
+
+        // Then
+        result shouldBe emptyList()
+    }
+
     private fun createTestHalfProduct(id: Long, name: String) = HalfProductBase(
         halfProductId = id,
         name = name,
