@@ -34,6 +34,8 @@ import com.erdees.foodcostcalc.ui.screens.products.createIngredient.CreateIngred
 import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
+import com.erdees.foodcostcalc.ui.screens.subscriptionScreen.SubscriptionScreen
+import com.erdees.foodcostcalc.ui.screens.loyaltyReward.LoyaltyRewardScreen
 
 @Composable
 fun FCCNavigation(
@@ -146,6 +148,10 @@ fun FCCNavigation(
 
         composable<FCCScreen.Onboarding> {
             OnboardingScreen(navController = navController)
+        }
+
+        composable<FCCScreen.LoyaltyReward> {
+            LoyaltyRewardScreen(navController = navController)
         }
     }
 }

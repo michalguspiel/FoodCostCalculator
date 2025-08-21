@@ -47,6 +47,9 @@ interface Preferences {
 
     val hasPromptedDefaultSettings: Flow<Boolean>
     suspend fun setHasPromptedDefaultSettings(value: Boolean)
+
+    val hasSeenLoyaltyScreen: Flow<Boolean>
+    suspend fun setHasSeenLoyaltyScreen(value: Boolean)
 }
 
 
@@ -72,6 +75,8 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val ONBOARDING_STATE = stringPreferencesKey(Constants.Preferences.ONBOARDING_STATE)
         val HAS_PROMPTED_DEFAULT_SETTINGS =
             booleanPreferencesKey(Constants.Preferences.HAS_PROMPTED_DEFAULT_SETTINGS)
+        val HAS_SEEN_LOYALTY_SCREEN =
+            booleanPreferencesKey(Constants.Preferences.HAS_SEEN_LOYALTY_SCREEN)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -179,5 +184,13 @@ class PreferencesImpl(private val context: Context) : Preferences {
 
     override suspend fun setHasPromptedDefaultSettings(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.HAS_PROMPTED_DEFAULT_SETTINGS] = value }
+    }
+
+    override val hasSeenLoyaltyScreen: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.HAS_SEEN_LOYALTY_SCREEN] ?: false
+    }
+
+    override suspend fun setHasSeenLoyaltyScreen(value: Boolean) {
+        context.dataStore.edit { prefs -> prefs[Keys.HAS_SEEN_LOYALTY_SCREEN] = value }
     }
 }

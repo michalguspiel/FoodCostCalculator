@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavDestination
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.data.repository.AnalyticsRepository
+import com.erdees.foodcostcalc.domain.manager.EntitlementManager
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
 import com.erdees.foodcostcalc.ui.navigation.FCCScreen
 import com.erdees.foodcostcalc.ui.spotlight.Spotlight
@@ -27,6 +28,7 @@ import timber.log.Timber
 class FCCHostScreenViewModel : ViewModel(), KoinComponent {
     private val preferences: Preferences by inject()
     private val analyticsRepository: AnalyticsRepository by inject()
+    private val entitlementManager: EntitlementManager by inject()
     val spotlight: Spotlight by inject()
 
     private val showHalfProducts = preferences.showHalfProducts.stateIn(
@@ -44,13 +46,25 @@ class FCCHostScreenViewModel : ViewModel(), KoinComponent {
 
     private fun getStartingDestination() {
         viewModelScope.launch {
-            val result = onboardingState.filterNotNull().map {
-                when (it) {
-                    OnboardingState.NOT_STARTED -> FCCScreen.Onboarding
-                    else -> FCCScreen.Products
-                }
-            }.first()
-            _startingDestination.update { result }
+            val onboardingStateValue = onboardingState.filterNotNull().first()
+            
+            // First check if onboarding is needed
+            if (onboardingStateValue == OnboardingState.NOT_STARTED) {
+                _startingDestination.update { FCCScreen.Onboarding }
+                return@launch
+            }
+            
+            // Then check if loyalty screen should be shown
+            val isLegacySubscriber = entitlementManager.isLegacySubscriber()
+            val hasSeenLoyaltyScreen = preferences.hasSeenLoyaltyScreen.first()
+            
+            if (isLegacySubscriber && !hasSeenLoyaltyScreen) {
+                _startingDestination.update { FCCScreen.LoyaltyReward }
+                return@launch
+            }
+            
+            // Default to Products screen
+            _startingDestination.update { FCCScreen.Products }
         }
     }
 

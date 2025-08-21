@@ -87,10 +87,42 @@ class EntitlementManager(
      * Determines if a specific "power feature" is available to the user.
      * 
      * @param feature The gated feature to check availability for
-     * @return Flow<Boolean> that emits true if the user is a premium subscriber,
-     * false otherwise. This allows the UI to reactively show/hide "Premium" badges on features.
+     * @return Flow<Boolean> that emits true if the user is a premium subscriber
+     * or a legacy subscriber, false otherwise. This allows the UI to reactively 
+     * show/hide "Premium" badges on features.
      */
     fun isFeatureUnlocked(feature: GatedFeature): Flow<Boolean> {
         return userRepository.userHasActiveSubscription()
+    }
+
+    /**
+     * Determines if a specific "power feature" is available to the user (suspend version).
+     * Checks both premium subscribers and legacy subscribers.
+     * 
+     * @param feature The gated feature to check availability for
+     * @return true if the user has access to the feature (either premium or legacy subscriber)
+     */
+    suspend fun isFeatureUnlockedSuspend(feature: GatedFeature): Boolean {
+        // Check if user has active premium subscription
+        if (userRepository.userHasActiveSubscription().first()) {
+            return true
+        }
+        
+        // Check if user is a legacy subscriber (grandfathered + has subscription)
+        return isLegacySubscriber()
+    }
+
+    /**
+     * Determines if the user is a legacy subscriber who should get premium features for free.
+     * Legacy subscribers are users who:
+     * 1. Installed the app before the grandfathered cutoff date (early supporters)
+     * 2. Have an active subscription (any subscription, including the old ad-free plan)
+     * 
+     * @return true if the user is a legacy subscriber who should get free premium access
+     */
+    suspend fun isLegacySubscriber(): Boolean {
+        // Must be grandfathered (installed before cutoff) AND have active subscription
+        return featureCutOffManager.isGrandfatheredUser() && 
+               userRepository.userHasActiveSubscription().first()
     }
 }

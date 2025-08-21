@@ -79,6 +79,9 @@ sealed class FCCScreen(
     @Serializable
     data object Onboarding : FCCScreen()
 
+    @Serializable
+    data object LoyaltyReward : FCCScreen()
+
     companion object {
         const val IS_COPIED = "isCopied"
         const val DISH_ID_KEY = "dishId"

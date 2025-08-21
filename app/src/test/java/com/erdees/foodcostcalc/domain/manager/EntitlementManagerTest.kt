@@ -54,6 +54,49 @@ class EntitlementManagerTest {
     }
 
     @Test
+    fun `isLegacySubscriber returns true when user is grandfathered and has subscription`() = runTest {
+        // Given
+        every { userRepository.userHasActiveSubscription() } returns flowOf(true)
+        every { featureCutOffManager.isGrandfatheredUser() } returns true
+
+        // When
+        val result = entitlementManager.isLegacySubscriber()
+
+        // Then
+        result shouldBe true
+    }
+
+    @Test
+    fun `isLegacySubscriber returns false when user is grandfathered but has no subscription`() = runTest {
+        // Given
+        every { userRepository.userHasActiveSubscription() } returns flowOf(false)
+        every { featureCutOffManager.isGrandfatheredUser() } returns true
+
+        // When
+        val result = entitlementManager.isLegacySubscriber()
+
+        // Then
+        result shouldBe false
+    }
+
+    @Test
+    fun `isLegacySubscriber returns false when user has subscription but is not grandfathered`() = runTest {
+        // Given
+        every { userRepository.userHasActiveSubscription() } returns flowOf(true)
+        every { featureCutOffManager.isGrandfatheredUser() } returns false
+
+        // When
+        val result = entitlementManager.isLegacySubscriber()
+
+        // Then
+        result shouldBe false
+    }
+
+        // Then
+        result shouldBe true
+    }
+
+    @Test
     fun `canCreateDish returns true when user is under free limit`() = runTest {
         // Given
         every { userRepository.userHasActiveSubscription() } returns flowOf(false)
