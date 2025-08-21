@@ -19,7 +19,7 @@ enum class Feature(val cutOffDate: LocalDate) {
  * Cutoff date for grandfathered users. Users who installed before this date
  * get free access to premium features.
  */
-private val GRANDFATHERED_USER_CUTOFF_DATE = LocalDate.of(2024, Month.DECEMBER, 1)
+private val GRANDFATHERED_USER_CUTOFF_DATE = LocalDate.of(2025, Month.OCTOBER, 1)
 
 @Suppress("MagicNumber")
 class FeatureManagerImpl(

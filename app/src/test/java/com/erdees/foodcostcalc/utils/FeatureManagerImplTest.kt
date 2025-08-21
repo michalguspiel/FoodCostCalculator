@@ -72,7 +72,7 @@ class FeatureManagerImplTest {
     fun `GIVEN firstInstallTime is after grandfathered cutoff isGrandfatheredUser returns false`() {
         // December 15, 2024 (after December 1, 2024 cutoff)
         val firstInstallTime = LocalDate
-            .of(2024, Month.DECEMBER, 15)
+            .of(2025, Month.OCTOBER, 15)
             .atStartOfDay(ZoneId.of("UTC"))
             .toInstant()
             .toEpochMilli()

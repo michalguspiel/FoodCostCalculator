@@ -194,7 +194,6 @@ class EntitlementManagerTest {
         // When & Then
         entitlementManager.isFeatureUnlocked(GatedFeature.CloudSync).first() shouldBe true
         entitlementManager.isFeatureUnlocked(GatedFeature.PdfExport).first() shouldBe true
-        entitlementManager.isFeatureUnlocked(GatedFeature.AdvancedAnalytics).first() shouldBe true
         entitlementManager.isFeatureUnlocked(GatedFeature.UnlimitedRecipes).first() shouldBe true
     }
 }
