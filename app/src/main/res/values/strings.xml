@@ -380,6 +380,21 @@
     <string name="star">star</string>
     <string name="products_missing_error">Can\'t load ingredients, please come back again later.</string>
 
+    <!-- PAYWALL -->
+    <string name="paywall_headline">Unlock Your Full Potential</string>
+    <string name="paywall_subtitle">Go Premium to get access to all the powerful tools you need to run your food business with confidence.</string>
+    <string name="paywall_benefit_unlimited_title">Unlimited Dishes &amp; Half-Products</string>
+    <string name="paywall_benefit_unlimited_desc">Go beyond the free limit and manage your entire menu.</string>
+    <string name="paywall_benefit_export_title">PDF &amp; CSV Export</string>
+    <string name="paywall_benefit_export_desc">Export recipes and cost breakdowns for professional use. (Coming Soon)</string>
+    <string name="paywall_benefit_ad_free_title">Ad-Free Experience</string>
+    <string name="paywall_benefit_ad_free_desc">Focus on your work with a clean, uninterrupted interface.</string>
+    <string name="paywall_upgrade_monthly">Upgrade for %1$s/month</string>
+    <string name="paywall_upgrade_yearly">Upgrade for %1$s/year</string>
+    <string name="paywall_restore_purchases">Restore Purchases</string>
+    <string name="paywall_terms_privacy">Terms of Service &amp; Privacy Policy</string>
+    <string name="paywall_save_percent">Save %1$s%%</string>
+
     <!-- ONBOARDING -->
     <string name="onboarding_welcome_title">Stop Guessing. Start Pricing.</string>
     <string name="onboarding_welcome_subtitle">The smart way to calculate food costs and set winning prices.</string>
