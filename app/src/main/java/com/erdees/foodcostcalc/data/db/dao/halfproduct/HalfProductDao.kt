@@ -32,4 +32,7 @@ interface HalfProductDao {
 
     @Query("DELETE FROM HalfProduct WHERE HalfProductId =:id")
     suspend fun deleteHalfProduct(id: Long)
+
+    @Query("SELECT COUNT(*) FROM HalfProduct")
+    suspend fun getHalfProductCount(): Int
 }
