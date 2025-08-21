@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.utils.di
 
 import android.content.pm.PackageManager
+import com.erdees.foodcostcalc.domain.manager.EntitlementManager
 import com.erdees.foodcostcalc.utils.FeatureManager
 import com.erdees.foodcostcalc.utils.FeatureManagerImpl
 import com.erdees.foodcostcalc.utils.MyDispatchers
@@ -23,5 +24,13 @@ val utilModule = module {
             null
         }
         FeatureManagerImpl(firstInstallTime = firstInstallTime)
+    }
+    single<EntitlementManager> {
+        EntitlementManager(
+            userRepository = get(),
+            dishRepository = get(),
+            halfProductRepository = get(),
+            featureCutOffManager = get()
+        )
     }
 }

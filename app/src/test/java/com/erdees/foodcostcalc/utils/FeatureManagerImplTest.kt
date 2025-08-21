@@ -54,4 +54,37 @@ class FeatureManagerImplTest {
         val result = checker.isFeatureEnabled(Feature.HIDE_PRODUCT_TAX_BY_DEFAULT)
         result shouldBe false
     }
+
+    @Test
+    fun `GIVEN firstInstallTime is before grandfathered cutoff isGrandfatheredUser returns true`() {
+        // November 1, 2024 (before December 1, 2024 cutoff)
+        val firstInstallTime = LocalDate
+            .of(2024, Month.NOVEMBER, 1)
+            .atStartOfDay(ZoneId.of("UTC"))
+            .toInstant()
+            .toEpochMilli()
+        val checker: FeatureManager = FeatureManagerImpl(firstInstallTime = firstInstallTime)
+        val result = checker.isGrandfatheredUser()
+        result shouldBe true
+    }
+
+    @Test
+    fun `GIVEN firstInstallTime is after grandfathered cutoff isGrandfatheredUser returns false`() {
+        // December 15, 2024 (after December 1, 2024 cutoff)
+        val firstInstallTime = LocalDate
+            .of(2025, Month.OCTOBER, 15)
+            .atStartOfDay(ZoneId.of("UTC"))
+            .toInstant()
+            .toEpochMilli()
+        val checker: FeatureManager = FeatureManagerImpl(firstInstallTime = firstInstallTime)
+        val result = checker.isGrandfatheredUser()
+        result shouldBe false
+    }
+
+    @Test
+    fun `GIVEN firstInstallTime is null isGrandfatheredUser returns false`() {
+        val checker: FeatureManager = FeatureManagerImpl(firstInstallTime = null)
+        val result = checker.isGrandfatheredUser()
+        result shouldBe false
+    }
 }
