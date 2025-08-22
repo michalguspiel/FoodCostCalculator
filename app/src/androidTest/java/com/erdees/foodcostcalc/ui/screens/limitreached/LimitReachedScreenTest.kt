@@ -1,13 +1,16 @@
 package com.erdees.foodcostcalc.ui.screens.limitreached
 
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
-import org.junit.Assert.assertEquals
+import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 
@@ -24,9 +27,10 @@ class LimitReachedScreenTest {
     fun limitReachedScreen_displaysRequiredComponents() {
         // Arrange
         val testSubHeadline = "You've successfully created 20 dishes—the maximum for the free plan."
-        
+        var context : Context? = null
         // Act
         composeTestRule.setContent {
+            context = LocalContext.current
             FCCTheme {
                 LimitReachedScreen(
                     subHeadline = testSubHeadline,
@@ -35,13 +39,19 @@ class LimitReachedScreenTest {
                 )
             }
         }
-        
+
+        context ?: throw IllegalStateException("Context is null")
+
         // Assert
-        composeTestRule.onNodeWithText("Wow, You're a Power User!").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.limit_reached_title))
+            .assertIsDisplayed()
         composeTestRule.onNodeWithText(testSubHeadline).assertIsDisplayed()
-        composeTestRule.onNodeWithText("Upgrade to Premium to unlock unlimited dishes, cloud backup, and all professional features.").assertIsDisplayed()
-        composeTestRule.onNodeWithText("See Premium Features").assertIsDisplayed()
-        composeTestRule.onNodeWithContentDescription("Close").assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.limit_reached_description))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithText(context.getString(R.string.limit_reached_button_text))
+            .assertIsDisplayed()
+        composeTestRule.onNodeWithContentDescription(context.getString(R.string.limit_reached_close_description))
+            .assertIsDisplayed()
     }
 
     @Test
@@ -49,9 +59,11 @@ class LimitReachedScreenTest {
         // Arrange
         var dismissCalled = false
         val testSubHeadline = "Test message"
-        
+        var context : Context? = null
+
         // Act
         composeTestRule.setContent {
+            context = LocalContext.current
             FCCTheme {
                 LimitReachedScreen(
                     subHeadline = testSubHeadline,
@@ -60,11 +72,14 @@ class LimitReachedScreenTest {
                 )
             }
         }
-        
-        composeTestRule.onNodeWithContentDescription("Close").performClick()
-        
+
+        context ?: throw IllegalStateException("Context is null")
+
+
+        composeTestRule.onNodeWithContentDescription(context.getString(R.string.limit_reached_close_description)).performClick()
+
         // Assert
-        assertEquals(true, dismissCalled)
+        Assert.assertEquals(true, dismissCalled)
     }
 
     @Test
@@ -72,9 +87,11 @@ class LimitReachedScreenTest {
         // Arrange
         var seePremiumCalled = false
         val testSubHeadline = "Test message"
-        
+        var context : Context? = null
+
         // Act
         composeTestRule.setContent {
+            context = LocalContext.current
             FCCTheme {
                 LimitReachedScreen(
                     subHeadline = testSubHeadline,
@@ -83,18 +100,20 @@ class LimitReachedScreenTest {
                 )
             }
         }
-        
-        composeTestRule.onNodeWithText("See Premium Features").performClick()
-        
+        context ?: throw IllegalStateException("Context is null")
+        composeTestRule.onNodeWithText(context.getString(R.string.limit_reached_button_text))
+            .performClick()
+
         // Assert
-        assertEquals(true, seePremiumCalled)
+        Assert.assertEquals(true, seePremiumCalled)
     }
 
     @Test
     fun limitReachedScreen_displaysCustomSubHeadline() {
         // Arrange
-        val customMessage = "You've successfully created 5 custom items—the maximum for the free plan."
-        
+        val customMessage =
+            "You've successfully created 5 custom items—the maximum for the free plan."
+
         // Act
         composeTestRule.setContent {
             FCCTheme {
@@ -105,27 +124,8 @@ class LimitReachedScreenTest {
                 )
             }
         }
-        
+
         // Assert
         composeTestRule.onNode(hasText(customMessage)).assertIsDisplayed()
-    }
-
-    @Test
-    fun limitReachedScreen_displaysStaticTexts() {
-        // Act
-        composeTestRule.setContent {
-            FCCTheme {
-                LimitReachedScreen(
-                    subHeadline = "Test",
-                    onDismiss = {},
-                    onSeePremium = {}
-                )
-            }
-        }
-        
-        // Assert - Check all static text elements
-        composeTestRule.onNodeWithText("Wow, You're a Power User!").assertIsDisplayed()
-        composeTestRule.onNodeWithText("Upgrade to Premium to unlock unlimited dishes, cloud backup, and all professional features.").assertIsDisplayed()
-        composeTestRule.onNodeWithText("See Premium Features").assertIsDisplayed()
     }
 }
