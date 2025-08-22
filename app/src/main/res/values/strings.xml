@@ -419,4 +419,14 @@
     <string name="create_add_product_title">Create &amp; Add: %1$s</string>
     <string name="add_product_to_dish_title">Add %1$s to %2$s</string>
 
+    <!-- LIMIT REACHED SCREEN -->
+    <string name="limit_reached_title">Wow, You\'re a Power User!</string>
+    <string name="limit_reached_description">Upgrade to Premium to reach the unlimited potential, and all professional features.</string>
+    <string name="limit_reached_button_text">Continue with Premium</string>
+    <string name="limit_reached_close_description">Close</string>
+
+    <!-- Limit Reached Dynamic Messages -->
+    <string name="limit_reached_dishes">You\'ve successfully created %1$d dishes - the maximum for the free plan.</string>
+    <string name="limit_reached_half_products">You\'ve successfully created %1$d half-products - the maximum for the free plan.</string>
+
 </resources>
