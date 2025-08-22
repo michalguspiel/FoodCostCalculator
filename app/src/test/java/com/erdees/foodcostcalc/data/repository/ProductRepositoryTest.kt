@@ -6,24 +6,46 @@ import com.erdees.foodcostcalc.data.model.local.ProductBase
 import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
 import com.erdees.foodcostcalc.domain.model.product.InputMethod
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ProductRepositoryTest {
 
     private val productDao = mockk<ProductDao>(relaxed = true)
     private val productDishDao = mockk<ProductDishDao>(relaxed = true)
-    
+
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     // For testing, we'll create a test implementation that accepts mocked DAOs
     private val testRepository = object : ProductRepository {
-        override val products = productDao.getProducts()
+        override val products get() = productDao.getProducts()
         override suspend fun getProduct(id: Long) = productDao.getProduct(id)
         override suspend fun addProduct(product: ProductBase) = productDao.addProduct(product)
         override suspend fun addProductDish(productDish: ProductDish) = productDishDao.addProductDish(productDish)
@@ -183,16 +205,27 @@ class ProductRepositoryTest {
     }
 
     @Test
-    fun `getProduct with non-existent id should still call dao`() = runTest {
+    fun `getProduct with non-existent id returns null and delegates to dao`() = runTest {
         // Given
         val nonExistentId = 999L
         every { productDao.getProduct(nonExistentId) } returns flowOf()
 
         // When
-        testRepository.getProduct(nonExistentId)
+        val result = testRepository.getProduct(nonExistentId).firstOrNull()
 
-        // Then - should still call the DAO even if no product exists
+        // Then
+        result shouldBe null
         io.mockk.verify { productDao.getProduct(nonExistentId) }
+    }
+
+    @Test
+    fun `addProduct propagates dao exception`() = runTest {
+        // Given
+        val product = createTestProduct(0L, "New Product")
+        coEvery { productDao.addProduct(product) } throws IllegalStateException("db error")
+
+        // When - Then
+        shouldThrow<IllegalStateException> { testRepository.addProduct(product) }
     }
 
     @Test

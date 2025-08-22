@@ -8,25 +8,46 @@ import com.erdees.foodcostcalc.data.model.local.associations.HalfProductDish
 import com.erdees.foodcostcalc.data.model.local.associations.ProductHalfProduct
 import com.erdees.foodcostcalc.data.model.local.joined.CompleteHalfProduct
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class HalfProductRepositoryTest {
 
     private val halfProductDao = mockk<HalfProductDao>(relaxed = true)
     private val halfProductDishDao = mockk<HalfProductDishDao>(relaxed = true)
     private val productHalfProductDao = mockk<ProductHalfProductDao>(relaxed = true)
 
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     // Test implementation that accepts mocked DAOs
     private val testRepository = object : HalfProductRepository {
-        override val completeHalfProducts = halfProductDao.getCompleteHalfProducts()
-        override val halfProducts = halfProductDao.getHalfProductBase()
+        override val completeHalfProducts get() = halfProductDao.getCompleteHalfProducts()
+        override val halfProducts get() = halfProductDao.getHalfProductBase()
         override suspend fun getCompleteHalfProduct(id: Long) = halfProductDao.getCompleteHalfProduct(id)
         override suspend fun addHalfProduct(halfProductBase: HalfProductBase) = halfProductDao.addHalfProduct(halfProductBase)
         override suspend fun addHalfProductDish(halfProductDish: HalfProductDish) = halfProductDishDao.addHalfProductDish(halfProductDish)
@@ -243,6 +264,55 @@ class HalfProductRepositoryTest {
 
         // Then
         result shouldBe emptyList()
+    }
+
+    @Test
+    fun `addHalfProduct propagates dao exception`() = runTest {
+        val halfProduct = createTestHalfProduct(0L, "New Half Product")
+        io.mockk.coEvery { halfProductDao.addHalfProduct(halfProduct) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.addHalfProduct(halfProduct) }
+    }
+
+    @Test
+    fun `addHalfProductDish propagates dao exception`() = runTest {
+        val halfProductDish = createTestHalfProductDish(1L, 2L)
+        io.mockk.coEvery { halfProductDishDao.addHalfProductDish(halfProductDish) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.addHalfProductDish(halfProductDish) }
+    }
+
+    @Test
+    fun `addProductHalfProduct propagates dao exception`() = runTest {
+        val productHalfProduct = createTestProductHalfProduct(1L, 2L)
+        io.mockk.coEvery { productHalfProductDao.addProductHalfProduct(productHalfProduct) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.addProductHalfProduct(productHalfProduct) }
+    }
+
+    @Test
+    fun `updateHalfProduct propagates dao exception`() = runTest {
+        val halfProduct = createTestHalfProduct(1L, "Updated Half Product")
+        io.mockk.coEvery { halfProductDao.editHalfProduct(halfProduct) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.updateHalfProduct(halfProduct) }
+    }
+
+    @Test
+    fun `deleteHalfProduct propagates dao exception`() = runTest {
+        val id = 1L
+        io.mockk.coEvery { halfProductDao.deleteHalfProduct(id) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.deleteHalfProduct(id) }
+    }
+
+    @Test
+    fun `deleteProductHalfProduct propagates dao exception`() = runTest {
+        val php = createTestProductHalfProduct(1L, 2L)
+        io.mockk.coEvery { productHalfProductDao.deleteProductHalfProduct(php) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.deleteProductHalfProduct(php) }
+    }
+
+    @Test
+    fun `updateProductHalfProduct propagates dao exception`() = runTest {
+        val php = createTestProductHalfProduct(1L, 2L)
+        io.mockk.coEvery { productHalfProductDao.updateProductHalfProduct(php) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.updateProductHalfProduct(php) }
     }
 
     private fun createTestHalfProduct(id: Long, name: String) = HalfProductBase(

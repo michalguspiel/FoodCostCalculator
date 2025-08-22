@@ -8,25 +8,46 @@ import com.erdees.foodcostcalc.data.model.local.associations.HalfProductDish
 import com.erdees.foodcostcalc.data.model.local.associations.ProductDish
 import com.erdees.foodcostcalc.data.model.local.joined.CompleteDish
 import com.erdees.foodcostcalc.domain.model.units.MeasurementUnit
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DishRepositoryTest {
 
     private val dishDao = mockk<DishDao>(relaxed = true)
     private val productDishDao = mockk<ProductDishDao>(relaxed = true)
     private val halfProductDishDao = mockk<HalfProductDishDao>(relaxed = true)
 
+    private val testDispatcher = UnconfinedTestDispatcher()
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
+    }
+
     // Test implementation that accepts mocked DAOs
     private val testRepository = object : DishRepository {
-        override val dishes = dishDao.getCompleteDishes()
+        override val dishes get() = dishDao.getCompleteDishes()
         override suspend fun getDish(id: Long) = dishDao.getCompleteDish(id)
         override suspend fun getDishCount() = dishDao.getDishCount()
         override suspend fun addDish(dish: DishBase) = dishDao.addDish(dish)
@@ -248,6 +269,35 @@ class DishRepositoryTest {
 
         // Then
         result shouldBe emptyList()
+    }
+
+    @Test
+    fun `addDish propagates dao exception`() = runTest {
+        val dish = createTestDish(0L, "New Dish")
+        coEvery { dishDao.addDish(dish) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.addDish(dish) }
+    }
+
+    @Test
+    fun `updateDish propagates dao exception`() = runTest {
+        val dish = createTestDish(1L, "Updated Dish")
+        coEvery { dishDao.editDish(dish) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.updateDish(dish) }
+    }
+
+    @Test
+    fun `deleteDish propagates dao exception`() = runTest {
+        val dishId = 1L
+        coEvery { dishDao.deleteDish(dishId) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.deleteDish(dishId) }
+    }
+
+    @Test
+    fun `updateDishRecipe propagates dao exception`() = runTest {
+        val recipeId = 5L
+        val dishId = 10L
+        coEvery { dishDao.update(recipeId, dishId) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.updateDishRecipe(recipeId, dishId) }
     }
 
     private fun createTestDish(id: Long, name: String) = DishBase(

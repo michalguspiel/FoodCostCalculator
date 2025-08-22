@@ -4,6 +4,7 @@ import com.erdees.foodcostcalc.data.db.dao.recipe.RecipeDao
 import com.erdees.foodcostcalc.data.model.local.Recipe
 import com.erdees.foodcostcalc.data.model.local.RecipeStep
 import com.erdees.foodcostcalc.data.model.local.joined.RecipeWithSteps
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.matchers.shouldBe
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -217,6 +218,34 @@ class RecipeRepositoryTest {
 
         // Then
         coVerify { recipeDao.deleteRecipeStepsByIds(stepIds) }
+    }
+
+    @Test
+    fun `upsertRecipe propagates dao exception`() = runTest {
+        val recipe = createTestRecipe(0L, "Test Recipe")
+        coEvery { recipeDao.upsertRecipe(recipe) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.upsertRecipe(recipe) }
+    }
+
+    @Test
+    fun `upsertRecipeSteps propagates dao exception`() = runTest {
+        val steps = listOf(createTestRecipeStep(0L, 1L, "Step", 1))
+        coEvery { recipeDao.upsert(steps) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.upsertRecipeSteps(steps) }
+    }
+
+    @Test
+    fun `getRecipeWithSteps propagates dao exception`() = runTest {
+        val id = 1L
+        coEvery { recipeDao.getRecipeWithSteps(id) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.getRecipeWithSteps(id) }
+    }
+
+    @Test
+    fun `deleteRecipeStepsByIds propagates dao exception`() = runTest {
+        val ids = listOf(1L, 2L)
+        coEvery { recipeDao.deleteRecipeStepsByIds(ids) } throws IllegalStateException("db error")
+        shouldThrow<IllegalStateException> { testRepository.deleteRecipeStepsByIds(ids) }
     }
 
     private fun createTestRecipe(id: Long, description: String) = Recipe(
