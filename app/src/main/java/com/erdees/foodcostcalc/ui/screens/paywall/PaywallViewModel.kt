@@ -1,20 +1,16 @@
 package com.erdees.foodcostcalc.ui.screens.paywall
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.billingclient.api.BillingClient
 import com.android.billingclient.api.ProductDetails
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.Plan
-import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumSubscription
 import com.erdees.foodcostcalc.ext.toPremiumSubscription
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -32,6 +28,15 @@ data object PaywallMissingProductDetails : Error("Product details missing") {
     private fun readResolve(): Any = PaywallMissingProductDetails
 }
 
+sealed class RestoreState {
+    object Idle : RestoreState()
+    object Success : RestoreState()
+    object NoPurchases : RestoreState()
+    data class Error(val message: String) : RestoreState()
+}
+
+
+
 /**
  * Represents the state of the paywall screen.
  *
@@ -44,7 +49,8 @@ data class PaywallUiState(
     val availablePlans: List<Plan> = emptyList(),
     val selectedPlan: Plan? = null,
     val isLoading: Boolean = false,
-    val error: Error? = null
+    val error: Error? = null,
+    val restoreState: RestoreState = RestoreState.Idle,
 ) {
     val monthlyPlan: Plan? = availablePlans.find { it.billingPeriod == "P1M" }
     val yearlyPlan: Plan? = availablePlans.find { it.billingPeriod == "P1Y" }
@@ -75,7 +81,7 @@ class PaywallViewModel : ViewModel(), KoinComponent {
                     
                     _uiState.value = PaywallUiState(
                         availablePlans = plans,
-                        selectedPlan = subscription.yearlyPlan, // Default to yearly for better value
+                        selectedPlan = subscription.yearlyPlan,
                         isLoading = false
                     )
                 } else {
@@ -126,18 +132,29 @@ class PaywallViewModel : ViewModel(), KoinComponent {
     }
 
     fun onRestorePurchases() {
-        // Trigger billing client to check for existing purchases
-        premiumUtil.billingClient?.let { billingClient ->
-            // The restore functionality is handled automatically by the billing client
-            // when checking for existing purchases in PremiumUtil.billingSetup()
-            Timber.i("Restore purchases triggered")
+        _uiState.value = _uiState.value.copy(isLoading = true)
+
+        premiumUtil.restorePurchases { result, hasRestored ->
+            viewModelScope.launch {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+
+                if (result.responseCode == BillingClient.BillingResponseCode.OK) {
+                    if (hasRestored) {
+                        _uiState.value = _uiState.value.copy(restoreState = RestoreState.Success)
+                    } else {
+                        _uiState.value = _uiState.value.copy(restoreState = RestoreState.NoPurchases)
+                    }
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        restoreState = RestoreState.Error("Error: ${result.debugMessage}")
+                    )
+                }
+            }
         }
     }
 
-    fun onTermsAndPrivacyClicked(context: Context) {
-        // This could be implemented to open terms and privacy policy
-        // For now, just log the action
-        Timber.i("Terms and Privacy Policy clicked")
+    fun resetRestoreState() {
+        _uiState.value = _uiState.value.copy(restoreState = RestoreState.Idle)
     }
 
     private fun setError(error: Error) {

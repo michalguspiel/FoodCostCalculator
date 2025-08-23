@@ -434,14 +434,16 @@ private fun SubscriptionScreenContentPreview1() {
             offerIdToken = "fakeOfferIdTokenMonthly",
             billingPeriod = "P1M",
             formattedPrice = "PLN 9.99",
-            currencyCode = "PLN"
+            currencyCode = "PLN",
+            priceInMicros = 9999000L
         ),
         yearlyPlan = Plan(
             id = "premium-mode-yearly-plan",
             offerIdToken = "fakeOfferIdTokenYearly",
             billingPeriod = "P1Y",
             formattedPrice = "PLN 59.99",
-            currencyCode = "PLN"
+            currencyCode = "PLN",
+            priceInMicros = 59990000L
         )
     )
     FCCTheme {
@@ -473,14 +475,16 @@ private fun SubscriptionScreenContentPreview2() {
             offerIdToken = "fakeOfferIdTokenMonthly",
             billingPeriod = "P1M",
             formattedPrice = "PLN 9.99",
-            currencyCode = "PLN"
+            currencyCode = "PLN",
+            priceInMicros = 9990000L
         ),
         yearlyPlan = Plan(
             id = "premium-mode-yearly-plan",
             offerIdToken = "fakeOfferIdTokenYearly",
             billingPeriod = "P1Y",
             formattedPrice = "PLN 59.99",
-            currencyCode = "PLN"
+            currencyCode = "PLN",
+            priceInMicros = 59990000L
         )
     )
     FCCTheme {

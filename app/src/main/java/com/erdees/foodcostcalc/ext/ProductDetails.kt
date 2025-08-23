@@ -41,5 +41,6 @@ fun SubscriptionOfferDetails.toPlan(): Plan {
         billingPeriod = this.pricingPhases.pricingPhaseList.first().billingPeriod,
         formattedPrice = this.pricingPhases.pricingPhaseList.first().formattedPrice,
         currencyCode = this.pricingPhases.pricingPhaseList.first().priceCurrencyCode,
+        priceInMicros = this.pricingPhases.pricingPhaseList.first().priceAmountMicros
     )
 }

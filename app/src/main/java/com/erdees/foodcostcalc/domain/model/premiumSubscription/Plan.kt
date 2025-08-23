@@ -8,5 +8,6 @@ data class Plan(
     val offerIdToken: String,
     val billingPeriod: String,
     val formattedPrice: String,
-    val currencyCode: String
+    val currencyCode: String,
+    val priceInMicros: Long,
 )

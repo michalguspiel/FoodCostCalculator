@@ -386,7 +386,7 @@
     <string name="paywall_benefit_unlimited_title">Unlimited Dishes &amp; Half-Products</string>
     <string name="paywall_benefit_unlimited_desc">Go beyond the free limit and manage your entire menu.</string>
     <string name="paywall_benefit_export_title">PDF &amp; CSV Export</string>
-    <string name="paywall_benefit_export_desc">Export recipes and cost breakdowns for professional use. (Coming Soon)</string>
+    <string name="paywall_benefit_export_desc">Export recipes and cost breakdowns for professional use.</string>
     <string name="paywall_benefit_ad_free_title">Ad-Free Experience</string>
     <string name="paywall_benefit_ad_free_desc">Focus on your work with a clean, uninterrupted interface.</string>
     <string name="paywall_upgrade_monthly">Upgrade for %1$s/month</string>
@@ -444,4 +444,7 @@
     <string name="limit_reached_dishes">You\'ve successfully created %1$d dishes - the maximum for the free plan.</string>
     <string name="limit_reached_half_products">You\'ve successfully created %1$d half-products - the maximum for the free plan.</string>
 
+    <!-- Paywall Screen -->
+    <string name="save_x_percent">(save %1$s%%)</string>
+    <string name="coming_soon">(Coming Soon)</string>
 </resources>
