@@ -109,7 +109,9 @@ private fun SingleChoiceSegmentedButtonRowScope.PlanButton(
             )
 
             Text(
-                text = stringResource(R.string.yearly),
+                text =
+                    if (plan.billingPeriod == "P1M") stringResource(R.string.monthly)
+                    else stringResource(R.string.yearly),
                 style = MaterialTheme.typography.labelLarge
             )
 
