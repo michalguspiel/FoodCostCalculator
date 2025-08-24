@@ -54,6 +54,7 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCDecorativeCircle
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
+import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
@@ -83,10 +84,9 @@ fun PremiumSubscriptionScreen(
                         modifier = Modifier.padding(top = 8.dp),
                         uiState = uiState,
                         onPlanSelected = viewModel::selectPlan,
-                        onUpgradeClicked = { viewModel.onUpgradeClicked(activity) },
+                        onUpgradeClick = { viewModel.onUpgradeClicked(activity) },
                         onRestorePurchases = viewModel::onRestorePurchases,
-                        onTermsAndPrivacyClicked = { launchPrivacyPolicySite(context) },
-                        onErrorAcknowledged = viewModel::acknowledgeError
+                        onTermsAndPrivacyClick = { launchPrivacyPolicySite(context) }
                     )
                 } else {
                     ActiveSubscriptionContent(
@@ -132,7 +132,7 @@ fun PremiumSubscriptionScreen(
 }
 
 private fun launchPrivacyPolicySite(context: Context) {
-    val link = "https://michalguspiel.github.io/Mobile-Privacy-Policy/"
+    val link = Constants.Links.PRIVACY_POLICY
     val intent = Intent(Intent.ACTION_VIEW, link.toUri())
     context.startActivity(intent)
 }
@@ -169,7 +169,7 @@ private fun ActiveSubscriptionContent(uiState: PaywallUiState, modifier: Modifie
 
             ActiveSubscriptionSection()
 
-            BenefitsSection()
+            BenefitsSection(modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.weight(1f))
 
@@ -201,11 +201,12 @@ private fun ActiveSubscriptionContent(uiState: PaywallUiState, modifier: Modifie
 }
 
 @Composable
-private fun ActiveSubscriptionSection() {
+private fun ActiveSubscriptionSection(modifier: Modifier = Modifier) {
     val activeSubscriptionText = stringResource(id = R.string.active_subscription)
     val thankYou = stringResource(id = R.string.happy_cooking)
 
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -245,10 +246,9 @@ private fun ActiveSubscriptionSection() {
 private fun PaywallScreenContent(
     uiState: PaywallUiState,
     onPlanSelected: (Plan) -> Unit,
-    onUpgradeClicked: () -> Unit,
+    onUpgradeClick: () -> Unit,
     onRestorePurchases: () -> Unit,
-    onTermsAndPrivacyClicked: () -> Unit,
-    onErrorAcknowledged: () -> Unit,
+    onTermsAndPrivacyClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier.fillMaxSize()) {
@@ -268,7 +268,7 @@ private fun PaywallScreenContent(
                 ) {
                     HeroSection()
 
-                    BenefitsSection()
+                    BenefitsSection(modifier = Modifier.fillMaxWidth())
                 }
 
                 Spacer(modifier = Modifier.size(16.dp))
@@ -281,13 +281,13 @@ private fun PaywallScreenContent(
                 Spacer(modifier = Modifier.size(16.dp))
                 CTASection(
                     selectedPlan = uiState.selectedPlan,
-                    onUpgradeClicked = onUpgradeClicked,
+                    onUpgradeClick = onUpgradeClick,
                     onRestorePurchases = onRestorePurchases,
-                    onTermsAndPrivacyClicked = onTermsAndPrivacyClicked
+                    onTermsAndPrivacyClick = onTermsAndPrivacyClick
                 )
             }
         } else {
-            SomethingWentWrongContent()
+            SomethingWentWrongContent(modifier = Modifier.fillMaxSize())
         }
 
         if (uiState.isLoading) {
@@ -297,8 +297,9 @@ private fun PaywallScreenContent(
 }
 
 @Composable
-private fun HeroSection() {
+private fun HeroSection(modifier: Modifier = Modifier) {
     Column(
+        modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
@@ -327,8 +328,9 @@ private fun HeroSection() {
 }
 
 @Composable
-private fun BenefitsSection() {
+private fun BenefitsSection(modifier: Modifier = Modifier) {
     Column(
+        modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         BenefitItem(
@@ -409,11 +411,11 @@ private fun BenefitItem(
 
 @Composable
 private fun CTASection(
-    modifier: Modifier = Modifier,
     selectedPlan: Plan?,
-    onUpgradeClicked: () -> Unit,
+    onUpgradeClick: () -> Unit,
     onRestorePurchases: () -> Unit,
-    onTermsAndPrivacyClicked: () -> Unit,
+    onTermsAndPrivacyClick: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -435,7 +437,7 @@ private fun CTASection(
             },
             modifier = Modifier.fillMaxWidth(),
             enabled = selectedPlan != null,
-            onClick = onUpgradeClicked
+            onClick = onUpgradeClick
         )
         Spacer(modifier = Modifier.size(8.dp))
         Row(
@@ -451,7 +453,7 @@ private fun CTASection(
             FCCTextButton(
                 modifier = Modifier.weight(0.5f),
                 text = stringResource(R.string.paywall_terms_privacy),
-                onClick = onTermsAndPrivacyClicked
+                onClick = onTermsAndPrivacyClick
             )
         }
     }
@@ -498,10 +500,9 @@ private fun PaywallScreenContentPreview() {
             PaywallScreenContent(
                 uiState = mockUiState,
                 onPlanSelected = {},
-                onUpgradeClicked = {},
+                onUpgradeClick = {},
                 onRestorePurchases = {},
-                onTermsAndPrivacyClicked = {},
-                onErrorAcknowledged = {}
+                onTermsAndPrivacyClick = {},
             )
         }
     }

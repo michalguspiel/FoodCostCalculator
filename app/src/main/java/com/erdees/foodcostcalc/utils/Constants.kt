@@ -2,6 +2,9 @@ package com.erdees.foodcostcalc.utils
 
 object Constants {
 
+    object Links {
+        const val PRIVACY_POLICY = "https://michalguspiel.github.io/Mobile-Privacy-Policy/"
+    }
 
     object Ads {
         const val PRODUCTS_AD_FREQUENCY = 4
