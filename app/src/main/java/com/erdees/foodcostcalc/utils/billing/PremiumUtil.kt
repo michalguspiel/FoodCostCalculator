@@ -145,6 +145,43 @@ class PremiumUtil(private val preferences: Preferences) {
         billingClient.launchBillingFlow(activity, billingFlowParams)
     }
 
+    /**
+     * Manually triggers a check for existing purchases and provides the result via a callback.
+     * This is intended to be called by a "Restore Purchases" button.
+     *
+     * @param onRestoreFinished A callback that returns the result of the query.
+     */
+    fun restorePurchases(onRestoreFinished: (result: BillingResult, hasRestored: Boolean) -> Unit) {
+        val client = billingClient ?: run {
+            // If the client is null, we can't proceed. Report an error.
+            onRestoreFinished(
+                BillingResult.newBuilder().setResponseCode(BillingResponseCode.BILLING_UNAVAILABLE).build(),
+                false
+            )
+            return
+        }
+
+        val params = QueryPurchasesParams.newBuilder()
+            .setProductType(BillingClient.ProductType.SUBS)
+            .build()
+
+        client.queryPurchasesAsync(params) { billingResult, purchases ->
+            if (billingResult.responseCode == BillingResponseCode.OK && purchases.isNotEmpty()) {
+                CoroutineScope(Dispatchers.IO).launch {
+                    preferences.setUserHasActiveSubscription(true)
+                }
+                Timber.i("Restore successful. User has active subscription.")
+                onRestoreFinished(billingResult, true)
+            } else {
+                CoroutineScope(Dispatchers.IO).launch {
+                    preferences.setUserHasActiveSubscription(false)
+                }
+                Timber.i("Restore finished. No active subscriptions found.")
+                onRestoreFinished(billingResult, false)
+            }
+        }
+    }
+
     companion object {
         const val PRODUCT_ID = "food.cost.calculator.premium.account"
         const val SUBSCRIPTION_MONTHLY_PLAN_ID = "premium-mode-monthly-plan"
