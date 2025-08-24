@@ -28,12 +28,12 @@ import com.erdees.foodcostcalc.ui.screens.halfProducts.addItemToHalfProduct.AddI
 import com.erdees.foodcostcalc.ui.screens.halfProducts.editHalfProduct.EditHalfProductScreen
 import com.erdees.foodcostcalc.ui.screens.onboarding.OnboardingScreen
 import com.erdees.foodcostcalc.ui.screens.onlineBackup.DataBackupScreen
+import com.erdees.foodcostcalc.ui.screens.paywall.PremiumSubscriptionScreen
 import com.erdees.foodcostcalc.ui.screens.products.ProductsScreen
 import com.erdees.foodcostcalc.ui.screens.products.createIngredient.CreateIngredientScreen
 import com.erdees.foodcostcalc.ui.screens.products.editProduct.EditProductScreen
 import com.erdees.foodcostcalc.ui.screens.recipe.RecipeScreen
 import com.erdees.foodcostcalc.ui.screens.settings.SettingsScreen
-import com.erdees.foodcostcalc.ui.screens.subscriptionScreen.SubscriptionScreen
 
 @Composable
 fun FCCNavigation(
@@ -133,7 +133,7 @@ fun FCCNavigation(
         }
 
         composable<FCCScreen.Subscription> {
-            SubscriptionScreen(navController)
+            PremiumSubscriptionScreen(navController)
         }
 
         composable<FCCScreen.FeatureRequest> {

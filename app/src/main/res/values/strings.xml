@@ -377,22 +377,24 @@
     <string name="subscription_extra_desc">Your subscription supports app development.</string>
     <string name="active_subscription">Your Premium subscription is active!</string>
     <string name="active_subscription_thank_you">Thank you for subscribing!</string>
+    <string name="happy_cooking">Happy cooking!</string>
     <string name="star">star</string>
     <string name="products_missing_error">Can\'t load ingredients, please come back again later.</string>
+    <string name="manage_subscription">Manage Subscription</string>
 
     <!-- PAYWALL -->
-    <string name="paywall_headline">Unlock Your Full Potential</string>
-    <string name="paywall_subtitle">Go Premium to get access to all the powerful tools you need to run your food business with confidence.</string>
+    <string name="paywall_headline">Unlock Full Potential</string>
+    <string name="paywall_subtitle">The essential toolkit for your food business.</string>
     <string name="paywall_benefit_unlimited_title">Unlimited Dishes &amp; Half-Products</string>
-    <string name="paywall_benefit_unlimited_desc">Go beyond the free limit and manage your entire menu.</string>
+    <string name="paywall_benefit_unlimited_desc">Go beyond the limit, manage your entire menu.</string>
     <string name="paywall_benefit_export_title">PDF &amp; CSV Export</string>
-    <string name="paywall_benefit_export_desc">Export recipes and cost breakdowns for professional use.</string>
+    <string name="paywall_benefit_export_desc">Export recipes and cost breakdowns.</string>
     <string name="paywall_benefit_ad_free_title">Ad-Free Experience</string>
     <string name="paywall_benefit_ad_free_desc">Focus on your work with a clean, uninterrupted interface.</string>
     <string name="paywall_upgrade_monthly">Upgrade for %1$s/month</string>
     <string name="paywall_upgrade_yearly">Upgrade for %1$s/year</string>
-    <string name="paywall_restore_purchases">Restore Purchases</string>
-    <string name="paywall_terms_privacy">Terms of Service &amp; Privacy Policy</string>
+    <string name="paywall_restore_purchases">Restore Purchase</string>
+    <string name="paywall_terms_privacy">Terms &amp; Privacy</string>
     <string name="paywall_save_percent">Save %1$s%%</string>
 
     <!-- ONBOARDING -->
@@ -445,6 +447,6 @@
     <string name="limit_reached_half_products">You\'ve successfully created %1$d half-products - the maximum for the free plan.</string>
 
     <!-- Paywall Screen -->
-    <string name="save_x_percent">(save %1$s%%)</string>
+    <string name="save_x_percent">save %1$s%%</string>
     <string name="coming_soon">(Coming Soon)</string>
 </resources>
