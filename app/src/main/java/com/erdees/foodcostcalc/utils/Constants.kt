@@ -154,6 +154,7 @@ object Constants {
         const val TAX = "tax"
         const val PREFERRED_CURRENCY_CODE = "preferred_currency"
         const val SUBSCRIPTION_STATE = "subscription_state"
+        const val CURRENT_ACTIVE_SUBSCRIPTION_ID = "current_active_subscription_id"
         const val SHOW_HALF_PRODUCTS = "show_half_products"
         const val SHOW_PRODUCT_TAX_PERCENT = "show_product_tax_percent"
         const val ONBOARDING_STATE = "onboarding_state"

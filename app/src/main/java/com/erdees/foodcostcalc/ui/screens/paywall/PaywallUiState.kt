@@ -1,6 +1,7 @@
 package com.erdees.foodcostcalc.ui.screens.paywall
 
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.Plan
+import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumPlanType
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumSubscription
 
 /**
@@ -8,7 +9,7 @@ import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumSubscript
  */
 data class PaywallUiState(
     val premiumSubscription: PremiumSubscription? = null,
-    val userAlreadySubscribes: Boolean = false,
+    val currentActivePremiumPlanType: PremiumPlanType?,
     val screenLaunchedWithoutSubscription: Boolean,
     val selectedPlan: Plan? = null,
     val isLoading: Boolean = false,

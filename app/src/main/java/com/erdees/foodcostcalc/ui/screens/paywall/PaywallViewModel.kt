@@ -48,15 +48,15 @@ class PaywallViewModel : ViewModel(), KoinComponent {
 
     fun initializeState() {
         viewModelScope.launch {
-            val userHasSub = preferences.userHasActiveSubscription().first()
+            val currentActivePremiumPlan = preferences.currentActivePremiumPlan().first()
             val productDetails = premiumUtil.productDetails.value.firstOrNull()
             cachedProductDetails = productDetails
             val subscription = productDetails?.toPremiumSubscription()
             _uiState.value = PaywallUiState(
                 premiumSubscription = subscription,
                 selectedPlan = subscription?.monthlyPlan,
-                userAlreadySubscribes = userHasSub,
-                screenLaunchedWithoutSubscription = !userHasSub
+                currentActivePremiumPlanType = currentActivePremiumPlan,
+                screenLaunchedWithoutSubscription = currentActivePremiumPlan == null,
             )
         }
         Timber.i("SubscriptionViewModel initialized with state: ${_uiState.value}")
@@ -64,9 +64,9 @@ class PaywallViewModel : ViewModel(), KoinComponent {
 
     private fun observeSubscriptionChanges() {
         viewModelScope.launch {
-            preferences.userHasActiveSubscription().collectLatest { hasSubscription ->
-                Timber.i("Subscription change detected: $hasSubscription")
-                _uiState.value = _uiState.value?.copy(userAlreadySubscribes = hasSubscription)
+            preferences.currentActivePremiumPlan().collectLatest {
+                Timber.i("Subscription change detected: $it")
+                _uiState.value = _uiState.value?.copy(currentActivePremiumPlanType = it)
             }
         }
     }
@@ -105,13 +105,13 @@ class PaywallViewModel : ViewModel(), KoinComponent {
     fun onRestorePurchases() {
         _uiState.value = _uiState.value?.copy(isLoading = true)
 
-        premiumUtil.restorePurchases { result, hasRestored ->
+        premiumUtil.restorePurchases { result, restoredPlan ->
             viewModelScope.launch {
                 _uiState.value = _uiState.value?.copy(isLoading = false)
 
                 if (result.responseCode == BillingClient.BillingResponseCode.OK) {
-                    if (hasRestored) {
-                        _uiState.value = _uiState.value?.copy(restoreState = RestoreState.Success)
+                    if (restoredPlan != null) {
+                        _uiState.value = _uiState.value?.copy(restoreState = RestoreState.Success, currentActivePremiumPlanType = restoredPlan)
                     } else {
                         _uiState.value =
                             _uiState.value?.copy(restoreState = RestoreState.NoPurchases)

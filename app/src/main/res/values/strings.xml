@@ -103,6 +103,7 @@
 
     <string name="confirm">Confirm</string>
     <string name="okay">Okay</string>
+    <string name="done">Done</string>
     <string name="success">Success</string>
     <string name="error">Error</string>
     <string name="back">Back</string>
@@ -381,7 +382,11 @@
     <string name="star">star</string>
     <string name="products_missing_error">Can\'t load ingredients, please come back again later.</string>
     <string name="manage_subscription">Manage Subscription</string>
+    <string name="loyalty_reward_headline">A Gift for Your Loyalty</string>
+    <string name="loyalty_reward_description">As one of our earliest supporters, you\'ve been automatically upgraded to the full Premium plan. You get all new features while keeping your original, lower price, as long as your subscription remains active.</string>
 
+    <string name="no_active_subscriptions">No active subscriptions found.</string>
+    <string name="premium_access_restored">Premium access restored!</string>
     <!-- PAYWALL -->
     <string name="paywall_headline">Unlock Full Potential</string>
     <string name="paywall_subtitle">The essential toolkit for your food business.</string>

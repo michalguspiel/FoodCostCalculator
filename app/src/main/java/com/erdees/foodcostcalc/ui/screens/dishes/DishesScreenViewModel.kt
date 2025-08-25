@@ -40,9 +40,9 @@ class DishesScreenViewModel : FCCBaseViewModel(), KoinComponent {
     private val _askForReview: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val askForReview = _askForReview
 
-    private val adFrequency: StateFlow<Int> = preferences.userHasActiveSubscription()
-        .map { hasSubscription ->
-            if (hasSubscription) Constants.Ads.PREMIUM_FREQUENCY
+    private val adFrequency: StateFlow<Int> = preferences.currentActivePremiumPlan()
+        .map { currentActivePremiumPlan ->
+            if (currentActivePremiumPlan != null) Constants.Ads.PREMIUM_FREQUENCY
             else Constants.Ads.DISHES_AD_FREQUENCY
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Constants.Ads.DISHES_AD_FREQUENCY)
 
