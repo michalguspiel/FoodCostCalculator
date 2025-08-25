@@ -26,9 +26,9 @@ class ProductsScreenViewModel : FCCBaseViewModel(), KoinComponent {
 
     val currency = preferences.currency.stateIn(viewModelScope, SharingStarted.Lazily, null)
 
-    private val adFrequency: StateFlow<Int> = preferences.userHasActiveSubscription()
-        .map { hasSubscription ->
-            if (hasSubscription) Constants.Ads.PREMIUM_FREQUENCY
+    private val adFrequency: StateFlow<Int> = preferences.currentActivePremiumPlan()
+        .map { currentActivePremiumPlan ->
+            if (currentActivePremiumPlan != null) Constants.Ads.PREMIUM_FREQUENCY
             else Constants.Ads.PRODUCTS_AD_FREQUENCY
         }.stateIn(viewModelScope, SharingStarted.Eagerly, Constants.Ads.PRODUCTS_AD_FREQUENCY)
 

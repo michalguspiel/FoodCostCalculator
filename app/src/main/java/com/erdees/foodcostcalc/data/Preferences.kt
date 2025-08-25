@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.erdees.foodcostcalc.domain.model.onboarding.OnboardingState
+import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumPlanType
 import com.erdees.foodcostcalc.ext.dataStore
 import com.erdees.foodcostcalc.utils.Constants
 import com.erdees.foodcostcalc.utils.Feature
@@ -27,8 +28,19 @@ interface Preferences {
     val currency: Flow<Currency?>
     suspend fun setDefaultCurrencyCode(code: String?)
 
+    /**
+     * Returns the currently active premium plan, or null if there is no active plan.
+     * If user has a legacy subscription, it's saved via Keys.SUBSCRIPTION_STATE, it will return [PremiumPlanType.LEGACY].
+     * */
+    fun currentActivePremiumPlan(): Flow<PremiumPlanType?>
+
+    /**
+     * Sets the currently active premium plan. If the plan is null, it clears the active plan.
+     * */
+    suspend fun setCurrentActivePremiumPlan(plan: PremiumPlanType?)
+
+    @Deprecated("Use currentActivePremiumPlan instead")
     fun userHasActiveSubscription(): Flow<Boolean>
-    suspend fun setUserHasActiveSubscription(value: Boolean)
 
     val metricUsed: Flow<Boolean>
     suspend fun setMetricUsed(value: Boolean)
@@ -47,6 +59,9 @@ interface Preferences {
 
     val hasPromptedDefaultSettings: Flow<Boolean>
     suspend fun setHasPromptedDefaultSettings(value: Boolean)
+
+    val hasSeenLoyaltyScreen: Flow<Boolean>
+    suspend fun setHasSeenLoyaltyScreen(value: Boolean)
 }
 
 
@@ -65,6 +80,7 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val DEFAULT_TAX = stringPreferencesKey(Constants.Preferences.TAX)
         val CURRENCY_CODE = stringPreferencesKey(Constants.Preferences.PREFERRED_CURRENCY_CODE)
         val SUBSCRIPTION_STATE = booleanPreferencesKey(Constants.Preferences.SUBSCRIPTION_STATE)
+        val CURRENT_ACTIVE_SUBSCRIPTION_ID = stringPreferencesKey(Constants.Preferences.CURRENT_ACTIVE_SUBSCRIPTION_ID)
         val METRIC = booleanPreferencesKey(Constants.Preferences.METRIC)
         val IMPERIAL = booleanPreferencesKey(Constants.Preferences.IMPERIAL)
         val SHOW_HALF_PRODUCTS = booleanPreferencesKey(Constants.Preferences.SHOW_HALF_PRODUCTS)
@@ -72,6 +88,8 @@ class PreferencesImpl(private val context: Context) : Preferences {
         val ONBOARDING_STATE = stringPreferencesKey(Constants.Preferences.ONBOARDING_STATE)
         val HAS_PROMPTED_DEFAULT_SETTINGS =
             booleanPreferencesKey(Constants.Preferences.HAS_PROMPTED_DEFAULT_SETTINGS)
+        val HAS_SEEN_LOYALTY_SCREEN =
+            booleanPreferencesKey(Constants.Preferences.HAS_SEEN_LOYALTY_SCREEN)
     }
 
     override val defaultCurrencyCode: Flow<String?> = context.dataStore.data.map { prefs ->
@@ -110,15 +128,33 @@ class PreferencesImpl(private val context: Context) : Preferences {
         context.dataStore.edit { prefs -> prefs[Keys.DEFAULT_TAX] = tax }
     }
 
+    @Deprecated("Use currentActivePremiumPlan instead")
     override fun userHasActiveSubscription(): Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[Keys.SUBSCRIPTION_STATE] == true
     }
 
-    override suspend fun setUserHasActiveSubscription(value: Boolean) {
-        context.dataStore.edit { prefs ->
-            prefs[Keys.SUBSCRIPTION_STATE] = value
+    override fun currentActivePremiumPlan(): Flow<PremiumPlanType?> {
+        return context.dataStore.data.map { prefs ->
+            val planId = prefs[Keys.CURRENT_ACTIVE_SUBSCRIPTION_ID]
+
+            val planFromId = planId?.let {
+                runCatching { PremiumPlanType.fromId(it) }.getOrNull()
+            }
+
+            planFromId ?: if (prefs[Keys.SUBSCRIPTION_STATE] == true) {
+                PremiumPlanType.LEGACY
+            } else {
+                null
+            }
         }
-        Timber.i("Subscription state set to $value")
+    }
+
+    override suspend fun setCurrentActivePremiumPlan(plan: PremiumPlanType?) {
+        context.dataStore.edit { prefs ->
+            plan?.productId?.let { productId ->
+                prefs[Keys.CURRENT_ACTIVE_SUBSCRIPTION_ID] = productId
+            } ?: prefs.remove(Keys.CURRENT_ACTIVE_SUBSCRIPTION_ID)
+        }
     }
 
     override val metricUsed: Flow<Boolean> =
@@ -179,5 +215,13 @@ class PreferencesImpl(private val context: Context) : Preferences {
 
     override suspend fun setHasPromptedDefaultSettings(value: Boolean) {
         context.dataStore.edit { prefs -> prefs[Keys.HAS_PROMPTED_DEFAULT_SETTINGS] = value }
+    }
+
+    override val hasSeenLoyaltyScreen: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[Keys.HAS_SEEN_LOYALTY_SCREEN] ?: false
+    }
+
+    override suspend fun setHasSeenLoyaltyScreen(value: Boolean) {
+        context.dataStore.edit { prefs -> prefs[Keys.HAS_SEEN_LOYALTY_SCREEN] = value }
     }
 }

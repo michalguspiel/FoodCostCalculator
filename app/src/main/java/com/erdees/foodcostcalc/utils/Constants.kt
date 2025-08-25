@@ -154,10 +154,12 @@ object Constants {
         const val TAX = "tax"
         const val PREFERRED_CURRENCY_CODE = "preferred_currency"
         const val SUBSCRIPTION_STATE = "subscription_state"
+        const val CURRENT_ACTIVE_SUBSCRIPTION_ID = "current_active_subscription_id"
         const val SHOW_HALF_PRODUCTS = "show_half_products"
         const val SHOW_PRODUCT_TAX_PERCENT = "show_product_tax_percent"
         const val ONBOARDING_STATE = "onboarding_state"
         const val HAS_PROMPTED_DEFAULT_SETTINGS = "has_prompted_default_settings"
+        const val HAS_SEEN_LOYALTY_SCREEN = "has_seen_loyalty_screen"
     }
 
     const val BASIC_MARGIN = 100

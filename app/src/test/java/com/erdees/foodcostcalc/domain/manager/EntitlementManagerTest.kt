@@ -22,7 +22,7 @@ class EntitlementManagerTest {
     private val featureCutOffManager = mockk<FeatureManager>()
 
     private val entitlementManager = EntitlementManager(
-        userRepository = userRepository,
+        preferences = userRepository,
         dishRepository = dishRepository,
         halfProductRepository = halfProductRepository,
         featureCutOffManager = featureCutOffManager

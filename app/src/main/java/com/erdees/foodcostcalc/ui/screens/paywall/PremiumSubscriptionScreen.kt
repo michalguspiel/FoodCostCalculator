@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.erdees.foodcostcalc.R
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.Plan
+import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumPlanType
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumSubscription
 import com.erdees.foodcostcalc.ext.getActivity
 import com.erdees.foodcostcalc.ui.composables.HeroImage
@@ -53,9 +54,9 @@ import com.erdees.foodcostcalc.ui.composables.buttons.FCCPrimaryButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTextButton
 import com.erdees.foodcostcalc.ui.composables.buttons.FCCTopAppBarNavIconButton
 import com.erdees.foodcostcalc.ui.composables.dividers.FCCDecorativeCircle
+import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -79,19 +80,23 @@ fun PremiumSubscriptionScreen(
                 .padding(paddingValues)
         ) {
             if (uiState != null) {
-                if (!uiState.userAlreadySubscribes) {
-                    PaywallScreenContent(
+                when (uiState.currentActivePremiumPlanType) {
+                    PremiumPlanType.UNLIMITED_PREMIUM,
+                    PremiumPlanType.LEGACY,
+                        -> ActiveSubscriptionContent(
+                        modifier = Modifier.padding(top = 8.dp),
+                        uiState = uiState,
+                        planType = uiState.currentActivePremiumPlanType,
+                        onDone = { navController.popBackStack() }
+                    )
+
+                    null -> PaywallScreenContent(
                         modifier = Modifier.padding(top = 8.dp),
                         uiState = uiState,
                         onPlanSelected = viewModel::selectPlan,
                         onUpgradeClick = { viewModel.onUpgradeClicked(activity) },
                         onRestorePurchases = viewModel::onRestorePurchases,
                         onTermsAndPrivacyClick = { launchPrivacyPolicySite(context) }
-                    )
-                } else {
-                    ActiveSubscriptionContent(
-                        modifier = Modifier.padding(top = 8.dp),
-                        uiState = uiState
                     )
                 }
             } else {
@@ -110,12 +115,12 @@ fun PremiumSubscriptionScreen(
     LaunchedEffect(uiState?.restoreState) {
         when (val state = uiState?.restoreState) {
             is RestoreState.Success -> {
-                Toast.makeText(context, "Premium access restored!", Toast.LENGTH_LONG).show()
+                Toast.makeText(context, context.getString(R.string.premium_access_restored), Toast.LENGTH_LONG).show()
                 viewModel.resetRestoreState()
             }
 
             is RestoreState.NoPurchases -> {
-                Toast.makeText(context, "No active subscriptions found.", Toast.LENGTH_LONG)
+                Toast.makeText(context, context.getString(R.string.no_active_subscriptions), Toast.LENGTH_LONG)
                     .show()
                 viewModel.resetRestoreState()
             }
@@ -137,9 +142,9 @@ private fun launchPrivacyPolicySite(context: Context) {
     context.startActivity(intent)
 }
 
-private fun onManageSubscription(context: Context) {
+private fun onManageSubscription(context: Context, currentPremiumPlanType: PremiumPlanType) {
     val link =
-        "https://play.google.com/store/account/subscriptions?sku=${PremiumUtil.PRODUCT_ID}&package=com.erdees.foodcostcalc"
+        "https://play.google.com/store/account/subscriptions?sku=${currentPremiumPlanType.productId}&package=com.erdees.foodcostcalc"
     val intent = Intent(Intent.ACTION_VIEW).apply {
         data = link.toUri()
         setPackage("com.android.vending")
@@ -149,7 +154,12 @@ private fun onManageSubscription(context: Context) {
 }
 
 @Composable
-private fun ActiveSubscriptionContent(uiState: PaywallUiState, modifier: Modifier = Modifier) {
+private fun ActiveSubscriptionContent(
+    uiState: PaywallUiState,
+    planType: PremiumPlanType,
+    modifier: Modifier = Modifier,
+    onDone: () -> Unit,
+) {
     val context = LocalContext.current
     Box(
         modifier = modifier.fillMaxSize()
@@ -167,21 +177,30 @@ private fun ActiveSubscriptionContent(uiState: PaywallUiState, modifier: Modifie
                 modifier = Modifier.size(80.dp),
             )
 
-            ActiveSubscriptionSection()
+            ActiveSubscriptionSection(planType)
 
             BenefitsSection(modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.weight(1f))
 
-            FCCTextButton(
-                text = stringResource(R.string.manage_subscription),
-                onClick = {
-                    onManageSubscription(context)
-                }
-            )
+            ButtonRow(secondaryButton = {
+                FCCTextButton(
+                    text = stringResource(R.string.manage_subscription),
+                    onClick = {
+                        onManageSubscription(context, planType)
+                    }
+                )
+            }, primaryButton = {
+                FCCPrimaryButton(
+                    text = stringResource(R.string.done),
+                    onClick = { onDone() }
+                )
+            })
+
+
         }
 
-        if (uiState.screenLaunchedWithoutSubscription && uiState.userAlreadySubscribes) {
+        if (uiState.screenLaunchedWithoutSubscription && uiState.currentActivePremiumPlanType != null) {
             val party = Party(
                 speed = 0f,
                 maxSpeed = 30f,
@@ -201,7 +220,10 @@ private fun ActiveSubscriptionContent(uiState: PaywallUiState, modifier: Modifie
 }
 
 @Composable
-private fun ActiveSubscriptionSection(modifier: Modifier = Modifier) {
+private fun ActiveSubscriptionSection(
+    premiumPlanType: PremiumPlanType,
+    modifier: Modifier = Modifier,
+) {
     val activeSubscriptionText = stringResource(id = R.string.active_subscription)
     val thankYou = stringResource(id = R.string.happy_cooking)
 
@@ -238,6 +260,24 @@ private fun ActiveSubscriptionSection(modifier: Modifier = Modifier) {
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurface
         )
+
+        if (premiumPlanType == PremiumPlanType.LEGACY) {
+            Spacer(Modifier.size(12.dp))
+            Text(
+                text = stringResource(R.string.loyalty_reward_headline),
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+            Text(
+                text = stringResource(R.string.loyalty_reward_description),
+                style = MaterialTheme.typography.bodyMedium,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+        }
     }
 }
 
@@ -488,7 +528,7 @@ private fun PaywallScreenContentPreview() {
             monthlyPlan = mockMonthlyPlan,
             yearlyPlan = mockYearlyPlan
         ),
-        userAlreadySubscribes = false,
+        currentActivePremiumPlanType = null,
         screenLaunchedWithoutSubscription = false,
         selectedPlan = mockYearlyPlan,
         isLoading = false,
@@ -537,7 +577,7 @@ private fun ActiveSubscriptionContentPreview() {
             monthlyPlan = mockMonthlyPlan,
             yearlyPlan = mockYearlyPlan
         ),
-        userAlreadySubscribes = true,
+        currentActivePremiumPlanType = PremiumPlanType.LEGACY,
         screenLaunchedWithoutSubscription = true,
         selectedPlan = mockYearlyPlan,
         isLoading = false,
@@ -546,7 +586,7 @@ private fun ActiveSubscriptionContentPreview() {
 
     FCCTheme {
         Surface {
-            ActiveSubscriptionContent(uiState = mockUiState)
+            ActiveSubscriptionContent(uiState = mockUiState, planType = PremiumPlanType.LEGACY) {}
         }
     }
 }

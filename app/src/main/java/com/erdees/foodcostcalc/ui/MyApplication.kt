@@ -114,11 +114,11 @@ class MyApplication : Application() {
                 if (billingResult.responseCode == BillingClient.BillingResponseCode.OK) {
                     if (purchase.isEmpty()) {
                         CoroutineScope(Dispatchers.IO).launch {
-                            preferences.setUserHasActiveSubscription(false)
+                            preferences.setCurrentActivePremiumPlan(null)
                         }
                     } else {
                         CoroutineScope(Dispatchers.IO).launch {
-                            preferences.setUserHasActiveSubscription(true)
+                            premiumUtil.setCurrentActivePremiumPlan(purchase)
                         }
                     }
                 }
