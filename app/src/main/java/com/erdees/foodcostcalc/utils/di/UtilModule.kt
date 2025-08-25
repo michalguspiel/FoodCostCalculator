@@ -27,7 +27,7 @@ val utilModule = module {
     }
     single<EntitlementManager> {
         EntitlementManager(
-            userRepository = get(),
+            preferences = get(),
             dishRepository = get(),
             halfProductRepository = get(),
             featureCutOffManager = get()

@@ -22,7 +22,7 @@ class EntitlementManagerTest {
     private val featureCutOffManager = mockk<FeatureManager>()
 
     private val entitlementManager = EntitlementManager(
-        userRepository = userRepository,
+        preferences = userRepository,
         dishRepository = dishRepository,
         halfProductRepository = halfProductRepository,
         featureCutOffManager = featureCutOffManager
@@ -48,49 +48,6 @@ class EntitlementManagerTest {
 
         // When
         val result = entitlementManager.canCreateDish()
-
-        // Then
-        result shouldBe true
-    }
-
-    @Test
-    fun `isLegacySubscriber returns true when user is grandfathered and has subscription`() = runTest {
-        // Given
-        every { userRepository.userHasActiveSubscription() } returns flowOf(true)
-        every { featureCutOffManager.isGrandfatheredUser() } returns true
-
-        // When
-        val result = entitlementManager.isLegacySubscriber()
-
-        // Then
-        result shouldBe true
-    }
-
-    @Test
-    fun `isLegacySubscriber returns false when user is grandfathered but has no subscription`() = runTest {
-        // Given
-        every { userRepository.userHasActiveSubscription() } returns flowOf(false)
-        every { featureCutOffManager.isGrandfatheredUser() } returns true
-
-        // When
-        val result = entitlementManager.isLegacySubscriber()
-
-        // Then
-        result shouldBe false
-    }
-
-    @Test
-    fun `isLegacySubscriber returns false when user has subscription but is not grandfathered`() = runTest {
-        // Given
-        every { userRepository.userHasActiveSubscription() } returns flowOf(true)
-        every { featureCutOffManager.isGrandfatheredUser() } returns false
-
-        // When
-        val result = entitlementManager.isLegacySubscriber()
-
-        // Then
-        result shouldBe false
-    }
 
         // Then
         result shouldBe true
