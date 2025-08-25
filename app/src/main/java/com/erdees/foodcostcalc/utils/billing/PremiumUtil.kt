@@ -99,7 +99,7 @@ class PremiumUtil(private val preferences: Preferences) {
                             .setProductList(
                                 ImmutableList.of(
                                     QueryProductDetailsParams.Product.newBuilder()
-                                        .setProductId(PRODUCT_ID)
+                                        .setProductId(PremiumPlanType.UNLIMITED_PREMIUM.productId)
                                         .setProductType(BillingClient.ProductType.SUBS)
                                         .build()
                                 )
@@ -131,7 +131,7 @@ class PremiumUtil(private val preferences: Preferences) {
         productDetails: ProductDetails,
         selectedOfferToken: String,
         billingClient: BillingClient,
-        activity: Activity
+        activity: Activity,
     ) {
         val productDetailsParamsList = listOf(
             BillingFlowParams.ProductDetailsParams.newBuilder()
@@ -157,7 +157,8 @@ class PremiumUtil(private val preferences: Preferences) {
         val client = billingClient ?: run {
             // If the client is null, we can't proceed. Report an error.
             onRestoreFinished(
-                BillingResult.newBuilder().setResponseCode(BillingResponseCode.BILLING_UNAVAILABLE).build(),
+                BillingResult.newBuilder().setResponseCode(BillingResponseCode.BILLING_UNAVAILABLE)
+                    .build(),
                 null
             )
             return
@@ -190,17 +191,11 @@ class PremiumUtil(private val preferences: Preferences) {
      *
      * @return The [PremiumPlanType] corresponding to the active purchase, or null if not found.
      * */
-    suspend fun setCurrentActivePremiumPlan(purchases: List<Purchase>): PremiumPlanType?{
+    suspend fun setCurrentActivePremiumPlan(purchases: List<Purchase>): PremiumPlanType? {
         val activePurchase = purchases.first()
         val purchasedProductId = activePurchase.products.firstOrNull()
         val premiumPlanType = purchasedProductId?.let { PremiumPlanType.fromId(purchasedProductId) }
         preferences.setCurrentActivePremiumPlan(premiumPlanType)
         return premiumPlanType
-    }
-
-    companion object {
-        const val PRODUCT_ID = "food.cost.calculator.premium.account"
-        const val SUBSCRIPTION_MONTHLY_PLAN_ID = "premium-mode-monthly-plan"
-        const val SUBSCRIPTION_YEARLY_PLAN_ID = "premium-mode-yearly-plan"
     }
 }

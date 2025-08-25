@@ -57,7 +57,6 @@ import com.erdees.foodcostcalc.ui.composables.dividers.FCCDecorativeCircle
 import com.erdees.foodcostcalc.ui.composables.rows.ButtonRow
 import com.erdees.foodcostcalc.ui.theme.FCCTheme
 import com.erdees.foodcostcalc.utils.Constants
-import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.core.Party
 import nl.dionsegijn.konfetti.core.Position
@@ -143,9 +142,9 @@ private fun launchPrivacyPolicySite(context: Context) {
     context.startActivity(intent)
 }
 
-private fun onManageSubscription(context: Context) {
+private fun onManageSubscription(context: Context, currentPremiumPlanType: PremiumPlanType) {
     val link =
-        "https://play.google.com/store/account/subscriptions?sku=${PremiumUtil.PRODUCT_ID}&package=com.erdees.foodcostcalc"
+        "https://play.google.com/store/account/subscriptions?sku=${currentPremiumPlanType.productId}&package=com.erdees.foodcostcalc"
     val intent = Intent(Intent.ACTION_VIEW).apply {
         data = link.toUri()
         setPackage("com.android.vending")
@@ -188,7 +187,7 @@ private fun ActiveSubscriptionContent(
                 FCCTextButton(
                     text = stringResource(R.string.manage_subscription),
                     onClick = {
-                        onManageSubscription(context)
+                        onManageSubscription(context, planType)
                     }
                 )
             }, primaryButton = {

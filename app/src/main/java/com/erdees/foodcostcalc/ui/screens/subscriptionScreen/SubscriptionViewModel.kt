@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.android.billingclient.api.ProductDetails
 import com.erdees.foodcostcalc.data.Preferences
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.Plan
+import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumPlanType
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumSubscription
 import com.erdees.foodcostcalc.ext.toPremiumSubscription
 import com.erdees.foodcostcalc.utils.billing.PremiumUtil
@@ -134,7 +135,7 @@ class SubscriptionViewModel : ViewModel(), KoinComponent {
 
     fun onManageSubscription(context: Context) {
         val link =
-            "https://play.google.com/store/account/subscriptions?sku=${PremiumUtil.PRODUCT_ID}&package=com.erdees.foodcostcalc"
+            "https://play.google.com/store/account/subscriptions?sku=${PremiumPlanType.LEGACY.productId}&package=com.erdees.foodcostcalc"
         val intent = Intent(Intent.ACTION_VIEW).apply {
             data = link.toUri()
             setPackage("com.android.vending")

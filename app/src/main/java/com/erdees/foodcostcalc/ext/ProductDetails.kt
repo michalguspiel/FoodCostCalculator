@@ -3,8 +3,8 @@ package com.erdees.foodcostcalc.ext
 import com.android.billingclient.api.ProductDetails
 import com.android.billingclient.api.ProductDetails.SubscriptionOfferDetails
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.Plan
+import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumPlanType
 import com.erdees.foodcostcalc.domain.model.premiumSubscription.PremiumSubscription
-import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 
 /**
  * Maps ProductDetails to PremiumSubscription.
@@ -14,11 +14,11 @@ import com.erdees.foodcostcalc.utils.billing.PremiumUtil
 fun ProductDetails.toPremiumSubscription(): PremiumSubscription {
     val monthlyPlan =
         this.subscriptionOfferDetails?.find {
-            it.basePlanId == PremiumUtil.SUBSCRIPTION_MONTHLY_PLAN_ID
+            it.basePlanId == PremiumPlanType.UNLIMITED_PREMIUM.monthlyId
         }?.toPlan() ?: throw IllegalStateException("Monthly plan not found")
     val yearlyPlan =
         this.subscriptionOfferDetails?.find {
-            it.basePlanId == PremiumUtil.SUBSCRIPTION_YEARLY_PLAN_ID
+            it.basePlanId == PremiumPlanType.UNLIMITED_PREMIUM.yearlyId
         }?.toPlan() ?: throw IllegalStateException("Yearly plan not found")
     return PremiumSubscription(
         id = this.productId,
